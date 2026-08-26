@@ -33,8 +33,13 @@ anlegen:
 
 | Name | Wert |
 | --- | --- |
-| `VITE_SUPABASE_URL` | `https://cnjrjinyxycdkrmzcime.supabase.co` |
+| `VITE_SUPABASE_URL` | `https://cnjrjinvxycdkrmzcime.supabase.co` |
 | `VITE_SUPABASE_ANON_KEY` | Dein Supabase Publishable key |
+
+Beide Werte **nackt** eintragen — ohne Anführungszeichen, ohne Zeilenumbruch und
+ohne Markdown-Klammern. Ein aus einem gerenderten Dokument kopiertes
+`[https://…](https://…)` ist der häufigste Grund für `ERR_NAME_NOT_RESOLVED`
+im Browser.
 
 Nach dem Push veröffentlicht GitHub Actions die App unter
 `https://DEIN-GITHUB-NAME.github.io/cartwise/`.
@@ -46,7 +51,7 @@ Installiere die Supabase CLI und spiele die Migrationen ein:
 ```cmd
 npm install -g supabase
 supabase login
-supabase link --project-ref cnjrjinyxycdkrmzcime
+supabase link --project-ref cnjrjinvxycdkrmzcime
 supabase db push
 supabase functions deploy get-exchange-rate
 supabase functions deploy set-user-role
