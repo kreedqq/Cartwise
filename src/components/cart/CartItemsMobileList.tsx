@@ -119,8 +119,16 @@ function CartItemCardMobile({
 
         <div className="grid grid-cols-2 gap-2 rounded-md bg-secondary/50 p-2.5 text-sm">
           <div>
-            <p className="text-[11px] text-muted-foreground">Gesamt USD</p>
+            <p className="text-[11px] text-muted-foreground">
+              Gesamt USD
+              {item.applied_price_tier === "bulk" && (
+                <span className="ml-1 font-medium text-primary">· Mengenpreis</span>
+              )}
+            </p>
             <p className="font-semibold tabular-nums">{formatUsd(item.totalUsd)}</p>
+            <p className="text-[10px] text-muted-foreground">
+              {formatUsd(item.unit_price_usd_snapshot)} / Stück
+            </p>
           </div>
           <div className="text-right">
             <p className="text-[11px] text-muted-foreground">Gesamt EUR</p>

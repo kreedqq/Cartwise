@@ -13,6 +13,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { parsePasteLine } from "@/lib/validation";
+import { formatUsd, getEffectiveUnitPrice } from "@/lib/money";
 import { resolveProductsByCodes } from "@/services/products";
 import { useCartItemMutations } from "@/hooks/useCartItems";
 import { toast } from "@/components/ui/toaster";
@@ -135,6 +136,7 @@ export function PasteImportDialog({ open, onOpenChange, cartId, nextPosition, cu
                     <TableHead>Code</TableHead>
                     <TableHead>Artikel</TableHead>
                     <TableHead className="text-right">Menge</TableHead>
+                    <TableHead className="text-right">Einzelpreis</TableHead>
                     <TableHead>Status</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -144,6 +146,11 @@ export function PasteImportDialog({ open, onOpenChange, cartId, nextPosition, cu
                       <TableCell className="font-mono text-xs">{row.code ?? row.raw}</TableCell>
                       <TableCell className="text-xs">{row.product?.name ?? "—"}</TableCell>
                       <TableCell className="text-right tabular-nums text-xs">{row.quantity ?? "—"}</TableCell>
+                      {/* Shows the price this quantity will actually get, so a
+                          bulk threshold is visible before importing. */}
+                      <TableCell className="text-right tabular-nums text-xs">
+                        <UnitPricePreview product={row.product} quantity={row.quantity} />
+                      </TableCell>
                       <TableCell>
                         {row.error ? (
                           <span className="inline-flex items-center gap-1 text-xs font-medium text-destructive">
@@ -184,5 +191,16 @@ export function PasteImportDialog({ open, onOpenChange, cartId, nextPosition, cu
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function UnitPricePreview({ product, quantity }: { product?: Tables<"products">; quantity: number | null }) {
+  if (!product || quantity == null) return <span className="text-muted-foreground">—</span>;
+  const effective = getEffectiveUnitPrice(product, quantity);
+  return (
+    <span>
+      {formatUsd(effective.unitPriceUsd)}
+      {effective.tier === "bulk" && <span className="ml-1 text-[10px] text-primary">Mengenpreis</span>}
+    </span>
   );
 }

@@ -57,7 +57,7 @@ export function PriceUpdateDialog({ open, onOpenChange, cartId, items, currentRa
           .map((item) => {
             const product = products.get(item.product_id as string);
             if (!product) return null;
-            return buildPriceUpdateDiff(item, product.price_usd, currentRate);
+            return buildPriceUpdateDiff(item, product, currentRate);
           })
           .filter((d): d is PriceUpdateDiff => d !== null && d.changed);
         setDiffs(computed);
@@ -81,7 +81,7 @@ export function PriceUpdateDialog({ open, onOpenChange, cartId, items, currentRa
         continue;
       }
       try {
-        await refreshPrice.mutateAsync({ item, currentPriceUsd: product.price_usd, currentRate });
+        await refreshPrice.mutateAsync({ item, product, currentRate });
         succeeded += 1;
       } catch {
         failed += 1;
@@ -132,9 +132,17 @@ export function PriceUpdateDialog({ open, onOpenChange, cartId, items, currentRa
                   {diffs.map((d) => (
                     <TableRow key={d.itemId}>
                       <TableCell className="font-mono text-xs">{d.productCodeSnapshot}</TableCell>
-                      <TableCell className="text-right tabular-nums text-xs">{formatUsd(d.oldUnitPriceUsd)}</TableCell>
+                      <TableCell className="text-right tabular-nums text-xs">
+                        {formatUsd(d.oldUnitPriceUsd)}
+                        {d.oldPriceTier === "bulk" && (
+                          <span className="ml-1 text-[10px] text-muted-foreground">(Mengenpreis)</span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right tabular-nums text-xs font-medium">
                         {formatUsd(d.newUnitPriceUsd)}
+                        {d.newPriceTier === "bulk" && (
+                          <span className="ml-1 text-[10px] font-normal text-muted-foreground">(Mengenpreis)</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-right tabular-nums text-xs">{formatRate(d.oldRate)}</TableCell>
                       <TableCell className="text-right tabular-nums text-xs font-medium">{formatRate(d.newRate)}</TableCell>

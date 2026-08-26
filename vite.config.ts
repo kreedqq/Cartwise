@@ -20,6 +20,9 @@ export default defineConfig({
     },
   },
   test: {
+    // Scoped to the real source tree so a stray copy of the project inside the
+    // working directory can never be picked up as a second, stale test suite.
+    include: ["src/**/*.{test,spec}.{ts,tsx}"],
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/tests/setup.ts"],

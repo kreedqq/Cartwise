@@ -15,8 +15,15 @@ export type CartStatus = "draft" | "ready" | "ordered" | "archived";
 export type ResolutionStatus = "resolved" | "not_found" | "inactive" | "pending";
 export type PdfImportStatus = "uploaded" | "previewed" | "applied" | "failed" | "cancelled";
 export type ImportRowQuality = "ok" | "warning" | "error";
-export type ImportRowAction = "create" | "update" | "skip";
+/**
+ * "auto" hands the create-vs-update decision to apply_pdf_import, which
+ * resolves it by normalized article code at apply time. The explicit values
+ * remain available as a manual override in the import preview.
+ */
+export type ImportRowAction = "auto" | "create" | "update" | "skip";
 export type ImportRowResult = "created" | "updated" | "skipped" | "failed";
+/** Which price tier produced the unit price applied to a cart line. */
+export type PriceTier = "normal" | "bulk";
 
 export interface Database {
   public: {
@@ -52,8 +59,13 @@ export interface Database {
           code: string;
           name: string;
           description: string | null;
+          dosage_vial: string | null;
           category: string | null;
           price_usd: number;
+          /** Optional volume price; NULL together with bulk_price_min_quantity. */
+          bulk_price_usd: number | null;
+          /** Quantity from which bulk_price_usd replaces price_usd for every unit. */
+          bulk_price_min_quantity: number | null;
           currency: "USD";
           is_active: boolean;
           last_price_change_at: string | null;
@@ -74,6 +86,10 @@ export interface Database {
           product_id: string;
           old_price_usd: number | null;
           new_price_usd: number;
+          old_bulk_price_usd: number | null;
+          new_bulk_price_usd: number | null;
+          old_bulk_price_min_quantity: number | null;
+          new_bulk_price_min_quantity: number | null;
           changed_by: string | null;
           changed_at: string;
         };
@@ -114,7 +130,13 @@ export interface Database {
           product_code_snapshot: string | null;
           product_name_snapshot: string | null;
           quantity: number;
+          /** The unit price actually applied (normal or bulk tier). */
           unit_price_usd_snapshot: number | null;
+          /** Frozen catalog normal price, used to re-select the tier on a quantity edit. */
+          normal_price_usd_snapshot: number | null;
+          bulk_price_usd_snapshot: number | null;
+          bulk_price_min_quantity_snapshot: number | null;
+          applied_price_tier: PriceTier | null;
           exchange_rate_snapshot: number | null;
           eur_value_snapshot: number | null;
           price_snapshot_at: string | null;
@@ -181,7 +203,13 @@ export interface Database {
           raw_text: string;
           parsed_code: string | null;
           parsed_name: string | null;
+          parsed_dosage_vial: string | null;
+          parsed_description: string | null;
+          parsed_category: string | null;
           parsed_price_usd: number | null;
+          parsed_bulk_price_usd: number | null;
+          parsed_bulk_price_min_quantity: number | null;
+          parsed_is_active: boolean | null;
           quality: ImportRowQuality;
           quality_reason: string | null;
           action: ImportRowAction | null;

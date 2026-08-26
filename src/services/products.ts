@@ -54,7 +54,9 @@ export async function listAllProducts(params?: { search?: string; category?: str
   let query = supabase.from("products").select("*").order("code", { ascending: true });
 
   if (params?.search) {
-    query = query.or(`code.ilike.%${params.search}%,name.ilike.%${params.search}%`);
+    query = query.or(
+      `code.ilike.%${params.search}%,name.ilike.%${params.search}%,dosage_vial.ilike.%${params.search}%`,
+    );
   }
   if (params?.category) {
     query = query.eq("category", params.category);
@@ -71,25 +73,38 @@ export async function listAllProducts(params?: { search?: string; category?: str
 export interface ProductWriteInput {
   code: string;
   name: string;
+  dosageVial?: string | null;
   description?: string | null;
   category?: string | null;
   priceUsd: number;
+  /** null means "no bulk tier"; always null or set together with the threshold. */
+  bulkPriceUsd?: number | null;
+  bulkPriceMinQuantity?: number | null;
   isActive: boolean;
 }
 
+/**
+ * Maps the form input onto database columns. Kept in one place so create and
+ * update can never disagree about which fields are written - the bulk pair in
+ * particular must always be written together.
+ */
+function toProductColumns(input: ProductWriteInput) {
+  const hasBulk = input.bulkPriceUsd != null && input.bulkPriceMinQuantity != null;
+  return {
+    code: input.code,
+    name: input.name,
+    dosage_vial: input.dosageVial || null,
+    description: input.description || null,
+    category: input.category || null,
+    price_usd: input.priceUsd,
+    bulk_price_usd: hasBulk ? input.bulkPriceUsd : null,
+    bulk_price_min_quantity: hasBulk ? input.bulkPriceMinQuantity : null,
+    is_active: input.isActive,
+  };
+}
+
 export async function createProduct(input: ProductWriteInput): Promise<Tables<"products">> {
-  const { data, error } = await supabase
-    .from("products")
-    .insert({
-      code: input.code,
-      name: input.name,
-      description: input.description || null,
-      category: input.category || null,
-      price_usd: input.priceUsd,
-      is_active: input.isActive,
-    })
-    .select()
-    .single();
+  const { data, error } = await supabase.from("products").insert(toProductColumns(input)).select().single();
   if (error) throw error;
   return data;
 }
@@ -97,14 +112,7 @@ export async function createProduct(input: ProductWriteInput): Promise<Tables<"p
 export async function updateProduct(id: string, input: ProductWriteInput): Promise<Tables<"products">> {
   const { data, error } = await supabase
     .from("products")
-    .update({
-      code: input.code,
-      name: input.name,
-      description: input.description || null,
-      category: input.category || null,
-      price_usd: input.priceUsd,
-      is_active: input.isActive,
-    })
+    .update(toProductColumns(input))
     .eq("id", id)
     .select()
     .single();

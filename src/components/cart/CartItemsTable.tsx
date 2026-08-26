@@ -118,7 +118,24 @@ function CartItemRowDesktop({
         {row.quantityError && <p className="mt-1 text-[11px] text-destructive">{row.quantityError}</p>}
         <SaveStatusIndicator status={row.quantityStatus} className="mt-1 justify-end" />
       </TableCell>
-      <TableCell className="text-right tabular-nums text-sm">{formatUsd(item.unit_price_usd_snapshot)}</TableCell>
+      <TableCell className="text-right tabular-nums text-sm">
+        {formatUsd(item.unit_price_usd_snapshot)}
+        {/* Makes the two-tier price rule self-explanatory: why 55 and not 60. */}
+        {item.applied_price_tier === "bulk" && (
+          <span
+            className="block text-[11px] font-normal text-primary"
+            title={
+              item.bulk_price_min_quantity_snapshot != null
+                ? `Mengenpreis ab ${item.bulk_price_min_quantity_snapshot} Stück (Normalpreis ${formatUsd(
+                    item.normal_price_usd_snapshot,
+                  )})`
+                : "Mengenpreis"
+            }
+          >
+            Mengenpreis
+          </span>
+        )}
+      </TableCell>
       <TableCell className="text-right tabular-nums text-sm font-medium">{formatUsd(item.totalUsd)}</TableCell>
       <TableCell className="text-right tabular-nums text-xs text-muted-foreground">
         {formatRate(item.exchange_rate_snapshot)}

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -11,41 +12,49 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { parseProductCsv, type CsvProductRow } from "@/services/csvProducts";
-import { applyImport, type ReviewedImportRow } from "@/services/pdfImport";
+import { ImportPreviewTable } from "@/components/admin/ImportPreviewTable";
+import { CSV_HEADERS, parseProductCsv } from "@/services/csvProducts";
+import { applyImport } from "@/services/pdfImport";
+import { listAllProducts } from "@/services/products";
 import { toast } from "@/components/ui/toaster";
-import type { ImportRowAction, Tables } from "@/types/database";
+import {
+  applyRowEdit,
+  summarizeReviewRows,
+  toApplyPayload,
+  toReviewRows,
+  type ImportReviewRow,
+} from "@/lib/importReview";
 
 interface ProductCsvImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  existingProducts: Tables<"products">[];
   onImported: () => void;
 }
 
-interface ReviewRow extends CsvProductRow {
-  action: ImportRowAction;
-  targetProductId: string | null;
-}
-
-export function ProductCsvImportDialog({ open, onOpenChange, existingProducts, onImported }: ProductCsvImportDialogProps) {
+/**
+ * The quick path: paste (or pick) a CSV in the product administration. Uses
+ * the same parser, preview table and apply RPC as the full import page, so
+ * both routes write exactly the same fields.
+ */
+export function ProductCsvImportDialog({ open, onOpenChange, onImported }: ProductCsvImportDialogProps) {
   const [text, setText] = React.useState("");
-  const [rows, setRows] = React.useState<ReviewRow[] | null>(null);
+  const [rows, setRows] = React.useState<ImportReviewRow[] | null>(null);
+  const [unknownHeaders, setUnknownHeaders] = React.useState<string[]>([]);
   const [submitting, setSubmitting] = React.useState(false);
 
-  const codeToProduct = React.useMemo(() => {
-    const map = new Map<string, Tables<"products">>();
-    for (const p of existingProducts) map.set(p.code, p);
-    return map;
-  }, [existingProducts]);
+  // The *unfiltered* catalog, so the "neu anlegen vs. aktualisieren" preview is
+  // correct even while a search filter is active in the product table. The
+  // server re-resolves the match anyway; this only keeps the preview honest.
+  const catalogQuery = useQuery({
+    queryKey: ["admin-products-index"],
+    queryFn: () => listAllProducts(),
+    enabled: open,
+  });
+
+  const productIdByCode = React.useMemo(
+    () => new Map((catalogQuery.data ?? []).map((p) => [p.code, p.id] as const)),
+    [catalogQuery.data],
+  );
 
   // Clears the CSV text/preview once the dialog is closed, so reopening it
   // starts fresh rather than showing the previous import's leftovers.
@@ -54,6 +63,7 @@ export function ProductCsvImportDialog({ open, onOpenChange, existingProducts, o
     if (!open) {
       setText("");
       setRows(null);
+      setUnknownHeaders([]);
     }
   }, [open]);
   /* eslint-enable react-hooks/set-state-in-effect */
@@ -66,48 +76,30 @@ export function ProductCsvImportDialog({ open, onOpenChange, existingProducts, o
 
   function handleAnalyze() {
     const parsed = parseProductCsv(text);
-    if (parsed.length === 0) {
-      toast.error("Keine Zeilen erkannt. Erwartete Spalten: code,name,description,category,price_usd,is_active");
+    if (parsed.rows.length === 0) {
+      toast.error(`Keine Datenzeilen erkannt. Erwartete Kopfzeile: ${CSV_HEADERS.join(",")}`);
       return;
     }
-    setRows(
-      parsed.map((row) => {
-        const existing = row.code ? codeToProduct.get(row.code) : undefined;
-        return {
-          ...row,
-          action: row.error ? "skip" : existing ? "update" : "create",
-          targetProductId: existing?.id ?? null,
-        };
-      }),
-    );
+    setUnknownHeaders(parsed.unknownHeaders);
+    setRows(toReviewRows(parsed.rows, productIdByCode));
   }
 
-  function updateAction(index: number, action: ImportRowAction) {
-    setRows((prev) => (prev ? prev.map((r, i) => (i === index ? { ...r, action } : r)) : prev));
+  function handleEdit(index: number, patch: Partial<ImportReviewRow>) {
+    setRows((prev) => (prev ? prev.map((row, i) => (i === index ? applyRowEdit(row, patch, productIdByCode) : row)) : prev));
   }
+
+  const summary = React.useMemo(() => summarizeReviewRows(rows ?? []), [rows]);
 
   async function handleImport() {
     if (!rows) return;
     setSubmitting(true);
     try {
-      const reviewed: ReviewedImportRow[] = rows.map((r) => ({
-        rowNumber: r.rowNumber,
-        rawText: `${r.code ?? ""};${r.name ?? ""};${r.priceUsd ?? ""}`,
-        parsedCode: r.code,
-        parsedName: r.name,
-        parsedPriceUsd: r.priceUsd,
-        quality: r.error ? "error" : "ok",
-        qualityReason: r.error,
-        action: r.action,
-        targetProductId: r.targetProductId,
-      }));
-
       const result = await applyImport({
         filePath: "csv-import:inline",
         fileName: "produkte-import.csv",
         fileSizeBytes: new Blob([text]).size,
         hasTextLayer: null,
-        rows: reviewed,
+        rows: toApplyPayload(rows),
       });
 
       toast.success(
@@ -124,11 +116,14 @@ export function ProductCsvImportDialog({ open, onOpenChange, existingProducts, o
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-6xl">
         <DialogHeader>
           <DialogTitle>Produkte per CSV importieren</DialogTitle>
           <DialogDescription>
-            Erwartete Spalten (Kopfzeile): <code className="rounded bg-secondary px-1 py-0.5">code,name,description,category,price_usd,is_active</code>
+            Erwartete Kopfzeile:{" "}
+            <code className="rounded bg-secondary px-1 py-0.5 text-xs">{CSV_HEADERS.join(",")}</code>. Deutsche
+            Spaltentitel wie „Artikelcode“, „Mengenpreis“ oder „Mengenpreis ab“ werden ebenfalls erkannt, die
+            Spaltenreihenfolge ist beliebig.
           </DialogDescription>
         </DialogHeader>
 
@@ -139,7 +134,7 @@ export function ProductCsvImportDialog({ open, onOpenChange, existingProducts, o
               value={text}
               onChange={(e) => setText(e.target.value)}
               rows={8}
-              placeholder="code,name,description,category,price_usd,is_active"
+              placeholder={CSV_HEADERS.join(",")}
               className="font-mono text-xs"
             />
             <DialogFooter>
@@ -150,58 +145,29 @@ export function ProductCsvImportDialog({ open, onOpenChange, existingProducts, o
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="max-h-96 overflow-y-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead className="text-right">Preis</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Aktion</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {rows.map((row, i) => (
-                    <TableRow key={i}>
-                      <TableCell className="font-mono text-xs">{row.code ?? "—"}</TableCell>
-                      <TableCell className="text-xs">{row.name ?? "—"}</TableCell>
-                      <TableCell className="text-right text-xs">{row.priceUsd ?? "—"}</TableCell>
-                      <TableCell>
-                        {row.error ? (
-                          <span className="inline-flex items-center gap-1 text-xs text-destructive">
-                            <AlertTriangle className="h-3 w-3" /> {row.error}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-success">OK</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={row.action}
-                          onValueChange={(v) => updateAction(i, v as ImportRowAction)}
-                          disabled={!!row.error}
-                        >
-                          <SelectTrigger className="h-8 w-32 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="create">Neu anlegen</SelectItem>
-                            <SelectItem value="update">Aktualisieren</SelectItem>
-                            <SelectItem value="skip">Überspringen</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            {unknownHeaders.length > 0 && (
+              <p className="flex items-start gap-2 rounded-md bg-warning/10 p-2.5 text-xs text-foreground">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" />
+                <span>
+                  Nicht erkannte Spalten werden nicht importiert: <strong>{unknownHeaders.join(", ")}</strong>
+                </span>
+              </p>
+            )}
+
+            <div className="max-h-[26rem] overflow-y-auto">
+              <ImportPreviewTable rows={rows} onEdit={handleEdit} />
             </div>
+
+            <p className="text-xs text-muted-foreground">
+              {summary.applicable} von {summary.total} Zeile(n) werden importiert · {summary.create} neu ·{" "}
+              {summary.update} Aktualisierung(en) · {summary.skip} übersprungen · {summary.error} fehlerhaft.
+            </p>
+
             <DialogFooter>
               <Button variant="outline" onClick={() => setRows(null)}>
                 Zurück
               </Button>
-              <Button onClick={handleImport} loading={submitting}>
+              <Button onClick={handleImport} loading={submitting} disabled={summary.applicable === 0}>
                 Import anwenden
               </Button>
             </DialogFooter>

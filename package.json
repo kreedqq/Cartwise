@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
-    "lint": "eslint .",
+    "lint": "eslint src *.config.js *.config.ts",
     "lint:fast": "oxlint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -38,6 +38,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^6.30.6",
+    "read-excel-file": "^9.3.10",
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.6.0",
     "zod": "^3.25.76"

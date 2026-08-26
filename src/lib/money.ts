@@ -9,6 +9,8 @@
  * rounding behaviour consistent and testable in one place.
  */
 
+import type { PriceTier } from "@/types/database";
+
 export const MAX_QUANTITY = 100_000;
 export const MIN_QUANTITY = 0.001;
 
@@ -36,6 +38,70 @@ export function calculateLineTotalUsd(quantity: number, unitPriceUsd: number): n
   if (!isFiniteNumber(quantity) || !isFiniteNumber(unitPriceUsd)) return null;
   if (quantity <= 0 || unitPriceUsd < 0) return null;
   return roundCurrency(quantity * unitPriceUsd);
+}
+
+/** The product fields that decide which unit price applies to a quantity. */
+export interface PricedProduct {
+  price_usd: number;
+  bulk_price_usd?: number | null;
+  bulk_price_min_quantity?: number | null;
+}
+
+export interface EffectiveUnitPrice {
+  /** The price applied to *every* unit of this quantity. */
+  unitPriceUsd: number;
+  tier: PriceTier;
+  /** The configured bulk tier, or null when the product has none. */
+  bulkPriceUsd: number | null;
+  bulkPriceMinQuantity: number | null;
+}
+
+/**
+ * A bulk tier only counts when both halves are present and plausible. Half a
+ * tier (a price without a threshold, or vice versa) is not interpretable, so
+ * it is treated as "no bulk tier" rather than guessed at - the database
+ * enforces the same pairing via products_bulk_price_pair_chk.
+ */
+export function hasBulkTier(product: PricedProduct): boolean {
+  return (
+    isFiniteNumber(product.bulk_price_usd) &&
+    (product.bulk_price_usd as number) >= 0 &&
+    isFiniteNumber(product.bulk_price_min_quantity) &&
+    (product.bulk_price_min_quantity as number) > 0
+  );
+}
+
+/**
+ * THE single source of truth for "what does one unit cost at this quantity".
+ * Every add, quantity edit, merge, price refresh and preview in the app goes
+ * through this function - there must never be a second place that decides
+ * between the normal and the bulk price.
+ *
+ *   quantity <  bulk_price_min_quantity -> price_usd      (tier "normal")
+ *   quantity >= bulk_price_min_quantity -> bulk_price_usd (tier "bulk")
+ *   no bulk tier configured             -> price_usd      (tier "normal")
+ *
+ * The bulk price replaces the normal price for the whole line, it is not a
+ * graduated surcharge: 12 units at a bulk price of 55 cost 660, not
+ * 9 * 60 + 3 * 55.
+ */
+export function getEffectiveUnitPrice(
+  product: PricedProduct,
+  quantity: number | null | undefined,
+): EffectiveUnitPrice {
+  const bulkAvailable = hasBulkTier(product);
+  const bulkPriceUsd = bulkAvailable ? (product.bulk_price_usd as number) : null;
+  const bulkPriceMinQuantity = bulkAvailable ? (product.bulk_price_min_quantity as number) : null;
+
+  const useBulk =
+    bulkAvailable && isFiniteNumber(quantity) && (quantity as number) >= (bulkPriceMinQuantity as number);
+
+  return {
+    unitPriceUsd: useBulk ? (bulkPriceUsd as number) : product.price_usd,
+    tier: useBulk ? "bulk" : "normal",
+    bulkPriceUsd,
+    bulkPriceMinQuantity,
+  };
 }
 
 /**
@@ -97,6 +163,18 @@ export function formatQuantity(value: number | null | undefined): string {
 export function formatRate(value: number | null | undefined): string {
   if (!isFiniteNumber(value)) return "—";
   return value.toFixed(6);
+}
+
+/**
+ * Short label for a product's bulk tier ("ab 10: USD 55,00"), or null when
+ * the product has no bulk tier. Used in the admin table and the cart to make
+ * the applied price explainable without a second calculation.
+ */
+export function formatBulkTier(product: PricedProduct): string | null {
+  if (!hasBulkTier(product)) return null;
+  return `ab ${formatQuantity(product.bulk_price_min_quantity as number)}: ${formatUsd(
+    product.bulk_price_usd as number,
+  )}`;
 }
 
 const dateTimeFormatter = new Intl.DateTimeFormat("de-DE", {

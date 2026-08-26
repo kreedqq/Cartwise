@@ -1,65 +1,74 @@
 import Papa from "papaparse";
 
-import { normalizeProductCode } from "@/lib/money";
+import {
+  IMPORT_FIELDS,
+  IMPORT_HEADER_LABELS,
+  parseProductTable,
+  type ImportField,
+  type ProductTableParseResult,
+} from "@/lib/productImportRow";
 import type { Tables } from "@/types/database";
 
-export interface CsvProductRow {
-  rowNumber: number;
-  code: string | null;
-  name: string | null;
-  description: string | null;
-  category: string | null;
-  priceUsd: number | null;
-  isActive: boolean;
-  error: string | null;
-}
-
-const EXPECTED_HEADERS = ["code", "name", "description", "category", "price_usd", "is_active"];
+/** The header row written by the export and understood by the import. */
+export const CSV_HEADERS: string[] = IMPORT_FIELDS.map((field) => IMPORT_HEADER_LABELS[field]);
 
 /**
- * Parses a product CSV export/import file. Expected header row:
- * code,name,description,category,price_usd,is_active
+ * Parses a product CSV. The header row is matched against the alias table in
+ * lib/productImportRow, so both the machine-readable export headers
+ * (code,name,dosage_vial,price_usd,bulk_price_usd,bulk_price_min_quantity,
+ * category,description,is_active) and German titles from a supplier price list
+ * ("Artikelcode", "Mengenpreis ab", ...) are accepted in any column order.
+ *
+ * Every recognised column ends up in the returned rows - and therefore in the
+ * import payload. Nothing is parsed and then dropped.
  */
-export function parseProductCsv(text: string): CsvProductRow[] {
-  const result = Papa.parse<Record<string, string>>(text, {
-    header: true,
-    skipEmptyLines: true,
-    transformHeader: (h) => h.trim().toLowerCase(),
-  });
-
-  return result.data.map((raw, index) => {
-    const code = raw.code?.trim() ? normalizeProductCode(raw.code) : null;
-    const name = raw.name?.trim() || null;
-    const priceRaw = raw.price_usd?.trim().replace(",", ".");
-    const priceUsd = priceRaw ? Number(priceRaw) : null;
-    const isActive = raw.is_active == null || raw.is_active.trim() === "" ? true : parseBoolean(raw.is_active);
-
-    let error: string | null = null;
-    if (!code) error = "Artikelcode fehlt.";
-    else if (!name) error = "Name fehlt.";
-    else if (priceUsd == null || !Number.isFinite(priceUsd) || priceUsd < 0) error = "Preis ist ungültig.";
-
-    return {
-      rowNumber: index + 1,
-      code,
-      name,
-      description: raw.description?.trim() || null,
-      category: raw.category?.trim() || null,
-      priceUsd,
-      isActive,
-      error,
-    };
-  });
+export function parseProductCsv(text: string): ProductTableParseResult {
+  const result = Papa.parse<string[]>(text, { skipEmptyLines: true });
+  return parseProductTable(result.data as string[][]);
 }
 
-function parseBoolean(value: string): boolean {
-  return ["true", "1", "yes", "ja", "aktiv"].includes(value.trim().toLowerCase());
+function exportValue(product: Tables<"products">, field: ImportField): string | number | boolean {
+  switch (field) {
+    case "code":
+      return product.code;
+    case "name":
+      return product.name;
+    case "dosageVial":
+      return product.dosage_vial ?? "";
+    case "priceUsd":
+      return product.price_usd;
+    case "bulkPriceUsd":
+      return product.bulk_price_usd ?? "";
+    case "bulkPriceMinQuantity":
+      return product.bulk_price_min_quantity ?? "";
+    case "category":
+      return product.category ?? "";
+    case "description":
+      return product.description ?? "";
+    case "isActive":
+      return product.is_active;
+  }
 }
 
+/** Exports the full catalog in exactly the shape the importer reads back in. */
 export function exportProductsToCsv(products: Tables<"products">[]): string {
   return Papa.unparse({
-    fields: EXPECTED_HEADERS,
-    data: products.map((p) => [p.code, p.name, p.description ?? "", p.category ?? "", p.price_usd, p.is_active]),
+    fields: CSV_HEADERS,
+    data: products.map((product) => IMPORT_FIELDS.map((field) => exportValue(product, field))),
+  });
+}
+
+/**
+ * The header row plus one filled example line, as a starting point for an
+ * import. The example doubles as documentation of the expected value format
+ * (plain decimal prices, a bulk pair, true/false status).
+ */
+export function buildProductCsvTemplate(): string {
+  return Papa.unparse({
+    fields: CSV_HEADERS,
+    data: [
+      ["ART-1001", "Beispielartikel", "10 mg / Vial", "60", "55", "10", "Beispielkategorie", "", "true"],
+    ],
   });
 }
 

@@ -4,13 +4,21 @@ import {
   calculateCartTotals,
   calculateLineTotalUsd,
   convertUsdToEur,
+  formatBulkTier,
   formatEur,
   formatUsd,
+  getEffectiveUnitPrice,
+  hasBulkTier,
   isValidQuantity,
   normalizeProductCode,
   roundCurrency,
   roundHalfUp,
+  type PricedProduct,
 } from "@/lib/money";
+
+/** The worked example from the spec: 1-9 x 60 USD, from 10 on 55 USD. */
+const TIERED = { price_usd: 60, bulk_price_usd: 55, bulk_price_min_quantity: 10 };
+const FLAT = { price_usd: 60, bulk_price_usd: null, bulk_price_min_quantity: null };
 
 describe("roundHalfUp", () => {
   it("rounds .005 up to the next cent (round-half-up, not banker's rounding)", () => {
@@ -46,6 +54,90 @@ describe("calculateLineTotalUsd", () => {
     expect(calculateLineTotalUsd(-1, 10)).toBeNull();
     expect(calculateLineTotalUsd(NaN, 10)).toBeNull();
     expect(calculateLineTotalUsd(1, -5)).toBeNull();
+  });
+});
+
+describe("getEffectiveUnitPrice", () => {
+  it("uses the normal price below the bulk threshold", () => {
+    expect(getEffectiveUnitPrice(TIERED, 1).unitPriceUsd).toBe(60);
+    expect(getEffectiveUnitPrice(TIERED, 7).unitPriceUsd).toBe(60);
+    expect(getEffectiveUnitPrice(TIERED, 9).unitPriceUsd).toBe(60);
+    expect(getEffectiveUnitPrice(TIERED, 9).tier).toBe("normal");
+  });
+
+  it("uses the bulk price from the threshold onwards, for every unit", () => {
+    expect(getEffectiveUnitPrice(TIERED, 10).unitPriceUsd).toBe(55);
+    expect(getEffectiveUnitPrice(TIERED, 12).unitPriceUsd).toBe(55);
+    expect(getEffectiveUnitPrice(TIERED, 1000).unitPriceUsd).toBe(55);
+    expect(getEffectiveUnitPrice(TIERED, 10).tier).toBe("bulk");
+  });
+
+  it("computes the spec's line totals exactly", () => {
+    const total = (quantity: number, product: PricedProduct = TIERED) =>
+      calculateLineTotalUsd(quantity, getEffectiveUnitPrice(product, quantity).unitPriceUsd);
+
+    expect(total(1)).toBe(60);
+    expect(total(9)).toBe(540);
+    expect(total(10)).toBe(550);
+    expect(total(12)).toBe(660);
+    // No bulk tier configured: the normal price applies at any quantity.
+    expect(total(12, FLAT)).toBe(720);
+  });
+
+  it("never applies a graduated price - the bulk price replaces the whole line", () => {
+    // 12 x 55 = 660, not 9 x 60 + 3 x 55 = 705.
+    expect(calculateLineTotalUsd(12, getEffectiveUnitPrice(TIERED, 12).unitPriceUsd)).not.toBe(705);
+  });
+
+  it("falls back to the normal price when only half a bulk tier is present", () => {
+    expect(getEffectiveUnitPrice({ price_usd: 60, bulk_price_usd: 55 }, 20).unitPriceUsd).toBe(60);
+    expect(getEffectiveUnitPrice({ price_usd: 60, bulk_price_min_quantity: 10 }, 20).unitPriceUsd).toBe(60);
+    expect(getEffectiveUnitPrice({ price_usd: 60, bulk_price_usd: 55, bulk_price_min_quantity: 0 }, 20).tier).toBe(
+      "normal",
+    );
+  });
+
+  it("accepts a bulk price of 0 (a giveaway is a valid price, unlike a missing one)", () => {
+    const product = { price_usd: 60, bulk_price_usd: 0, bulk_price_min_quantity: 10 };
+    expect(getEffectiveUnitPrice(product, 10).unitPriceUsd).toBe(0);
+    expect(getEffectiveUnitPrice(product, 9).unitPriceUsd).toBe(60);
+  });
+
+  it("handles fractional thresholds and quantities", () => {
+    const product = { price_usd: 10, bulk_price_usd: 8, bulk_price_min_quantity: 2.5 };
+    expect(getEffectiveUnitPrice(product, 2.499).unitPriceUsd).toBe(10);
+    expect(getEffectiveUnitPrice(product, 2.5).unitPriceUsd).toBe(8);
+  });
+
+  it("keeps the normal price when the quantity is unknown", () => {
+    expect(getEffectiveUnitPrice(TIERED, null).unitPriceUsd).toBe(60);
+    expect(getEffectiveUnitPrice(TIERED, NaN).unitPriceUsd).toBe(60);
+  });
+
+  it("reports the configured tier alongside the applied price", () => {
+    const effective = getEffectiveUnitPrice(TIERED, 3);
+    expect(effective.bulkPriceUsd).toBe(55);
+    expect(effective.bulkPriceMinQuantity).toBe(10);
+  });
+});
+
+describe("hasBulkTier", () => {
+  it("requires both halves of the pair to be present and plausible", () => {
+    expect(hasBulkTier(TIERED)).toBe(true);
+    expect(hasBulkTier(FLAT)).toBe(false);
+    expect(hasBulkTier({ price_usd: 60, bulk_price_usd: 55, bulk_price_min_quantity: 0 })).toBe(false);
+    expect(hasBulkTier({ price_usd: 60, bulk_price_usd: -1, bulk_price_min_quantity: 10 })).toBe(false);
+  });
+});
+
+describe("formatBulkTier", () => {
+  it("describes the tier for the admin table", () => {
+    expect(formatBulkTier(TIERED)).toContain("ab 10");
+    expect(formatBulkTier(TIERED)).toContain("55,00");
+  });
+
+  it("returns null when there is no tier to describe", () => {
+    expect(formatBulkTier(FLAT)).toBeNull();
   });
 });
 

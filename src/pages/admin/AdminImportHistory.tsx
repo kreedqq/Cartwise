@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { EmptyState } from "@/components/common/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getImportRows, listImportHistory } from "@/services/pdfImport";
-import { formatDateTime } from "@/lib/money";
+import { formatDateTime, formatQuantity, formatUsd } from "@/lib/money";
 import type { PdfImportStatus } from "@/types/database";
 
 const STATUS_VARIANT: Record<PdfImportStatus, "secondary" | "success" | "destructive" | "warning" | "outline"> = {
@@ -77,12 +77,18 @@ function ImportRowsDetail({ importId }: { importId: string }) {
           {rowsQuery.isLoading ? (
             <Skeleton className="h-24 w-full" />
           ) : (
-            <Table>
+            <Table className="min-w-[1000px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>#</TableHead>
                   <TableHead>Code</TableHead>
                   <TableHead>Name</TableHead>
+                  <TableHead>Dosage / Vial</TableHead>
+                  <TableHead className="text-right">Normalpreis</TableHead>
+                  <TableHead className="text-right">Mengenpreis</TableHead>
+                  <TableHead className="text-right">ab Menge</TableHead>
+                  <TableHead>Kategorie</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Aktion</TableHead>
                   <TableHead>Ergebnis</TableHead>
                   <TableHead>Meldung</TableHead>
@@ -94,6 +100,22 @@ function ImportRowsDetail({ importId }: { importId: string }) {
                     <TableCell className="text-xs text-muted-foreground">{row.row_number}</TableCell>
                     <TableCell className="font-mono text-xs">{row.parsed_code ?? "—"}</TableCell>
                     <TableCell className="text-xs">{row.parsed_name ?? "—"}</TableCell>
+                    <TableCell className="text-xs">{row.parsed_dosage_vial ?? "—"}</TableCell>
+                    <TableCell className="text-right text-xs tabular-nums">
+                      {formatUsd(row.parsed_price_usd)}
+                    </TableCell>
+                    <TableCell className="text-right text-xs tabular-nums">
+                      {formatUsd(row.parsed_bulk_price_usd)}
+                    </TableCell>
+                    <TableCell className="text-right text-xs tabular-nums">
+                      {row.parsed_bulk_price_min_quantity != null
+                        ? formatQuantity(row.parsed_bulk_price_min_quantity)
+                        : "—"}
+                    </TableCell>
+                    <TableCell className="text-xs">{row.parsed_category ?? "—"}</TableCell>
+                    <TableCell className="text-xs">
+                      {row.parsed_is_active == null ? "—" : row.parsed_is_active ? "Aktiv" : "Inaktiv"}
+                    </TableCell>
                     <TableCell className="text-xs">{row.action ?? "—"}</TableCell>
                     <TableCell className="text-xs">{row.result ?? "—"}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">{row.result_message ?? "—"}</TableCell>

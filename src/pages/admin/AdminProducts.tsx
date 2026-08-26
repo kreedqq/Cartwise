@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Download, MoreVertical, Plus, Search, Upload } from "lucide-react";
+import { Download, FileDown, MoreVertical, Plus, Search, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,8 +27,8 @@ import {
   updateProduct,
   type ProductWriteInput,
 } from "@/services/products";
-import { downloadCsv, exportProductsToCsv } from "@/services/csvProducts";
-import { formatDateTime, formatUsd } from "@/lib/money";
+import { buildProductCsvTemplate, downloadCsv, exportProductsToCsv } from "@/services/csvProducts";
+import { formatBulkTier, formatDateTime, formatUsd } from "@/lib/money";
 import type { Tables } from "@/types/database";
 
 export default function AdminProductsPage() {
@@ -104,13 +104,19 @@ export default function AdminProductsPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Suche nach Code oder Name …"
+            placeholder="Suche nach Code, Name oder Dosage …"
             className="pl-8"
           />
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={() => setCsvOpen(true)}>
             <Upload /> CSV-Import
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => downloadCsv("produkte-vorlage.csv", buildProductCsvTemplate())}
+          >
+            <FileDown /> CSV-Vorlage
           </Button>
           <Button variant="outline" onClick={handleExport} disabled={!productsQuery.data?.length}>
             <Download /> CSV-Export
@@ -138,8 +144,9 @@ export default function AdminProductsPage() {
             <TableRow>
               <TableHead>Code</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Kategorie</TableHead>
+              <TableHead>Dosage / Vial</TableHead>
               <TableHead className="text-right">Preis USD</TableHead>
+              <TableHead>Kategorie</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Letzte Preisänderung</TableHead>
               <TableHead className="text-right">Aktionen</TableHead>
@@ -150,8 +157,18 @@ export default function AdminProductsPage() {
               <TableRow key={product.id}>
                 <TableCell className="font-mono text-xs">{product.code}</TableCell>
                 <TableCell className="text-sm">{product.name}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">{product.dosage_vial ?? "—"}</TableCell>
+                {/* Normal price with the bulk tier as a second line, so the whole
+                    price rule is visible without widening the table by two columns. */}
+                <TableCell className="text-right tabular-nums text-sm">
+                  {formatUsd(product.price_usd)}
+                  {formatBulkTier(product) && (
+                    <span className="block text-[11px] font-normal text-muted-foreground">
+                      {formatBulkTier(product)}
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">{product.category ?? "—"}</TableCell>
-                <TableCell className="text-right tabular-nums text-sm">{formatUsd(product.price_usd)}</TableCell>
                 <TableCell>
                   <Badge variant={product.is_active ? "success" : "secondary"}>
                     {product.is_active ? "Aktiv" : "Inaktiv"}
@@ -193,12 +210,7 @@ export default function AdminProductsPage() {
 
       <ProductFormDialog open={formOpen} onOpenChange={setFormOpen} product={editing} loading={saving} onSubmit={handleSubmit} />
 
-      <ProductCsvImportDialog
-        open={csvOpen}
-        onOpenChange={setCsvOpen}
-        existingProducts={productsQuery.data ?? []}
-        onImported={invalidate}
-      />
+      <ProductCsvImportDialog open={csvOpen} onOpenChange={setCsvOpen} onImported={invalidate} />
 
       <ConfirmDialog
         open={!!deleteTarget}

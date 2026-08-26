@@ -14,6 +14,7 @@ import {
   updateCartItemNote,
   updateCartItemQuantity,
 } from "@/services/cartItems";
+import type { SnapshotSourceProduct } from "@/lib/snapshot";
 import type { Tables } from "@/types/database";
 
 export function useCartItems(cartId: string | undefined) {
@@ -85,13 +86,13 @@ export function useCartItemMutations(cartId: string) {
   const refreshPrice = useMutation({
     mutationFn: ({
       item,
-      currentPriceUsd,
+      product,
       currentRate,
     }: {
       item: Tables<"cart_items">;
-      currentPriceUsd: number;
+      product: SnapshotSourceProduct;
       currentRate: number | null;
-    }) => refreshCartItemPrice(item, currentPriceUsd, currentRate),
+    }) => refreshCartItemPrice(item, product, currentRate),
     onSuccess: invalidate,
   });
 

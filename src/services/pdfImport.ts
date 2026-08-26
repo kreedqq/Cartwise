@@ -1,9 +1,16 @@
 import { supabase } from "@/lib/supabaseClient";
 import { PDF_IMPORT_BUCKET } from "@/lib/constants";
-import type { ParsedImportRow } from "@/pdf/parseProductLines";
+import { contentTypeForImportFile } from "@/services/productImportSource";
+import type { ParsedProductImportRow } from "@/lib/productImportRow";
 import type { ImportRowAction, Tables } from "@/types/database";
 
-export interface ReviewedImportRow extends ParsedImportRow {
+/**
+ * A parsed row plus the decision for it. The default action is "auto": the
+ * create-vs-update choice is then made server-side by apply_pdf_import from
+ * the normalized article code, which also closes the gap between building the
+ * preview and applying it.
+ */
+export interface ReviewedImportRow extends ParsedProductImportRow {
   action: ImportRowAction;
   targetProductId: string | null;
 }
@@ -16,11 +23,11 @@ export interface ApplyImportResult {
   failed: number;
 }
 
-/** Uploads the raw PDF to the private admin-only storage bucket for auditability. */
+/** Uploads the raw import file to the private admin-only bucket for auditability. */
 export async function uploadImportFile(file: File): Promise<string> {
   const path = `admin-uploads/${Date.now()}-${sanitizeFileName(file.name)}`;
   const { error } = await supabase.storage.from(PDF_IMPORT_BUCKET).upload(path, file, {
-    contentType: file.type || "application/pdf",
+    contentType: contentTypeForImportFile(file.name),
     upsert: false,
   });
   if (error) throw error;
@@ -34,7 +41,10 @@ function sanitizeFileName(name: string): string {
 /**
  * Applies a reviewed batch (rows the admin has already inspected/edited and
  * assigned an action to) as one database transaction via the
- * apply_pdf_import RPC (see supabase/migrations/0009_import_rpc.sql).
+ * apply_pdf_import RPC (see supabase/migrations/0014_bulk_pricing.sql).
+ *
+ * Every parsed field travels in the payload, so no imported value is dropped
+ * on the way to the database.
  */
 export async function applyImport(params: {
   filePath: string;
@@ -53,7 +63,13 @@ export async function applyImport(params: {
       raw_text: r.rawText,
       parsed_code: r.parsedCode,
       parsed_name: r.parsedName,
+      parsed_dosage_vial: r.parsedDosageVial,
+      parsed_description: r.parsedDescription,
+      parsed_category: r.parsedCategory,
       parsed_price_usd: r.parsedPriceUsd,
+      parsed_bulk_price_usd: r.parsedBulkPriceUsd,
+      parsed_bulk_price_min_quantity: r.parsedBulkPriceMinQuantity,
+      parsed_is_active: r.parsedIsActive,
       quality: r.quality,
       quality_reason: r.qualityReason,
       action: r.action,

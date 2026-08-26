@@ -1,6 +1,12 @@
 import { supabase } from "@/lib/supabaseClient";
 import { ConcurrencyError } from "@/lib/errors";
-import { buildSnapshot } from "@/lib/snapshot";
+import {
+  buildSnapshot,
+  repriceForQuantity,
+  snapshotToColumns,
+  CLEARED_PRICE_COLUMNS,
+  type SnapshotSourceProduct,
+} from "@/lib/snapshot";
 import { resolveProductByCode, resolveProductsByCodes } from "@/services/products";
 import type { Database, Tables } from "@/types/database";
 
@@ -17,6 +23,8 @@ export async function listCartItems(cartId: string): Promise<Tables<"cart_items"
 /**
  * Adds a new line item: resolves the product code against the catalog and,
  * if found, writes an immediate price snapshot (see docs/KONZEPT.md §5).
+ * The unit price is picked by quantity via getEffectiveUnitPrice, so a line
+ * added with 10 units already carries the bulk price.
  */
 export async function addCartItem(
   cartId: string,
@@ -54,10 +62,7 @@ export async function addCartItem(
       product_id: product.id,
       product_code_snapshot: snapshot.productCodeSnapshot,
       product_name_snapshot: snapshot.productNameSnapshot,
-      unit_price_usd_snapshot: snapshot.unitPriceUsdSnapshot,
-      exchange_rate_snapshot: snapshot.exchangeRateSnapshot,
-      eur_value_snapshot: snapshot.eurValueSnapshot,
-      price_snapshot_at: snapshot.priceSnapshotAt,
+      ...snapshotToColumns(snapshot),
       resolution_status: resolution.status === "inactive" ? "inactive" : "resolved",
     })
     .select()
@@ -80,40 +85,38 @@ export async function reresolveCartItemCode(
     patch.resolution_status = "not_found";
     patch.product_code_snapshot = null;
     patch.product_name_snapshot = null;
-    patch.unit_price_usd_snapshot = null;
-    patch.exchange_rate_snapshot = null;
-    patch.eur_value_snapshot = null;
-    patch.price_snapshot_at = null;
+    Object.assign(patch, CLEARED_PRICE_COLUMNS);
   } else {
     const product = resolution.product!;
+    // A new code means a new price structure, so the tier is re-selected for
+    // the quantity this line already has.
     const snapshot = buildSnapshot(product, item.quantity, currentRate);
     patch.product_id = product.id;
     patch.resolution_status = resolution.status === "inactive" ? "inactive" : "resolved";
     patch.product_code_snapshot = snapshot.productCodeSnapshot;
     patch.product_name_snapshot = snapshot.productNameSnapshot;
-    patch.unit_price_usd_snapshot = snapshot.unitPriceUsdSnapshot;
-    patch.exchange_rate_snapshot = snapshot.exchangeRateSnapshot;
-    patch.eur_value_snapshot = snapshot.eurValueSnapshot;
-    patch.price_snapshot_at = snapshot.priceSnapshotAt;
+    Object.assign(patch, snapshotToColumns(snapshot));
   }
 
   return updateCartItemOptimistic(item.id, item.version, patch);
 }
 
+/**
+ * Changes the quantity of a line and re-selects the price tier from the price
+ * structure frozen on that line.
+ *
+ * This is what makes 7 x 60 = 420 turn into 12 x 55 = 660 when the quantity is
+ * raised past the bulk threshold - and back to 60 when it drops below it. The
+ * tier is re-read from the *snapshot*, never from today's catalog, so a
+ * quantity edit still cannot silently import a newer catalog price (that
+ * remains the job of the explicit "Preise aktualisieren" action).
+ */
 export async function updateCartItemQuantity(
   item: Tables<"cart_items">,
   newQuantity: number,
 ): Promise<Tables<"cart_items">> {
   const patch: Partial<Tables<"cart_items">> = { quantity: newQuantity };
-
-  // Recompute the snapshot total using the *existing* unit price/rate - a
-  // quantity edit alone must not silently refresh the price (that requires
-  // the explicit "Preise aktualisieren" action).
-  if (item.unit_price_usd_snapshot != null) {
-    const totalUsd = Math.round(newQuantity * item.unit_price_usd_snapshot * 100) / 100;
-    patch.eur_value_snapshot =
-      item.exchange_rate_snapshot != null ? Math.round(totalUsd * item.exchange_rate_snapshot * 100) / 100 : null;
-  }
+  Object.assign(patch, repriceForQuantity(item, newQuantity) ?? {});
 
   return updateCartItemOptimistic(item.id, item.version, patch);
 }
@@ -164,24 +167,17 @@ export async function reorderCartItems(items: { id: string; position: number }[]
 
 /**
  * Applies the "Preise aktualisieren" action to one item: pulls the current
- * catalog price + current rate and writes a fresh snapshot. Assumes the
- * caller has already shown the preview/confirmation (see
- * src/lib/snapshot.ts buildPriceUpdateDiff).
+ * catalog price structure + current rate and writes a fresh snapshot, with
+ * the tier resolved for this line's quantity. Assumes the caller has already
+ * shown the preview/confirmation (see src/lib/snapshot.ts buildPriceUpdateDiff).
  */
 export async function refreshCartItemPrice(
   item: Tables<"cart_items">,
-  currentPriceUsd: number,
+  product: SnapshotSourceProduct,
   currentRate: number | null,
 ): Promise<Tables<"cart_items">> {
-  const totalUsd = Math.round(item.quantity * currentPriceUsd * 100) / 100;
-  const eurValue = currentRate != null ? Math.round(totalUsd * currentRate * 100) / 100 : null;
-
-  return updateCartItemOptimistic(item.id, item.version, {
-    unit_price_usd_snapshot: currentPriceUsd,
-    exchange_rate_snapshot: currentRate,
-    eur_value_snapshot: eurValue,
-    price_snapshot_at: new Date().toISOString(),
-  });
+  const snapshot = buildSnapshot(product, item.quantity, currentRate);
+  return updateCartItemOptimistic(item.id, item.version, snapshotToColumns(snapshot));
 }
 
 export interface BulkImportLine {
@@ -193,7 +189,7 @@ export interface BulkImportLine {
  * Used by the "paste multiple lines" / Excel-style bulk import flow.
  * Resolves all codes in one batch query, then inserts all rows in one
  * request, keeping the round trips constant instead of O(n) for large
- * pastes.
+ * pastes. Each line gets its own tier decision based on its own quantity.
  */
 export async function addCartItemsBulk(
   cartId: string,
@@ -224,10 +220,7 @@ export async function addCartItemsBulk(
       resolution_status: product.is_active ? "resolved" : "inactive",
       product_code_snapshot: snapshot.productCodeSnapshot,
       product_name_snapshot: snapshot.productNameSnapshot,
-      unit_price_usd_snapshot: snapshot.unitPriceUsdSnapshot,
-      exchange_rate_snapshot: snapshot.exchangeRateSnapshot,
-      eur_value_snapshot: snapshot.eurValueSnapshot,
-      price_snapshot_at: snapshot.priceSnapshotAt,
+      ...snapshotToColumns(snapshot),
     };
   });
 
@@ -241,6 +234,10 @@ export async function addCartItemsBulk(
  * position) row by summing quantities, then deletes the rest. This is the
  * explicit, user-triggered counterpart to assumption A3 (duplicates are
  * allowed by default, never silently merged) - see docs/KONZEPT.md §1.
+ *
+ * The merged quantity can cross a bulk threshold that none of the individual
+ * lines reached (5 + 7 = 12), so the surviving line is repriced just like a
+ * manual quantity edit.
  */
 export async function mergeDuplicateCartItems(items: Tables<"cart_items">[]): Promise<void> {
   if (items.length < 2) return;
@@ -249,11 +246,7 @@ export async function mergeDuplicateCartItems(items: Tables<"cart_items">[]): Pr
   const totalQuantity = sorted.reduce((sum, i) => sum + i.quantity, 0);
 
   const patch: Partial<Tables<"cart_items">> = { quantity: totalQuantity };
-  if (keep.unit_price_usd_snapshot != null) {
-    const totalUsd = Math.round(totalQuantity * keep.unit_price_usd_snapshot * 100) / 100;
-    patch.eur_value_snapshot =
-      keep.exchange_rate_snapshot != null ? Math.round(totalUsd * keep.exchange_rate_snapshot * 100) / 100 : null;
-  }
+  Object.assign(patch, repriceForQuantity(keep, totalQuantity) ?? {});
 
   const { error: updateError } = await supabase
     .from("cart_items")

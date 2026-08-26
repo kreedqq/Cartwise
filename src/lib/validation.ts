@@ -165,24 +165,103 @@ export function parsePasteLine(line: string): ParsedPasteLine | null {
 
 /** Products (admin) ------------------------------------------------------------ */
 
-export const productFormSchema = z.object({
-  code: productCodeSchema,
-  name: z.string().trim().min(1, "Name wird benötigt.").max(200),
-  description: z.string().max(4000).optional().or(z.literal("")),
-  category: z.string().max(120).optional().or(z.literal("")),
-  priceUsd: z
-    .union([z.number(), z.string()])
-    .transform((v, ctx) => {
-      const num = typeof v === "string" ? Number(v.replace(",", ".")) : v;
+/**
+ * An optional decimal input: an empty field means "not set" (null), not zero.
+ * Used for the bulk price pair, where null and 0 mean very different things.
+ */
+function optionalDecimal(message: string) {
+  return z
+    .union([z.number(), z.string(), z.null(), z.undefined()])
+    .transform((value, ctx): number | null => {
+      if (value === null || value === undefined) return null;
+      if (typeof value === "string" && value.trim() === "") return null;
+      const num = typeof value === "string" ? Number(value.replace(",", ".")) : value;
       if (!Number.isFinite(num)) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Preis muss eine Zahl sein." });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message });
         return z.NEVER;
       }
       return num;
-    })
-    .pipe(z.number().min(0, "Preis darf nicht negativ sein.").max(10_000_000, "Preis ist unplausibel hoch.")),
-  isActive: z.boolean().default(true),
-});
+    });
+}
+
+export const productFormSchema = z
+  .object({
+    code: productCodeSchema,
+    name: z.string().trim().min(1, "Name wird benötigt.").max(200),
+    dosageVial: z.string().trim().max(200, "Dosage / Vial ist zu lang.").optional().or(z.literal("")),
+    description: z.string().max(4000).optional().or(z.literal("")),
+    category: z.string().max(120).optional().or(z.literal("")),
+    priceUsd: z
+      .union([z.number(), z.string()])
+      .transform((v, ctx) => {
+        const num = typeof v === "string" ? Number(v.replace(",", ".")) : v;
+        if (!Number.isFinite(num)) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Preis muss eine Zahl sein." });
+          return z.NEVER;
+        }
+        return num;
+      })
+      .pipe(z.number().min(0, "Preis darf nicht negativ sein.").max(10_000_000, "Preis ist unplausibel hoch.")),
+    bulkPriceUsd: optionalDecimal("Mengenpreis muss eine Zahl sein."),
+    bulkPriceMinQuantity: optionalDecimal('"Mengenpreis ab" muss eine Zahl sein.'),
+    isActive: z.boolean().default(true),
+  })
+  // The bulk tier is only interpretable as a pair, mirroring the database
+  // constraint products_bulk_price_pair_chk.
+  .superRefine((data, ctx) => {
+    if (data.bulkPriceUsd != null && data.bulkPriceMinQuantity == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["bulkPriceMinQuantity"],
+        message: 'Bitte "Mengenpreis ab" angeben, wenn ein Mengenpreis gesetzt ist.',
+      });
+    }
+    if (data.bulkPriceMinQuantity != null && data.bulkPriceUsd == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["bulkPriceUsd"],
+        message: 'Bitte einen Mengenpreis angeben, wenn "Mengenpreis ab" gesetzt ist.',
+      });
+    }
+    if (data.bulkPriceUsd != null && data.bulkPriceUsd < 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["bulkPriceUsd"],
+        message: "Mengenpreis darf nicht negativ sein.",
+      });
+    }
+    if (data.bulkPriceUsd != null && data.bulkPriceUsd > 10_000_000) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["bulkPriceUsd"],
+        message: "Mengenpreis ist unplausibel hoch.",
+      });
+    }
+    if (data.bulkPriceMinQuantity != null && data.bulkPriceMinQuantity <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["bulkPriceMinQuantity"],
+        message: '"Mengenpreis ab" muss größer als 0 sein.',
+      });
+    }
+    if (data.bulkPriceMinQuantity != null && data.bulkPriceMinQuantity > MAX_QUANTITY) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["bulkPriceMinQuantity"],
+        message: `"Mengenpreis ab" darf höchstens ${MAX_QUANTITY.toLocaleString("de-DE")} betragen.`,
+      });
+    }
+    if (
+      data.bulkPriceMinQuantity != null &&
+      Math.round(data.bulkPriceMinQuantity * 1000) !== data.bulkPriceMinQuantity * 1000
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["bulkPriceMinQuantity"],
+        message: '"Mengenpreis ab" darf höchstens 3 Nachkommastellen haben.',
+      });
+    }
+  });
 export type ProductFormInput = z.infer<typeof productFormSchema>;
 
 /** PDF / CSV import rows -------------------------------------------------------- */
@@ -190,14 +269,13 @@ export type ProductFormInput = z.infer<typeof productFormSchema>;
 export const importRowEditSchema = z.object({
   parsedCode: z.string().trim().max(64).optional().or(z.literal("")),
   parsedName: z.string().trim().max(200).optional().or(z.literal("")),
-  parsedPriceUsd: z
-    .union([z.number(), z.string(), z.null()])
-    .transform((v) => {
-      if (v === null || v === "") return null;
-      const num = typeof v === "string" ? Number(v.replace(",", ".")) : v;
-      return Number.isFinite(num) ? num : null;
-    }),
-  action: z.enum(["create", "update", "skip"]),
+  parsedDosageVial: z.string().trim().max(200).optional().or(z.literal("")),
+  parsedCategory: z.string().trim().max(120).optional().or(z.literal("")),
+  parsedPriceUsd: optionalDecimal("Normalpreis muss eine Zahl sein."),
+  parsedBulkPriceUsd: optionalDecimal("Mengenpreis muss eine Zahl sein."),
+  parsedBulkPriceMinQuantity: optionalDecimal('"Mengenpreis ab" muss eine Zahl sein.'),
+  parsedIsActive: z.boolean().nullable(),
+  action: z.enum(["auto", "create", "update", "skip"]),
 });
 export type ImportRowEditInput = z.infer<typeof importRowEditSchema>;
 
