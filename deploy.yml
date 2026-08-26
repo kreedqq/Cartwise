@@ -1,0 +1,90 @@
+name: Build, test & deploy to GitHub Pages
+
+# Runs on every push to main: installs deps, type-checks, lints, runs the
+# unit test suite, builds the production bundle with the correct GitHub
+# Pages base path, then publishes it. A failing check/test/lint/typecheck
+# step stops the deploy - nothing broken ever reaches Pages.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Minimum permissions needed to publish to GitHub Pages via the official
+# actions. Nothing here can touch repo contents beyond checkout.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deployment in flight at a time; a newer push cancels an
+# in-progress older one instead of racing it.
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test -- --run
+
+      - name: Build
+        # VITE_BASE_PATH must match the repository name for a project site
+        # (https://<user>.github.io/<repo>/). If this repo is published at
+        # the root of a user/org site (<user>.github.io) or a custom domain,
+        # set VITE_BASE_PATH to "/" instead (see README "GitHub Pages base
+        # path" section).
+        #
+        # VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are the PUBLIC anon
+        # config only - safe to bake into the static bundle, since all real
+        # access control is enforced by Postgres Row Level Security, not by
+        # keeping this URL/key secret. They still live in GitHub Secrets
+        # (rather than being committed) purely so the repo doesn't hard-code
+        # a specific Supabase project and so they're easy to rotate.
+        # The service-role key is NEVER used here and must never be added as
+        # a GitHub Secret - it only ever lives in Supabase Edge Function
+        # secrets (see README "Secrets" section).
+        env:
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+
+      - name: Inject base path into 404.html SPA fallback
+        run: |
+          sed -i "s#__BASE_PATH__#/${{ github.event.repository.name }}/#g" dist/404.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
