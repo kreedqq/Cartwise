@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Weiterleitung …</title>
+    <script>
+      // GitHub Pages has no server-side rewrites, so a direct hit on a deep
+      // link like /shared-cart-app/carts/123 returns this 404 page instead of
+      // the SPA. We remember the requested path and redirect to the app's
+      // base URL; index.html's inline script then restores the original
+      // path via history.replaceState. Standard "spa-github-pages" trick.
+      //
+      // BASE_PATH is replaced by the deploy workflow (.github/workflows/deploy.yml)
+      // to match the Vite `base` used for the build (e.g. "/shared-cart-app/").
+      // For local `vite preview` / custom-domain root deployments it stays "/".
+      var BASE_PATH = "__BASE_PATH__";
+      sessionStorage.setItem(
+        "spa-redirect",
+        location.pathname + location.search + location.hash,
+      );
+      location.replace(location.origin + BASE_PATH);
+    </script>
+  </head>
+  <body>
+    <p>Weiterleitung zur Anwendung …</p>
+  </body>
+</html>

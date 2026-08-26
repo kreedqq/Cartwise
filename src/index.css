@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 25% 98%;
+    --foreground: 222 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 30% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 30% 12%;
+
+    --primary: 222 65% 32%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 220 20% 94%;
+    --secondary-foreground: 222 30% 18%;
+
+    --muted: 220 18% 94%;
+    --muted-foreground: 220 10% 42%;
+
+    --accent: 199 70% 46%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 210 40% 98%;
+
+    --success: 152 55% 32%;
+    --success-foreground: 152 55% 96%;
+
+    --warning: 38 92% 42%;
+    --warning-foreground: 38 92% 97%;
+
+    --border: 220 16% 88%;
+    --input: 220 16% 88%;
+    --ring: 222 65% 32%;
+
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 222 32% 8%;
+    --foreground: 210 30% 94%;
+
+    --card: 222 28% 11%;
+    --card-foreground: 210 30% 94%;
+
+    --popover: 222 28% 11%;
+    --popover-foreground: 210 30% 94%;
+
+    --primary: 210 80% 62%;
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 222 24% 16%;
+    --secondary-foreground: 210 30% 94%;
+
+    --muted: 222 20% 16%;
+    --muted-foreground: 220 12% 65%;
+
+    --accent: 199 80% 55%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 210 30% 96%;
+
+    --success: 152 50% 45%;
+    --success-foreground: 152 50% 97%;
+
+    --warning: 38 90% 55%;
+    --warning-foreground: 38 90% 10%;
+
+    --border: 222 18% 20%;
+    --input: 222 18% 20%;
+    --ring: 210 80% 62%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings:
+      "cv02",
+      "cv03",
+      "cv04",
+      "cv11";
+  }
+
+  ::selection {
+    @apply bg-primary/20;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
