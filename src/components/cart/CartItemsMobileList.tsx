@@ -21,9 +21,10 @@ interface CartItemsMobileListProps {
   cartId: string;
   currentRate: number | null;
   nextPosition: number;
+  readOnly?: boolean;
 }
 
-export function CartItemsMobileList({ items, cartId, currentRate, nextPosition }: CartItemsMobileListProps) {
+export function CartItemsMobileList({ items, cartId, currentRate, nextPosition, readOnly }: CartItemsMobileListProps) {
   return (
     <div className="space-y-3">
       {items.map((item, index) => (
@@ -34,6 +35,7 @@ export function CartItemsMobileList({ items, cartId, currentRate, nextPosition }
           cartId={cartId}
           currentRate={currentRate}
           nextPosition={nextPosition + index}
+          readOnly={readOnly}
         />
       ))}
     </div>
@@ -46,12 +48,14 @@ function CartItemCardMobile({
   cartId,
   currentRate,
   nextPosition,
+  readOnly,
 }: {
   item: ComputedCartItem;
   index: number;
   cartId: string;
   currentRate: number | null;
   nextPosition: number;
+  readOnly?: boolean;
 }) {
   const row = useCartItemRow(item, cartId, currentRate);
   const isProblem = item.resolution_status === "not_found" || item.resolution_status === "inactive";
@@ -66,7 +70,7 @@ function CartItemCardMobile({
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" disabled={readOnly}>
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -89,6 +93,7 @@ function CartItemCardMobile({
               onChange={(e) => row.onCodeChange(e.target.value)}
               onBlur={row.onCodeBlur}
               invalid={item.resolution_status === "not_found"}
+              disabled={readOnly}
               className="h-9 font-mono text-xs uppercase"
             />
           </div>
@@ -99,6 +104,7 @@ function CartItemCardMobile({
               onChange={(e) => row.onQuantityChange(e.target.value)}
               onBlur={row.onQuantityBlur}
               invalid={!!row.quantityError}
+              disabled={readOnly}
               inputMode="decimal"
               className="h-9 text-right tabular-nums"
             />
@@ -145,6 +151,7 @@ function CartItemCardMobile({
             onChange={(e) => row.onNoteChange(e.target.value)}
             onBlur={row.onNoteBlur}
             placeholder="Optionale Notiz"
+            disabled={readOnly}
             className="h-9 text-sm"
           />
           <SaveStatusIndicator status={row.noteStatus} />

@@ -14,7 +14,7 @@ export default function NotFoundPage() {
         Die angeforderte Seite existiert nicht oder wurde verschoben.
       </p>
       <Button asChild>
-        <Link to="/dashboard">Zurück zum Dashboard</Link>
+        <Link to="/dashboard">Zurück zur Übersicht</Link>
       </Button>
     </div>
   );

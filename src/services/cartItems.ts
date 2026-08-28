@@ -11,6 +11,9 @@ import { resolveProductByCode, resolveProductsByCodes } from "@/services/product
 import type { Database, Tables } from "@/types/database";
 
 export async function listCartItems(cartId: string): Promise<Tables<"cart_items">[]> {
+  const { error: syncError } = await supabase.rpc("sync_cart_selling_prices", { _cart_id: cartId });
+  if (syncError) throw syncError;
+
   const { data, error } = await supabase
     .from("cart_items")
     .select("*")
@@ -248,12 +251,12 @@ export async function mergeDuplicateCartItems(items: Tables<"cart_items">[]): Pr
   const patch: Partial<Tables<"cart_items">> = { quantity: totalQuantity };
   Object.assign(patch, repriceForQuantity(keep, totalQuantity) ?? {});
 
-  const { error: updateError } = await supabase
-    .from("cart_items")
-    .update(patch)
-    .eq("id", keep.id)
-    .eq("version", keep.version);
-  if (updateError) throw updateError;
+  // Must go through the same optimistic-locking check as every other write:
+  // without .select().maybeSingle() here, a concurrent edit to `keep` between
+  // load and merge would silently match zero rows (no error!), and the
+  // duplicate rows below would still be deleted - losing their quantity
+  // entirely instead of folding it into `keep`.
+  await updateCartItemOptimistic(keep.id, keep.version, patch);
 
   const { error: deleteError } = await supabase
     .from("cart_items")

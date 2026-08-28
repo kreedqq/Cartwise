@@ -1,0 +1,33 @@
+{
+  "name": "orforglipron",
+  "status": 200,
+  "labels": [
+    {
+      "id": "ebe44919-a00d-4ea1-a511-18e6a87da34c",
+      "setId": "8ac446c5-feba-474f-a103-23facb9b5c62",
+      "effectiveTime": "20260729",
+      "brand": [
+        "FOUNDAYO"
+      ],
+      "generic": [
+        "ORFORGLIPRON"
+      ],
+      "manufacturer": [
+        "Eli Lilly and Company"
+      ],
+      "application": [
+        "NDA220934"
+      ],
+      "route": [
+        "ORAL"
+      ],
+      "indications": "1 INDICATIONS AND USAGE FOUNDAYO TM is indicated in combination with a reduced-calorie diet and increased physical activity to reduce excess body weight and maintain weight reduction long term in adults with obesity or adults with overweight in the presence of at least one weight-related comorbid condition. FOUNDAYO™ is a GLP-1 receptor agonist indicated in combination with a reduced-calorie diet and increased physical activity to reduce excess body weight and maintain weight reduction long term",
+      "boxedWarning": "WARNING: RISK OF THYROID C-CELL TUMORS In products with glucagon-like peptide-1 (GLP-1) receptor agonist activity that are pharmacologically active in rats and mice, rodent thyroid C-cell tumors (adenomas and carcinomas) have been observed at clinically relevant exposures and are considered GLP-1 receptor-dependent effects in rodents. Orforglipron is not pharmacologically active in rats or mice an",
+      "contraindications": "4 CONTRAINDICATIONS FOUNDAYO is contraindicated in patients with: A personal or family history of MTC or in patients with MEN 2 [see Warnings and Precautions ( 5.1 )] . Known serious hypersensitivity to orforglipron or any of the excipients in FOUNDAYO. Serious hypersensitivity reactions, including anaphylaxis and angioedema, have been reported with GLP-1 receptor agonists [see Warnings and Precau",
+      "warnings": "5 WARNINGS AND PRECAUTIONS Acute Pancreatitis: Has been observed in patients treated with GLP-1 receptor agonists, including FOUNDAYO. Discontinue if pancreatitis is suspected. ( 5.2 ) Severe Gastrointestinal Reactions: Use has been associated with gastrointestinal adverse reactions, sometimes severe. FOUNDAYO is not recommended in patients with severe gastroparesis. ( 5.3 ) Acute Kidney Injury Du",
+      "adverse": "6 ADVERSE REACTIONS The following serious adverse reactions are described below or elsewhere in the prescribing information: Risk of Thyroid C-Cell Tumors [see Warnings and Precautions ( 5.1 )] Acute Pancreatitis [see Warnings and Precautions ( 5.2 )] Severe Gastrointestinal Reactions [see Warnings and Precautions ( 5.3 )] Acute Kidney Injury Due to Volume Depletion [see Warnings and Precautions (",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action FOUNDAYO is a GLP-1 receptor agonist that binds to and activates the human GLP-1 receptor. GLP-1 is a physiological regulator of appetite and caloric intake. GLP-1 receptors are present in brain regions that regulate appetite. In animal studies, orforglipron distributed to and activated neurons in brain regions that regulate appetite and food intak",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION Take FOUNDAYO orally once daily, with or without food. ( 2.1 ) Swallow tablets whole. Do not break, crush, or chew. ( 2.1 ) Do not take more than one tablet per day. ( 2.1 ) Starting dosage is 0.8 mg once daily. After at least 30 days, increase dosage to 2.5 mg once daily"
+    }
+  ]
+}

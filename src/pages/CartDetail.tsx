@@ -64,25 +64,37 @@ export default function CartDetailPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         <div className="min-w-0 space-y-4">
-          <AddItemBar
-            cartId={cart.id}
-            nextPosition={nextPosition}
-            currentRate={rate?.rate ?? null}
-            onOpenPasteImport={() => setPasteOpen(true)}
-          />
+          {cart.status === "ordered" ? (
+            <p className="rounded-lg border border-dashed border-border bg-secondary/30 px-4 py-3 text-sm text-muted-foreground">
+              Dieser Warenkorb wurde bereits als Bestellung abgeschickt und ist deshalb schreibgeschützt.
+            </p>
+          ) : (
+            <AddItemBar
+              cartId={cart.id}
+              nextPosition={nextPosition}
+              currentRate={rate?.rate ?? null}
+              onOpenPasteImport={() => setPasteOpen(true)}
+            />
+          )}
 
           {itemsQuery.isFetching && !itemsQuery.isLoading && <Skeleton className="h-2 w-full" />}
 
           {items.length === 0 ? (
             <EmptyState
               icon={PackageOpen}
-              title="Noch keine Artikel"
+              title="Dein Warenkorb ist noch leer."
               description="Füge oben einen Artikelcode und eine Menge hinzu, oder füge mehrere Zeilen auf einmal ein."
             />
           ) : (
             <>
               <div className="hidden lg:block">
-                <CartItemsTable items={items} cartId={cart.id} currentRate={rate?.rate ?? null} nextPosition={nextPosition} />
+                <CartItemsTable
+                  items={items}
+                  cartId={cart.id}
+                  currentRate={rate?.rate ?? null}
+                  nextPosition={nextPosition}
+                  readOnly={cart.status === "ordered"}
+                />
               </div>
               <div className="lg:hidden">
                 <CartItemsMobileList
@@ -90,6 +102,7 @@ export default function CartDetailPage() {
                   cartId={cart.id}
                   currentRate={rate?.rate ?? null}
                   nextPosition={nextPosition}
+                  readOnly={cart.status === "ordered"}
                 />
               </div>
             </>
@@ -97,6 +110,8 @@ export default function CartDetailPage() {
         </div>
 
         <CartSummaryBar
+          cartId={cart.id}
+          cartStatus={cart.status}
           totals={totals}
           rate={rate}
           rateLoading={rateQuery.isFetching}

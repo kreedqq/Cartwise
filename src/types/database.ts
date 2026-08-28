@@ -15,6 +15,8 @@ export type CartStatus = "draft" | "ready" | "ordered" | "archived";
 export type ResolutionStatus = "resolved" | "not_found" | "inactive" | "pending";
 export type PdfImportStatus = "uploaded" | "previewed" | "applied" | "failed" | "cancelled";
 export type ImportRowQuality = "ok" | "warning" | "error";
+export type OrderStatus = "pending" | "processing" | "confirmed" | "completed" | "cancelled";
+export type ShippingCurrency = "USD" | "EUR";
 /**
  * "auto" hands the create-vs-update decision to apply_pdf_import, which
  * resolves it by normalized article code at apply time. The explicit values
@@ -243,6 +245,160 @@ export interface Database {
         Update: never;
         Relationships: never[];
       };
+      orders: {
+        Row: {
+          id: string;
+          order_number: string;
+          user_id: string;
+          cart_id: string | null;
+          status: OrderStatus;
+          note: string | null;
+          total_usd: number;
+          total_eur: number | null;
+          exchange_rate: number | null;
+          submitted_at: string;
+          created_at: string;
+          updated_at: string;
+          china_shipping_amount: number | null;
+          china_shipping_currency: ShippingCurrency | null;
+          de_shipping_amount: number | null;
+          de_shipping_currency: ShippingCurrency | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["orders"]["Row"]> & {
+          user_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["orders"]["Row"]>;
+        Relationships: never[];
+      };
+      order_items: {
+        Row: {
+          id: string;
+          order_id: string;
+          position: number;
+          product_id: string | null;
+          product_code_snapshot: string;
+          product_name_snapshot: string;
+          dosage_vial_snapshot: string | null;
+          description_snapshot: string | null;
+          normal_price_usd_snapshot: number;
+          bulk_price_usd_snapshot: number | null;
+          bulk_price_min_quantity_snapshot: number | null;
+          applied_price_tier: PriceTier;
+          unit_price_usd_snapshot: number;
+          quantity: number;
+          line_total_usd: number;
+          exchange_rate_snapshot: number | null;
+          eur_value_snapshot: number | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["order_items"]["Row"]> & {
+          order_id: string;
+        };
+        Update: never;
+        Relationships: never[];
+      };
+      order_status_history: {
+        Row: {
+          id: string;
+          order_id: string;
+          old_status: OrderStatus | null;
+          new_status: OrderStatus;
+          changed_by: string | null;
+          changed_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["order_status_history"]["Row"]> & {
+          order_id: string;
+          new_status: OrderStatus;
+        };
+        Update: never;
+        Relationships: never[];
+      };
+      product_favorites: {
+        Row: {
+          id: string;
+          user_id: string;
+          product_id: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["product_favorites"]["Row"]> & {
+          user_id: string;
+          product_id: string;
+        };
+        Update: never;
+        Relationships: never[];
+      };
+      order_admin_notes: {
+        Row: {
+          order_id: string;
+          note: string;
+          updated_by: string | null;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["order_admin_notes"]["Row"]> & {
+          order_id: string;
+          note: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["order_admin_notes"]["Row"]>;
+        Relationships: never[];
+      };
+      order_templates: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["order_templates"]["Row"]> & {
+          user_id: string;
+          name: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["order_templates"]["Row"]>;
+        Relationships: never[];
+      };
+      order_template_items: {
+        Row: {
+          id: string;
+          template_id: string;
+          position: number;
+          product_code: string;
+          quantity: number;
+        };
+        Insert: Partial<Database["public"]["Tables"]["order_template_items"]["Row"]> & {
+          template_id: string;
+          product_code: string;
+          quantity: number;
+        };
+        Update: never;
+        Relationships: never[];
+      };
+      customer_roles: {
+        Row: {
+          id: string;
+          name: string;
+          markup_percent: number;
+          is_active: boolean;
+          is_default: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["customer_roles"]["Row"]> & {
+          name: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["customer_roles"]["Row"]>;
+        Relationships: never[];
+      };
+      user_customer_roles: {
+        Row: {
+          user_id: string;
+          role_id: string;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: Database["public"]["Tables"]["user_customer_roles"]["Row"];
+        Update: Partial<Database["public"]["Tables"]["user_customer_roles"]["Row"]>;
+        Relationships: never[];
+      };
     };
     Views: {
       cart_summaries: {
@@ -255,6 +411,15 @@ export interface Database {
           unresolved_count: number;
           missing_price_count: number;
           latest_price_snapshot_at: string | null;
+        };
+        Relationships: never[];
+      };
+      admin_user_directory: {
+        Row: {
+          id: string;
+          email: string | null;
+          display_name: string;
+          created_at: string;
         };
         Relationships: never[];
       };
@@ -285,6 +450,44 @@ export interface Database {
         };
         Returns: undefined;
       };
+      create_order: {
+        Args: { _cart_id: string; _note: string | null };
+        Returns: { orderId: string; orderNumber: string; totalUsd: number };
+      };
+      set_order_status: {
+        Args: { _order_id: string; _status: OrderStatus; _admin_note: string | null };
+        Returns: Database["public"]["Tables"]["orders"]["Row"];
+      };
+      list_shop_products: { Args: Record<string, never>; Returns: Database["public"]["Tables"]["products"]["Row"][] };
+      get_shop_product_by_code: {
+        Args: { _code: string };
+        Returns: Database["public"]["Tables"]["products"]["Row"] | null;
+      };
+      get_my_customer_role_name: { Args: Record<string, never>; Returns: string | null };
+      sync_cart_selling_prices: { Args: { _cart_id: string }; Returns: undefined };
+      admin_upsert_customer_role: {
+        Args: { _id: string | null; _name: string; _markup_percent: number; _is_active: boolean };
+        Returns: Database["public"]["Tables"]["customer_roles"]["Row"];
+      };
+      admin_delete_customer_role: { Args: { _id: string }; Returns: undefined };
+      admin_assign_customer_role: { Args: { _user_id: string; _role_id: string }; Returns: undefined };
+      admin_set_de_shipping: {
+        Args: { _order_id: string; _amount: number | null; _currency: ShippingCurrency | null };
+        Returns: Database["public"]["Tables"]["orders"]["Row"];
+      };
+      admin_clear_china_shipping: {
+        Args: { _order_id: string };
+        Returns: Database["public"]["Tables"]["orders"]["Row"];
+      };
+      admin_preview_china_split: {
+        Args: { _amount: number; _order_ids: string[] };
+        Returns: { shares: number[]; total: number; count: number };
+      };
+      admin_apply_china_split: {
+        Args: { _amount: number; _currency: ShippingCurrency; _order_ids: string[] };
+        Returns: { shares: number[]; total: number; count: number };
+      };
+      delete_order: { Args: { _order_id: string }; Returns: undefined };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

@@ -1,0 +1,410 @@
+{
+  "slug": "mots-c",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "MOTS-c",
+    "MOTS-C"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "MOTS-c",
+      "totalCount": 9,
+      "studies": [
+        {
+          "nctId": "NCT07678073",
+          "title": "Comparison of the Effects of General Anesthesia and Combined Spinal-Epidural Anesthesia on Ferroptosis, Humanin and MOTS-c Levels in Renal Transplantation",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "University of Gaziantep",
+          "enrollment": 68,
+          "start": "2026-03-01",
+          "completion": "2026-10-15",
+          "lastUpdate": "2026-07-08",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07678073"
+        },
+        {
+          "nctId": "NCT07638696",
+          "title": "Mitophagy and Mitochondrial DNA Dynamics During Ramadan Dry Fasting vs 16:8 Time-Restricted Feeding",
+          "status": "NOT_YET_RECRUITING",
+          "phase": null,
+          "sponsor": "Bahcesehir Cyprus University",
+          "enrollment": 120,
+          "start": "2027-01-15",
+          "completion": "2027-04-30",
+          "lastUpdate": "2026-06-11",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07638696"
+        },
+        {
+          "nctId": "NCT07505745",
+          "title": "MOTS-c for Improving Insulin Sensitivity in Adults With Prediabetes and Overweight/Obesity",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Hudson Biotech",
+          "enrollment": 120,
+          "start": "2026-02-02",
+          "completion": "2028-05-17",
+          "lastUpdate": "2026-04-01",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07505745"
+        },
+        {
+          "nctId": "NCT04013568",
+          "title": "Exercise Post-Diagnosis of Breast Cancer",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "University of Hawaii",
+          "enrollment": 62,
+          "start": "2019-08-28",
+          "completion": "2026-03-06",
+          "lastUpdate": "2026-03-31",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04013568"
+        },
+        {
+          "nctId": "NCT03878706",
+          "title": "The Cardiovascular Effect of GLP-1 Agonist, SGLT2 Inhibitor and Their Combination",
+          "status": "RECRUITING",
+          "phase": null,
+          "sponsor": "University of Athens",
+          "enrollment": 240,
+          "start": "2017-11-03",
+          "completion": "2027-06-30",
+          "lastUpdate": "2026-03-13",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT03878706"
+        },
+        {
+          "nctId": "NCT06500975",
+          "title": "Long Term Outcomes After Vestibular Implantation",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Johns Hopkins University",
+          "enrollment": 32,
+          "start": "2024-12-01",
+          "completion": "2029-12",
+          "lastUpdate": "2026-03-09",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06500975"
+        },
+        {
+          "nctId": "NCT07438002",
+          "title": "Analysis of Effects of High-intensity Physical Exercise in Subjects With Dialyzed Chronic Kidney Disease and in Conservative Treatment",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Casa di Cura Dott. Pederzoli",
+          "enrollment": 50,
+          "start": "2025-09-02",
+          "completion": "2026-09",
+          "lastUpdate": "2026-02-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07438002"
+        },
+        {
+          "nctId": "NCT06133946",
+          "title": "Cohort Of DEafness-gene Screening",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": null,
+          "sponsor": "Affiliated Hospital of Nantong University",
+          "enrollment": 35920,
+          "start": "2016-01-01",
+          "completion": "2028-12-31",
+          "lastUpdate": "2023-11-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06133946"
+        },
+        {
+          "nctId": "NCT04027712",
+          "title": "Platelet Reactivity, B-amyloid, MOTS-c and Mortality of Type II Diabetics With CAD",
+          "status": "UNKNOWN",
+          "phase": null,
+          "sponsor": "University of Athens",
+          "enrollment": 120,
+          "start": "2014-01-01",
+          "completion": "2021-12-31",
+          "lastUpdate": "2019-07-23",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04027712"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "MOTS-c AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 13,
+      "articles": [
+        {
+          "pmid": "41966639",
+          "title": "Safety and Efficacy of Approved and Unapproved Peptide Therapies for Musculoskeletal Injuries and Athletic Performance.",
+          "source": "Sports Med",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Mendias CL",
+            "Awan TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s40279-026-02437-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41966639/"
+        },
+        {
+          "pmid": "42592019",
+          "title": "Mitochondrial dysfunction in ARDS: unraveling the regulatory networks and therapeutic opportunities.",
+          "source": "Front Immunol",
+          "pubdate": "2026",
+          "authors": [
+            "Li YH",
+            "Wang M",
+            "Wan K",
+            "Li J",
+            "Li XF"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3389/fimmu.2026.1899718",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42592019/"
+        },
+        {
+          "pmid": "40674654",
+          "title": "Repeated Heat Stress Modulates the Levels of the Mitokines MOTS-C and FGF21 in Active Men during Calf Muscle Immobilization.",
+          "source": "Med Sci Sports Exerc",
+          "pubdate": "2025 Dec 1",
+          "authors": [
+            "Elhusseiny R",
+            "Ihsan M",
+            "Labidi M",
+            "Alhammoud M",
+            "Mtibaa K",
+            "Nader N"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1249/MSS.0000000000003825",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40674654/"
+        },
+        {
+          "pmid": "39160573",
+          "title": "The correlation between mitochondrial derived peptide (MDP) and metabolic states: a systematic review and meta-analysis.",
+          "source": "Diabetol Metab Syndr",
+          "pubdate": "2024 Aug 19",
+          "authors": [
+            "Zhou Q",
+            "Yin S",
+            "Lei X",
+            "Tian Y",
+            "Lin D",
+            "Wang L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1186/s13098-024-01405-w",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39160573/"
+        },
+        {
+          "pmid": "42633878",
+          "title": "MOTS-c in sepsis-induced cardiomyopathy: Mechanisms and translational potential.",
+          "source": "Eur J Pharmacol",
+          "pubdate": "2026 Aug 23",
+          "authors": [
+            "Zhao Z",
+            "Chen W",
+            "Zheng X",
+            "Geng Z",
+            "Dai N",
+            "Zhang H"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1016/j.ejphar.2026.179261",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42633878/"
+        },
+        {
+          "pmid": "36490309",
+          "title": "Circulating levels of MOTS-c in patients with breast cancer treated with metformin.",
+          "source": "Aging (Albany NY)",
+          "pubdate": "2022 Dec 6",
+          "authors": [
+            "Cuyàs E",
+            "Verdura S",
+            "Martin-Castillo B",
+            "Menendez JA",
+            "METTEN study group"
+          ],
+          "pubtype": [
+            "Randomized Controlled Trial",
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.18632/aging.204423",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36490309/"
+        },
+        {
+          "pmid": "34445477",
+          "title": "The Role of Mitochondria-Derived Peptides in Cardiovascular Diseases and Their Potential as Therapeutic Targets.",
+          "source": "Int J Mol Sci",
+          "pubdate": "2021 Aug 16",
+          "authors": [
+            "Dabravolski SA",
+            "Nikiforov NG",
+            "Starodubova AV",
+            "Popkova TV",
+            "Orekhov AN"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3390/ijms22168770",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34445477/"
+        },
+        {
+          "pmid": "34351816",
+          "title": "Acute endurance exercise stimulates circulating levels of mitochondrial-derived peptides in humans.",
+          "source": "J Appl Physiol (1985)",
+          "pubdate": "2021 Sep 1",
+          "authors": [
+            "von Walden F",
+            "Fernandez-Gonzalo R",
+            "Norrbom J",
+            "Emanuelsson EB",
+            "Figueiredo VC",
+            "Gidlund EK"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1152/japplphysiol.00706.2019",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34351816/"
+        },
+        {
+          "pmid": "41593376",
+          "title": "Exogenous MOTS-c mitigates myocardial ischemia-reperfusion injury: experimental and in silico evidence from rat heart models.",
+          "source": "Naunyn Schmiedebergs Arch Pharmacol",
+          "pubdate": "2026 Apr",
+          "authors": [
+            "Santhanam SS",
+            "Jayaraman S",
+            "Kurian GA"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1007/s00210-026-05018-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41593376/"
+        },
+        {
+          "pmid": "34413391",
+          "title": "Effect of aerobic and resistance exercise on the mitochondrial peptide MOTS-c in Hispanic and Non-Hispanic White breast cancer survivors.",
+          "source": "Sci Rep",
+          "pubdate": "2021 Aug 19",
+          "authors": [
+            "Dieli-Conwright CM",
+            "Sami N",
+            "Norris MK",
+            "Wan J",
+            "Kumagai H",
+            "Kim SJ"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, N.I.H., Extramural"
+          ],
+          "doi": "10.1038/s41598-021-96419-z",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34413391/"
+        },
+        {
+          "pmid": "31432706",
+          "title": "Reduced skeletal muscle expression of mitochondrial-derived peptides humanin and MOTS-C and Nrf2 in chronic kidney disease.",
+          "source": "Am J Physiol Renal Physiol",
+          "pubdate": "2019 Nov 1",
+          "authors": [
+            "Liu C",
+            "Gidlund EK",
+            "Witasp A",
+            "Qureshi AR",
+            "Söderberg M",
+            "Thorell A"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1152/ajprenal.00202.2019",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31432706/"
+        },
+        {
+          "pmid": "32052315",
+          "title": "β-Amyloid and mitochondrial-derived peptide-c are additive predictors of adverse outcome to high-on-treatment platelet reactivity in type 2 diabetics with revascularized coronary artery disease.",
+          "source": "J Thromb Thrombolysis",
+          "pubdate": "2020 Apr",
+          "authors": [
+            "Ikonomidis I",
+            "Katogiannis K",
+            "Kyriakou E",
+            "Taichert M",
+            "Katsimaglis G",
+            "Tsoumani M"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article",
+            "Multicenter Study"
+          ],
+          "doi": "10.1007/s11239-020-02060-4",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32052315/"
+        },
+        {
+          "pmid": "42640735",
+          "title": "Mitochondrial-derived peptides (MDPs) activated by physical exercise as therapeutic targets for metabolic disorders: A systematic review.",
+          "source": "Physiol Int",
+          "pubdate": "2026 Aug 25",
+          "authors": [
+            "Ayubi N",
+            "Wibawa JC",
+            "Kurnaz M",
+            "Komaini A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1556/2060.2026.00863",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42640735/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "MOTS-c",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 146675088,
+      "cas": "1627580-64-6",
+      "formula": "C101H152N28O22S2",
+      "iupac": "(4S)-4-[[(2S)-5-amino-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-amino-4-methylsulfanylbutanoyl]amino]-5-carbamimidamidopentanoyl]amino]-3-(1H-indol-3-yl)propanoyl]amino]-5-oxopentanoyl]amino]-5-[[(2S)-1-[[2-[[(2S)-1-[[(2S,3S)-1-[[(2S)-1-[[(2S)-1-[(2S)-2-[[(2S)-1-[[(2S)-6-amino-1-[[(2S)-1-[[(1S)-4-carbamimidamido-1-carboxybutyl]amino]-4-methyl-1-oxopentan-2-yl]amino]-1-oxohexan-2-yl]amino]-5-carbamimidamido-1-oxopentan-2-yl]carbamoyl]pyrrolidin-1-yl]-3-(4-hydroxyphenyl)-1-oxopropan-2-yl]amino]-1-oxo-3-phenylpropan-2-yl]amino]-3-methyl-1-oxopentan-2-yl]amino]-3-(4-hydroxyphenyl)-1-oxopropan-2-yl]amino]-2-oxoethyl]amino]-4-methylsulfanyl-1-oxobutan-2-yl]amino]-5-oxopentanoic acid"
+    }
+  }
+}

@@ -13,6 +13,7 @@ import {
   normalizeProductCode,
   roundCurrency,
   roundHalfUp,
+  summarizeOrderCharges,
   type PricedProduct,
 } from "@/lib/money";
 
@@ -231,5 +232,54 @@ describe("formatUsd / formatEur", () => {
   it("formats finite numbers as currency strings", () => {
     expect(formatUsd(19.9)).toContain("19,90");
     expect(formatEur(19.9)).toContain("19,90");
+  });
+});
+
+describe("summarizeOrderCharges", () => {
+  it("adds same-currency shipping onto the product subtotal", () => {
+    const charges = summarizeOrderCharges({
+      productUsd: 100,
+      productEur: 100,
+      chinaAmount: 20,
+      chinaCurrency: "EUR",
+      deAmount: 8,
+      deCurrency: "EUR",
+      usdToEurRate: 1,
+    });
+    expect(charges.grandUsd).toBe(128);
+    expect(charges.grandEur).toBe(128);
+    expect(charges.grandDisplay).toContain("128");
+  });
+
+  it("never blindly adds mixed currencies without a rate", () => {
+    const charges = summarizeOrderCharges({
+      productUsd: 1000,
+      productEur: null,
+      chinaAmount: 100,
+      chinaCurrency: "USD",
+      deAmount: 20,
+      deCurrency: "EUR",
+      usdToEurRate: null,
+    });
+    expect(charges.grandUsd).toBe(1100);
+    expect(charges.leftoverEur).toBe(20);
+    expect(charges.grandDisplay).toContain("1.100,00");
+    expect(charges.grandDisplay).toContain("20,00");
+    expect(charges.grandUsd + 20).not.toBe(charges.grandUsd);
+  });
+
+  it("uses the stored USD→EUR rate to merge mixed shipping", () => {
+    const charges = summarizeOrderCharges({
+      productUsd: 1000,
+      productEur: 900,
+      chinaAmount: 100,
+      chinaCurrency: "USD",
+      deAmount: 20,
+      deCurrency: "EUR",
+      usdToEurRate: 0.9,
+    });
+    expect(charges.grandUsd).toBe(1122.22);
+    expect(charges.grandEur).toBe(1010);
+    expect(charges.leftoverEur).toBe(0);
   });
 });

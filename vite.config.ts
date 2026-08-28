@@ -27,5 +27,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/tests/setup.ts"],
     css: true,
+    // Windows / constrained CI: too many fork workers time out before they boot.
+    maxWorkers: 2,
   },
 });

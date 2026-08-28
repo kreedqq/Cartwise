@@ -1,4 +1,6 @@
-export const APP_NAME = "Warenkorb & Bestelllisten";
+export const APP_NAME = "Peptix";
+export const BRAND_NAME = "Peptix";
+export const BRAND_TAGLINE = "B2B Bestellplattform";
 
 export const PDF_IMPORT_BUCKET = "pdf-imports";
 export const MAX_PDF_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -19,4 +21,13 @@ export const QUERY_KEYS = {
   userRoles: ["user-roles"] as const,
   profiles: ["profiles"] as const,
   auditLogs: ["audit-logs"] as const,
+  shopProducts: ["shop-products"] as const,
+  myOrders: ["my-orders"] as const,
+  order: (id: string) => ["orders", id] as const,
+  orderStatusHistory: (id: string) => ["orders", id, "history"] as const,
+  adminOrders: ["admin-orders"] as const,
+  adminUserDirectory: ["admin-user-directory"] as const,
+  favorites: ["favorites"] as const,
+  orderTemplates: ["order-templates"] as const,
+  orderAdminNote: (id: string) => ["orders", id, "admin-note"] as const,
 };

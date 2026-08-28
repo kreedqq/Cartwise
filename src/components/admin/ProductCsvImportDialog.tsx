@@ -107,8 +107,9 @@ export function ProductCsvImportDialog({ open, onOpenChange, onImported }: Produ
       );
       onImported();
       onOpenChange(false);
-    } catch {
-      toast.error("CSV-Import fehlgeschlagen.");
+    } catch (error) {
+      console.error("CSV-Import fehlgeschlagen:", error);
+      toast.error(`CSV-Import fehlgeschlagen: ${error instanceof Error ? error.message : "Unbekannter Fehler."}`);
     } finally {
       setSubmitting(false);
     }

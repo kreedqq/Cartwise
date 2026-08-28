@@ -29,6 +29,7 @@ export default function AdminUsersPage() {
       await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       setTarget(null);
     } catch (error) {
+      console.error("Rolle ändern fehlgeschlagen:", error);
       toast.error(error instanceof Error ? error.message : "Rolle konnte nicht geändert werden.");
     } finally {
       setLoading(false);

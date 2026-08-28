@@ -21,7 +21,8 @@ export function DuplicateWarningBanner({ cartId, duplicateCodes, items }: Duplic
     try {
       await merge.mutateAsync(group);
       toast.success(`Duplikate für „${code}" wurden zusammengeführt.`);
-    } catch {
+    } catch (error) {
+      console.error("Duplikate zusammenführen fehlgeschlagen:", error);
       toast.error("Zusammenführen fehlgeschlagen. Bitte lade die Seite neu und versuche es erneut.");
     }
   }

@@ -105,6 +105,34 @@ export function getEffectiveUnitPrice(
 }
 
 /**
+ * Apply a role markup to a catalog (or bulk) unit price. 4 decimal places,
+ * matching public.apply_role_markup. The percent itself must never be sent
+ * to a customer client - this helper exists so tests lock the formula that
+ * the database uses.
+ */
+export function applyRoleMarkup(amount: number, markupPercent: number): number {
+  if (!isFiniteNumber(amount) || !isFiniteNumber(markupPercent)) return amount;
+  return roundHalfUp(amount * (1 + markupPercent / 100), 4);
+}
+
+/**
+ * Catalog bulk-then-markup selling unit price. Server-side create_order
+ * uses the SQL twin sell_unit_price; tests use this to lock the contract.
+ */
+export function sellingUnitPrice(product: PricedProduct, quantity: number, markupPercent: number): number {
+  return applyRoleMarkup(getEffectiveUnitPrice(product, quantity).unitPriceUsd, markupPercent);
+}
+
+/** Split a money amount across n buckets. Remainder cents go to the last share. */
+export function splitAmountEvenly(total: number, count: number): number[] {
+  if (!Number.isInteger(count) || count < 1) return [];
+  const cents = Math.round(roundCurrency(total) * 100);
+  const base = Math.floor(cents / count);
+  const rem = cents - base * count;
+  return Array.from({ length: count }, (_, i) => roundCurrency((base + (i === count - 1 ? rem : 0)) / 100));
+}
+
+/**
  * Convert a USD amount to EUR using the given rate, rounded to cents.
  * Returns null (never a guessed value) if the rate is missing/invalid.
  */
@@ -112,6 +140,107 @@ export function convertUsdToEur(amountUsd: number, rate: number | null | undefin
   if (!isFiniteNumber(amountUsd)) return null;
   if (!isFiniteNumber(rate) || (rate as number) <= 0) return null;
   return roundCurrency(amountUsd * (rate as number));
+}
+
+/** Inverse of convertUsdToEur using the stored USD→EUR rate. Never invents a rate. */
+export function convertEurToUsd(amountEur: number, usdToEurRate: number | null | undefined): number | null {
+  if (!isFiniteNumber(amountEur)) return null;
+  if (!isFiniteNumber(usdToEurRate) || (usdToEurRate as number) <= 0) return null;
+  return roundCurrency(amountEur / (usdToEurRate as number));
+}
+
+export type ChargeCurrency = "USD" | "EUR";
+
+export const SHIPPING_LABEL_CHINA = "Versand aus China";
+export const SHIPPING_LABEL_GERMANY = "Versand aus Deutschland";
+export const GRAND_TOTAL_LABEL = "Gesamt Endpreis inkl. Versand";
+
+export function formatMoney(amount: number, currency: string): string {
+  return currency === "EUR" ? formatEur(amount) : formatUsd(amount);
+}
+
+export interface OrderChargesInput {
+  productUsd: number;
+  productEur: number | null;
+  chinaAmount?: number | null;
+  chinaCurrency?: string | null;
+  deAmount?: number | null;
+  deCurrency?: string | null;
+  usdToEurRate?: number | null;
+}
+
+export interface ShippingCharge {
+  amount: number;
+  currency: ChargeCurrency;
+}
+
+export interface OrderCharges {
+  productUsd: number;
+  productEur: number | null;
+  china: ShippingCharge | null;
+  germany: ShippingCharge | null;
+  grandUsd: number;
+  grandEur: number | null;
+  leftoverEur: number;
+  grandDisplay: string;
+}
+
+function asChargeCurrency(value: string | null | undefined): ChargeCurrency | null {
+  return value === "USD" || value === "EUR" ? value : null;
+}
+
+/**
+ * Product subtotal plus the two shipping kinds. USD and EUR are never added
+ * together; conversion uses only the order's stored USD→EUR rate.
+ */
+export function summarizeOrderCharges(input: OrderChargesInput): OrderCharges {
+  let usd = roundCurrency(input.productUsd);
+  let eur =
+    input.productEur != null && isFiniteNumber(input.productEur) ? roundCurrency(input.productEur) : null;
+  let leftoverEur = 0;
+  const rate = input.usdToEurRate ?? null;
+
+  function addSlice(amount: number | null | undefined, currencyRaw: string | null | undefined): ShippingCharge | null {
+    if (!isFiniteNumber(amount) || amount < 0) return null;
+    const currency = asChargeCurrency(currencyRaw);
+    if (!currency) return null;
+    if (amount === 0) return { amount, currency };
+
+    if (currency === "USD") {
+      usd = roundCurrency(usd + amount);
+      const asEur = convertUsdToEur(amount, rate);
+      if (asEur != null && eur != null) eur = roundCurrency(eur + asEur);
+    } else {
+      const asUsd = convertEurToUsd(amount, rate);
+      if (asUsd != null) usd = roundCurrency(usd + asUsd);
+      else leftoverEur = roundCurrency(leftoverEur + amount);
+      if (eur != null) eur = roundCurrency(eur + amount);
+    }
+    return { amount, currency };
+  }
+
+  const china = addSlice(input.chinaAmount, input.chinaCurrency);
+  const germany = addSlice(input.deAmount, input.deCurrency);
+
+  let grandDisplay: string;
+  if (leftoverEur > 0) {
+    grandDisplay = `${formatUsd(usd)} + ${formatEur(leftoverEur)}`;
+  } else if (eur != null) {
+    grandDisplay = `${formatUsd(usd)} · ${formatEur(eur)}`;
+  } else {
+    grandDisplay = formatUsd(usd);
+  }
+
+  return {
+    productUsd: roundCurrency(input.productUsd),
+    productEur: input.productEur != null && isFiniteNumber(input.productEur) ? roundCurrency(input.productEur) : null,
+    china,
+    germany,
+    grandUsd: usd,
+    grandEur: eur,
+    leftoverEur,
+    grandDisplay,
+  };
 }
 
 export function isFiniteNumber(value: unknown): value is number {

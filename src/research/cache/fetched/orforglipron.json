@@ -1,0 +1,704 @@
+{
+  "slug": "orforglipron",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "orforglipron",
+    "LY3502970"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "orforglipron",
+      "totalCount": 51,
+      "studies": [
+        {
+          "nctId": "NCT07790861",
+          "title": "A Study of Orforglipron (LY3502970) in Chinese Participants With Obesity or Overweight and Weight-Related Health Problems",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 192,
+          "start": "2026-12",
+          "completion": "2028-03",
+          "lastUpdate": "2026-08-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07790861"
+        },
+        {
+          "nctId": "NCT07241390",
+          "title": "A Study of Orforglipron (LY3502970) on Cardiovascular Outcomes in Adults With Atherosclerotic Cardiovascular Disease and/or Chronic Kidney Disease (ATTAIN-Outcomes)",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 7140,
+          "start": "2025-12-01",
+          "completion": "2031-08",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07241390"
+        },
+        {
+          "nctId": "NCT06672939",
+          "title": "A Study of Orforglipron (LY3502970) in Adolescent Participants With Obesity, or Overweight With Related Comorbidities",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 150,
+          "start": "2024-11-18",
+          "completion": "2031-01",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06672939"
+        },
+        {
+          "nctId": "NCT06672549",
+          "title": "A Platform Trial for Pediatric Participants With Obesity or Overweight (LY900040)",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 125,
+          "start": "2024-11-18",
+          "completion": "2027-03",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06672549"
+        },
+        {
+          "nctId": "NCT07613307",
+          "title": "A Study of Orforglipron (LY3502970) in Participants With Type 2 Diabetes Who Observe Ramadan Fasting",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 130,
+          "start": "2026-07-15",
+          "completion": "2027-05",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07613307"
+        },
+        {
+          "nctId": "NCT07223593",
+          "title": "Efficacy and Safety of Orforglipron in Participants With Peripheral Artery Disease",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 1205,
+          "start": "2025-10-31",
+          "completion": "2028-06",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07223593"
+        },
+        {
+          "nctId": "NCT07153471",
+          "title": "A Study of Orforglipron (LY3502970) in Participants With Obesity or Overweight and Osteoarthritis (OA) of the Knee",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 800,
+          "start": "2025-09-15",
+          "completion": "2028-05",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07153471"
+        },
+        {
+          "nctId": "NCT07668336",
+          "title": "A Study of Orforglipron (LY3502970) Compared With Dulaglutide in Pediatric Participants With Type 2 Diabetes",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 170,
+          "start": "2026-09",
+          "completion": "2030-03",
+          "lastUpdate": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07668336"
+        },
+        {
+          "nctId": "NCT05869903",
+          "title": "A Study of Orforglipron (LY3502970) in Adult Participants With Obesity or Overweight With Weight-Related Comorbidities",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 3127,
+          "start": "2023-06-05",
+          "completion": "2027-10",
+          "lastUpdate": "2026-08-14",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT05869903"
+        },
+        {
+          "nctId": "NCT07202884",
+          "title": "A Study of Orforglipron in Female Participants With Stress Urinary Incontinence Who Have Obesity or Overweight",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 1000,
+          "start": "2025-09-30",
+          "completion": "2028-03",
+          "lastUpdate": "2026-08-06",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07202884"
+        },
+        {
+          "nctId": "NCT06993792",
+          "title": "A Master Protocol for Orforglipron (LY3502970) in Participants With Obesity or Overweight With and Without Type 2 Diabetes",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 1400,
+          "start": "2025-05-15",
+          "completion": "2027-08",
+          "lastUpdate": "2026-07-31",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06993792"
+        },
+        {
+          "nctId": "NCT07739537",
+          "title": "PATHS-T2D: A Recall-by-Genotype Study of Physiologic and Pharmacologic Responses",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 100,
+          "start": "2026-10-01",
+          "completion": "2030-09-30",
+          "lastUpdate": "2026-07-31",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07739537"
+        },
+        {
+          "nctId": "NCT06972459",
+          "title": "A Study of Orforglipron (LY3502970) in Participants With Obesity or Overweight and at Least One Weight-Related Comorbidity",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 800,
+          "start": "2025-05-15",
+          "completion": "2027-08",
+          "lastUpdate": "2026-07-29",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06972459"
+        },
+        {
+          "nctId": "NCT07729332",
+          "title": "Switching to Oral Weight Management Pharmacotherapy to Prevent Weight Regain After GLP-1 Therapy Discontinuation",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 60,
+          "start": "2026-11-01",
+          "completion": "2031-07-31",
+          "lastUpdate": "2026-07-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07729332"
+        },
+        {
+          "nctId": "NCT05931380",
+          "title": "A Study of Once-Daily Oral Orforglipron (LY3502970) in Japanese Adult Participants With Obesity Disease",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 238,
+          "start": "2023-07-31",
+          "completion": "2025-06-19",
+          "lastUpdate": "2026-07-20",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT05931380"
+        },
+        {
+          "nctId": "NCT06370728",
+          "title": "A Drug-Drug Interaction (DDI) Study of Orforglipron With Carbamazepine in Healthy Participants",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 30,
+          "start": "2024-05-06",
+          "completion": "2024-07-23",
+          "lastUpdate": "2026-07-17",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT06370728"
+        },
+        {
+          "nctId": "NCT06023095",
+          "title": "A Study of LY3502970 in Chinese Participants With Obesity or Are Overweight With Weight-related Comorbidities",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 24,
+          "start": "2023-09-21",
+          "completion": "2024-07-29",
+          "lastUpdate": "2026-07-17",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT06023095"
+        },
+        {
+          "nctId": "NCT06440980",
+          "title": "A Study to Compare Tablets and Capsules of Orforglipron (LY3502970) in Healthy Participants Who Are Obese or Overweight",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 533,
+          "start": "2024-06-24",
+          "completion": "2025-06-02",
+          "lastUpdate": "2026-07-17",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT06440980"
+        },
+        {
+          "nctId": "NCT05086445",
+          "title": "A Study of LY3502970 in Japanese Participants With Type 2 Diabetes Mellitus",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 62,
+          "start": "2021-11-12",
+          "completion": "2022-09-05",
+          "lastUpdate": "2026-07-16",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT05086445"
+        },
+        {
+          "nctId": "NCT05841238",
+          "title": "A Multiple Dose Study of LY3502970 in Healthy Overweight and Obese Participants",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 52,
+          "start": "2023-04-26",
+          "completion": "2023-11-13",
+          "lastUpdate": "2026-07-10",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT05841238"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "orforglipron AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 88,
+      "articles": [
+        {
+          "pmid": "40960239",
+          "title": "Orforglipron, an Oral Small-Molecule GLP-1 Receptor Agonist for Obesity Treatment.",
+          "source": "N Engl J Med",
+          "pubdate": "2025 Nov 6",
+          "authors": [
+            "Wharton S",
+            "Aronne LJ",
+            "Stefanski A",
+            "Alfaris NF",
+            "Ciudin A",
+            "Yokote K"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Multicenter Study",
+            "Clinical Trial, Phase III"
+          ],
+          "doi": "10.1056/NEJMoa2511774",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40960239/"
+        },
+        {
+          "pmid": "40544435",
+          "title": "Orforglipron, an Oral Small-Molecule GLP-1 Receptor Agonist, in Early Type 2 Diabetes.",
+          "source": "N Engl J Med",
+          "pubdate": "2025 Sep 18",
+          "authors": [
+            "Rosenstock J",
+            "Hsia S",
+            "Nevarez Ruiz L",
+            "Eyde S",
+            "Cox D",
+            "Wu WS"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase III",
+            "Multicenter Study"
+          ],
+          "doi": "10.1056/NEJMoa2505669",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40544435/"
+        },
+        {
+          "pmid": "39952695",
+          "title": "Emerging pharmacotherapies for obesity: A systematic review.",
+          "source": "Pharmacol Rev",
+          "pubdate": "2025 Jan",
+          "authors": [
+            "Kokkorakis M",
+            "Chakhtoura M",
+            "Rhayem C",
+            "Al Rifai J",
+            "Ghezzawi M",
+            "Valenzuela-Vallejo L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.1124/pharmrev.123.001045",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39952695/"
+        },
+        {
+          "pmid": "37351564",
+          "title": "Daily Oral GLP-1 Receptor Agonist Orforglipron for Adults with Obesity.",
+          "source": "N Engl J Med",
+          "pubdate": "2023 Sep 7",
+          "authors": [
+            "Wharton S",
+            "Blevins T",
+            "Connery L",
+            "Rosenstock J",
+            "Raha S",
+            "Liu R"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase I",
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1056/NEJMoa2302392",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37351564/"
+        },
+        {
+          "pmid": "37344954",
+          "title": "Orforglipron (LY3502970), a novel, oral non-peptide glucagon-like peptide-1 receptor agonist: A Phase 1a, blinded, placebo-controlled, randomized, single- and multiple-ascending-dose study in healthy participants.",
+          "source": "Diabetes Obes Metab",
+          "pubdate": "2023 Sep",
+          "authors": [
+            "Pratt E",
+            "Ma X",
+            "Liu R",
+            "Robins D",
+            "Haupt A",
+            "Coskun T"
+          ],
+          "pubtype": [
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase I",
+            "Journal Article"
+          ],
+          "doi": "10.1111/dom.15184",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37344954/"
+        },
+        {
+          "pmid": "37852529",
+          "title": "Safety and efficacy of the new, oral, small-molecule, GLP-1 receptor agonists orforglipron and danuglipron for the treatment of type 2 diabetes and obesity: systematic review and meta-analysis of randomized controlled trials.",
+          "source": "Metabolism",
+          "pubdate": "2023 Dec",
+          "authors": [
+            "Karakasis P",
+            "Patoulias D",
+            "Pamporis K",
+            "Stachteas P",
+            "Bougioukas KI",
+            "Klisic A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1016/j.metabol.2023.155710",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37852529/"
+        },
+        {
+          "pmid": "41296780",
+          "title": "Efficacy and Safety of Orforglipron in Obese Adults With or Without Diabetes: A Systematic Review and Meta-Analysis.",
+          "source": "Endocrinol Diabetes Metab",
+          "pubdate": "2025 Nov",
+          "authors": [
+            "Pandey RK",
+            "Jan M",
+            "Mohammad A",
+            "Jawaid KA",
+            "Naveed M",
+            "Abid MA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review",
+            "Meta-Analysis"
+          ],
+          "doi": "10.1002/edm2.70134",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41296780/"
+        },
+        {
+          "pmid": "40813122",
+          "title": "Medications for adults with type 2 diabetes: a living systematic review and network meta-analysis.",
+          "source": "BMJ",
+          "pubdate": "2025 Aug 14",
+          "authors": [
+            "Nong K",
+            "Jeppesen BT",
+            "Shi Q",
+            "Agoritsas T",
+            "Guyatt GH",
+            "White H"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review",
+            "Network Meta-Analysis"
+          ],
+          "doi": "10.1136/bmj-2024-083039",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40813122/"
+        },
+        {
+          "pmid": "37369232",
+          "title": "Efficacy and safety of oral orforglipron in patients with type 2 diabetes: a multicentre, randomised, dose-response, phase 2 study.",
+          "source": "Lancet",
+          "pubdate": "2023 Aug 5",
+          "authors": [
+            "Frias JP",
+            "Hsia S",
+            "Eyde S",
+            "Liu R",
+            "Ma X",
+            "Konig M"
+          ],
+          "pubtype": [
+            "Randomized Controlled Trial",
+            "Multicenter Study",
+            "Clinical Trial, Phase II",
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/S0140-6736(23)01302-8",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37369232/"
+        },
+        {
+          "pmid": "41765029",
+          "title": "Efficacy and safety of once-daily oral orforglipron compared with oral semaglutide in adults with type 2 diabetes (ACHIEVE-3): a multinational, multicentre, non-inferiority, open-label, randomised, phase 3 trial.",
+          "source": "Lancet",
+          "pubdate": "2026 Mar 21",
+          "authors": [
+            "Rosenstock J",
+            "Yabe D",
+            "Cox D",
+            "Li J",
+            "Denning M",
+            "Wu WS"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Multicenter Study",
+            "Clinical Trial, Phase III",
+            "Randomized Controlled Trial",
+            "Comparative Study",
+            "Equivalence Trial"
+          ],
+          "doi": "10.1016/S0140-6736(26)00202-3",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41765029/"
+        },
+        {
+          "pmid": "39305981",
+          "title": "Seven glucagon-like peptide-1 receptor agonists and polyagonists for weight loss in patients with obesity or overweight: an updated systematic review and network meta-analysis of randomized controlled trials.",
+          "source": "Metabolism",
+          "pubdate": "2024 Dec",
+          "authors": [
+            "Xie Z",
+            "Zheng G",
+            "Liang Z",
+            "Li M",
+            "Deng W",
+            "Cao W"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review",
+            "Network Meta-Analysis",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/j.metabol.2024.156038",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39305981/"
+        },
+        {
+          "pmid": "40804463",
+          "title": "Gastrointestinal adverse events associated with GLP-1 RA in non-diabetic patients with overweight or obesity: a systematic review and network meta-analysis.",
+          "source": "Int J Obes (Lond)",
+          "pubdate": "2025 Oct",
+          "authors": [
+            "Ismaiel A",
+            "Scarlata GGM",
+            "Boitos I",
+            "Leucuta DC",
+            "Popa SL",
+            "Al Srouji N"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Network Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1038/s41366-025-01859-6",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40804463/"
+        },
+        {
+          "pmid": "40888509",
+          "title": "Disposition and Absolute Bioavailability of Orally Administered Orforglipron in Healthy Participants.",
+          "source": "Clin Pharmacol Drug Dev",
+          "pubdate": "2026 Jan",
+          "authors": [
+            "Morse BL",
+            "Bhattachar S",
+            "Ma X",
+            "Coutant DE",
+            "Czeskis B",
+            "Nicoll C"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Clinical Trial, Phase I",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1002/cpdd.1594",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40888509/"
+        },
+        {
+          "pmid": "41275875",
+          "title": "Orforglipron, an oral small-molecule GLP-1 receptor agonist, for the treatment of obesity in people with type 2 diabetes (ATTAIN-2): a phase 3, double-blind, randomised, multicentre, placebo-controlled trial.",
+          "source": "Lancet",
+          "pubdate": "2026 Dec 20",
+          "authors": [
+            "Horn DB",
+            "Ryan DH",
+            "Kis SG",
+            "Alves B",
+            "Mu Y",
+            "Kim SG"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Multicenter Study",
+            "Clinical Trial, Phase III"
+          ],
+          "doi": "10.1016/S0140-6736(25)02165-8",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41275875/"
+        },
+        {
+          "pmid": "38414573",
+          "title": "Orforglipron, a novel non-peptide oral daily glucagon-like peptide-1 receptor agonist as an anti-obesity medicine: A systematic review and meta-analysis.",
+          "source": "Obes Sci Pract",
+          "pubdate": "2024 Apr",
+          "authors": [
+            "Dutta D",
+            "Nagendra L",
+            "Anne B",
+            "Kumar M",
+            "Sharma M",
+            "Kamrul-Hasan ABM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1002/osp4.743",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38414573/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "orforglipron",
+      "found": true,
+      "products": [
+        {
+          "sponsor": "ELI LILLY AND CO",
+          "application": "NDA220934",
+          "products": [
+            {
+              "brand": "FOUNDAYO",
+              "active": [
+                {
+                  "name": "ORFORGLIPRON CALCIUM",
+                  "strength": "EQ 2.5MG BASE"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            },
+            {
+              "brand": "FOUNDAYO",
+              "active": [
+                {
+                  "name": "ORFORGLIPRON CALCIUM",
+                  "strength": "EQ 14.5MG BASE"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            },
+            {
+              "brand": "FOUNDAYO",
+              "active": [
+                {
+                  "name": "ORFORGLIPRON CALCIUM",
+                  "strength": "EQ 5.5MG BASE"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            },
+            {
+              "brand": "FOUNDAYO",
+              "active": [
+                {
+                  "name": "ORFORGLIPRON CALCIUM",
+                  "strength": "EQ 0.8MG BASE"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            },
+            {
+              "brand": "FOUNDAYO",
+              "active": [
+                {
+                  "name": "ORFORGLIPRON CALCIUM",
+                  "strength": "EQ 17.2MG BASE"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            },
+            {
+              "brand": "FOUNDAYO",
+              "active": [
+                {
+                  "name": "ORFORGLIPRON CALCIUM",
+                  "strength": "EQ 9MG BASE"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            }
+          ]
+        }
+      ],
+      "message": null
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 137319706,
+      "cas": "2212020-52-3",
+      "formula": "C48H48F2N10O5",
+      "iupac": "3-[(1S,2S)-1-[5-[(4S)-2,2-dimethyloxan-4-yl]-2-[(4S)-2-(4-fluoro-3,5-dimethylphenyl)-3-[3-(4-fluoro-1-methylindazol-5-yl)-2-oxoimidazol-1-yl]-4-methyl-6,7-dihydro-4H-pyrazolo[4,3-c]pyridine-5-carbonyl]indol-1-yl]-2-methylcyclopropyl]-4H-1,2,4-oxadiazol-5-one"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+---
+description: Project memory, shop/lexicon split, research safety, and docs-first workflow
+alwaysApply: true
+---
+
+# Peptix project memory
+
+Before non-trivial work, read `docs/PROJECT_STATE.md`, `docs/ARCHITECTURE.md`, `docs/TODO.md`, and the latest `docs/CHANGELOG.md`. After major changes, update those files. Code is the source of truth: if docs disagree, fix the docs.
+
+Protect auth, shop, cart, orders, pricing/RLS, peptide calculator, lexicon, and admin unless the task requires a change there.
+
+Shop (`products`, prices, cart, orders) stays separate from the lexicon (`substances`, sources, studies). Do not show shop prices or cart actions in the lexicon. Do not invent studies, PMIDs, NCTs, approvals, PK, doses, or community quotes. Community sources must not raise evidence. No API/login/rate-limit bypass and no Reddit scraping. Never commit secrets; document env **names** only (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
+
+Do not git commit unless the user asks. Do not force-push or rewrite history. After code changes run `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` when those scripts exist.

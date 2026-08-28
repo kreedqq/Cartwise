@@ -14,9 +14,9 @@ export interface ProductResolution {
  */
 export async function resolveProductByCode(rawCode: string): Promise<ProductResolution> {
   const code = normalizeProductCode(rawCode);
-  const { data, error } = await supabase.from("products").select("*").eq("code", code).maybeSingle();
+  const { data, error } = await supabase.rpc("get_shop_product_by_code", { _code: code });
   if (error) throw error;
-  if (!data) return { status: "not_found", product: null };
+  if (!data || !data.id) return { status: "not_found", product: null };
   if (!data.is_active) return { status: "inactive", product: data };
   return { status: "resolved", product: data };
 }
@@ -26,26 +26,32 @@ export async function resolveProductsByCodes(rawCodes: string[]): Promise<Map<st
   const codes = Array.from(new Set(rawCodes.map(normalizeProductCode))).filter(Boolean);
   if (codes.length === 0) return new Map();
 
-  const { data, error } = await supabase.from("products").select("*").in("code", codes);
-  if (error) throw error;
-
+  const products = await listShopProducts();
   const map = new Map<string, Tables<"products">>();
-  for (const product of data ?? []) {
-    map.set(product.code, product);
+  for (const product of products) {
+    if (codes.includes(product.code)) map.set(product.code, product);
   }
   return map;
 }
 
-/** Fetches products by id (used by the "Preise aktualisieren" preview). */
+/** Selling-price catalog for the current user (markup already applied server-side). */
+export async function listShopProducts(): Promise<Tables<"products">[]> {
+  const { data, error } = await supabase.rpc("list_shop_products");
+  if (error) throw error;
+  return data ?? [];
+}
+
+/** Fetches products by id using the current user's selling prices. */
 export async function getProductsByIds(ids: string[]): Promise<Map<string, Tables<"products">>> {
   const uniqueIds = Array.from(new Set(ids)).filter(Boolean);
   if (uniqueIds.length === 0) return new Map();
 
-  const { data, error } = await supabase.from("products").select("*").in("id", uniqueIds);
-  if (error) throw error;
-
+  const products = await listShopProducts();
+  const wanted = new Set(uniqueIds);
   const map = new Map<string, Tables<"products">>();
-  for (const product of data ?? []) map.set(product.id, product);
+  for (const product of products) {
+    if (wanted.has(product.id)) map.set(product.id, product);
+  }
   return map;
 }
 

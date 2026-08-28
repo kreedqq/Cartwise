@@ -13,21 +13,29 @@ import {
 import { useAuth } from "@/context/AuthProvider";
 import { useTheme } from "@/hooks/useTheme";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { useCarts } from "@/hooks/useCarts";
+import { useCartSummaries } from "@/hooks/useCartSummaries";
 import { signOut } from "@/services/auth";
 import { toast } from "@/components/ui/toaster";
-import { APP_NAME } from "@/lib/constants";
+import { BrandMark } from "@/components/layout/BrandMark";
 
 export function Topbar() {
   const { profile, user } = useAuth();
   const { theme, toggle } = useTheme();
   const online = useOnlineStatus();
   const navigate = useNavigate();
+  const cartsQuery = useCarts();
+  const summariesQuery = useCartSummaries();
+
+  const activeCart = cartsQuery.data?.find((c) => c.is_active_cart);
+  const cartCount = activeCart ? (summariesQuery.data?.get(activeCart.id)?.item_count ?? 0) : 0;
 
   async function handleSignOut() {
     try {
       await signOut();
       navigate("/login");
-    } catch {
+    } catch (error) {
+      console.error("Abmelden fehlgeschlagen:", error);
       toast.error("Abmelden fehlgeschlagen. Bitte versuche es erneut.");
     }
   }
@@ -40,12 +48,9 @@ export function Topbar() {
     .join("");
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border bg-background/95 px-4 backdrop-blur sm:px-6">
-      <div className="flex items-center gap-2 lg:hidden">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <ShoppingCart className="h-4.5 w-4.5" />
-        </div>
-        <span className="text-sm font-semibold">{APP_NAME}</span>
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border/80 bg-background/90 px-4 backdrop-blur-md sm:px-6">
+      <div className="lg:hidden">
+        <BrandMark />
       </div>
 
       <div className="hidden flex-1 lg:block" />
@@ -57,6 +62,21 @@ export function Topbar() {
             Offline
           </span>
         )}
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative"
+          aria-label={cartCount > 0 ? `Aktiver Warenkorb, ${cartCount} Artikel` : "Aktiver Warenkorb"}
+          onClick={() => navigate(activeCart ? `/carts/${activeCart.id}` : "/dashboard")}
+        >
+          <ShoppingCart className="h-4 w-4" />
+          {cartCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground ring-2 ring-background">
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
+        </Button>
 
         <Button variant="ghost" size="icon" onClick={toggle} aria-label="Farbschema umschalten">
           {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

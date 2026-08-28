@@ -37,11 +37,18 @@ export async function updateCartNote(id: string, expectedVersion: number, note: 
   return updateCartOptimistic(id, expectedVersion, { note: note || null });
 }
 
+export function isOpenCart(status: CartStatus): boolean {
+  return status !== "ordered";
+}
+
 export async function updateCartStatus(
   id: string,
   expectedVersion: number,
   status: CartStatus,
 ): Promise<Tables<"carts">> {
+  if (status === "ordered") {
+    throw new Error("Der Bestellstatus wird nur durch das Absenden gesetzt.");
+  }
   return updateCartOptimistic(id, expectedVersion, { status });
 }
 
@@ -55,10 +62,11 @@ async function updateCartOptimistic(
     .update(patch)
     .eq("id", id)
     .eq("version", expectedVersion)
+    .neq("status", "ordered")
     .select()
     .maybeSingle();
   if (error) throw error;
-  if (!data) throw new ConcurrencyError("Dieser Warenkorb wurde zwischenzeitlich anderswo geändert.");
+  if (!data) throw new ConcurrencyError("Dieser Warenkorb wurde zwischenzeitlich anderswo geändert oder ist bereits bestellt.");
   return data;
 }
 
@@ -78,9 +86,13 @@ export async function archiveCart(id: string, expectedVersion: number): Promise<
 }
 
 export async function softDeleteCart(id: string): Promise<void> {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("carts")
     .update({ deleted_at: new Date().toISOString(), is_active_cart: false })
-    .eq("id", id);
+    .eq("id", id)
+    .neq("status", "ordered")
+    .select("id")
+    .maybeSingle();
   if (error) throw error;
+  if (!data) throw new Error("Abgeschickte Bestellungen können nicht gelöscht werden.");
 }

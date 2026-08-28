@@ -108,11 +108,19 @@ export function ProductFormDialog({ open, onOpenChange, product, loading, onSubm
       });
       onOpenChange(false);
     } catch (error) {
+      // Log the real Postgres/Supabase error (RLS denial, constraint
+      // violation, missing grant, ...) so it's diagnosable in the console -
+      // the toast below is deliberately generic-but-informative for the
+      // admin, never a bare "Failed to fetch".
+      console.error("Produkt konnte nicht gespeichert werden:", error);
       const message = error instanceof Error ? error.message : "Unbekannter Fehler.";
-      if (message.toLowerCase().includes("duplicate") || message.toLowerCase().includes("bereits")) {
+      const lower = message.toLowerCase();
+      if (lower.includes("duplicate") || lower.includes("bereits") || lower.includes("products_code_key")) {
         setErrors({ code: "Dieser Artikelcode existiert bereits." });
+      } else if (lower.includes("permission denied") || lower.includes("row-level security") || lower.includes("42501")) {
+        toast.error("Keine Berechtigung zum Speichern. Bitte prüfe, ob dein Konto die Admin-Rolle hat.");
       } else {
-        toast.error("Produkt konnte nicht gespeichert werden.");
+        toast.error(`Produkt konnte nicht gespeichert werden: ${message}`);
       }
     }
   }

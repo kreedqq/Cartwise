@@ -5,15 +5,21 @@ import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/toaster";
 import { registerSchema } from "@/lib/validation";
-import { signUp } from "@/services/auth";
-import { AuthLayout, mapAuthError } from "@/pages/Login";
+import { mapAuthError, POST_LOGIN_PATH, signUp } from "@/services/auth";
+import { AuthLayout } from "@/components/auth/AuthLayout";
+import { OAuthButtons } from "@/components/auth/OAuthButtons";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [form, setForm] = React.useState({ email: "", password: "", passwordConfirm: "", displayName: "" });
+  const [form, setForm] = React.useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    passwordConfirm: "",
+  });
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [loading, setLoading] = React.useState(false);
   const [done, setDone] = React.useState(false);
@@ -24,7 +30,12 @@ export default function RegisterPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const result = registerSchema.safeParse(form);
+    const result = registerSchema.safeParse({
+      email: form.email,
+      password: form.password,
+      passwordConfirm: form.passwordConfirm,
+      displayName: `${form.firstName} ${form.lastName}`.trim(),
+    });
     if (!result.success) {
       setErrors(Object.fromEntries(result.error.issues.map((i) => [i.path[0], i.message])));
       return;
@@ -34,8 +45,7 @@ export default function RegisterPage() {
     try {
       const { session } = await signUp(result.data.email, result.data.password, result.data.displayName);
       if (session) {
-        // Email confirmation is disabled on this project - the user is signed in immediately.
-        navigate("/dashboard", { replace: true });
+        navigate(POST_LOGIN_PATH, { replace: true });
       } else {
         setDone(true);
       }
@@ -49,97 +59,98 @@ export default function RegisterPage() {
   if (done) {
     return (
       <AuthLayout>
-        <Card className="w-full max-w-sm">
-          <CardHeader className="items-center text-center">
-            <CardTitle>Fast geschafft</CardTitle>
-            <CardDescription>
-              Wir haben dir eine Bestätigungs-E-Mail an <strong>{form.email}</strong> gesendet. Bitte bestätige
-              deine Adresse, um dich anzumelden.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild className="w-full" variant="outline">
-              <Link to="/login">Zur Anmeldung</Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <p className="text-sm leading-relaxed text-foreground">
+          Wir haben dir eine Bestätigungs-E-Mail an <strong>{form.email}</strong> gesendet. Bitte bestätige deine
+          Adresse, um dich anzumelden.
+        </p>
+        <Button asChild className="mt-5 w-full" variant="outline">
+          <Link to="/login">Zur Anmeldung</Link>
+        </Button>
       </AuthLayout>
     );
   }
 
   return (
     <AuthLayout>
-      <Card className="w-full max-w-sm">
-        <CardHeader className="items-center text-center">
-          <CardTitle className="text-xl">Konto erstellen</CardTitle>
-          <CardDescription>Lege ein neues Konto an, um Warenkörbe zu verwalten.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-            <div className="space-y-1.5">
-              <Label htmlFor="displayName">Anzeigename</Label>
-              <Input
-                id="displayName"
-                autoComplete="name"
-                value={form.displayName}
-                invalid={!!errors.displayName}
-                onChange={(e) => update("displayName", e.target.value)}
-              />
-              {errors.displayName && <p className="text-xs text-destructive">{errors.displayName}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="email">E-Mail-Adresse</Label>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={form.email}
-                invalid={!!errors.email}
-                onChange={(e) => update("email", e.target.value)}
-              />
-              {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Passwort</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                value={form.password}
-                invalid={!!errors.password}
-                onChange={(e) => update("password", e.target.value)}
-              />
-              {errors.password ? (
-                <p className="text-xs text-destructive">{errors.password}</p>
-              ) : (
-                <p className="text-xs text-muted-foreground">Mindestens 8 Zeichen, mit Buchstabe und Zahl.</p>
-              )}
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="passwordConfirm">Passwort bestätigen</Label>
-              <Input
-                id="passwordConfirm"
-                type="password"
-                autoComplete="new-password"
-                value={form.passwordConfirm}
-                invalid={!!errors.passwordConfirm}
-                onChange={(e) => update("passwordConfirm", e.target.value)}
-              />
-              {errors.passwordConfirm && <p className="text-xs text-destructive">{errors.passwordConfirm}</p>}
-            </div>
-            <Button type="submit" className="w-full" loading={loading}>
-              <UserPlus /> Registrieren
-            </Button>
-          </form>
+      <form className="space-y-3" onSubmit={handleSubmit} noValidate>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="firstName">Vorname</Label>
+            <Input
+              id="firstName"
+              autoComplete="given-name"
+              value={form.firstName}
+              invalid={!!errors.displayName}
+              onChange={(e) => update("firstName", e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="lastName">Nachname</Label>
+            <Input
+              id="lastName"
+              autoComplete="family-name"
+              value={form.lastName}
+              invalid={!!errors.displayName}
+              onChange={(e) => update("lastName", e.target.value)}
+            />
+          </div>
+        </div>
+        {errors.displayName && <p className="text-xs text-destructive">{errors.displayName}</p>}
+        <div className="space-y-1.5">
+          <Label htmlFor="email">E-Mail-Adresse</Label>
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            value={form.email}
+            invalid={!!errors.email}
+            onChange={(e) => update("email", e.target.value)}
+          />
+          {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="password">Passwort</Label>
+          <Input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            value={form.password}
+            invalid={!!errors.password}
+            onChange={(e) => update("password", e.target.value)}
+          />
+          {errors.password ? (
+            <p className="text-xs text-destructive">{errors.password}</p>
+          ) : (
+            <p className="text-xs text-muted-foreground">Mindestens 8 Zeichen, mit Buchstabe und Zahl.</p>
+          )}
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="passwordConfirm">Passwort bestätigen</Label>
+          <Input
+            id="passwordConfirm"
+            type="password"
+            autoComplete="new-password"
+            value={form.passwordConfirm}
+            invalid={!!errors.passwordConfirm}
+            onChange={(e) => update("passwordConfirm", e.target.value)}
+          />
+          {errors.passwordConfirm && <p className="text-xs text-destructive">{errors.passwordConfirm}</p>}
+        </div>
+        <Button type="submit" size="lg" className="h-10 w-full rounded-[10px]" loading={loading}>
+          <UserPlus /> Konto erstellen
+        </Button>
+      </form>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            Bereits ein Konto?{" "}
-            <Link to="/login" className="font-medium text-primary hover:underline">
-              Jetzt anmelden
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+      <div className="mt-4">
+        <OAuthButtons />
+      </div>
+
+      <p className="mt-4 text-center text-sm text-muted-foreground">
+        Bereits ein Konto?{" "}
+        <Link to="/login" className="font-medium text-primary hover:underline">
+          Jetzt anmelden
+        </Link>
+      </p>
     </AuthLayout>
   );
 }

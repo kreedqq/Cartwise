@@ -1,0 +1,602 @@
+{
+  "slug": "tesamorelin",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "tesamorelin"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "tesamorelin",
+      "totalCount": 24,
+      "studies": [
+        {
+          "nctId": "NCT06554717",
+          "title": "Tesamorelin as an Adjunct to Exercise for Improving Physical Function in HIV",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 100,
+          "start": "2025-07-10",
+          "completion": "2028-12-01",
+          "lastUpdate": "2026-05-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06554717"
+        },
+        {
+          "nctId": "NCT03226821",
+          "title": "Body Composition and Adipose Tissue in HIV",
+          "status": "TERMINATED",
+          "phase": "PHASE4",
+          "sponsor": "Columbia University",
+          "enrollment": 6,
+          "start": "2018-02-07",
+          "completion": "2025-04-30",
+          "lastUpdate": "2026-05-19",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT03226821"
+        },
+        {
+          "nctId": "NCT07481734",
+          "title": "Tesamorelin for Reduction of Liver Fat in Adults With Fatty Liver Disease (Mock Study)",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Hudson Biotech",
+          "enrollment": 120,
+          "start": "2026-02-02",
+          "completion": "2028-02-17",
+          "lastUpdate": "2026-03-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07481734"
+        },
+        {
+          "nctId": "NCT02572323",
+          "title": "Phase II Trial of Tesamorelin for Cognition in Aging HIV-Infected Persons",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "University of California, San Diego",
+          "enrollment": 73,
+          "start": "2017-02-15",
+          "completion": "2023-10-15",
+          "lastUpdate": "2026-03-12",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT02572323"
+        },
+        {
+          "nctId": "NCT03375788",
+          "title": "Growth Hormone Releasing Hormone Analog to Improve Nonalcoholic Fatty Liver Disease and Associated Cardiovascular Risk",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 51,
+          "start": "2019-01-17",
+          "completion": "2025-01-10",
+          "lastUpdate": "2025-11-20",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT03375788"
+        },
+        {
+          "nctId": "NCT03150511",
+          "title": "Tesamorelin to Improve Functional Outcomes After Peripheral Nerve Injury",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Johns Hopkins University",
+          "enrollment": 36,
+          "start": "2018-06-01",
+          "completion": "2027-12",
+          "lastUpdate": "2025-11-12",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT03150511"
+        },
+        {
+          "nctId": "NCT00608023",
+          "title": "TH9507 Extension Study in Patients With HIV-Associated Lipodystrophy",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Theratechnologies",
+          "enrollment": 263,
+          "start": "2007-08",
+          "completion": "2008-10",
+          "lastUpdate": "2022-09-30",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00608023"
+        },
+        {
+          "nctId": "NCT03826160",
+          "title": "Growth Hormone Dynamics and Cardiac Steatosis in HIV",
+          "status": "COMPLETED",
+          "phase": null,
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 23,
+          "start": "2019-01-30",
+          "completion": "2022-04-19",
+          "lastUpdate": "2022-07-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT03826160"
+        },
+        {
+          "nctId": "NCT01388920",
+          "title": "Efficacy and Safety Study of Tesamorelin in Chronic Obstructive Pulmonary Disease (COPD) Subjects With Muscle Wasting",
+          "status": "TERMINATED",
+          "phase": "PHASE2",
+          "sponsor": "Theratechnologies",
+          "enrollment": 3,
+          "start": "2011-09",
+          "completion": "2011-12",
+          "lastUpdate": "2022-03-18",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT01388920"
+        },
+        {
+          "nctId": "NCT02196831",
+          "title": "Tesamorelin Effects on Liver Fat and Histology in HIV",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 61,
+          "start": "2015-07-01",
+          "completion": "2019-07-24",
+          "lastUpdate": "2020-01-27",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT02196831"
+        },
+        {
+          "nctId": "NCT02931474",
+          "title": "Impact of GHRH on Sleep Promotion and Endocrine Regulation in Service Members Who Sustained a Traumatic Brain Injury and Have Current Insomnia",
+          "status": "WITHDRAWN",
+          "phase": "PHASE2",
+          "sponsor": "National Institute of Nursing Research (NINR)",
+          "enrollment": 0,
+          "start": "2016-10-06",
+          "completion": "2017-03-08",
+          "lastUpdate": "2019-11-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT02931474"
+        },
+        {
+          "nctId": "NCT02553603",
+          "title": "The Effect of Growth Hormone Releasing Hormone on Cognitive Function in Individuals With Mild Cognitive Impairment",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "The University of Texas Medical Branch, Galveston",
+          "enrollment": 22,
+          "start": "2017-07-18",
+          "completion": "2019-01-17",
+          "lastUpdate": "2019-11-04",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT02553603"
+        },
+        {
+          "nctId": "NCT01591902",
+          "title": "Diabetic Retinopathy in HIV Subjects Treated With EGRIFTA®",
+          "status": "TERMINATED",
+          "phase": "PHASE4",
+          "sponsor": "Theratechnologies",
+          "enrollment": 129,
+          "start": "2012-06",
+          "completion": "2018-08",
+          "lastUpdate": "2018-09-11",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01591902"
+        },
+        {
+          "nctId": "NCT01579695",
+          "title": "Long-term Observational Study in HIV Subjects Exposed to EGRIFTA®",
+          "status": "TERMINATED",
+          "phase": null,
+          "sponsor": "Theratechnologies",
+          "enrollment": 391,
+          "start": "2013-02",
+          "completion": "2018-08",
+          "lastUpdate": "2018-09-11",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01579695"
+        },
+        {
+          "nctId": "NCT00675506",
+          "title": "Effectiveness of Growth Hormone Releasing Hormone in Reducing Abdominal Fat in People Who Are Obese",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 60,
+          "start": "2008-07",
+          "completion": "2012-01",
+          "lastUpdate": "2017-12-13",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00675506"
+        },
+        {
+          "nctId": "NCT01263717",
+          "title": "Effects of Growth Hormone Releasing Hormone in HIV",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 54,
+          "start": "2010-12",
+          "completion": "2014-02",
+          "lastUpdate": "2017-10-30",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT01263717"
+        },
+        {
+          "nctId": "NCT01788462",
+          "title": "Egrifta Replacement and Sleep Disordered Breathing",
+          "status": "WITHDRAWN",
+          "phase": null,
+          "sponsor": "Johns Hopkins University",
+          "enrollment": 0,
+          "start": "2012-05",
+          "completion": "2020-01",
+          "lastUpdate": "2017-03-03",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01788462"
+        },
+        {
+          "nctId": "NCT01632592",
+          "title": "Abdominal Obesity, Cardiovascular Inflammation, and Effects of Growth Hormone Releasing Hormone Analogue",
+          "status": "WITHDRAWN",
+          "phase": "NA",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 0,
+          "start": "2014-01",
+          "completion": "2014-01",
+          "lastUpdate": "2014-01-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01632592"
+        },
+        {
+          "nctId": "NCT00795210",
+          "title": "Effects of Short-term Growth Hormone in HIV-infected Patients",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 25,
+          "start": "2009-02",
+          "completion": "2012-11",
+          "lastUpdate": "2014-01-08",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00795210"
+        },
+        {
+          "nctId": "NCT00257712",
+          "title": "SMART: Somatotrophics, Memory, and Aging Research Trial",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "University of Washington",
+          "enrollment": 151,
+          "start": "2006-02",
+          "completion": "2011-12",
+          "lastUpdate": "2013-12-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT00257712"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "tesamorelin AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 73,
+      "articles": [
+        {
+          "pmid": "41476424",
+          "title": "Injectable Peptide Therapy: A Primer for Orthopaedic and Sports Medicine Physicians.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Jan",
+          "authors": [
+            "Mayfield CK",
+            "Bolia IK",
+            "Feingold CL",
+            "Lin EH",
+            "Liu JN",
+            "Rick Hatch GF"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1177/03635465251357593",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41476424/"
+        },
+        {
+          "pmid": "41490200",
+          "title": "Therapeutic Peptides in Orthopaedics: Applications, Challenges, and Future Directions.",
+          "source": "J Am Acad Orthop Surg Glob Res Rev",
+          "pubdate": "2026 Jan 1",
+          "authors": [
+            "Rahman OF",
+            "Lee SJ",
+            "Seeds WA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.5435/JAAOSGlobal-D-25-00236",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41490200/"
+        },
+        {
+          "pmid": "41966639",
+          "title": "Safety and Efficacy of Approved and Unapproved Peptide Therapies for Musculoskeletal Injuries and Athletic Performance.",
+          "source": "Sports Med",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Mendias CL",
+            "Awan TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s40279-026-02437-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41966639/"
+        },
+        {
+          "pmid": "21283099",
+          "title": "Tesamorelin.",
+          "source": "Nat Rev Drug Discov",
+          "pubdate": "2011 Feb",
+          "authors": [
+            "Grunfeld C",
+            "Dritselis A",
+            "Kirkpatrick P"
+          ],
+          "pubtype": [
+            "News"
+          ],
+          "doi": "10.1038/nrd3362",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21283099/"
+        },
+        {
+          "pmid": "42123471",
+          "title": "Therapeutic Peptides in Aesthetic, Metabolic and Endocrine Conditions: Effects, Safety, Clinical Applications, and Future Perspectives.",
+          "source": "Int J Mol Sci",
+          "pubdate": "2026 Apr 27",
+          "authors": [
+            "Renke G",
+            "Chinellato L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3390/ijms27093890",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42123471/"
+        },
+        {
+          "pmid": "30920787",
+          "title": "",
+          "source": "",
+          "pubdate": "2016 Aug",
+          "authors": [],
+          "pubtype": [
+            "Review"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30920787/"
+        },
+        {
+          "pmid": "38905488",
+          "title": "Efficacy and safety of tesamorelin in people with HIV on integrase inhibitors.",
+          "source": "AIDS",
+          "pubdate": "2024 Oct 1",
+          "authors": [
+            "Russo SC",
+            "Ockene MW",
+            "Arpante AK",
+            "Johnson JE",
+            "Lee H",
+            "Toribio M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't",
+            "Research Support, N.I.H., Extramural"
+          ],
+          "doi": "10.1097/QAD.0000000000003965",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38905488/"
+        },
+        {
+          "pmid": "21668043",
+          "title": "Tesamorelin: a review of its use in the management of HIV-associated lipodystrophy.",
+          "source": "Drugs",
+          "pubdate": "2011 May 28",
+          "authors": [
+            "Dhillon S"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.2165/11202240-000000000-00000",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21668043/"
+        },
+        {
+          "pmid": "39813152",
+          "title": "Effects of Tesamorelin on Neurocognitive Impairment in Persons With HIV and Abdominal Obesity.",
+          "source": "J Infect Dis",
+          "pubdate": "2025 Jun 2",
+          "authors": [
+            "Ellis RJ",
+            "Vaida F",
+            "Hu K",
+            "Dube M",
+            "Henry B",
+            "Chow F"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase II",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1093/infdis/jiaf012",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39813152/"
+        },
+        {
+          "pmid": "33756511",
+          "title": "Tesamorelin improves fat quality independent of changes in fat quantity.",
+          "source": "AIDS",
+          "pubdate": "2021 Jul 15",
+          "authors": [
+            "Lake JE",
+            "La K",
+            "Erlandson KM",
+            "Adrian S",
+            "Yenokyan G",
+            "Scherzinger A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, N.I.H., Extramural"
+          ],
+          "doi": "10.1097/QAD.0000000000002897",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33756511/"
+        },
+        {
+          "pmid": "28617838",
+          "title": "Safety and metabolic effects of tesamorelin, a growth hormone-releasing factor analogue, in patients with type 2 diabetes: A randomized, placebo-controlled trial.",
+          "source": "PLoS One",
+          "pubdate": "2017",
+          "authors": [
+            "Clemmons DR",
+            "Miller S",
+            "Mamputu JC"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1371/journal.pone.0179538",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28617838/"
+        },
+        {
+          "pmid": "25038357",
+          "title": "Effect of tesamorelin on visceral fat and liver fat in HIV-infected patients with abdominal fat accumulation: a randomized clinical trial.",
+          "source": "JAMA",
+          "pubdate": "2014 Jul 23-30",
+          "authors": [
+            "Stanley TL",
+            "Feldpausch MN",
+            "Oh J",
+            "Branch KL",
+            "Lee H",
+            "Torriani M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, N.I.H., Extramural"
+          ],
+          "doi": "10.1001/jama.2014.8334",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25038357/"
+        },
+        {
+          "pmid": "32701508",
+          "title": "Effects of tesamorelin on hepatic transcriptomic signatures in HIV-associated NAFLD.",
+          "source": "JCI Insight",
+          "pubdate": "2020 Aug 20",
+          "authors": [
+            "Fourman LT",
+            "Billingsley JM",
+            "Agyapong G",
+            "Ho Sui SJ",
+            "Feldpausch MN",
+            "Purdy J"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, N.I.H., Extramural",
+            "Research Support, N.I.H., Intramural",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1172/jci.insight.140134",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32701508/"
+        },
+        {
+          "pmid": "18724445",
+          "title": "Tesamorelin for fat accumulation. 52-week effects and safety of tesamorelin (growth hormone releasing factor) in HIV patients with fat accumulation.",
+          "source": "Posit Aware",
+          "pubdate": "2008 May-Jun",
+          "authors": [
+            "Berger D"
+          ],
+          "pubtype": [
+            "Newspaper Article",
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18724445/"
+        },
+        {
+          "pmid": "19243281",
+          "title": "Tesamorelin, a human growth hormone releasing factor analogue.",
+          "source": "Expert Opin Investig Drugs",
+          "pubdate": "2009 Mar",
+          "authors": [
+            "Wang Y",
+            "Tomlinson B"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1517/13543780802707658",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19243281/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "tesamorelin",
+      "found": true,
+      "products": [
+        {
+          "sponsor": "THERATECHNOLOGIES",
+          "application": "BLA022505",
+          "products": [
+            {
+              "brand": "EGRIFTA",
+              "active": [
+                {
+                  "name": "TESAMORELIN ACETATE",
+                  "strength": "EQ 1MG BASE/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "POWDER",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "EGRIFTA",
+              "active": [
+                {
+                  "name": "TESAMORELIN ACETATE",
+                  "strength": "EQ 2MG BASE/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "POWDER",
+              "route": "SUBCUTANEOUS"
+            }
+          ]
+        }
+      ],
+      "message": null
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 16137828,
+      "cas": "218949-48-5",
+      "formula": "C221H366N72O67S",
+      "iupac": "(4S)-4-[[2-[[(2S)-5-amino-2-[[(2S)-5-amino-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S,3S)-2-[[(2S)-2-[[(2S)-5-amino-2-[[(2S)-2-[[(2S)-2-[[(2S)-6-amino-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-5-amino-2-[[2-[[(2S)-2-[[(2S)-2-[[(2S)-6-amino-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-4-amino-2-[[(2S,3R)-2-[[(2S)-2-[[(2S,3S)-2-[[(2S)-2-[[(2S)-3-carboxy-2-[[(2S)-2-[[(2S)-2-[[(E)-hex-3-enoyl]amino]-3-(4-hydroxyphenyl)propanoyl]amino]propanoyl]amino]propanoyl]amino]propanoyl]amino]-3-methylpentanoyl]amino]-3-phenylpropanoyl]amino]-3-hydroxybutanoyl]amino]-4-oxobutanoyl]amino]-3-hydroxypropanoyl]amino]-3-(4-hydroxyphenyl)propanoyl]amino]-5-carbamimidamidopentanoyl]amino]hexanoyl]amino]-3-methylbutanoyl]amino]-4-methylpentanoyl]amino]acetyl]amino]-5-oxopentanoyl]amino]-4-methylpentanoyl]amino]-3-hydroxypropanoyl]amino]propanoyl]amino]-5-carbamimidamidopentanoyl]amino]hexanoyl]amino]-4-methylpentanoyl]amino]-4-methylpentanoyl]amino]-5-oxopentanoyl]amino]-3-carboxypropanoyl]amino]-3-methylpentanoyl]amino]-4-methylsulfanylbutanoyl]amino]-3-hydroxypropanoyl]amino]-5-carbamimidamidopentanoyl]amino]-5-oxopentanoyl]amino]-5-oxopentanoyl]amino]acetyl]amino]-5-[[(2S)-1-[[(2S)-4-amino-1-[[(2S)-5-amino-1-[[(2S)-1-[[(2S)-1-[[2-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-amino-4-methyl-1-oxopentan-2-yl]amino]-5-carbamimidamido-1-oxopentan-2-yl]amino]-1-oxopropan-2-yl]amino]-5-carbamimidamido-1-oxopentan-2-yl]amino]-1-oxopropan-2-yl]amino]-2-oxoethyl]amino]-5-carbamimidamido-1-oxopentan-2-yl]amino]-4-carboxy-1-oxobutan-2-yl]amino]-1,5-dioxopentan-2-yl]amino]-1,4-dioxobutan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-5-oxopentanoic acid"
+    }
+  }
+}

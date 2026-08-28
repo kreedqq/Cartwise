@@ -1,12 +1,15 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, ShieldCheck, UserCircle, ShoppingCart } from "lucide-react";
+import { BookOpen, ClipboardList, LayoutGrid, ShieldCheck, ShoppingBag, UserCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthProvider";
-import { APP_NAME } from "@/lib/constants";
+import { BrandMark } from "@/components/layout/BrandMark";
 
 const navItems = [
-  { to: "/dashboard", label: "Warenkörbe", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Übersicht", icon: LayoutGrid },
+  { to: "/shop", label: "Shop", icon: ShoppingBag },
+  { to: "/peptide", label: "Rechner & Lexikon", icon: BookOpen },
+  { to: "/orders", label: "Bestellungen", icon: ClipboardList },
   { to: "/profile", label: "Profil", icon: UserCircle },
 ];
 
@@ -14,25 +17,22 @@ export function Sidebar() {
   const { isAdmin } = useAuth();
 
   return (
-    <aside className="hidden w-64 shrink-0 border-r border-border bg-card/50 lg:flex lg:flex-col">
-      <div className="flex h-16 items-center gap-2 px-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <ShoppingCart className="h-4.5 w-4.5" />
-        </div>
-        <span className="text-sm font-semibold leading-tight">{APP_NAME}</span>
+    <aside className="hidden w-[15.5rem] shrink-0 bg-sidebar text-sidebar-foreground lg:flex lg:flex-col">
+      <div className="flex h-16 items-center px-5">
+        <BrandMark inverted />
       </div>
 
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      <nav className="flex-1 space-y-0.5 px-3 py-4">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium tracking-wide transition-colors",
                 isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                  ? "bg-primary/12 text-primary"
+                  : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground",
               )
             }
           >
@@ -43,23 +43,22 @@ export function Sidebar() {
 
         {isAdmin && (
           <>
-            <div className="px-3 pb-1 pt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Administration
+            <div className="px-3 pb-1 pt-8 text-[10px] font-semibold uppercase tracking-[0.18em] text-sidebar-muted">
+              Intern
             </div>
             <NavLink
               to="/admin"
-              end
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium tracking-wide transition-colors",
                   isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                    ? "bg-primary/12 text-primary"
+                    : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground",
                 )
               }
             >
               <ShieldCheck className="h-4 w-4" />
-              Admin-Dashboard
+              Admin
             </NavLink>
           </>
         )}

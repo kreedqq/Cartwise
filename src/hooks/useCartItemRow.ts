@@ -57,7 +57,10 @@ export function useCartItemRow(item: ComputedCartItem, cartId: string, currentRa
       } catch (error) {
         setCodeStatus("error");
         if (error instanceof ConcurrencyError) handleConflict("Diese Zeile");
-        else toast.error("Artikelcode konnte nicht gespeichert werden.");
+        else {
+          console.error("Artikelcode speichern fehlgeschlagen:", error);
+          toast.error("Artikelcode konnte nicht gespeichert werden.");
+        }
       }
     },
     [item, mutations.updateCode, currentRate],
@@ -79,7 +82,10 @@ export function useCartItemRow(item: ComputedCartItem, cartId: string, currentRa
       } catch (error) {
         setQuantityStatus("error");
         if (error instanceof ConcurrencyError) handleConflict("Diese Zeile");
-        else toast.error("Menge konnte nicht gespeichert werden.");
+        else {
+          console.error("Menge speichern fehlgeschlagen:", error);
+          toast.error("Menge konnte nicht gespeichert werden.");
+        }
       }
     },
     [item, mutations.updateQuantity],
@@ -95,7 +101,10 @@ export function useCartItemRow(item: ComputedCartItem, cartId: string, currentRa
       } catch (error) {
         setNoteStatus("error");
         if (error instanceof ConcurrencyError) handleConflict("Diese Zeile");
-        else toast.error("Notiz konnte nicht gespeichert werden.");
+        else {
+          console.error("Notiz speichern fehlgeschlagen:", error);
+          toast.error("Notiz konnte nicht gespeichert werden.");
+        }
       }
     },
     [item, mutations.updateNote],
@@ -128,7 +137,8 @@ export function useCartItemRow(item: ComputedCartItem, cartId: string, currentRa
   async function remove() {
     try {
       await mutations.remove.mutateAsync(item.id);
-    } catch {
+    } catch (error) {
+      console.error("Position löschen fehlgeschlagen:", error);
       toast.error("Position konnte nicht gelöscht werden.");
     }
   }
@@ -136,7 +146,8 @@ export function useCartItemRow(item: ComputedCartItem, cartId: string, currentRa
   async function duplicate(nextPosition: number) {
     try {
       await mutations.duplicate.mutateAsync({ item: item as Tables<"cart_items">, nextPosition });
-    } catch {
+    } catch (error) {
+      console.error("Position duplizieren fehlgeschlagen:", error);
       toast.error("Position konnte nicht dupliziert werden.");
     }
   }

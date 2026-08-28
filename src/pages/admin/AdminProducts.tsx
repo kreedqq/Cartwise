@@ -68,14 +68,20 @@ export default function AdminProductsPage() {
       await setProductActive(product.id, !product.is_active);
       await invalidate();
       toast.success(product.is_active ? "Produkt deaktiviert." : "Produkt aktiviert.");
-    } catch {
+    } catch (error) {
+      console.error("Produktstatus ändern fehlgeschlagen:", error);
       toast.error("Status konnte nicht geändert werden.");
     }
   }
 
   async function openDeleteDialog(product: Tables<"products">) {
     setDeleteTarget(product);
-    const referenced = await isProductReferenced(product.id).catch(() => true);
+    // Fail safe: if the referenced-check itself errors, assume "referenced"
+    // so a hard delete is blocked rather than silently allowed.
+    const referenced = await isProductReferenced(product.id).catch((error: unknown) => {
+      console.error("Prüfung auf Warenkorb-Referenzen fehlgeschlagen:", error);
+      return true;
+    });
     setDeleteBlocked(referenced);
   }
 
@@ -86,7 +92,8 @@ export default function AdminProductsPage() {
       toast.success("Produkt gelöscht.");
       setDeleteTarget(null);
       await invalidate();
-    } catch {
+    } catch (error) {
+      console.error("Produkt löschen fehlgeschlagen:", error);
       toast.error("Löschen fehlgeschlagen.");
     }
   }

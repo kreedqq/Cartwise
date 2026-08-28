@@ -13,6 +13,9 @@
     "format:check": "prettier --check .",
     "preview": "vite preview",
     "test": "vitest run",
+    "research:fetch": "node scripts/fetch-research-sources.mjs",
+    "research:labels": "node scripts/fetch-regulatory-labels.mjs",
+    "research:compile": "node scripts/compile-research-profiles.mjs",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },

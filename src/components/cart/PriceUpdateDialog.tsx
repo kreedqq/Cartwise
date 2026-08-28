@@ -62,7 +62,10 @@ export function PriceUpdateDialog({ open, onOpenChange, cartId, items, currentRa
           .filter((d): d is PriceUpdateDiff => d !== null && d.changed);
         setDiffs(computed);
       })
-      .catch(() => toast.error("Aktuelle Preise konnten nicht geladen werden."))
+      .catch((error: unknown) => {
+        console.error("Aktuelle Preise laden fehlgeschlagen:", error);
+        toast.error("Aktuelle Preise konnten nicht geladen werden.");
+      })
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, currentRate]);
@@ -83,7 +86,8 @@ export function PriceUpdateDialog({ open, onOpenChange, cartId, items, currentRa
       try {
         await refreshPrice.mutateAsync({ item, product, currentRate });
         succeeded += 1;
-      } catch {
+      } catch (error) {
+        console.error(`Preis-Update für Position ${item.id} fehlgeschlagen:`, error);
         failed += 1;
       }
     }

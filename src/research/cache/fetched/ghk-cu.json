@@ -1,0 +1,356 @@
+{
+  "slug": "ghk-cu",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "GHK-Cu",
+    "\"glycyl-L-histidyl-L-lysine\" copper"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "GHK-Cu",
+      "totalCount": 3,
+      "studies": [
+        {
+          "nctId": "NCT07706361",
+          "title": "Two-Part Study of the Effects of the X39 Patch on Circulating GHK and GHK-Cu Levels in Healthy Adults",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "NA",
+          "sponsor": "LifeWave, Inc.",
+          "enrollment": 100,
+          "start": "2027-01",
+          "completion": "2027-04",
+          "lastUpdate": "2026-07-15",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07706361"
+        },
+        {
+          "nctId": "NCT07437586",
+          "title": "Topical GHK-Cu Gel for Acute Skin Wound Healing",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Hudson Biotech",
+          "enrollment": 60,
+          "start": "2026-02-02",
+          "completion": "2028-03-17",
+          "lastUpdate": "2026-02-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07437586"
+        },
+        {
+          "nctId": "NCT05932732",
+          "title": "Trial Assessing the Impact on Facial Skin Quality, Hydration, and Skin Barrier of Three (3) Hydrafacial Treatments in Adults of All Skin Types.",
+          "status": "COMPLETED",
+          "phase": "PHASE4",
+          "sponsor": "Austin Institute for Clinical Research",
+          "enrollment": 27,
+          "start": "2023-11-20",
+          "completion": "2024-10-09",
+          "lastUpdate": "2024-10-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05932732"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "GHK-Cu AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 15,
+      "articles": [
+        {
+          "pmid": "41490200",
+          "title": "Therapeutic Peptides in Orthopaedics: Applications, Challenges, and Future Directions.",
+          "source": "J Am Acad Orthop Surg Glob Res Rev",
+          "pubdate": "2026 Jan 1",
+          "authors": [
+            "Rahman OF",
+            "Lee SJ",
+            "Seeds WA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.5435/JAAOSGlobal-D-25-00236",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41490200/"
+        },
+        {
+          "pmid": "41476424",
+          "title": "Injectable Peptide Therapy: A Primer for Orthopaedic and Sports Medicine Physicians.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Jan",
+          "authors": [
+            "Mayfield CK",
+            "Bolia IK",
+            "Feingold CL",
+            "Lin EH",
+            "Liu JN",
+            "Rick Hatch GF"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1177/03635465251357593",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41476424/"
+        },
+        {
+          "pmid": "41966639",
+          "title": "Safety and Efficacy of Approved and Unapproved Peptide Therapies for Musculoskeletal Injuries and Athletic Performance.",
+          "source": "Sports Med",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Mendias CL",
+            "Awan TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s40279-026-02437-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41966639/"
+        },
+        {
+          "pmid": "42578445",
+          "title": "Peptide Supplements and Their Therapeutic Applications in Sports Medicine.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Aug 11",
+          "authors": [
+            "Tewari K",
+            "Liu TP",
+            "Im C",
+            "Hamad C",
+            "Petrigliano F",
+            "Cheung EC"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1177/03635465261464420",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42578445/"
+        },
+        {
+          "pmid": "42123471",
+          "title": "Therapeutic Peptides in Aesthetic, Metabolic and Endocrine Conditions: Effects, Safety, Clinical Applications, and Future Perspectives.",
+          "source": "Int J Mol Sci",
+          "pubdate": "2026 Apr 27",
+          "authors": [
+            "Renke G",
+            "Chinellato L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3390/ijms27093890",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42123471/"
+        },
+        {
+          "pmid": "42635865",
+          "title": "Peptides in Regenerative Medicine: A Comprehensive Review of Clinical Applications in Tissue Repair and Chronic Pain Management.",
+          "source": "Curr Pain Headache Rep",
+          "pubdate": "2026 Aug 24",
+          "authors": [
+            "Luansritisakul C",
+            "Chiang MC",
+            "Burns SL",
+            "Fonseca ACG"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s11916-026-01542-z",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42635865/"
+        },
+        {
+          "pmid": "42021992",
+          "title": "Therapeutic peptides in gerontology: mechanisms and applications for healthy aging.",
+          "source": "Front Aging",
+          "pubdate": "2026",
+          "authors": [
+            "Mavrych V",
+            "Shypilova I",
+            "Bolgova O"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3389/fragi.2026.1790247",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42021992/"
+        },
+        {
+          "pmid": "42619529",
+          "title": "The Regenerative Potential of GHK-Cu in Aesthetic Medicine.",
+          "source": "Aesthet Surg J",
+          "pubdate": "2026 Aug 20",
+          "authors": [
+            "Mokhtar J",
+            "Mohamad B",
+            "Haddad J",
+            "Said A",
+            "Menon A",
+            "Kreutz-Rodrigues L"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1093/asj/sjag169",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42619529/"
+        },
+        {
+          "pmid": "37180036",
+          "title": "Improved laccase production by Trametes versicolor using Copper-Glycyl-L-Histidyl-L-Lysine as a novel and high-efficient inducer.",
+          "source": "Front Bioeng Biotechnol",
+          "pubdate": "2023",
+          "authors": [
+            "Wang F",
+            "Yu X",
+            "Yu Z",
+            "Cui Y",
+            "Xu L",
+            "Huo S"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.3389/fbioe.2023.1176352",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37180036/"
+        },
+        {
+          "pmid": "39795193",
+          "title": "Are We Ready to Measure Skin Permeation of Modern Antiaging GHK-Cu Tripeptide Encapsulated in Liposomes?",
+          "source": "Molecules",
+          "pubdate": "2025 Jan 1",
+          "authors": [
+            "Ogórek K",
+            "Nowak K",
+            "Wadych E",
+            "Ruzik L",
+            "Timerbaev AR",
+            "Matczuk M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3390/molecules30010136",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39795193/"
+        },
+        {
+          "pmid": "25731775",
+          "title": "Tripeptide-copper complex GHK-Cu (II) transiently improved healing outcome in a rat model of ACL reconstruction.",
+          "source": "J Orthop Res",
+          "pubdate": "2015 Jul",
+          "authors": [
+            "Fu SC",
+            "Cheuk YC",
+            "Chiu WY",
+            "Yung SH",
+            "Rolf CG",
+            "Chan KM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1002/jor.22831",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25731775/"
+        },
+        {
+          "pmid": "30741553",
+          "title": "Chelating Surfaces for Oriented Human Serum Albumin Molecules.",
+          "source": "Langmuir",
+          "pubdate": "2019 Mar 5",
+          "authors": [
+            "Tuccitto N",
+            "Messina GML",
+            "Li-Destri G",
+            "Wietecka A",
+            "Marletta G"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1021/acs.langmuir.9b00068",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30741553/"
+        },
+        {
+          "pmid": "25690343",
+          "title": "Microneedle-Mediated Delivery of Copper Peptide Through Skin.",
+          "source": "Pharm Res",
+          "pubdate": "2015 Aug",
+          "authors": [
+            "Li H",
+            "Low YS",
+            "Chong HP",
+            "Zin MT",
+            "Lee CY",
+            "Li B"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1007/s11095-015-1652-z",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25690343/"
+        },
+        {
+          "pmid": "16847171",
+          "title": "Effects of topical copper tripeptide complex on CO2 laser-resurfaced skin.",
+          "source": "Arch Facial Plast Surg",
+          "pubdate": "2006 Jul-Aug",
+          "authors": [
+            "Miller TR",
+            "Wagner JD",
+            "Baack BR",
+            "Eisbach KJ"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1001/archfaci.8.4.252",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16847171/"
+        },
+        {
+          "pmid": "18350235",
+          "title": "Biological activities of selected peptides: skin penetration ability of copper complexes with peptides.",
+          "source": "J Cosmet Sci",
+          "pubdate": "2008 Jan-Feb",
+          "authors": [
+            "Mazurowska L",
+            "Mojski M"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18350235/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "GHK-Cu",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 139035031,
+      "cas": null,
+      "formula": "C14H21CuN6O4-",
+      "iupac": "copper (2S)-6-amino-2-[[(2S)-2-(2-azanidylacetyl)azanidyl-3-(1H-imidazol-4-yl)propanoyl]amino]hexanoate"
+    }
+  }
+}

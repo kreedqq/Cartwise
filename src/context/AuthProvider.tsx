@@ -4,6 +4,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 import { getOwnProfile } from "@/services/profiles";
 import { getOwnRoles } from "@/services/roles";
+import { getMyCustomerRoleName } from "@/services/customerRoles";
 import type { Role, Tables } from "@/types/database";
 
 interface AuthState {
@@ -12,6 +13,7 @@ interface AuthState {
   profile: Tables<"profiles"> | null;
   roles: Role[];
   isAdmin: boolean;
+  customerRoleName: string | null;
   loading: boolean;
   refreshProfile: () => Promise<void>;
 }
@@ -22,13 +24,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);
   const [profile, setProfile] = React.useState<Tables<"profiles"> | null>(null);
   const [roles, setRoles] = React.useState<Role[]>([]);
+  const [customerRoleName, setCustomerRoleName] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   const loadUserData = React.useCallback(async (userId: string) => {
     try {
-      const [profileData, roleData] = await Promise.all([getOwnProfile(userId), getOwnRoles(userId)]);
+      const [profileData, roleData, pricingRoleName] = await Promise.all([
+        getOwnProfile(userId),
+        getOwnRoles(userId),
+        getMyCustomerRoleName().catch(() => null),
+      ]);
       setProfile(profileData);
       setRoles(roleData);
+      setCustomerRoleName(pricingRoleName);
     } catch (error) {
       console.error("Profil/Rollen konnten nicht geladen werden:", error);
     }
@@ -54,6 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setProfile(null);
         setRoles([]);
+        setCustomerRoleName(null);
       }
     });
 
@@ -75,6 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     profile,
     roles,
     isAdmin: roles.includes("admin"),
+    customerRoleName,
     loading,
     refreshProfile,
   };

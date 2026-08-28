@@ -42,7 +42,8 @@ export function CreateCartDialog() {
       setName("");
       setNote("");
       navigate(`/carts/${cart.id}`);
-    } catch {
+    } catch (error) {
+      console.error("Warenkorb erstellen fehlgeschlagen:", error);
       toast.error("Warenkorb konnte nicht erstellt werden.");
     }
   }

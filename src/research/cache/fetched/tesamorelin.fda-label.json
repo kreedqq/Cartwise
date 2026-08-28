@@ -1,0 +1,60 @@
+{
+  "name": "tesamorelin",
+  "status": 200,
+  "labels": [
+    {
+      "id": "7d9be20d-e0a5-47ab-997e-82ab2bd54cba",
+      "setId": "3d783378-b02d-4f19-99dd-0fc91a042224",
+      "effectiveTime": "20260729",
+      "brand": [
+        "EGRIFTA SV"
+      ],
+      "generic": [
+        "TESAMORELIN"
+      ],
+      "manufacturer": [
+        "Theratechnologies Inc."
+      ],
+      "application": [
+        "BLA022505"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE EGRIFTA SV is indicated for the reduction of excess abdominal fat in HIV-infected adult patients with lipodystrophy. Limitations of Use: Long-term cardiovascular safety of EGRIFTA SV has not been established. Consider risk/benefit of continuation of treatment in patients who have not had a reduction in visceral adipose tissue. EGRIFTA SV is not indicated for weight loss management as it has a weight neutral effect. There are no data to support improved compliance with ant",
+      "boxedWarning": null,
+      "contraindications": "4 CONTRAINDICATIONS EGRIFTA SV is contraindicated in: Patients with disruption of the hypothalamic-pituitary axis ( 4 ) Patients with active malignancy ( 4 ) Patients with known hypersensitivity to tesamorelin or excipients in EGRIFTA SV ( 4 ) Pregnancy ( 4 ) EGRIFTA SV is contraindicated in: Patients with disruption of the hypothalamic-pituitary axis due to hypophysectomy, hypopituitarism, pituit",
+      "warnings": "5 WARNINGS AND PRECAUTIONS Increased risk of neoplasms: Preexisting malignancy should be inactive and its treatment complete prior to starting EGRIFTA SV . Discontinue EGRIFTA SV if there is any evidence of recurrent malignancy. ( 5.1 ) Elevated IGF-1: EGRIFTA SV stimulates GH production and increases serum IGF-1, a growth factor. The effects of prolonged elevations in IGF-1 levels are unknown. Mo",
+      "adverse": "6 ADVERSE REACTIONS The following important adverse reactions are also described elsewhere in the labeling: Increased risk of neoplasms [see Warnings and Precautions ( 5.1 )] Elevated IGF-1 levels [see Warnings and Precautions ( 5.2 )] Fluid retention [see Warnings and Precautions ( 5.3 )] Glucose intolerance or diabetes mellitus [see Warnings and Precautions ( 5.4 )] Hypersensitivity reactions [s",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action In vitro, tesamorelin binds and stimulates human GRF receptors with similar potency as the endogenous GRF [see Clinical Pharmacology ( 12.2 )]. Growth hormone-releasing factor (GHRF), also known as growth hormone-releasing hormone (GHRH), is a hypothalamic peptide that acts on the pituitary somatotroph cells to stimulate the synthesis and pulsatile",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION The recommendations in this prescribing information only apply to EGRIFTA SV (tesamorelin) for injection 2 mg per vial formulation. For recommendations for tesamorelin for injection 1 mg per vial formulation, see the EGRIFTA prescribing information. These two formulations"
+    },
+    {
+      "id": "285bfbe0-2839-441c-9d4d-990b6f413e7b",
+      "setId": "839334d3-8c1d-4c26-9036-2ab524a6ea75",
+      "effectiveTime": "20260729",
+      "brand": [
+        "EGRIFTA WR"
+      ],
+      "generic": [
+        "TESAMORELIN"
+      ],
+      "manufacturer": [
+        "Theratechnologies Inc."
+      ],
+      "application": [
+        "BLA022505"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE EGRIFTA WR is indicated for the reduction of excess abdominal fat in HIV-infected adult patients with lipodystrophy. Limitations of Use: Long-term cardiovascular safety of EGRIFTA WR has not been established. Consider risk/benefit of continuation of treatment in patients who have not had a reduction in visceral adipose tissue. EGRIFTA WR is not indicated for weight loss management as it has a weight neutral effect. There are no data to support improved compliance with ant",
+      "boxedWarning": null,
+      "contraindications": "4 CONTRAINDICATIONS EGRIFTA WR is contraindicated in: Patients with disruption of the hypothalamic-pituitary axis ( 4 ) Patients with active malignancy ( 4 ) Patients with known hypersensitivity to tesamorelin or excipients in EGRIFTA WR ( 4 ) Pregnancy ( 4 ) EGRIFTA WR is contraindicated in: Patients with disruption of the hypothalamic-pituitary axis due to hypophysectomy, hypopituitarism, pituit",
+      "warnings": "5 WARNINGS AND PRECAUTIONS Increased risk of neoplasms: Preexisting malignancy should be inactive and its treatment complete prior to starting EGRIFTA WR . Discontinue EGRIFTA WR if there is any evidence of recurrent malignancy. ( 5.1 ) Elevated IGF-1: EGRIFTA WR stimulates GH production and increases serum IGF-1, a growth factor. The effects of prolonged elevations in IGF-1 levels are unknown. Mo",
+      "adverse": "6 ADVERSE REACTIONS The following important adverse reactions are also described elsewhere in the labeling: Increased risk of neoplasms [see Warnings and Precautions ( 5.1 )] Elevated IGF-1 levels [see Warnings and Precautions ( 5.2 )] Fluid retention [see Warnings and Precautions ( 5.3 )] Glucose intolerance or diabetes mellitus [see Warnings and Precautions ( 5.4 )] Hypersensitivity reactions [s",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action In vitro, tesamorelin binds and stimulates human GRF receptors with similar potency as the endogenous GRF [see Clinical Pharmacology ( 12.2 )]. Growth hormone-releasing factor (GHRF), also known as growth hormone-releasing hormone (GHRH), is a hypothalamic peptide that acts on the pituitary somatotroph cells to stimulate the synthesis and pulsatile",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION The recommendations in this prescribing information only apply to EGRIFTA WR (tesamorelin) for injection 11.6 mg per vial formulation. For recommendations for tesamorelin for injection 2 mg per vial formulation, see the EGRIFTA SV prescribing information. These two formul"
+    }
+  ]
+}

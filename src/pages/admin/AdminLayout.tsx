@@ -1,16 +1,16 @@
 import { Outlet } from "react-router-dom";
 
 import { AdminNav } from "@/components/layout/AdminNav";
+import { PageHeader } from "@/components/common/PageHeader";
 
 export default function AdminLayout() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Administration</h1>
-        <p className="text-sm text-muted-foreground">
-          Produktdaten, Importe, Wechselkurs und Benutzerrollen verwalten.
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Peptix"
+        title="Administration"
+        description="Bestellungen, Produkte, Importe, Wechselkurs und Benutzerrollen verwalten."
+      />
       <AdminNav />
       <Outlet />
     </div>

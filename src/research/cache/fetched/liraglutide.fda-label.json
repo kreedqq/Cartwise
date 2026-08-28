@@ -1,0 +1,87 @@
+{
+  "name": "liraglutide",
+  "status": 200,
+  "labels": [
+    {
+      "id": "e829ecbe-8005-412e-a0a1-65b44265050f",
+      "setId": "0450d8a2-a88e-4849-9788-ed4f5246f223",
+      "effectiveTime": "20251113",
+      "brand": [
+        "Liraglutide"
+      ],
+      "generic": [
+        "LIRAGLUTIDE"
+      ],
+      "manufacturer": [
+        "Lupin Pharmaceuticals, Inc."
+      ],
+      "application": [
+        "ANDA215421"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE Liraglutide injection is indicated: as an adjunct to diet and exercise to improve glycemic control in adults and pediatric patients aged 10 years and older with type 2 diabetes mellitus Limitations of Use: Liraglutide injection contains liraglutide. Coadministration with other liraglutide-containing products is not recommended. Liraglutide injection is a glucagon-like peptide-1 (GLP-1) receptor agonist indicated: as an adjunct to diet and exercise to improve glycemic cont",
+      "boxedWarning": "WARNING: RISK OF THYROID C-CELL TUMORS WARNING: RISK OF THYROID C-CELL TUMORS Liraglutide causes dose-dependent and treatment-duration-dependent thyroid C-cell tumors at clinically relevant exposures in both genders of rats and mice. It is unknown whether liraglutide injection causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans, as the human relevance of liraglutid",
+      "contraindications": "4 CONTRAINDICATIONS Liraglutide injection is contraindicated in patients with a: personal or family history of medullary thyroid carcinoma (MTC) or in patients with Multiple Endocrine Neoplasia syndrome type 2 (MEN 2) [see Warnings and Precautions ( 5.1 )] . serious hypersensitivity reaction to liraglutide or to any of the excipients in liraglutide injection. Serious hypersensitivity reactions inc",
+      "warnings": "5 WARNINGS AND PRECAUTIONS Acute Pancreatitis : Has been observed in patients treated with GLP-1 receptor agonists, including liraglutide injection. Discontinue if pancreatitis is suspected. ( 5.2 ) Never Share a liraglutide injection Pen Between Patients, even if the needle is changed. ( 5.3 ) Hypoglycemia : Adult patients taking an insulin secretagogue or insulin may have an increased risk of hy",
+      "adverse": "6 ADVERSE REACTIONS The following serious adverse reactions are described below or elsewhere in the prescribing information: Risk of Thyroid C-cell Tumors [see Warnings and Precautions ( 5.1 )] Acute Pancreatitis [see Warnings and Precautions ( 5.2 )] Hypoglycemia [see Warnings and Precautions ( 5.4 )] Acute Kidney Injury Due to Volume Depletion [see Warnings and Precautions ( 5.5 )] Severe Gastro",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Liraglutide is an acylated human GLP-1 receptor agonist with 97% amino acid sequence homology to endogenous human GLP-1(7 to 37). GLP-1(7 to 37) represents <20% of total circulating endogenous GLP-1. Like GLP-1(7 to 37), liraglutide activates the GLP-1 receptor, a membrane-bound cell-surface receptor coupled to adenylyl cyclase by the stimulatory G",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION Adult Patients: Initiate at 0.6 mg injected subcutaneously once daily for one week then increase to 1.2 mg daily. If additional glycemic control is required, increase the dose to 1.8 mg daily after one week of treatment with the 1.2 mg daily dose. ( 2.1 ) Pediatric Patien"
+    },
+    {
+      "id": "15f41bf3-b403-b32c-e64f-2330120c519e",
+      "setId": "0b898330-eca1-f60a-71d2-b91716e336ed",
+      "effectiveTime": "20251016",
+      "brand": [
+        "Liraglutide"
+      ],
+      "generic": [
+        "LIRAGLUTIDE"
+      ],
+      "manufacturer": [
+        "Biocon Pharma Inc."
+      ],
+      "application": [
+        "ANDA217063"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE Liraglutide injection is indicated in combination with a reduced calorie diet and increased physical activity to reduce excess body weight and maintain weight reduction long term in: Adults and pediatric patients aged 12 years and older with body weight greater than 60 kg and obesity. Adults with overweight in the presence of at least one weight-related comorbid condition. Limitations of Use Liraglutide injection contains liraglutide. Coadministration with other liragluti",
+      "boxedWarning": "WARNING: RISK OF THYROID C-CELL TUMORS Liraglutide causes dose-dependent and treatment-duration-dependent thyroid C-cell tumors at clinically relevant exposures in both genders of rats and mice. It is unknown whether liraglutide injection causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans, as the human relevance of liraglutide-induced rodent thyroid C-cell tumors ",
+      "contraindications": "4 CONTRAINDICATIONS Liraglutide injection is contraindicated in: Patients with a personal or family history of medullary thyroid carcinoma (MTC) or patients with Multiple Endocrine Neoplasia syndrome type 2 (MEN 2) [see Warnings and Precautions (5.1) ]. Patients with a serious hypersensitivity reaction to liraglutide or to any of the excipients in liraglutide injection. Serious hypersensitivity re",
+      "warnings": "5 WARNINGS AND PRECAUTIONS Acute Pancreatitis: Has been observed in patients treated with GLP-1 receptor agonists, including liraglutide injection. Discontinue if pancreatitis is suspected. ( 5.2 ) Acute Gallbladder Disease: If cholelithiasis or cholecystitis are suspected, gallbladder studies are indicated. ( 5.3 ) Hypoglycemia: Can occur in adults when liraglutide injection is used with an insul",
+      "adverse": "6 ADVERSE REACTIONS The following serious adverse reactions are described below or elsewhere in the prescribing information: Risk of Thyroid C-Cell Tumors [see Warnings and Precautions (5.1) ] Acute Pancreatitis [see Warnings and Precautions (5.2) ] Acute Gallbladder Disease [see Warnings and Precautions (5.3) ] Risk for Hypoglycemia with Concomitant Use of Anti-Diabetic Therapy [see Warnings and ",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Liraglutide is an acylated human GLP-1 receptor agonist with 97% amino acid sequence homology to endogenous human GLP-1 (7-37). Like endogenous GLP-1, liraglutide binds to and activates the GLP-1 receptor, a cell-surface receptor coupled to adenylyl cyclase activation through the stimulatory G-protein, Gs. Endogenous GLP-1 has a half-life of 1.5 to",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION Inject liraglutide injection subcutaneously in the abdomen, thigh, or upper arm once daily at any time of day, without regard to the timing of meals. ( 2.1 ) The recommended dose of liraglutide injection is 3 mg daily. ( 2.2 ) Initiate at 0.6 mg per day for one week. In w"
+    },
+    {
+      "id": "8e3ed594-772c-4762-abaf-eac7a114d9c7",
+      "setId": "0ba917f7-b974-4364-a745-7494ecae3e73",
+      "effectiveTime": "20250130",
+      "brand": [
+        "Liraglutide"
+      ],
+      "generic": [
+        "LIRAGLUTIDE"
+      ],
+      "manufacturer": [
+        "A-S Medication Solutions"
+      ],
+      "application": [
+        "NDA022341"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE Liraglutide is indicated: • as an adjunct to diet and exercise to improve glycemic control in adults and pediatric patients aged 10 years and older with type 2 diabetes mellitus, • to reduce the risk of major adverse cardiovascular events (cardiovascular death, non-fatal myocardial infarction, or non-fatal stroke) in adults with type 2 diabetes mellitus and established cardiovascular disease. Limitations of Use : Liraglutide should not be used in patients with type 1 diab",
+      "boxedWarning": "WARNING: RISK OF THYROID C-CELL TUMORS • Liraglutide causes dose-dependent and treatment-duration-dependent thyroid C-cell tumors at clinically relevant exposures in both genders of rats and mice. It is unknown whether liraglutide causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans, as the human relevance of liraglutide-induced rodent thyroid C-cell tumors has not ",
+      "contraindications": "4 CONTRAINDICATIONS Liraglutide is contraindicated in patients with a: • personal or family history of medullary thyroid carcinoma (MTC) or in patients with Multiple Endocrine Neoplasia syndrome type 2 (MEN 2) [see Warnings and Precautions (5.1) ] . • serious hypersensitivity reaction to liraglutide or to any of the excipients in liraglutide. Serious hypersensitivity reactions including anaphylact",
+      "warnings": "5 WARNINGS AND PRECAUTIONS • Pancreatitis : Postmarketing reports, including fatal and non-fatal hemorrhagic or necrotizing pancreatitis. Discontinue promptly if pancreatitis is suspected. Do not restart if pancreatitis is confirmed (5.2) . • Never share a liraglutide pen between patients, even if the needle is changed (5.3) . • Hypoglycemia: Adult patients taking an insulin secretagogue or insuli",
+      "adverse": "6 ADVERSE REACTIONS The following serious adverse reactions are described below or elsewhere in the prescribing information: • Risk of Thyroid C-cell Tumors [see Warnings and Precautions (5.1) ] • Pancreatitis [see Warnings and Precautions (5.2) ] • Hypoglycemia [see Warnings and Precautions (5.4) ] • Acute Kidney Injury [see Warnings and Precautions (5.5) ] • Hypersensitivity Reactions [see Warni",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Liraglutide is an acylated human Glucagon-Like Peptide-1 (GLP-1) receptor agonist with 97% amino acid sequence homology to endogenous human GLP-1(7-37). GLP-1(7-37) represents <20% of total circulating endogenous GLP-1. Like GLP-1(7-37), liraglutide activates the GLP-1 receptor, a membrane-bound cell-surface receptor coupled to adenylyl cyclase by ",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION • Adult Patients : Initiate at 0.6 mg injected subcutaneously once daily for one week then increase to 1.2 mg daily. If additional glycemic control is required, increase the dose to 1.8 mg daily after one week of treatment with the 1.2 mg daily dose (2.1) . • Pediatric Pa"
+    }
+  ]
+}

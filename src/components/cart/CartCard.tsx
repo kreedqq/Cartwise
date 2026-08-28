@@ -16,6 +16,7 @@ import { RenameCartDialog } from "@/components/cart/RenameCartDialog";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { useCartMutations } from "@/hooks/useCarts";
 import { formatDateTime, formatEur, formatQuantity, formatUsd } from "@/lib/money";
+import { isOpenCart } from "@/services/carts";
 import { toast } from "@/components/ui/toaster";
 import type { CartSummaryRow, Tables } from "@/types/database";
 
@@ -37,7 +38,8 @@ export function CartCard({ cart, summary }: CartCardProps) {
       await rename.mutateAsync({ cart, name });
       setRenameOpen(false);
       toast.success("Warenkorb umbenannt.");
-    } catch {
+    } catch (error) {
+      console.error("Warenkorb umbenennen fehlgeschlagen:", error);
       toast.error("Umbenennen fehlgeschlagen.");
     }
   }
@@ -47,7 +49,8 @@ export function CartCard({ cart, summary }: CartCardProps) {
       const newId = await duplicate.mutateAsync({ cartId: cart.id, newName: `${cart.name} (Kopie)` });
       toast.success("Warenkorb dupliziert.");
       navigate(`/carts/${newId}`);
-    } catch {
+    } catch (error) {
+      console.error("Warenkorb duplizieren fehlgeschlagen:", error);
       toast.error("Duplizieren fehlgeschlagen.");
     }
   }
@@ -55,7 +58,8 @@ export function CartCard({ cart, summary }: CartCardProps) {
   async function handleToggleActive() {
     try {
       await activate.mutateAsync(cart.id);
-    } catch {
+    } catch (error) {
+      console.error("Warenkorb aktivieren fehlgeschlagen:", error);
       toast.error("Konnte nicht als aktiv markiert werden.");
     }
   }
@@ -65,7 +69,8 @@ export function CartCard({ cart, summary }: CartCardProps) {
       await archive.mutateAsync(cart);
       setArchiveOpen(false);
       toast.success("Warenkorb archiviert.");
-    } catch {
+    } catch (error) {
+      console.error("Warenkorb archivieren fehlgeschlagen:", error);
       toast.error("Archivieren fehlgeschlagen.");
     }
   }
@@ -75,7 +80,8 @@ export function CartCard({ cart, summary }: CartCardProps) {
       await remove.mutateAsync(cart.id);
       setDeleteOpen(false);
       toast.success("Warenkorb gelöscht.");
-    } catch {
+    } catch (error) {
+      console.error("Warenkorb löschen fehlgeschlagen:", error);
       toast.error("Löschen fehlgeschlagen.");
     }
   }
@@ -83,7 +89,11 @@ export function CartCard({ cart, summary }: CartCardProps) {
   return (
     <>
       <Card
-        className={cart.is_active_cart ? "border-primary/50 ring-1 ring-primary/20" : undefined}
+        className={
+          cart.is_active_cart
+            ? "border-primary/40 shadow-md ring-1 ring-primary/15 transition-transform duration-150 hover:-translate-y-0.5"
+            : "transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-md"
+        }
       >
         <CardHeader className="flex-row items-start justify-between gap-2 space-y-0">
           <div
@@ -107,23 +117,31 @@ export function CartCard({ cart, summary }: CartCardProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => navigate(`/carts/${cart.id}`)}>Öffnen</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setRenameOpen(true)}>Umbenennen</DropdownMenuItem>
+              {isOpenCart(cart.status) && (
+                <DropdownMenuItem onClick={() => setRenameOpen(true)}>Umbenennen</DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={handleDuplicate}>
                 <Copy /> Duplizieren
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleToggleActive}>
-                {cart.is_active_cart ? <PinOff /> : <Pin />}
-                {cart.is_active_cart ? "Als aktiv entfernen" : "Als aktiv markieren"}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {cart.status !== "archived" && (
-                <DropdownMenuItem onClick={() => setArchiveOpen(true)}>
-                  <Archive /> Archivieren
+              {isOpenCart(cart.status) && (
+                <DropdownMenuItem onClick={handleToggleActive}>
+                  {cart.is_active_cart ? <PinOff /> : <Pin />}
+                  {cart.is_active_cart ? "Als aktiv entfernen" : "Als aktiv markieren"}
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
-                <Trash2 /> Löschen
-              </DropdownMenuItem>
+              {isOpenCart(cart.status) && (
+                <>
+                  <DropdownMenuSeparator />
+                  {cart.status !== "archived" && (
+                    <DropdownMenuItem onClick={() => setArchiveOpen(true)}>
+                      <Archive /> Archivieren
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
+                    <Trash2 /> Löschen
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </CardHeader>

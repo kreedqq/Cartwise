@@ -12,9 +12,10 @@ import { useAuth } from "@/context/AuthProvider";
 import { profileSchema } from "@/lib/validation";
 import { updateDisplayName } from "@/services/profiles";
 import { formatDateTime } from "@/lib/money";
+import { PageHeader } from "@/components/common/PageHeader";
 
 export default function ProfilePage() {
-  const { user, profile, roles, refreshProfile } = useAuth();
+  const { user, profile, roles, customerRoleName, refreshProfile } = useAuth();
   const [displayName, setDisplayName] = React.useState(profile?.display_name ?? "");
   const [error, setError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
@@ -41,7 +42,8 @@ export default function ProfilePage() {
       await updateDisplayName(user.id, result.data.displayName);
       await refreshProfile();
       toast.success("Profil gespeichert.");
-    } catch {
+    } catch (error) {
+      console.error("Profil speichern fehlgeschlagen:", error);
       toast.error("Profil konnte nicht gespeichert werden.");
     } finally {
       setSaving(false);
@@ -49,11 +51,12 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Profil &amp; Einstellungen</h1>
-        <p className="text-sm text-muted-foreground">Verwalte deinen Anzeigenamen und sieh deine Kontodaten ein.</p>
-      </div>
+    <div className="mx-auto max-w-2xl space-y-8">
+      <PageHeader
+        eyebrow="Konto"
+        title="Profil"
+        description="Anzeigename, Rolle und Kontodaten. Du siehst nur deine eigene Rolle."
+      />
 
       <Card>
         <form onSubmit={handleSave}>
@@ -77,7 +80,11 @@ export default function ProfilePage() {
               {error && <p className="text-xs text-destructive">{error}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label>Rolle</Label>
+              <Label>Meine Rolle</Label>
+              <p className="text-sm font-medium">{customerRoleName ?? "—"}</p>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Kontozugriff</Label>
               <div className="flex gap-2">
                 {roles.map((role) => (
                   <Badge key={role} variant={role === "admin" ? "success" : "secondary"}>

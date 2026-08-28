@@ -1,0 +1,603 @@
+{
+  "slug": "retatrutide",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "retatrutide",
+    "LY3437943"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "retatrutide",
+      "totalCount": 34,
+      "studies": [
+        {
+          "nctId": "NCT06383390",
+          "title": "The Effect of Retatrutide Once Weekly on Cardiovascular Outcomes and Kidney Outcomes in Adults Living With Obesity (TRIUMPH-Outcomes)",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 10000,
+          "start": "2024-04-30",
+          "completion": "2029-02",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06383390"
+        },
+        {
+          "nctId": "NCT07165028",
+          "title": "A Master Protocol of Multiple Agents in Adults With Metabolic Dysfunction-Associated Steatotic Liver Disease (SYNERGY-Outcomes)",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 4500,
+          "start": "2025-10-15",
+          "completion": "2032-08",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07165028"
+        },
+        {
+          "nctId": "NCT05929066",
+          "title": "A Study of Retatrutide (LY3437943) in Participants Who Have Obesity or Overweight",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 2335,
+          "start": "2023-07-10",
+          "completion": "2026-04-30",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05929066"
+        },
+        {
+          "nctId": "NCT07629401",
+          "title": "Pre-approval Expanded Access of Retatrutide (LY3437943)",
+          "status": "AVAILABLE",
+          "phase": null,
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": null,
+          "start": null,
+          "completion": null,
+          "lastUpdate": "2026-08-06",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07629401"
+        },
+        {
+          "nctId": "NCT05882045",
+          "title": "A Study of Retatrutide (LY3437943) in Participants With Obesity and Cardiovascular Disease",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 1946,
+          "start": "2023-05-30",
+          "completion": "2026-05-14",
+          "lastUpdate": "2026-07-30",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05882045"
+        },
+        {
+          "nctId": "NCT05929079",
+          "title": "A Study of Retatrutide (LY3437943) in Participants With Type 2 Diabetes Mellitus Who Have Obesity or Overweight",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 1152,
+          "start": "2023-07-11",
+          "completion": "2026-06-16",
+          "lastUpdate": "2026-07-30",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05929079"
+        },
+        {
+          "nctId": "NCT07035093",
+          "title": "A Study of Retatrutide (LY3437943) in Participants Who Have Obesity or Overweight and Chronic Low Back Pain",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 586,
+          "start": "2025-05-29",
+          "completion": "2027-09",
+          "lastUpdate": "2026-07-23",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07035093"
+        },
+        {
+          "nctId": "NCT06662383",
+          "title": "A Study of Retatrutide (LY3437943) Compared to Tirzepatide (LY3298176) in Adults Who Have Obesity",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 800,
+          "start": "2024-11-01",
+          "completion": "2026-12",
+          "lastUpdate": "2026-07-20",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06662383"
+        },
+        {
+          "nctId": "NCT06297603",
+          "title": "Effect of Retatrutide Compared With Placebo in Participants With Type 2 Diabetes and Moderate or Severe Renal Impairment, With Inadequate Glycemic Control on Basal Insulin, With or Without Metformin and/or SGLT2 Inhibitor (TRANSCEND-T2D-3)",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 320,
+          "start": "2024-03-15",
+          "completion": "2026-11",
+          "lastUpdate": "2026-07-20",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06297603"
+        },
+        {
+          "nctId": "NCT06982859",
+          "title": "A Study to Evaluate the Effect of Retatrutide on Insulin Secretion and Insulin Sensitivity in Adult Participants With Type 2 Diabetes Mellitus",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 95,
+          "start": "2025-06-02",
+          "completion": "2026-12",
+          "lastUpdate": "2026-07-16",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06982859"
+        },
+        {
+          "nctId": "NCT06982846",
+          "title": "A Study to Investigate the Response of Participants With Type 2 Diabetes Mellitus on Once-Weekly Retatrutide to Hypoglycemia",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 80,
+          "start": "2025-06-06",
+          "completion": "2026-05-04",
+          "lastUpdate": "2026-06-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06982846"
+        },
+        {
+          "nctId": "NCT07357415",
+          "title": "A Study of Retatrutide (LY3437943) in Participants Without Type 2 Diabetes Who Have Obesity or Overweight",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 600,
+          "start": "2026-01-24",
+          "completion": "2028-11",
+          "lastUpdate": "2026-06-09",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07357415"
+        },
+        {
+          "nctId": "NCT07232719",
+          "title": "A Study of Retatrutide (LY3437943) in Participants With Obesity or Overweight",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 250,
+          "start": "2025-11-17",
+          "completion": "2027-07",
+          "lastUpdate": "2026-04-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07232719"
+        },
+        {
+          "nctId": "NCT06260722",
+          "title": "Effect of Retatrutide Compared With Semaglutide in Adult Participants With Type 2 Diabetes and Inadequate Glycemic Control With Metformin With or Without SGLT2 Inhibitor (TRANSCEND-T2D-2)",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 1250,
+          "start": "2024-02-21",
+          "completion": "2027-01",
+          "lastUpdate": "2026-04-13",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06260722"
+        },
+        {
+          "nctId": "NCT07467447",
+          "title": "Effect of LY3437943 Versus Placebo in Participants Who Have Obesity or Are Overweight",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Hudson Biotech",
+          "enrollment": 300,
+          "start": "2026-02-15",
+          "completion": "2028-02-17",
+          "lastUpdate": "2026-03-12",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07467447"
+        },
+        {
+          "nctId": "NCT06354660",
+          "title": "Effect of Retatrutide Compared With Placebo in Adult Participants With Type 2 Diabetes and Inadequate Glycemic Control With Diet and Exercise Alone (TRANSCEND-T2D-1)",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 537,
+          "start": "2024-04-10",
+          "completion": "2026-02-20",
+          "lastUpdate": "2026-03-05",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06354660"
+        },
+        {
+          "nctId": "NCT06859268",
+          "title": "A Study of Retatrutide (LY3437943) in the Maintenance of Weight Reduction in Individuals With Obesity",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 643,
+          "start": "2025-03-05",
+          "completion": "2028-04",
+          "lastUpdate": "2026-03-03",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06859268"
+        },
+        {
+          "nctId": "NCT05931367",
+          "title": "A Study of Retatrutide (LY3437943) Once Weekly in Participants Who Have Obesity or Overweight and Osteoarthritis of the Knee",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 445,
+          "start": "2023-08-01",
+          "completion": "2025-11-14",
+          "lastUpdate": "2026-01-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05931367"
+        },
+        {
+          "nctId": "NCT07226947",
+          "title": "Body Composition and Exercise to Prevent Muscle Loss With GLP1 Agonist Treatment",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 100,
+          "start": "2025-11-24",
+          "completion": "2027-06",
+          "lastUpdate": "2025-12-30",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07226947"
+        },
+        {
+          "nctId": "NCT05936151",
+          "title": "A Study of Retatrutide (LY3437943) on Renal Function in Participants With Overweight or Obesity and Chronic Kidney Disease With or Without Type 2 Diabetes",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 146,
+          "start": "2023-07-20",
+          "completion": "2025-10-21",
+          "lastUpdate": "2025-11-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05936151"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "retatrutide AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 93,
+      "articles": [
+        {
+          "pmid": "39761578",
+          "title": "Efficacy and Safety of Glucagon-Like Peptide-1 Receptor Agonists for Weight Loss Among Adults Without Diabetes : A Systematic Review of Randomized Controlled Trials.",
+          "source": "Ann Intern Med",
+          "pubdate": "2025 Feb",
+          "authors": [
+            "Moiz A",
+            "Filion KB",
+            "Toutounchi H",
+            "Tsoukas MA",
+            "Yu OHY",
+            "Peters TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.7326/ANNALS-24-01590",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39761578/"
+        },
+        {
+          "pmid": "40988099",
+          "title": "Evaluating the Rates of Pancreatitis and Pancreatic Cancer Among GLP-1 Receptor Agonists: A Systematic Review and Meta-Analysis of Randomised Controlled Trials.",
+          "source": "Endocrinol Diabetes Metab",
+          "pubdate": "2025 Sep",
+          "authors": [
+            "Wen J",
+            "Nadora D",
+            "Bernstein E",
+            "How-Volkman C",
+            "Truong A",
+            "Joy B"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1002/edm2.70113",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40988099/"
+        },
+        {
+          "pmid": "37366315",
+          "title": "Triple-Hormone-Receptor Agonist Retatrutide for Obesity - A Phase 2 Trial.",
+          "source": "N Engl J Med",
+          "pubdate": "2023 Aug 10",
+          "authors": [
+            "Jastreboff AM",
+            "Kaplan LM",
+            "Frías JP",
+            "Wu Q",
+            "Du Y",
+            "Gurbuz S"
+          ],
+          "pubtype": [
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase II",
+            "Journal Article"
+          ],
+          "doi": "10.1056/NEJMoa2301972",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37366315/"
+        },
+        {
+          "pmid": "40685589",
+          "title": "Efficacy and Safety of GLP-1 Receptor Agonists, Dual Agonists, and Retatrutide for Weight Loss in Adults With Overweight or Obesity: A Bayesian NMA.",
+          "source": "Obesity (Silver Spring)",
+          "pubdate": "2025 Nov",
+          "authors": [
+            "Sinha B",
+            "Ghosal S"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Network Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1002/oby.24360",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40685589/"
+        },
+        {
+          "pmid": "38843460",
+          "title": "Efficacy and Safety of GLP-1 Medicines for Type 2 Diabetes and Obesity.",
+          "source": "Diabetes Care",
+          "pubdate": "2024 Nov 1",
+          "authors": [
+            "Drucker DJ"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.2337/dci24-0003",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38843460/"
+        },
+        {
+          "pmid": "41090431",
+          "title": "Retatrutide for the treatment of obesity, obstructive sleep apnea and knee osteoarthritis: Rationale and design of the TRIUMPH registrational clinical trials.",
+          "source": "Diabetes Obes Metab",
+          "pubdate": "2026 Jan",
+          "authors": [
+            "Giblin K",
+            "Kaplan LM",
+            "Somers VK",
+            "Le Roux CW",
+            "Hunter DJ",
+            "Wu Q"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1111/dom.70209",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41090431/"
+        },
+        {
+          "pmid": "40563436",
+          "title": "Retatrutide-A Game Changer in Obesity Pharmacotherapy.",
+          "source": "Biomolecules",
+          "pubdate": "2025 May 30",
+          "authors": [
+            "Katsi V",
+            "Koutsopoulos G",
+            "Fragoulis C",
+            "Dimitriadis K",
+            "Tsioufis K"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3390/biom15060796",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40563436/"
+        },
+        {
+          "pmid": "39952695",
+          "title": "Emerging pharmacotherapies for obesity: A systematic review.",
+          "source": "Pharmacol Rev",
+          "pubdate": "2025 Jan",
+          "authors": [
+            "Kokkorakis M",
+            "Chakhtoura M",
+            "Rhayem C",
+            "Al Rifai J",
+            "Ghezzawi M",
+            "Valenzuela-Vallejo L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.1124/pharmrev.123.001045",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39952695/"
+        },
+        {
+          "pmid": "38302593",
+          "title": "What is the pipeline for future medications for obesity?",
+          "source": "Int J Obes (Lond)",
+          "pubdate": "2025 Mar",
+          "authors": [
+            "Melson E",
+            "Ashraf U",
+            "Papamargaritis D",
+            "Davies MJ"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1038/s41366-024-01473-y",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38302593/"
+        },
+        {
+          "pmid": "39305981",
+          "title": "Seven glucagon-like peptide-1 receptor agonists and polyagonists for weight loss in patients with obesity or overweight: an updated systematic review and network meta-analysis of randomized controlled trials.",
+          "source": "Metabolism",
+          "pubdate": "2024 Dec",
+          "authors": [
+            "Xie Z",
+            "Zheng G",
+            "Liang Z",
+            "Li M",
+            "Deng W",
+            "Cao W"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review",
+            "Network Meta-Analysis",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/j.metabol.2024.156038",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39305981/"
+        },
+        {
+          "pmid": "40291085",
+          "title": "Efficacy and safety of retatrutide, a novel GLP-1, GIP, and glucagon receptor agonist for obesity treatment: a systematic review and meta-analysis of randomized controlled trials.",
+          "source": "Proc (Bayl Univ Med Cent)",
+          "pubdate": "2025",
+          "authors": [
+            "Abdrabou Abouelmagd A",
+            "Abdelrehim AM",
+            "Bashir MN",
+            "Abdelsalam F",
+            "Marey A",
+            "Tanas Y"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1080/08998280.2025.2456441",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40291085/"
+        },
+        {
+          "pmid": "38687506",
+          "title": "Incretin-Based Weight Loss Pharmacotherapy: Can Resistance Exercise Optimize Changes in Body Composition?",
+          "source": "Diabetes Care",
+          "pubdate": "2024 Oct 1",
+          "authors": [
+            "Locatelli JC",
+            "Costa JG",
+            "Haynes A",
+            "Naylor LH",
+            "Fegan PG",
+            "Yeap BB"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.2337/dci23-0100",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38687506/"
+        },
+        {
+          "pmid": "37385280",
+          "title": "Retatrutide, a GIP, GLP-1 and glucagon receptor agonist, for people with type 2 diabetes: a randomised, double-blind, placebo and active-controlled, parallel-group, phase 2 trial conducted in the USA.",
+          "source": "Lancet",
+          "pubdate": "2023 Aug 12",
+          "authors": [
+            "Rosenstock J",
+            "Frias J",
+            "Jastreboff AM",
+            "Du Y",
+            "Lou J",
+            "Gurbuz S"
+          ],
+          "pubtype": [
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase II",
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/S0140-6736(23)01053-X",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37385280/"
+        },
+        {
+          "pmid": "38858523",
+          "title": "Triple hormone receptor agonist retatrutide for metabolic dysfunction-associated steatotic liver disease: a randomized phase 2a trial.",
+          "source": "Nat Med",
+          "pubdate": "2024 Jul",
+          "authors": [
+            "Sanyal AJ",
+            "Kaplan LM",
+            "Frias JP",
+            "Brouwers B",
+            "Wu Q",
+            "Thomas MK"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase II"
+          ],
+          "doi": "10.1038/s41591-024-03018-2",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38858523/"
+        },
+        {
+          "pmid": "42250575",
+          "title": "Efficacy and safety of retatrutide, a GIP, GLP-1, and glucagon receptor agonist, in people with type 2 diabetes and inadequate glycaemic control with diet and exercise (TRANSCEND-T2D-1): a double-blind, randomised, phase 3 trial.",
+          "source": "Lancet",
+          "pubdate": "2026 Jun 13",
+          "authors": [
+            "Bajaj HS",
+            "Welch M",
+            "Shah P",
+            "Luna E",
+            "Jaouimaa FZ",
+            "Liu B"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase III",
+            "Multicenter Study"
+          ],
+          "doi": "10.1016/S0140-6736(26)00967-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42250575/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "retatrutide",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 404,
+      "httpStatus": 404,
+      "ok": false,
+      "cid": null,
+      "cas": null,
+      "formula": null,
+      "iupac": null
+    }
+  }
+}

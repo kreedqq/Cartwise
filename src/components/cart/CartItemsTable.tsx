@@ -28,9 +28,10 @@ interface CartItemsTableProps {
   cartId: string;
   currentRate: number | null;
   nextPosition: number;
+  readOnly?: boolean;
 }
 
-export function CartItemsTable({ items, cartId, currentRate, nextPosition }: CartItemsTableProps) {
+export function CartItemsTable({ items, cartId, currentRate, nextPosition, readOnly }: CartItemsTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -57,6 +58,7 @@ export function CartItemsTable({ items, cartId, currentRate, nextPosition }: Car
             cartId={cartId}
             currentRate={currentRate}
             nextPosition={nextPosition + index}
+            readOnly={readOnly}
           />
         ))}
       </TableBody>
@@ -70,12 +72,14 @@ function CartItemRowDesktop({
   cartId,
   currentRate,
   nextPosition,
+  readOnly,
 }: {
   item: ComputedCartItem;
   index: number;
   cartId: string;
   currentRate: number | null;
   nextPosition: number;
+  readOnly?: boolean;
 }) {
   const row = useCartItemRow(item, cartId, currentRate);
   const isProblem = item.resolution_status === "not_found" || item.resolution_status === "inactive";
@@ -90,6 +94,7 @@ function CartItemRowDesktop({
             onChange={(e) => row.onCodeChange(e.target.value)}
             onBlur={row.onCodeBlur}
             invalid={item.resolution_status === "not_found"}
+            disabled={readOnly}
             className="h-8 font-mono text-xs uppercase"
           />
         </div>
@@ -112,6 +117,7 @@ function CartItemRowDesktop({
           onChange={(e) => row.onQuantityChange(e.target.value)}
           onBlur={row.onQuantityBlur}
           invalid={!!row.quantityError}
+          disabled={readOnly}
           inputMode="decimal"
           className="h-8 text-right tabular-nums"
         />
@@ -150,6 +156,7 @@ function CartItemRowDesktop({
           onChange={(e) => row.onNoteChange(e.target.value)}
           onBlur={row.onNoteBlur}
           placeholder="Notiz"
+          disabled={readOnly}
           className="h-8 text-xs"
         />
         <SaveStatusIndicator status={row.noteStatus} className="mt-1" />
@@ -157,7 +164,7 @@ function CartItemRowDesktop({
       <TableCell className="text-right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant="ghost" size="icon" className="h-8 w-8" disabled={readOnly}>
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

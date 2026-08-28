@@ -7,8 +7,11 @@ import { CartSummaryPanel } from "@/components/cart/CartSummaryPanel";
 import { formatEur, formatUsd } from "@/lib/money";
 import type { CartTotals } from "@/lib/money";
 import type { ExchangeRateResult } from "@/services/exchangeRate";
+import type { CartStatus } from "@/types/database";
 
 interface CartSummaryBarProps {
+  cartId: string;
+  cartStatus: CartStatus;
   totals: CartTotals;
   rate: ExchangeRateResult | undefined;
   rateLoading: boolean;

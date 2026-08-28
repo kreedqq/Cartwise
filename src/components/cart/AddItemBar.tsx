@@ -36,7 +36,8 @@ export function AddItemBar({ cartId, nextPosition, currentRate, onOpenPasteImpor
       setCode("");
       setQuantity("1");
       codeRef.current?.focus();
-    } catch {
+    } catch (error) {
+      console.error("Position hinzufügen fehlgeschlagen:", error);
       toast.error("Position konnte nicht hinzugefügt werden.");
     }
   }

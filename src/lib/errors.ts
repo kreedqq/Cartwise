@@ -51,9 +51,12 @@ export function toAppError(error: unknown): AppError {
     }
   }
 
-  if (import.meta.env.DEV) {
-    console.error("Unhandled error:", error);
-  }
+  // Always log the real error, in every environment - this is a developer
+  // detail visible only in the browser console, never surfaced to the user,
+  // and is often the only way to diagnose a production-only issue (see
+  // docs/SECURITY.md "keine sensiblen Fehlerdetails" - that rule is about
+  // the *UI*, not the console).
+  console.error("Unhandled error:", error);
 
   return {
     message: "Etwas ist schiefgelaufen. Bitte versuche es erneut oder lade die Seite neu.",

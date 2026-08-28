@@ -1,0 +1,295 @@
+{
+  "slug": "cjc-1295",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "CJC-1295",
+    "CJC1295"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "CJC-1295",
+      "totalCount": 1,
+      "studies": [
+        {
+          "nctId": "NCT00267527",
+          "title": "A Study to Evaluate CJC 1295 in HIV Patients With Visceral Obesity",
+          "status": "TERMINATED",
+          "phase": "PHASE2",
+          "sponsor": "ConjuChem",
+          "enrollment": 120,
+          "start": "2005-12",
+          "completion": "2006-09",
+          "lastUpdate": "2006-10-16",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT00267527"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "CJC-1295 AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 13,
+      "articles": [
+        {
+          "pmid": "16352683",
+          "title": "Prolonged stimulation of growth hormone (GH) and insulin-like growth factor I secretion by CJC-1295, a long-acting analog of GH-releasing hormone, in healthy adults.",
+          "source": "J Clin Endocrinol Metab",
+          "pubdate": "2006 Mar",
+          "authors": [
+            "Teichman SL",
+            "Neale A",
+            "Lawrence B",
+            "Gagnon C",
+            "Castaigne JP",
+            "Frohman LA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1210/jc.2005-1536",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16352683/"
+        },
+        {
+          "pmid": "41490200",
+          "title": "Therapeutic Peptides in Orthopaedics: Applications, Challenges, and Future Directions.",
+          "source": "J Am Acad Orthop Surg Glob Res Rev",
+          "pubdate": "2026 Jan 1",
+          "authors": [
+            "Rahman OF",
+            "Lee SJ",
+            "Seeds WA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.5435/JAAOSGlobal-D-25-00236",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41490200/"
+        },
+        {
+          "pmid": "41476424",
+          "title": "Injectable Peptide Therapy: A Primer for Orthopaedic and Sports Medicine Physicians.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Jan",
+          "authors": [
+            "Mayfield CK",
+            "Bolia IK",
+            "Feingold CL",
+            "Lin EH",
+            "Liu JN",
+            "Rick Hatch GF"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1177/03635465251357593",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41476424/"
+        },
+        {
+          "pmid": "41966639",
+          "title": "Safety and Efficacy of Approved and Unapproved Peptide Therapies for Musculoskeletal Injuries and Athletic Performance.",
+          "source": "Sports Med",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Mendias CL",
+            "Awan TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s40279-026-02437-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41966639/"
+        },
+        {
+          "pmid": "42578445",
+          "title": "Peptide Supplements and Their Therapeutic Applications in Sports Medicine.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Aug 11",
+          "authors": [
+            "Tewari K",
+            "Liu TP",
+            "Im C",
+            "Hamad C",
+            "Petrigliano F",
+            "Cheung EC"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1177/03635465261464420",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42578445/"
+        },
+        {
+          "pmid": "42123471",
+          "title": "Therapeutic Peptides in Aesthetic, Metabolic and Endocrine Conditions: Effects, Safety, Clinical Applications, and Future Perspectives.",
+          "source": "Int J Mol Sci",
+          "pubdate": "2026 Apr 27",
+          "authors": [
+            "Renke G",
+            "Chinellato L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3390/ijms27093890",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42123471/"
+        },
+        {
+          "pmid": "41880199",
+          "title": "A new era of doping? Use of peptide and peptide-analog drugs in recreational and professional sport and bodybuilding: a critical review.",
+          "source": "J Sports Med Phys Fitness",
+          "pubdate": "2026 Jul",
+          "authors": [
+            "Coutinho LFD",
+            "DE Oliveira Neves LF",
+            "Camilo RP"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.23736/S0022-4707.26.17773-1",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41880199/"
+        },
+        {
+          "pmid": "42021992",
+          "title": "Therapeutic peptides in gerontology: mechanisms and applications for healthy aging.",
+          "source": "Front Aging",
+          "pubdate": "2026",
+          "authors": [
+            "Mavrych V",
+            "Shypilova I",
+            "Bolgova O"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3389/fragi.2026.1790247",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42021992/"
+        },
+        {
+          "pmid": "15817669",
+          "title": "Human growth hormone-releasing factor (hGRF)1-29-albumin bioconjugates activate the GRF receptor on the anterior pituitary in rats: identification of CJC-1295 as a long-lasting GRF analog.",
+          "source": "Endocrinology",
+          "pubdate": "2005 Jul",
+          "authors": [
+            "Jetté L",
+            "Léger R",
+            "Thibaudeau K",
+            "Benquet C",
+            "Robitaille M",
+            "Pellerin I"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1210/en.2004-1286",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15817669/"
+        },
+        {
+          "pmid": "17018654",
+          "title": "Pulsatile secretion of growth hormone (GH) persists during continuous stimulation by CJC-1295, a long-acting GH-releasing hormone analog.",
+          "source": "J Clin Endocrinol Metab",
+          "pubdate": "2006 Dec",
+          "authors": [
+            "Ionescu M",
+            "Frohman LA"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article",
+            "Research Support, N.I.H., Extramural",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1210/jc.2006-1702",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17018654/"
+        },
+        {
+          "pmid": "42160466",
+          "title": "Injectable Peptides in Sports Medicine: A Structured Narrative Review of Evidence, Safety, and Antidoping Implications.",
+          "source": "JBJS Rev",
+          "pubdate": "2026 May 1",
+          "authors": [
+            "Villegas Meza AD",
+            "Nocek M",
+            "Mitchell BC",
+            "Lizarraga M",
+            "DeFoor MT",
+            "Ruzbarsky JJ"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.2106/JBJS.RVW.26.00027",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42160466/"
+        },
+        {
+          "pmid": "21871962",
+          "title": "Immunoaffinity purification of peptide hormones prior to liquid chromatography-mass spectrometry in doping controls.",
+          "source": "Methods",
+          "pubdate": "2012 Feb",
+          "authors": [
+            "Thomas A",
+            "Schänzer W",
+            "Delahaut P",
+            "Thevis M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't",
+            "Review"
+          ],
+          "doi": "10.1016/j.ymeth.2011.08.009",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21871962/"
+        },
+        {
+          "pmid": "42395176",
+          "title": "The emerging landscape of performance-enhancing peptides modulating GH-IGF1 axis: bridging the gap between clinical evidence and patient self-administration.",
+          "source": "Front Endocrinol (Lausanne)",
+          "pubdate": "2026",
+          "authors": [
+            "Dominikowski A",
+            "Rękoś Z",
+            "Olejarz M",
+            "Szczepanek-Parulska E",
+            "Domin R",
+            "RuchaŁa M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3389/fendo.2026.1822475",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42395176/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "CJC-1295",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 91971820,
+      "cas": "446262-90-4",
+      "formula": "C165H269N47O46",
+      "iupac": "(3S)-4-[[(2S)-1-[[(2S,3S)-1-[[(2S)-1-[[(2S,3R)-1-[[(2S)-5-amino-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-6-amino-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-5-amino-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-6-amino-1-[[(2S)-1-[[(2S)-1-[[(2S)-5-amino-1-[[(2S)-1-[[(2S,3S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-amino-6-[3-(2,5-dioxopyrrol-1-yl)propanoylamino]-1-oxohexan-2-yl]amino]-5-carbamimidamido-1-oxopentan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-3-methyl-1-oxopentan-2-yl]amino]-3-carboxy-1-oxopropan-2-yl]amino]-1,5-dioxopentan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-1-oxohexan-2-yl]amino]-5-carbamimidamido-1-oxopentan-2-yl]amino]-1-oxopropan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-1,5-dioxopentan-2-yl]amino]-1-oxopropan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-3-methyl-1-oxobutan-2-yl]amino]-1-oxohexan-2-yl]amino]-5-carbamimidamido-1-oxopentan-2-yl]amino]-3-(4-hydroxyphenyl)-1-oxopropan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-1,5-dioxopentan-2-yl]amino]-3-hydroxy-1-oxobutan-2-yl]amino]-1-oxo-3-phenylpropan-2-yl]amino]-3-methyl-1-oxopentan-2-yl]amino]-1-oxopropan-2-yl]amino]-3-[[(2R)-2-[[(2S)-2-amino-3-(4-hydroxyphenyl)propanoyl]amino]propanoyl]amino]-4-oxobutanoic acid"
+    }
+  }
+}

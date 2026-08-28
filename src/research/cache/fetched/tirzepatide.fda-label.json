@@ -1,0 +1,89 @@
+{
+  "name": "tirzepatide",
+  "status": 200,
+  "labels": [
+    {
+      "id": "b14e7744-9d67-48f7-92ad-dafdfacbc793",
+      "setId": "0818426a-53eb-4db7-9609-bbae1e7a3964",
+      "effectiveTime": "20260729",
+      "brand": [
+        "MOUNJARO"
+      ],
+      "generic": [
+        "TIRZEPATIDE"
+      ],
+      "manufacturer": [
+        "A-S Medication Solutions"
+      ],
+      "application": [
+        "NDA215866"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE MOUNJARO ® is indicated as an adjunct to diet and exercise to improve glycemic control in adults and pediatric patients 10 years of age and older with type 2 diabetes mellitus. MOUNJARO ® is a glucose-dependent insulinotropic polypeptide (GIP) receptor and glucagon-like peptide-1 (GLP-1) receptor agonist indicated as an adjunct to diet and exercise to improve glycemic control in adults and pediatric patients 10 years of age and older with type 2 diabetes mellitus. ( 1 )",
+      "boxedWarning": "WARNING: RISK OF THYROID C-CELL TUMORS In both male and female rats, tirzepatide causes dose-dependent and treatment-duration-dependent thyroid C-cell tumors at clinically relevant exposures. It is unknown whether MOUNJARO causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans as human relevance of tirzepatide-induced rodent thyroid C-cell tumors has not been determin",
+      "contraindications": "4 CONTRAINDICATIONS MOUNJARO is contraindicated in patients with: A personal or family history of medullary thyroid carcinoma (MTC) or in patients with Multiple Endocrine Neoplasia syndrome type 2 (MEN 2) [see Warnings and Precautions ( 5.1 )] . Known serious hypersensitivity to tirzepatide or any of the excipients in MOUNJARO. Serious hypersensitivity reactions, including anaphylaxis and angioede",
+      "warnings": "5 WARNINGS AND PRECAUTIONS Acute Pancreatitis: Has been observed in patients treated with GLP-1 receptor agonists, or MOUNJARO. Discontinue if pancreatitis is suspected. ( 5.2 ) Hypoglycemia with Concomitant Use of Insulin Secretagogues or Insulin: Concomitant use with an insulin secretagogue or insulin may increase the risk of hypoglycemia, including severe hypoglycemia. Reducing dose of insulin ",
+      "adverse": "6 ADVERSE REACTIONS The following serious adverse reactions are described below or elsewhere in the prescribing information: Risk of Thyroid C-cell Tumors [see Warnings and Precautions ( 5.1 )] Acute Pancreatitis [see Warnings and Precautions ( 5.2 )] Hypoglycemia with Concomitant Use of Insulin Secretagogues or Insulin [see Warnings and Precautions ( 5.3 )] Hypersensitivity Reactions [see Warning",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Tirzepatide is a GIP receptor and GLP-1 receptor agonist. It contains a C20 fatty diacid that enables albumin binding and prolongs the half-life. Tirzepatide selectively binds to and activates both the GIP and GLP-1 receptors, the targets for native GIP and GLP-1. Tirzepatide enhances first- and second-phase insulin secretion, and reduces glucagon ",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION The recommended starting dosage is 2.5 mg injected subcutaneously once weekly. ( 2.1 ) After 4 weeks, increase to 5 mg injected subcutaneously once weekly. ( 2.1 ) If additional glycemic control is needed, increase the dosage in 2.5 mg increments after at least 4 weeks on"
+    },
+    {
+      "id": "86a64015-7f78-4281-8b7f-579b6c3dc1f7",
+      "setId": "487cd7e7-434c-4925-99fa-aa80b1cc776b",
+      "effectiveTime": "20260422",
+      "brand": [
+        "Zepbound",
+        "ZEPBOUND",
+        "Zepbound KwikPen"
+      ],
+      "generic": [
+        "TIRZEPATIDE"
+      ],
+      "manufacturer": [
+        "Eli Lilly and Company"
+      ],
+      "application": [
+        "NDA217806"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE ZEPBOUND ® is indicated in combination with a reduced-calorie diet and increased physical activity: to reduce excess body weight and maintain weight reduction long term in adults with obesity or adults with overweight in the presence of at least one weight-related comorbid condition. to treat moderate to severe obstructive sleep apnea (OSA) in adults with obesity. ZEPBOUND is a glucose-dependent insulinotropic polypeptide (GIP) receptor and glucagon-like peptide-1 (GLP-1)",
+      "boxedWarning": "WARNING: RISK OF THYROID C-CELL TUMORS In rats, tirzepatide causes dose-dependent and treatment-duration-dependent thyroid C-cell tumors at clinically relevant exposures. It is unknown whether ZEPBOUND causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans as human relevance of tirzepatide-induced rodent thyroid C-cell tumors has not been determined [see Warnings and ",
+      "contraindications": "4 CONTRAINDICATIONS ZEPBOUND is contraindicated in patients with: A personal or family history of MTC or in patients with MEN 2 [see Warnings and Precautions ( 5.1 )] . Known serious hypersensitivity to tirzepatide or any of the excipients in ZEPBOUND. Serious hypersensitivity reactions, including anaphylaxis and angioedema, have been reported with tirzepatide [see Warnings and Precautions ( 5.6 )",
+      "warnings": "5 WARNINGS AND PRECAUTIONS Severe Gastrointestinal Adverse Reactions: Use has been associated with gastrointestinal adverse reactions, sometimes severe. ZEPBOUND is not recommended in patients with severe gastroparesis. ( 5.2 ) Acute Kidney Injury Due to Volume Depletion: Monitor renal function in patients reporting adverse reactions that could lead to volume depletion. ( 5.3 ) Acute Gallbladder D",
+      "adverse": "6 ADVERSE REACTIONS The following serious adverse reactions are described below or elsewhere in the prescribing information: Risk of Thyroid C-cell Tumors [see Warnings and Precautions ( 5.1 )] Severe Gastrointestinal Adverse Reactions [see Warnings and Precautions ( 5.2 )] Acute Kidney Injury Due to Volume Depletion [see Warnings and Precautions ( 5.3 )] Acute Gallbladder Disease [see Warnings an",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Tirzepatide is a GIP receptor and GLP-1 receptor agonist. It contains a C20 fatty diacid that enables albumin binding and prolongs the half-life. Tirzepatide selectively binds to and activates both the GIP and GLP-1 receptors, the targets for native GIP and GLP-1. GLP-1 is a physiological regulator of appetite and caloric intake. Nonclinical studie",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION Recommended Dose Escalation Schedule The recommended starting dosage is 2.5 mg injected subcutaneously once weekly for 4 weeks. Increase the dosage in 2.5 mg increments after at least 4 weeks until recommended maintenance dosage is achieved. ( 2.1 ) Consider treatment res"
+    },
+    {
+      "id": "7d192f25-180e-4206-9a68-8d7cfd492d10",
+      "setId": "78aad975-4971-49fa-b4b0-6aa39f76d2e7",
+      "effectiveTime": "20260729",
+      "brand": [
+        "MOUNJARO"
+      ],
+      "generic": [
+        "TIRZEPATIDE"
+      ],
+      "manufacturer": [
+        "A-S Medication Solutions"
+      ],
+      "application": [
+        "NDA215866"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE MOUNJARO ® is indicated as an adjunct to diet and exercise to improve glycemic control in adults and pediatric patients 10 years of age and older with type 2 diabetes mellitus. MOUNJARO ® is a glucose-dependent insulinotropic polypeptide (GIP) receptor and glucagon-like peptide-1 (GLP-1) receptor agonist indicated as an adjunct to diet and exercise to improve glycemic control in adults and pediatric patients 10 years of age and older with type 2 diabetes mellitus. ( 1 )",
+      "boxedWarning": "WARNING: RISK OF THYROID C-CELL TUMORS In both male and female rats, tirzepatide causes dose-dependent and treatment-duration-dependent thyroid C-cell tumors at clinically relevant exposures. It is unknown whether MOUNJARO causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans as human relevance of tirzepatide-induced rodent thyroid C-cell tumors has not been determin",
+      "contraindications": "4 CONTRAINDICATIONS MOUNJARO is contraindicated in patients with: A personal or family history of medullary thyroid carcinoma (MTC) or in patients with Multiple Endocrine Neoplasia syndrome type 2 (MEN 2) [see Warnings and Precautions ( 5.1 )] . Known serious hypersensitivity to tirzepatide or any of the excipients in MOUNJARO. Serious hypersensitivity reactions, including anaphylaxis and angioede",
+      "warnings": "5 WARNINGS AND PRECAUTIONS Acute Pancreatitis: Has been observed in patients treated with GLP-1 receptor agonists, or MOUNJARO. Discontinue if pancreatitis is suspected. ( 5.2 ) Hypoglycemia with Concomitant Use of Insulin Secretagogues or Insulin: Concomitant use with an insulin secretagogue or insulin may increase the risk of hypoglycemia, including severe hypoglycemia. Reducing dose of insulin ",
+      "adverse": "6 ADVERSE REACTIONS The following serious adverse reactions are described below or elsewhere in the prescribing information: Risk of Thyroid C-cell Tumors [see Warnings and Precautions ( 5.1 )] Acute Pancreatitis [see Warnings and Precautions ( 5.2 )] Hypoglycemia with Concomitant Use of Insulin Secretagogues or Insulin [see Warnings and Precautions ( 5.3 )] Hypersensitivity Reactions [see Warning",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Tirzepatide is a GIP receptor and GLP-1 receptor agonist. It contains a C20 fatty diacid that enables albumin binding and prolongs the half-life. Tirzepatide selectively binds to and activates both the GIP and GLP-1 receptors, the targets for native GIP and GLP-1. Tirzepatide enhances first- and second-phase insulin secretion, and reduces glucagon ",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION The recommended starting dosage is 2.5 mg injected subcutaneously once weekly. ( 2.1 ) After 4 weeks, increase to 5 mg injected subcutaneously once weekly. ( 2.1 ) If additional glycemic control is needed, increase the dosage in 2.5 mg increments after at least 4 weeks on"
+    }
+  ]
+}

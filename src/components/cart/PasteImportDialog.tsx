@@ -76,7 +76,8 @@ export function PasteImportDialog({ open, onOpenChange, cartId, nextPosition, cu
           product: l.code ? products.get(l.code) : undefined,
         })),
       );
-    } catch {
+    } catch (error) {
+      console.error("Artikelcodes prüfen fehlgeschlagen:", error);
       toast.error("Artikelcodes konnten nicht geprüft werden.");
     } finally {
       setResolving(false);
@@ -96,7 +97,8 @@ export function PasteImportDialog({ open, onOpenChange, cartId, nextPosition, cu
       });
       toast.success(`${validRows.length} Position(en) hinzugefügt.`);
       onOpenChange(false);
-    } catch {
+    } catch (error) {
+      console.error("Paste-Import fehlgeschlagen:", error);
       toast.error("Import fehlgeschlagen.");
     }
   }

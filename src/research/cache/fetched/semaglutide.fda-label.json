@@ -1,0 +1,88 @@
+{
+  "name": "semaglutide",
+  "status": 200,
+  "labels": [
+    {
+      "id": "6834044a-22f1-4f35-b846-b3448ee84c16",
+      "setId": "27f15fac-7d98-4114-a2ec-92494a91da98",
+      "effectiveTime": "20260130",
+      "brand": [
+        "OZEMPIC",
+        "RYBELSUS"
+      ],
+      "generic": [
+        "ORAL SEMAGLUTIDE"
+      ],
+      "manufacturer": [
+        "Novo Nordisk Pharmaceutical Industries, LP"
+      ],
+      "application": [
+        "NDA213051"
+      ],
+      "route": [
+        "ORAL"
+      ],
+      "indications": "1 INDICATIONS AND USAGE RYBELSUS and OZEMPIC tablets are indicated: • as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus. • to reduce the risk of major adverse cardiovascular (CV) events (CV death, non-fatal myocardial infarction or non-fatal stroke) in adults with type 2 diabetes mellitus who are at high risk for these events. RYBELSUS and OZEMPIC tablets are glucagon-like peptide-1 (GLP-1) receptor agonists indicated: • as an adjunct to diet ",
+      "boxedWarning": "WARNING: RISK OF THYROID C-CELL TUMORS • In rodents, semaglutide causes dose-dependent and treatment-duration-dependent thyroid C-cell tumors at clinically relevant exposures. It is unknown whether RYBELSUS and OZEMPIC tablets cause thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans as human relevance of semaglutide-induced rodent thyroid C-cell tumors has not been deter",
+      "contraindications": "4 CONTRAINDICATIONS RYBELSUS and OZEMPIC tablets are contraindicated in patients with: • A personal or family history of medullary thyroid carcinoma (MTC) or in patients with Multiple Endocrine Neoplasia syndrome type 2 (MEN 2) [see Warnings and Precautions ( 5.1 )] . • A prior serious hypersensitivity reaction to semaglutide or to any of the excipients in RYBELSUS or OZEMPIC tablets. Serious hype",
+      "warnings": "5 WARNINGS AND PRECAUTIONS • Acute Pancreatitis : Has been observed in patients treated with GLP-1 receptor agonists, including RYBELSUS or OZEMPIC tablets. Discontinue if pancreatitis is suspected. ( 5.2 ) • Diabetic Retinopathy Complications : Has been reported in a cardiovascular outcomes trial with semaglutide injection. Patients with a history of diabetic retinopathy should be monitored. ( 5.",
+      "adverse": "6 ADVERSE REACTIONS The following serious adverse reactions are described below or elsewhere in the prescribing information: • Risk of Thyroid C-cell Tumors [see Warnings and Precautions ( 5.1 )] • Acute Pancreatitis [see Warnings and Precautions ( 5.2 )] • Diabetic Retinopathy Complications [see Warnings and Precautions ( 5.3 )] • Hypoglycemia with Concomitant Use of Insulin Secretagogues or Insu",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Semaglutide is a GLP-1 analogue with 94% sequence homology to human GLP-1. Semaglutide acts as a GLP-1 receptor agonist that selectively binds to and activates the GLP-1 receptor, the target for native GLP-1. GLP-1 is a physiological hormone that has multiple actions on glucose, mediated by the GLP-1 receptors. The principal mechanism of protractio",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION • RYBELSUS and OZEMPIC tablets are not substitutable on a mg-to-mg basis. • Take RYBELSUS or OZEMPIC tablets orally once daily on an empty stomach in the morning with water (up to 4 ounces of water); do not take with other liquids besides water. ( 2.1 ) • Swallow tablets "
+    },
+    {
+      "id": "4b9bdfa7-1075-45cd-baac-66632beb38df",
+      "setId": "42bdd912-2393-44c4-b7e0-47672ca28991",
+      "effectiveTime": "20260730",
+      "brand": [
+        "Ozempic"
+      ],
+      "generic": [
+        "SEMAGLUTIDE"
+      ],
+      "manufacturer": [
+        "A-S Medication Solutions"
+      ],
+      "application": [
+        "NDA209637"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE OZEMPIC is indicated: • as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus. • to reduce the risk of major adverse cardiovascular events (cardiovascular death, non-fatal myocardial infarction or non-fatal stroke) in adults with type 2 diabetes mellitus and established cardiovascular disease. • to reduce the risk of sustained eGFR decline, end-stage kidney disease, and cardiovascular death in adults with type 2 diabetes me",
+      "boxedWarning": "WARNING: RISK OF THYROID C-CELL TUMORS • In rodents, semaglutide causes dose-dependent and treatment-duration-dependent thyroid C-cell tumors at clinically relevant exposures. It is unknown whether OZEMPIC causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans as human relevance of semaglutide-induced rodent thyroid C-cell tumors has not been determined [see Warnings ",
+      "contraindications": "4 CONTRAINDICATIONS OZEMPIC is contraindicated in patients with: • A personal or family history of MTC or in patients with MEN 2 [see Warnings and Precautions ( 5.1 )] . • A serious hypersensitivity reaction to semaglutide or to any of the excipients in OZEMPIC. Serious hypersensitivity reactions including anaphylaxis and angioedema have been reported with OZEMPIC [see Warnings and Precautions ( 5",
+      "warnings": "5 WARNINGS AND PRECAUTIONS • Acute Pancreatitis: Has been observed in patients treated with GLP-1 receptor agonists, including OZEMPIC. Discontinue if pancreatitis is suspected. ( 5.2 ) • Diabetic Retinopathy Complications: Has been reported in a clinical trial. Patients with a history of diabetic retinopathy should be monitored. ( 5.3 ) • Never share an OZEMPIC pen between patients , even if the ",
+      "adverse": "6 ADVERSE REACTIONS The following serious adverse reactions are described below or elsewhere in the prescribing information: • Risk of Thyroid C-cell Tumors [see Warnings and Precautions ( 5.1 )] • Acute Pancreatitis [see Warnings and Precautions ( 5.2) ] • Diabetic Retinopathy Complications [see Warnings and Precautions ( 5.3 )] • Hypoglycemia with Concomitant Use of Insulin Secretagogues or Insu",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Semaglutide is a GLP-1 analogue with 94% sequence homology to human GLP-1. Semaglutide acts as a GLP-1 receptor agonist that selectively binds to and activates the GLP-1 receptor, the target for native GLP-1. GLP-1 is a physiological hormone that has multiple actions on glucose, mediated by the GLP-1 receptors. The principal mechanism of protractio",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION • Administer once weekly at any time of day, with or without meals. ( 2.1 ) • Start at 0.25 mg once weekly. After 4 weeks, increase the dosage to 0.5 mg once weekly. ( 2.2 ) • If additional glycemic control is needed, increase the dosage to 1 mg once weekly after at least"
+    },
+    {
+      "id": "a5c23c93-1c61-4768-b7f2-1e430cd21a8d",
+      "setId": "979e4df4-0597-48ea-b51c-0f699fa6d166",
+      "effectiveTime": "20231122",
+      "brand": [
+        "Ozempic"
+      ],
+      "generic": [
+        "SEMAGLUTIDE"
+      ],
+      "manufacturer": [
+        "A-S Medication Solutions"
+      ],
+      "application": [
+        "NDA209637"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE OZEMPIC is indicated: • as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus. • to reduce the risk of major adverse cardiovascular events (cardiovascular death, non-fatal myocardial infarction or non-fatal stroke) in adults with type 2 diabetes mellitus and established cardiovascular disease. Limitations of Use • OZEMPIC has not been studied in patients with a history of pancreatitis. Consider other antidiabetic therapies ",
+      "boxedWarning": "WARNING: RISK OF THYROID C-CELL TUMORS • In rodents, semaglutide causes dose-dependent and treatment-duration-dependent thyroid C-cell tumors at clinically relevant exposures. It is unknown whether OZEMPIC causes thyroid C-cell tumors, including medullary thyroid carcinoma (MTC), in humans as human relevance of semaglutide-induced rodent thyroid C-cell tumors has not been determined [see Warnings ",
+      "contraindications": "4 CONTRAINDICATIONS OZEMPIC is contraindicated in patients with: • A personal or family history of MTC or in patients with MEN 2 [see Warnings and Precautions ( 5.1 )] . • A serious hypersensitivity reaction to semaglutide or to any of the excipients in OZEMPIC. Serious hypersensitivity reactions including anaphylaxis and angioedema have been reported with OZEMPIC [see Warnings and Precautions ( 5",
+      "warnings": "5 WARNINGS AND PRECAUTIONS • Pancreatitis: Has been reported in clinical trials. Discontinue promptly if pancreatitis is suspected. Do not restart if pancreatitis is confirmed ( 5.2 ). • Diabetic Retinopathy Complications: Has been reported in a clinical trial. Patients with a history of diabetic retinopathy should be monitored ( 5.3 ). • Never share an OZEMPIC pen between patients , even if the n",
+      "adverse": "6 ADVERSE REACTIONS The following serious adverse reactions are described below or elsewhere in the prescribing information: • Risk of Thyroid C-cell Tumors [see Warnings and Precautions ( 5.1 )] • Pancreatitis [see Warnings and Precautions ( 5.2 )] • Diabetic Retinopathy Complications [see Warnings and Precautions ( 5.3 )] • Hypoglycemia with Concomitant Use of Insulin Secretagogues or Insulin [s",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Semaglutide is a GLP-1 analogue with 94% sequence homology to human GLP-1. Semaglutide acts as a GLP-1 receptor agonist that selectively binds to and activates the GLP-1 receptor, the target for native GLP-1. GLP-1 is a physiological hormone that has multiple actions on glucose, mediated by the GLP-1 receptors. The principal mechanism of protractio",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION • Administer once weekly at any time of day, with or without meals ( 2.1 ). • Start at 0.25 mg once weekly. After 4 weeks, increase the dosage to 0.5 mg once weekly ( 2.2 ). • If additional glycemic control is needed, increase the dosage to 1 mg once weekly after at least"
+    }
+  ]
+}

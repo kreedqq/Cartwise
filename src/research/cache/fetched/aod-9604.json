@@ -1,0 +1,208 @@
+{
+  "slug": "aod-9604",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "AOD9604",
+    "AOD-9604"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "AOD9604",
+      "totalCount": 0,
+      "studies": []
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "AOD9604 AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 10,
+      "articles": [
+        {
+          "pmid": "41490200",
+          "title": "Therapeutic Peptides in Orthopaedics: Applications, Challenges, and Future Directions.",
+          "source": "J Am Acad Orthop Surg Glob Res Rev",
+          "pubdate": "2026 Jan 1",
+          "authors": [
+            "Rahman OF",
+            "Lee SJ",
+            "Seeds WA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.5435/JAAOSGlobal-D-25-00236",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41490200/"
+        },
+        {
+          "pmid": "41966639",
+          "title": "Safety and Efficacy of Approved and Unapproved Peptide Therapies for Musculoskeletal Injuries and Athletic Performance.",
+          "source": "Sports Med",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Mendias CL",
+            "Awan TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s40279-026-02437-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41966639/"
+        },
+        {
+          "pmid": "15134286",
+          "title": "AOD-9604 Metabolic.",
+          "source": "Curr Opin Investig Drugs",
+          "pubdate": "2004 Apr",
+          "authors": [
+            "Wilding J"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15134286/"
+        },
+        {
+          "pmid": "15834452",
+          "title": "Gateways to clinical trials.",
+          "source": "Methods Find Exp Clin Pharmacol",
+          "pubdate": "2005 Apr",
+          "authors": [
+            "Bayés M",
+            "Rabasseda X",
+            "Prous JR"
+          ],
+          "pubtype": [
+            "Bibliography",
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15834452/"
+        },
+        {
+          "pmid": "14685303",
+          "title": "Gateways to clinical trials.",
+          "source": "Methods Find Exp Clin Pharmacol",
+          "pubdate": "2003 Nov",
+          "authors": [
+            "Bayes M",
+            "Rabasseda X",
+            "Prous JR"
+          ],
+          "pubtype": [
+            "Bibliography",
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/14685303/"
+        },
+        {
+          "pmid": "14571286",
+          "title": "Gateways to clinical trials.",
+          "source": "Methods Find Exp Clin Pharmacol",
+          "pubdate": "2003 Sep",
+          "authors": [
+            "Bayés M",
+            "Rabasseda X",
+            "Prous JR"
+          ],
+          "pubtype": [
+            "Bibliography",
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/14571286/"
+        },
+        {
+          "pmid": "16931496",
+          "title": "Potential role of new therapies in modifying cardiovascular risk in overweight patients with metabolic risk factors.",
+          "source": "Obesity (Silver Spring)",
+          "pubdate": "2006 Jun",
+          "authors": [
+            "Jensen MD"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1038/oby.2006.294",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16931496/"
+        },
+        {
+          "pmid": "24976118",
+          "title": "Identification and characterization of peptide drugs in unknown pharmaceutical preparations seized by the Belgian authorities: case report on AOD9604.",
+          "source": "Drug Test Anal",
+          "pubdate": "2014 Sep",
+          "authors": [
+            "Vanhee C",
+            "Moens G",
+            "Deconinck E",
+            "De Beer JO"
+          ],
+          "pubtype": [
+            "Letter"
+          ],
+          "doi": "10.1002/dta.1687",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24976118/"
+        },
+        {
+          "pmid": "17971763",
+          "title": "[Obesity: a review of currently used antiobesity drugs and new compounds in clinical development].",
+          "source": "Postepy Hig Med Dosw (Online)",
+          "pubdate": "2007 Oct 19",
+          "authors": [
+            "Zieba R"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17971763/"
+        },
+        {
+          "pmid": "42395176",
+          "title": "The emerging landscape of performance-enhancing peptides modulating GH-IGF1 axis: bridging the gap between clinical evidence and patient self-administration.",
+          "source": "Front Endocrinol (Lausanne)",
+          "pubdate": "2026",
+          "authors": [
+            "Dominikowski A",
+            "Rękoś Z",
+            "Olejarz M",
+            "Szczepanek-Parulska E",
+            "Domin R",
+            "RuchaŁa M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3389/fendo.2026.1822475",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42395176/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "AOD-9604",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 71300630,
+      "cas": "221231-10-3",
+      "formula": "C78H123N23O23S2",
+      "iupac": "(2S)-2-[[2-[[(4R,7S,13S,16S,19S,22S,25R)-25-[[(2S)-5-amino-2-[[(2S)-2-[[(2S,3S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-amino-3-(4-hydroxyphenyl)propanoyl]amino]-4-methylpentanoyl]amino]-5-carbamimidamidopentanoyl]amino]-3-methylpentanoyl]amino]-3-methylbutanoyl]amino]-5-oxopentanoyl]amino]-22-(3-carbamimidamidopropyl)-13-(2-carboxyethyl)-7,19-bis(hydroxymethyl)-6,9,12,15,18,21,24-heptaoxo-16-propan-2-yl-1,2-dithia-5,8,11,14,17,20,23-heptazacyclohexacosane-4-carbonyl]amino]acetyl]amino]-3-phenylpropanoic acid"
+    }
+  }
+}

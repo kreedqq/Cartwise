@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "semaglutide",
+    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/ozempic",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "slug": "semaglutide-wegovy",
+    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/wegovy",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "slug": "tirzepatide",
+    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/mounjaro",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "slug": "liraglutide",
+    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/victoza",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "slug": "liraglutide-saxenda",
+    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/saxenda",
+    "status": 200,
+    "ok": true
+  }
+]

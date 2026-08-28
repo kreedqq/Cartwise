@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { AlertTriangle, Clock, RefreshCw, TrendingUp } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -6,8 +7,11 @@ import { Separator } from "@/components/ui/separator";
 import { formatDateTime, formatEur, formatQuantity, formatRate, formatUsd } from "@/lib/money";
 import type { CartTotals } from "@/lib/money";
 import type { ExchangeRateResult } from "@/services/exchangeRate";
+import type { CartStatus } from "@/types/database";
 
 interface CartSummaryPanelProps {
+  cartId: string;
+  cartStatus: CartStatus;
   totals: CartTotals;
   rate: ExchangeRateResult | undefined;
   rateLoading: boolean;
@@ -17,6 +21,8 @@ interface CartSummaryPanelProps {
 }
 
 export function CartSummaryPanel({
+  cartId,
+  cartStatus,
   totals,
   rate,
   rateLoading,
@@ -24,22 +30,23 @@ export function CartSummaryPanel({
   onUpdatePrices,
   updatingPrices,
 }: CartSummaryPanelProps) {
+  const navigate = useNavigate();
+  const canCheckout = cartStatus !== "ordered" && cartStatus !== "archived";
+
   return (
     <div className="space-y-5">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Summe USD</p>
-        <p className="text-3xl font-bold tabular-nums tracking-tight">{formatUsd(totals.totalUsd)}</p>
-      </div>
-
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Summe EUR</p>
+      <div className="rounded-2xl border border-border/70 bg-secondary/40 px-4 py-5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Produktsumme USD</p>
+        <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight text-primary">{formatUsd(totals.totalUsd)}</p>
+        <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Produktsumme EUR</p>
         {totals.totalEur != null ? (
-          <p className="text-2xl font-semibold tabular-nums tracking-tight text-primary">
-            {formatEur(totals.totalEur)}
-          </p>
+          <p className="mt-1 text-xl font-semibold tabular-nums tracking-tight">{formatEur(totals.totalEur)}</p>
         ) : (
-          <p className="text-sm font-medium text-warning">Kein Wechselkurs verfügbar</p>
+          <p className="mt-1 text-sm font-medium text-muted-foreground">Kein Wechselkurs verfügbar</p>
         )}
+        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+          Versand aus China und Versand aus Deutschland werden nach der Bestellung zugeordnet. Der Gesamt Endpreis inkl. Versand erscheint in der Bestellung.
+        </p>
       </div>
 
       <Separator />
@@ -89,11 +96,26 @@ export function CartSummaryPanel({
         </p>
       )}
 
+      {canCheckout ? (
+        <Button
+          size="lg"
+          className="w-full"
+          disabled={totals.totalUsd <= 0}
+          onClick={() => navigate(`/carts/${cartId}/checkout`)}
+        >
+          Bestellung prüfen
+        </Button>
+      ) : (
+        <p className="rounded-md bg-secondary/60 p-2.5 text-center text-xs text-muted-foreground">
+          {cartStatus === "ordered" ? "Dieser Warenkorb wurde bereits bestellt." : "Dieser Warenkorb ist archiviert."}
+        </p>
+      )}
+
       <div className="space-y-2">
         <Button variant="outline" size="sm" className="w-full" onClick={onRefreshRate} loading={rateLoading}>
           <RefreshCw /> Wechselkurs aktualisieren
         </Button>
-        <Button size="sm" className="w-full" onClick={onUpdatePrices} loading={updatingPrices}>
+        <Button size="sm" className="w-full" onClick={onUpdatePrices} loading={updatingPrices} disabled={!canCheckout}>
           Preise aktualisieren
         </Button>
       </div>

@@ -1,0 +1,682 @@
+{
+  "slug": "semaglutide",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "semaglutide"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "semaglutide",
+      "totalCount": 773,
+      "studies": [
+        {
+          "nctId": "NCT07787936",
+          "title": "GLP-1/GIP Receptor Agonists in Obesity-Related HFpEF: The GLIDE-HF Registry",
+          "status": "NOT_YET_RECRUITING",
+          "phase": null,
+          "sponsor": "Miedziowe Centrum Zdrowia SA",
+          "enrollment": 150,
+          "start": "2027-01-01",
+          "completion": "2033-01-01",
+          "lastUpdate": "2026-08-26",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07787936"
+        },
+        {
+          "nctId": "NCT07783854",
+          "title": "A Randomized Controlled Study of Dose-tapering Regimen of Semaglutide for Weight-Loss Maintenance in Adults With Overweight or Obesity",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Union Hospital, Tongji Medical College, Huazhong University of Science and Technology",
+          "enrollment": 72,
+          "start": "2026-09-01",
+          "completion": "2029-06-30",
+          "lastUpdate": "2026-08-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07783854"
+        },
+        {
+          "nctId": "NCT07668414",
+          "title": "A Research Study Investigating How Well the Medicine Zenagamtide Helps People With Excess Body Weight Lose Weight Compared to Semaglutide",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 650,
+          "start": "2026-09-22",
+          "completion": "2028-10-10",
+          "lastUpdate": "2026-08-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07668414"
+        },
+        {
+          "nctId": "NCT06015893",
+          "title": "Semaglutide Therapy for Alcohol Reduction (STAR)",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "National Institute on Drug Abuse (NIDA)",
+          "enrollment": 63,
+          "start": "2023-10-17",
+          "completion": "2027-03-31",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06015893"
+        },
+        {
+          "nctId": "NCT07781371",
+          "title": "A Retrospective Real-World Cohort Study",
+          "status": "NOT_YET_RECRUITING",
+          "phase": null,
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 100000,
+          "start": "2026-08-20",
+          "completion": "2026-11-02",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07781371"
+        },
+        {
+          "nctId": "NCT04596631",
+          "title": "A Research Study to Compare a New Medicine Oral Semaglutide to a Dummy Medicine in Children and Teenagers With Type 2 Diabetes",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 132,
+          "start": "2020-11-02",
+          "completion": "2026-02-03",
+          "lastUpdate": "2026-08-21",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT04596631"
+        },
+        {
+          "nctId": "NCT06897475",
+          "title": "A Study of LY3457263 Compared With Placebo in Participants With Type 2 Diabetes on a Stable Dose of Semaglutide or Tirzepatide",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 240,
+          "start": "2025-03-28",
+          "completion": "2027-01",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06897475"
+        },
+        {
+          "nctId": "NCT07779343",
+          "title": "OBESIAL: A Prospective Interventional Real-world Study of a Multidisciplinary Obesity Management Programme",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "University of Health Sciences, Algeria",
+          "enrollment": 300,
+          "start": "2026-01-22",
+          "completion": "2028-01-23",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07779343"
+        },
+        {
+          "nctId": "NCT07485062",
+          "title": "Exercise and Diabetes Interventions to Improve Brain Health in Older Adults With Type 2 Diabetes",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Western University, Canada",
+          "enrollment": 164,
+          "start": "2026-09-01",
+          "completion": "2029-05-01",
+          "lastUpdate": "2026-08-20",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07485062"
+        },
+        {
+          "nctId": "NCT07563699",
+          "title": "Safety, Tolerability and Efficacy of Semaglutide Depot in Subjects With Type-2 Diabetes Mellitus",
+          "status": "RECRUITING",
+          "phase": "PHASE1, PHASE2",
+          "sponsor": "Mapi Pharma Ltd.",
+          "enrollment": 24,
+          "start": "2026-08-09",
+          "completion": "2028-06",
+          "lastUpdate": "2026-08-20",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07563699"
+        },
+        {
+          "nctId": "NCT07213323",
+          "title": "Probiotic Intervention for Digestive Health in Obese Patients Initiating GLP-RA Treatment",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Hospices Civils de Lyon",
+          "enrollment": 50,
+          "start": "2026-08-05",
+          "completion": "2028-08-05",
+          "lastUpdate": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07213323"
+        },
+        {
+          "nctId": "NCT07772960",
+          "title": "Semaglutide Dose Effects on Metabolic and Stress Hormone, Craving and Alcohol Use Outcomes",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "Yale University",
+          "enrollment": 90,
+          "start": "2026-10-01",
+          "completion": "2031-10-31",
+          "lastUpdate": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07772960"
+        },
+        {
+          "nctId": "NCT06807970",
+          "title": "Optimization of Obesity for Total Knee Replacement With Glucagon-like Peptide-1 Receptor Agonist",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "EARLY_PHASE1",
+          "sponsor": "The University of Hong Kong",
+          "enrollment": 54,
+          "start": "2025-09-01",
+          "completion": "2028-07-01",
+          "lastUpdate": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06807970"
+        },
+        {
+          "nctId": "NCT06546384",
+          "title": "GLP-1 RA on Alcohol Consumption, Metabolism and Liver Parameters in Patients With Obesity and Fatty Liver Disease",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "NA",
+          "sponsor": "Insel Gruppe AG, University Hospital Bern",
+          "enrollment": 64,
+          "start": "2026-11-01",
+          "completion": "2027-04-30",
+          "lastUpdate": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06546384"
+        },
+        {
+          "nctId": "NCT07770282",
+          "title": "Efficacy and Safety of Semaglutide Versus Placebo on Cardiometabolic Profile in Patients With Schizophrenia With Metabolic Syndrome",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "All India Institute of Medical Sciences, Bhubaneswar",
+          "enrollment": 600,
+          "start": "2026-12-01",
+          "completion": "2030-12-30",
+          "lastUpdate": "2026-08-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07770282"
+        },
+        {
+          "nctId": "NCT05891496",
+          "title": "A Research Study Looking at the Effect of Semaglutide on the Immune System and Other Biological Processes in People With Alzheimer's Disease",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 23,
+          "start": "2023-06-20",
+          "completion": "2025-09-08",
+          "lastUpdate": "2026-08-18",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT05891496"
+        },
+        {
+          "nctId": "NCT07770841",
+          "title": "Research Study on How Well Oral Semaglutide Works for Weight Loss in Adults With Excess Body Weight",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 450,
+          "start": "2026-08-12",
+          "completion": "2028-04-11",
+          "lastUpdate": "2026-08-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07770841"
+        },
+        {
+          "nctId": "NCT07770152",
+          "title": "Semaglutide in Youth With Autism Spectrum Disorder",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Children's Hospital Medical Center, Cincinnati",
+          "enrollment": 42,
+          "start": "2026-09-01",
+          "completion": "2029-09-01",
+          "lastUpdate": "2026-08-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07770152"
+        },
+        {
+          "nctId": "NCT07769047",
+          "title": "Semaglutide and Structured Lifestyle Support to Improve Heart and Blood Vessel Health in Postmenopausal Obese Breast Cancer Survivors Taking Aromatase Inhibitors",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Mayo Clinic",
+          "enrollment": 50,
+          "start": "2026-09-01",
+          "completion": "2035-07-30",
+          "lastUpdate": "2026-08-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07769047"
+        },
+        {
+          "nctId": "NCT07202247",
+          "title": "Metabolic Interventions (Time-Restricted Eating, GLP1 Receptor Agonist, and Heart Healthy Diet) to Improve Cardiometabolic Health in Prostate Cancer Patients During Androgen Deprivation Therapy, IMPACT-ADT Trial",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "City of Hope Medical Center",
+          "enrollment": 60,
+          "start": "2025-11-05",
+          "completion": "2028-04-09",
+          "lastUpdate": "2026-08-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07202247"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "semaglutide AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 2485,
+      "articles": [
+        {
+          "pmid": "40196933",
+          "title": "Real-world evidence on the utilization, clinical and comparative effectiveness, and adverse effects of newer GLP-1RA-based weight-loss therapies.",
+          "source": "Diabetes Obes Metab",
+          "pubdate": "2025 Apr",
+          "authors": [
+            "Thomsen RW",
+            "Mailhac A",
+            "Løhde JB",
+            "Pottegård A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1111/dom.16364",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40196933/"
+        },
+        {
+          "pmid": "38613667",
+          "title": "Subcutaneously administered tirzepatide vs semaglutide for adults with type 2 diabetes: a systematic review and network meta-analysis of randomised controlled trials.",
+          "source": "Diabetologia",
+          "pubdate": "2024 Jul",
+          "authors": [
+            "Karagiannis T",
+            "Malandris K",
+            "Avgerinos I",
+            "Stamati A",
+            "Kakotrichi P",
+            "Liakos A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review",
+            "Network Meta-Analysis"
+          ],
+          "doi": "10.1007/s00125-024-06144-1",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38613667/"
+        },
+        {
+          "pmid": "36578889",
+          "title": "Efficacy and Safety of Semaglutide for Weight Loss in Obesity Without Diabetes: A Systematic Review and Meta-Analysis.",
+          "source": "J ASEAN Fed Endocr Soc",
+          "pubdate": "2022",
+          "authors": [
+            "Tan HC",
+            "Dampil OA",
+            "Marquez MM"
+          ],
+          "pubtype": [
+            "Meta-Analysis",
+            "Systematic Review",
+            "Journal Article"
+          ],
+          "doi": "10.15605/jafes.037.02.14",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36578889/"
+        },
+        {
+          "pmid": "39761578",
+          "title": "Efficacy and Safety of Glucagon-Like Peptide-1 Receptor Agonists for Weight Loss Among Adults Without Diabetes : A Systematic Review of Randomized Controlled Trials.",
+          "source": "Ann Intern Med",
+          "pubdate": "2025 Feb",
+          "authors": [
+            "Moiz A",
+            "Filion KB",
+            "Toutounchi H",
+            "Tsoukas MA",
+            "Yu OHY",
+            "Peters TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.7326/ANNALS-24-01590",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39761578/"
+        },
+        {
+          "pmid": "41161687",
+          "title": "Tirzepatide for adults living with obesity.",
+          "source": "Cochrane Database Syst Rev",
+          "pubdate": "2025 Oct 30",
+          "authors": [
+            "Franco JV",
+            "Guo Y",
+            "Varela LB",
+            "Aqra Z",
+            "Alhalahla M",
+            "Medina Rodriguez M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review",
+            "Meta-Analysis"
+          ],
+          "doi": "10.1002/14651858.CD016018",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41161687/"
+        },
+        {
+          "pmid": "40988099",
+          "title": "Evaluating the Rates of Pancreatitis and Pancreatic Cancer Among GLP-1 Receptor Agonists: A Systematic Review and Meta-Analysis of Randomised Controlled Trials.",
+          "source": "Endocrinol Diabetes Metab",
+          "pubdate": "2025 Sep",
+          "authors": [
+            "Wen J",
+            "Nadora D",
+            "Bernstein E",
+            "How-Volkman C",
+            "Truong A",
+            "Joy B"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1002/edm2.70113",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40988099/"
+        },
+        {
+          "pmid": "33667417",
+          "title": "Semaglutide 2·4 mg once a week in adults with overweight or obesity, and type 2 diabetes (STEP 2): a randomised, double-blind, double-dummy, placebo-controlled, phase 3 trial.",
+          "source": "Lancet",
+          "pubdate": "2021 Mar 13",
+          "authors": [
+            "Davies M",
+            "Færch L",
+            "Jeppesen OK",
+            "Pakseresht A",
+            "Pedersen SD",
+            "Perreault L"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't",
+            "Equivalence Trial"
+          ],
+          "doi": "10.1016/S0140-6736(21)00213-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33667417/"
+        },
+        {
+          "pmid": "38952487",
+          "title": "Clinical Pharmacokinetics of Semaglutide: A Systematic Review.",
+          "source": "Drug Des Devel Ther",
+          "pubdate": "2024",
+          "authors": [
+            "Yang XD",
+            "Yang YY"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.2147/DDDT.S470826",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38952487/"
+        },
+        {
+          "pmid": "38679221",
+          "title": "Long-Term Efficacy and Safety of Once-Weekly Semaglutide for Weight Loss in Patients Without Diabetes: A Systematic Review and Meta-Analysis of Randomized Controlled Trials.",
+          "source": "Am J Cardiol",
+          "pubdate": "2024 Jul 1",
+          "authors": [
+            "Moiz A",
+            "Levett JY",
+            "Filion KB",
+            "Peri K",
+            "Reynier P",
+            "Eisenberg MJ"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review",
+            "Meta-Analysis",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/j.amjcard.2024.04.041",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38679221/"
+        },
+        {
+          "pmid": "40685589",
+          "title": "Efficacy and Safety of GLP-1 Receptor Agonists, Dual Agonists, and Retatrutide for Weight Loss in Adults With Overweight or Obesity: A Bayesian NMA.",
+          "source": "Obesity (Silver Spring)",
+          "pubdate": "2025 Nov",
+          "authors": [
+            "Sinha B",
+            "Ghosal S"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Network Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1002/oby.24360",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40685589/"
+        },
+        {
+          "pmid": "34305810",
+          "title": "Safety of Semaglutide.",
+          "source": "Front Endocrinol (Lausanne)",
+          "pubdate": "2021",
+          "authors": [
+            "Smits MM",
+            "Van Raalte DH"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't",
+            "Review"
+          ],
+          "doi": "10.3389/fendo.2021.645563",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34305810/"
+        },
+        {
+          "pmid": "39719170",
+          "title": "Effect of glucagon-like peptide-1 receptor agonists and co-agonists on body composition: Systematic review and network meta-analysis.",
+          "source": "Metabolism",
+          "pubdate": "2025 Mar",
+          "authors": [
+            "Karakasis P",
+            "Patoulias D",
+            "Fragakis N",
+            "Mantzoros CS"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Network Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1016/j.metabol.2024.156113",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39719170/"
+        },
+        {
+          "pmid": "36945734",
+          "title": "Effects of oral semaglutide on cardiovascular outcomes in individuals with type 2 diabetes and established atherosclerotic cardiovascular disease and/or chronic kidney disease: Design and baseline characteristics of SOUL, a randomized trial.",
+          "source": "Diabetes Obes Metab",
+          "pubdate": "2023 Jul",
+          "authors": [
+            "McGuire DK",
+            "Busui RP",
+            "Deanfield J",
+            "Inzucchi SE",
+            "Mann JFE",
+            "Marx N"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't",
+            "Clinical Trial Protocol"
+          ],
+          "doi": "10.1111/dom.15058",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36945734/"
+        },
+        {
+          "pmid": "38330988",
+          "title": "Efficacy and safety of once weekly semaglutide 2·4 mg for weight management in a predominantly east Asian population with overweight or obesity (STEP 7): a double-blind, multicentre, randomised controlled trial.",
+          "source": "Lancet Diabetes Endocrinol",
+          "pubdate": "2024 Mar",
+          "authors": [
+            "Mu Y",
+            "Bao X",
+            "Eliaschewitz FG",
+            "Hansen MR",
+            "Kim BT",
+            "Koroleva A"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/S2213-8587(23)00388-1",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38330988/"
+        },
+        {
+          "pmid": "32333876",
+          "title": "Safety and efficacy of oral semaglutide versus dulaglutide in Japanese patients with type 2 diabetes (PIONEER 10): an open-label, randomised, active-controlled, phase 3a trial.",
+          "source": "Lancet Diabetes Endocrinol",
+          "pubdate": "2020 May",
+          "authors": [
+            "Yabe D",
+            "Nakamura J",
+            "Kaneto H",
+            "Deenadayalan S",
+            "Navarria A",
+            "Gislum M"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Comparative Study",
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/S2213-8587(20)30074-7",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32333876/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "semaglutide",
+      "found": true,
+      "products": [
+        {
+          "sponsor": "NOVO",
+          "application": "NDA213051",
+          "products": [
+            {
+              "brand": "OZEMPIC",
+              "active": [
+                {
+                  "name": "SEMAGLUTIDE",
+                  "strength": "9MG"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            },
+            {
+              "brand": "OZEMPIC",
+              "active": [
+                {
+                  "name": "SEMAGLUTIDE",
+                  "strength": "1.5MG"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            },
+            {
+              "brand": "RYBELSUS",
+              "active": [
+                {
+                  "name": "SEMAGLUTIDE",
+                  "strength": "7MG"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            },
+            {
+              "brand": "OZEMPIC",
+              "active": [
+                {
+                  "name": "SEMAGLUTIDE",
+                  "strength": "4MG"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            },
+            {
+              "brand": "RYBELSUS",
+              "active": [
+                {
+                  "name": "SEMAGLUTIDE",
+                  "strength": "14MG"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            },
+            {
+              "brand": "RYBELSUS",
+              "active": [
+                {
+                  "name": "SEMAGLUTIDE",
+                  "strength": "3MG"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "TABLET",
+              "route": "ORAL"
+            }
+          ]
+        }
+      ],
+      "message": null
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 56843331,
+      "cas": "910463-68-2",
+      "formula": "C187H291N45O59",
+      "iupac": "18-[[(1R)-4-[2-[2-[2-[2-[2-[2-[[(5S)-5-[[(2S)-2-[[(2S)-2-[[(2S)-5-amino-2-[[2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S,3R)-2-[[(2S)-2-[[(2S,3R)-2-[[2-[[(2S)-2-[[2-[[(2S)-2-amino-3-(1H-imidazol-5-yl)propanoyl]amino]-2-methylpropanoyl]amino]-4-carboxybutanoyl]amino]acetyl]amino]-3-hydroxybutanoyl]amino]-3-phenylpropanoyl]amino]-3-hydroxybutanoyl]amino]-3-hydroxypropanoyl]amino]-3-carboxypropanoyl]amino]-3-methylbutanoyl]amino]-3-hydroxypropanoyl]amino]-3-hydroxypropanoyl]amino]-3-(4-hydroxyphenyl)propanoyl]amino]-4-methylpentanoyl]amino]-4-carboxybutanoyl]amino]acetyl]amino]-5-oxopentanoyl]amino]propanoyl]amino]propanoyl]amino]-6-[[(2S)-1-[[(2S)-1-[[(2S,3S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-5-carbamimidamido-1-[[2-[[(2S)-5-carbamimidamido-1-(carboxymethylamino)-1-oxopentan-2-yl]amino]-2-oxoethyl]amino]-1-oxopentan-2-yl]amino]-3-methyl-1-oxobutan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-3-(1H-indol-3-yl)-1-oxopropan-2-yl]amino]-1-oxopropan-2-yl]amino]-3-methyl-1-oxopentan-2-yl]amino]-1-oxo-3-phenylpropan-2-yl]amino]-4-carboxy-1-oxobutan-2-yl]amino]-6-oxohexyl]amino]-2-oxoethoxy]ethoxy]ethylamino]-2-oxoethoxy]ethoxy]ethylamino]-1-carboxy-4-oxobutyl]amino]-18-oxooctadecanoic acid"
+    }
+  }
+}
