@@ -35,3 +35,6 @@ supabase/.temp
 
 # Local Vercel project link (created by `vercel link`)
 .vercel
+
+# Local production snapshots (never commit)
+.local-backups/

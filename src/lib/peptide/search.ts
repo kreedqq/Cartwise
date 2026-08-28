@@ -1,29 +1,44 @@
-import { CATEGORY_LABELS, PEPTIDE_SUBSTANCES } from "@/lib/peptide/catalog";
+import { PEPTIDE_SUBSTANCES } from "@/lib/peptide/catalog";
+import { matchesLexiconCategory } from "@/lib/peptide/lexiconFilters";
 import type { PeptideCategory, PeptideSubstance } from "@/lib/peptide/types";
 
-function haystack(substance: PeptideSubstance): string {
+/** Search fields from the dual-read spec: name, alias, development name, CAS, slug. */
+export type SubstanceSearchFields = {
+  name: string;
+  displayName: string;
+  aliases: readonly string[];
+  developmentNames: readonly string[];
+  slug: string;
+  category: PeptideCategory | string;
+  casNumber?: string | null;
+};
+
+export function substanceSearchHaystack(substance: SubstanceSearchFields): string {
   return [
     substance.name,
     substance.displayName,
     ...substance.aliases,
     ...substance.developmentNames,
     substance.slug,
-    substance.category,
-    CATEGORY_LABELS[substance.category],
-    substance.moleculeType ?? "",
-    substance.identityNote ?? "",
+    substance.casNumber ?? "",
   ]
     .join(" ")
     .toLowerCase();
 }
 
-export function searchSubstances(query: string, category: PeptideCategory | "all" = "all"): PeptideSubstance[] {
+export function matchesSubstanceSearch(
+  substance: SubstanceSearchFields,
+  query: string,
+  category: PeptideCategory | "all" = "all",
+): boolean {
+  if (!matchesLexiconCategory(substance, category)) return false;
   const needle = query.trim().toLowerCase();
-  return PEPTIDE_SUBSTANCES.filter((item) => {
-    if (category !== "all" && item.category !== category) return false;
-    if (!needle) return true;
-    return haystack(item).includes(needle);
-  });
+  if (!needle) return true;
+  return substanceSearchHaystack(substance).includes(needle);
+}
+
+export function searchSubstances(query: string, category: PeptideCategory | "all" = "all"): PeptideSubstance[] {
+  return PEPTIDE_SUBSTANCES.filter((item) => matchesSubstanceSearch(item, query, category));
 }
 
 export const PRODUCT_CODE_PREFIX_RULES: Array<{ test: RegExp; slug: string }> = [

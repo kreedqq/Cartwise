@@ -1,6 +1,6 @@
 # Research Persistence & Database Architecture
 
-**Status:** Phase 1 (identity + product mapping) implemented in `0024`. Later phases (sources, studies, claims, evidence, lexicon switch) remain analysis only.  
+**Status:** Phases 1–4 are implemented in Git (see `docs/RESEARCH_PERSISTENCE_PHASE_*.md`). Phase 5 audit: `docs/RESEARCH_PERSISTENCE_PHASE_5_READINESS.md`. This file remains the original target analysis; later phase tables now exist as migrations. Lexicon switch is still not started.  
 **Date:** 2026-08-28  
 **Code baseline before Phase 1:** `837b155` (`chore: backup research batch 02`)
 

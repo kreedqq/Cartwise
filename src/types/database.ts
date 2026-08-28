@@ -515,6 +515,455 @@ export interface Database {
           },
         ];
       };
+      research_runs: {
+        Row: {
+          id: string;
+          run_type: "historical_import" | "migration_import" | "live";
+          connector: string;
+          query: string | null;
+          batch_label: string | null;
+          status: "running" | "completed" | "failed";
+          started_at: string | null;
+          completed_at: string | null;
+          sources_found: number | null;
+          sources_accepted: number | null;
+          sources_rejected: number | null;
+          studies_found: number | null;
+          studies_accepted: number | null;
+          errors: string | null;
+          operator_note: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["research_runs"]["Row"]> & {
+          run_type: "historical_import" | "migration_import" | "live";
+          connector: string;
+          status: "running" | "completed" | "failed";
+        };
+        Update: Partial<Database["public"]["Tables"]["research_runs"]["Row"]>;
+        Relationships: never[];
+      };
+      sources: {
+        Row: {
+          id: string;
+          source_type:
+            | "fda"
+            | "ema"
+            | "bfarm"
+            | "mhra"
+            | "clinical_trial"
+            | "pubmed"
+            | "journal"
+            | "systematic_review"
+            | "review"
+            | "meta_analysis"
+            | "manufacturer"
+            | "literature"
+            | "scientific"
+            | "regulatory"
+            | "other";
+          title: string;
+          publisher: string | null;
+          authors: string | null;
+          publication_date: string | null;
+          access_date: string | null;
+          url: string;
+          doi: string | null;
+          pmid: string | null;
+          nct_id: string | null;
+          abstract: string | null;
+          external_id: string | null;
+          source_quality: number | null;
+          status: "active" | "superseded" | "unavailable" | "rejected";
+          legacy_ids: string[];
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["sources"]["Row"]> & {
+          source_type: Database["public"]["Tables"]["sources"]["Row"]["source_type"];
+          title: string;
+          url: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["sources"]["Row"]>;
+        Relationships: never[];
+      };
+      source_substances: {
+        Row: {
+          id: string;
+          source_id: string;
+          substance_id: string;
+          legacy_source_id: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["source_substances"]["Row"]> & {
+          source_id: string;
+          substance_id: string;
+          legacy_source_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["source_substances"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "source_substances_source_id_fkey";
+            columns: ["source_id"];
+            isOneToOne: false;
+            referencedRelation: "sources";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "source_substances_substance_id_fkey";
+            columns: ["substance_id"];
+            isOneToOne: false;
+            referencedRelation: "substances";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      studies: {
+        Row: {
+          id: string;
+          nct_id: string;
+          title: string;
+          sponsor: string | null;
+          phase: string | null;
+          status: string | null;
+          enrollment: number | null;
+          start_date: string | null;
+          completion_date: string | null;
+          last_updated: string | null;
+          has_results: boolean;
+          source_url: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["studies"]["Row"]> & {
+          nct_id: string;
+          title: string;
+          source_url: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["studies"]["Row"]>;
+        Relationships: never[];
+      };
+      study_substances: {
+        Row: {
+          id: string;
+          study_id: string;
+          substance_id: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["study_substances"]["Row"]> & {
+          study_id: string;
+          substance_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["study_substances"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "study_substances_study_id_fkey";
+            columns: ["study_id"];
+            isOneToOne: false;
+            referencedRelation: "studies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "study_substances_substance_id_fkey";
+            columns: ["substance_id"];
+            isOneToOne: false;
+            referencedRelation: "substances";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      study_sources: {
+        Row: {
+          id: string;
+          study_id: string;
+          source_id: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["study_sources"]["Row"]> & {
+          study_id: string;
+          source_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["study_sources"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "study_sources_study_id_fkey";
+            columns: ["study_id"];
+            isOneToOne: false;
+            referencedRelation: "studies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "study_sources_source_id_fkey";
+            columns: ["source_id"];
+            isOneToOne: false;
+            referencedRelation: "sources";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      research_run_sources: {
+        Row: {
+          id: string;
+          research_run_id: string;
+          source_id: string;
+          discovered_at: string | null;
+          accepted: boolean;
+          rejection_reason: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["research_run_sources"]["Row"]> & {
+          research_run_id: string;
+          source_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["research_run_sources"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "research_run_sources_research_run_id_fkey";
+            columns: ["research_run_id"];
+            isOneToOne: false;
+            referencedRelation: "research_runs";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "research_run_sources_source_id_fkey";
+            columns: ["source_id"];
+            isOneToOne: false;
+            referencedRelation: "sources";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      claims: {
+        Row: {
+          id: string;
+          stable_key: string;
+          substance_id: string;
+          claim_type:
+            | "mechanism"
+            | "effect"
+            | "efficacy"
+            | "safety"
+            | "pharmacology"
+            | "clinical_evidence"
+            | "current_research"
+            | "other";
+          statement: string;
+          status: "draft" | "review-required" | "approved" | "rejected";
+          safety_category:
+            | "common_adverse_event"
+            | "serious_adverse_event"
+            | "warning"
+            | "contraindication"
+            | "long_term_unknown"
+            | "interaction"
+            | null;
+          supersedes_claim_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["claims"]["Row"]> & {
+          stable_key: string;
+          substance_id: string;
+          claim_type: Database["public"]["Tables"]["claims"]["Row"]["claim_type"];
+          statement: string;
+          status: Database["public"]["Tables"]["claims"]["Row"]["status"];
+        };
+        Update: Partial<Database["public"]["Tables"]["claims"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "claims_substance_id_fkey";
+            columns: ["substance_id"];
+            isOneToOne: false;
+            referencedRelation: "substances";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      claim_sources: {
+        Row: {
+          id: string;
+          claim_id: string;
+          source_id: string;
+          study_id: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["claim_sources"]["Row"]> & {
+          claim_id: string;
+          source_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["claim_sources"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "claim_sources_claim_id_fkey";
+            columns: ["claim_id"];
+            isOneToOne: false;
+            referencedRelation: "claims";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "claim_sources_source_id_fkey";
+            columns: ["source_id"];
+            isOneToOne: false;
+            referencedRelation: "sources";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "claim_sources_study_id_fkey";
+            columns: ["study_id"];
+            isOneToOne: false;
+            referencedRelation: "studies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      evidence_assessments: {
+        Row: {
+          id: string;
+          claim_id: string;
+          evidence_level: "A" | "B" | "C" | "D" | "E" | "F" | null;
+          confidence: "high" | "moderate" | "low" | "insufficient" | null;
+          evidence_type:
+            | "human"
+            | "clinical_trial"
+            | "observational"
+            | "case_report"
+            | "systematic_review"
+            | "meta_analysis"
+            | "animal"
+            | "in_vitro"
+            | "mechanistic"
+            | "regulatory"
+            | "other";
+          rationale: string | null;
+          review_status: "draft" | "review-required" | "approved" | "rejected";
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["evidence_assessments"]["Row"]> & {
+          claim_id: string;
+          evidence_type: Database["public"]["Tables"]["evidence_assessments"]["Row"]["evidence_type"];
+          review_status: Database["public"]["Tables"]["evidence_assessments"]["Row"]["review_status"];
+        };
+        Update: Partial<Database["public"]["Tables"]["evidence_assessments"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "evidence_assessments_claim_id_fkey";
+            columns: ["claim_id"];
+            isOneToOne: true;
+            referencedRelation: "claims";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      regulatory_records: {
+        Row: {
+          id: string;
+          stable_key: string;
+          substance_id: string;
+          authority: "fda" | "ema" | "bfarm" | "mhra" | "nmpa" | "other";
+          region: "US" | "EU" | "UK" | "JP" | "CN" | "unspecified";
+          status:
+            | "approved"
+            | "approved_specific_indication"
+            | "clinical_development"
+            | "investigational"
+            | "not_approved"
+            | "insufficient_information"
+            | "unknown";
+          indication: string | null;
+          product_name: string | null;
+          application_id: string | null;
+          source_id: string;
+          effective_date: string | null;
+          last_checked: string | null;
+          is_current: boolean;
+          note: string | null;
+          review_status: "draft" | "review-required" | "approved" | "rejected";
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["regulatory_records"]["Row"]> & {
+          substance_id: string;
+          authority: Database["public"]["Tables"]["regulatory_records"]["Row"]["authority"];
+          region: Database["public"]["Tables"]["regulatory_records"]["Row"]["region"];
+          status: Database["public"]["Tables"]["regulatory_records"]["Row"]["status"];
+          source_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["regulatory_records"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "regulatory_records_substance_id_fkey";
+            columns: ["substance_id"];
+            isOneToOne: false;
+            referencedRelation: "substances";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "regulatory_records_source_id_fkey";
+            columns: ["source_id"];
+            isOneToOne: false;
+            referencedRelation: "sources";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      regulatory_history: {
+        Row: {
+          id: string;
+          regulatory_record_id: string;
+          old_status: string | null;
+          new_status: string | null;
+          old_indication: string | null;
+          new_indication: string | null;
+          source_id: string | null;
+          changed_at: string;
+          reason: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["regulatory_history"]["Row"]> & {
+          regulatory_record_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["regulatory_history"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "regulatory_history_regulatory_record_id_fkey";
+            columns: ["regulatory_record_id"];
+            isOneToOne: false;
+            referencedRelation: "regulatory_records";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "regulatory_history_source_id_fkey";
+            columns: ["source_id"];
+            isOneToOne: false;
+            referencedRelation: "sources";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      review_actions: {
+        Row: {
+          id: string;
+          entity_type:
+            | "claim"
+            | "evidence_assessment"
+            | "regulatory_record"
+            | "research_update"
+            | "substance";
+          entity_id: string | null;
+          entity_stable_key: string | null;
+          action: "approve" | "reject" | "request_review" | "edit" | "publish" | "unpublish";
+          previous_status: string | null;
+          new_status: string | null;
+          reason: string | null;
+          admin_user_id: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["review_actions"]["Row"]> & {
+          entity_type: Database["public"]["Tables"]["review_actions"]["Row"]["entity_type"];
+          action: Database["public"]["Tables"]["review_actions"]["Row"]["action"];
+        };
+        Update: Partial<Database["public"]["Tables"]["review_actions"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: {
       cart_summaries: {

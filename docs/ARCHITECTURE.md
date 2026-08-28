@@ -9,6 +9,10 @@ Browser (Peptix SPA)
   ├─ Edge: get-exchange-rate, set-user-role
   └─ Peptide platform (client modules + published.json)
        ├─ Identity also seeded to Postgres (Phase 1; lexicon still reads files)
+       ├─ Sources/studies/claims/regulatory live on cartwise-prod (0024–0029)
+       ├─ Dual-read (Phase 7): optional `VITE_RESEARCH_DB_MODE=dual` compares Postgres; public UI stays files
+       ├─ Admin Research (Phase 8): Postgres primary (`review_actions` append-only)
+       ├─ Production SPA: `https://cartwise-zeta.vercel.app` → `cartwise-prod` (Phase 9 QA: session-limited; Phase 9B: local tree DEPLOYMENT_READY, SPA not yet updated)
        └─ Node scripts (official APIs) → cache → compile (not called from the browser)
 ```
 
@@ -20,8 +24,8 @@ Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PA
 - `src/components/layout/` — AppShell, Sidebar, MobileNav, Topbar, AdminNav, BrandMark
 - `src/components/shop|cart|orders|auth|admin|ui/`
 - `src/hooks/` — React Query wrappers
-- `src/services/` — Supabase RPC/table access for **shop**
-- `src/lib/peptide/` — calculator, identity catalog, mapping, published profiles
+- `src/services/` — Supabase RPC/table access for shop and admin research
+- `src/lib/peptide/` — calculator, identity catalog, mapping, published profiles, dual-read, admin research workflow
 - `src/research/` — connector types, engine, queries, fetch cache
 
 ## Authentication
@@ -30,18 +34,18 @@ Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PA
 
 ## Shop vs peptide
 
-| Shop (Postgres) | Lexicon (client, Phase 1) |
+| Shop (Postgres) | Lexicon (client files) / Admin Research (Postgres) |
 |---|---|
 | `products` SKU, `price_usd`, bulk, availability | `PeptideSubstance` + `SubstanceProfile` from `catalog.ts` + `published.json` |
 | Cart / checkout / orders | Sources, studies, evidence, community disclaimer |
-| `list_shop_products` | File overlay; Postgres identity is **not** the lexicon read path yet |
-| `product_substances` (SKU → substance, no prices) | Client `substanceSlugForProduct` prefix/name mapping still live |
+| `list_shop_products` | File overlay; Postgres identity is **not** the lexicon display path |
+| `product_substances` (SKU → substance, no prices; live after 0024+0029) | Client `substanceSlugForProduct` prefix/name mapping still used by lexicon (legacy fallback) |
 
-Mapping is dual: client prefix/name **and** `product_substances`. Lexicon UI must not render prices or cart actions.
+Mapping is dual: client prefix/name **legacy fallback** and `product_substances` (intended SoT after apply). Lexicon UI must not render prices or cart actions. Unresolved shop labels (TB-500/TB4 mix, Melanotan I, Klow, multi-INN blends) stay unmapped in Postgres.
 
 ## Database (Postgres)
 
-Defined in `supabase/migrations/` (0001–0024). Hand-mirrored in `src/types/database.ts`.
+Defined in `supabase/migrations/` (0001–0029 in Git). Hand-mirrored in `src/types/database.ts`. Live `cartwise-prod` is on 0001–0029.
 
 **Auth-adjacent:** `profiles`, `user_roles` (`user` \| `admin`).
 
@@ -57,7 +61,11 @@ Defined in `supabase/migrations/` (0001–0024). Hand-mirrored in `src/types/dat
 
 **Research identity (Phase 1, 0024):** `substances`, `substance_aliases`, `substance_components`, `product_substances`. RLS: authenticated SELECT; admin write via `has_role`. Shop `products` columns were not altered.
 
-There are **no** SQL tables for source/study/community/research_update. Those remain TypeScript + `published.json`. Dual-read flag: `VITE_RESEARCH_DB_MODE` (`legacy` default). See `docs/RESEARCH_PERSISTENCE_PHASE_1.md`.
+**Research science (Phase 2, 0025):** `research_runs`, `research_run_sources`, `sources`, `source_substances`, `studies`, `study_substances`, `study_sources`. Imported from `published.json` (not raw cache).
+
+**Research claims (Phase 3, 0026):** `claims`, `claim_sources`, `evidence_assessments`. Cited blocks from `published.json` (one claim per slot/item; summary paragraphs not split). A–F lives on assessments, not on `claims`.
+
+**Research regulatory + review (Phase 4, 0027):** `regulatory_records`, `regulatory_history`, `review_actions`. Imported from published regulatory sources (41 records). Empty FDA/EMA search is never `not_approved`. Community remains unpublished as SQL. Dual-read: `VITE_RESEARCH_DB_MODE` (`legacy` default; `dual` compares; `postgres` prepared). Live apply **done** (0024–0029). Lexicon still files. Phase 7: `docs/RESEARCH_DUAL_READ_PHASE_7.md`. **0028** tightens evidence SELECT. **0029** explicit `product_substances` manuals.
 
 ## Peptide / research data models
 
@@ -73,7 +81,7 @@ Postgres `products`. Lexicon only stores `PeptideProductRef` (code, name, streng
 
 Curated in `published.json`: title, URL, publisher, dates, DOI, PMID, NCT, `sourceType`, `sourceQuality` 1–5, `accessDate`. Search-count rows are `scientific` (not primary trials). Community types: blog, reddit, forum, community.
 
-Approved-label profiles store `regulatoryRegions` (e.g. US, EU). Audit findings that are not auto-resolved are `reviewItems` (priority, topic, note, sourceIds) and appear in Admin Research. Batch 02 compile applies title/sponsor filters (`keepStudy` / `keepArticle`) so noisy CT.gov/PubMed hits are not published. Shop blends (`glow-blend`) compile as mapping-only profiles, not unique INNs.
+Approved-label profiles store `regulatoryRegions` (e.g. US, EU). Audit findings that are not auto-resolved stay in `published.json` `reviewItems` (lexicon overlay) and in Postgres `review_actions` / review-required rows. **Admin Research** reads Postgres; `reviewItems` are labeled legacy fallback only. Batch 02 compile applies title/sponsor filters (`keepStudy` / `keepArticle`) so noisy CT.gov/PubMed hits are not published. Shop blends (`glow-blend`) compile as mapping-only profiles, not unique INNs.
 
 **Completeness vs review (two layers, not one enum):**
 
@@ -97,17 +105,23 @@ Type exists (`CommunityReport`). **No published community reports** in the curre
 
 ### RESEARCH_UPDATE
 
-Type + `createResearchDraft` / `canPublish` in `src/research/engine.ts`. Admin queue has no persisted draft rows yet (empty queue copy; reports are compiled profiles).
+Type + `createResearchDraft` / `canPublish` in `src/research/engine.ts`. There is **no** `research_updates` table. Admin Research shows Research Updates = 0 and does not invent rows.
 
 ### Relationships (logical)
 
 ```
 Product.code ──client prefix/name──► Substance.slug (catalog.ts)
 Product.id   ──product_substances──► substances.id (Postgres, Phase 1)
-Substance ──1:n──► Source          (still published.json)
-Substance ──1:n──► Study (NCT)     (still published.json)
+Substance ──n:n──► Source          (Postgres source_substances; lexicon still published.json)
+Substance ──n:n──► Study (NCT)     (Postgres study_substances; lexicon still published.json)
+Study ──n:n──► Source              (study_sources)
+Substance ──1:n──► Claim            (Postgres claims; lexicon still published.json)
+Claim ──n:n──► Source               (claim_sources)
+Claim ──1:1──► EvidenceAssessment   (A–F not on the claim row)
+Substance ──1:n──► RegulatoryRecord (region + product; lexicon still published.json)
+RegulatoryRecord ──1:n──► RegulatoryHistory
+ReviewAction ──admin──► claim | evidence | regulatory | research_update | substance
 Substance ──1:n──► CommunityReport (none published)
-Source ──n:1──► Substance
 Community ─x─► EvidenceLevel   (forbidden; communityCannotRaiseEvidence)
 ```
 

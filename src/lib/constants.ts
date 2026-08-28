@@ -30,4 +30,9 @@ export const QUERY_KEYS = {
   favorites: ["favorites"] as const,
   orderTemplates: ["order-templates"] as const,
   orderAdminNote: (id: string) => ["orders", id, "admin-note"] as const,
+  researchDualRead: ["research-dual-read"] as const,
+  adminResearchDashboard: ["admin-research-dashboard"] as const,
+  adminResearchQueue: (kind: string, page: number) => ["admin-research-queue", kind, page] as const,
+  adminResearchDetail: (kind: string, id: string) => ["admin-research-detail", kind, id] as const,
+  adminResearchMappings: (page: number) => ["admin-research-mappings", page] as const,
 };

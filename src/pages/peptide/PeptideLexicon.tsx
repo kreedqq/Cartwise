@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CATEGORY_LABELS, PEPTIDE_SUBSTANCES, REGULATORY_LABELS, SAFETY_DISCLAIMER } from "@/lib/peptide/catalog";
+import { LEXICON_STATUS_FILTERS, matchesLexiconStatus, type LexiconStatusFilter } from "@/lib/peptide/lexiconFilters";
 import { formatReviewedDate } from "@/lib/peptide/profiles";
 import { searchSubstances } from "@/lib/peptide/search";
 import type { PeptideCategory } from "@/lib/peptide/types";
@@ -14,32 +15,12 @@ const FILTERS: Array<{ id: "all" | PeptideCategory; label: string }> = [
   ...Object.entries(CATEGORY_LABELS).map(([id, label]) => ({ id: id as PeptideCategory, label })),
 ];
 
-const STATUS_FILTERS = [
-  { id: "all", label: "Alle Status" },
-  { id: "approved", label: "Approved" },
-  { id: "clinical-trial", label: "Clinical Trial" },
-  { id: "investigational", label: "Investigational" },
-  { id: "preclinical", label: "Preclinical" },
-  { id: "limited-data", label: "Limited Data" },
-] as const;
-
-type StatusFilter = (typeof STATUS_FILTERS)[number]["id"];
-
-function matchesStatus(item: { evidenceLevel: string; regulatoryStatus: string }, filter: StatusFilter): boolean {
-  if (filter === "all") return true;
-  if (filter === "approved") return item.regulatoryStatus === "approved" || item.regulatoryStatus === "approved-specific";
-  if (filter === "clinical-trial") return item.regulatoryStatus === "clinical-development";
-  if (filter === "investigational") return item.regulatoryStatus === "investigational";
-  if (filter === "preclinical") return item.evidenceLevel === "D";
-  return item.evidenceLevel === "E" || item.evidenceLevel === "F" || item.regulatoryStatus === "insufficient";
-}
-
 export default function PeptideLexiconPage() {
   const [query, setQuery] = React.useState("");
   const [category, setCategory] = React.useState<"all" | PeptideCategory>("all");
-  const [status, setStatus] = React.useState<StatusFilter>("all");
+  const [status, setStatus] = React.useState<LexiconStatusFilter>("all");
   const items = React.useMemo(
-    () => searchSubstances(query, category).filter((item) => matchesStatus(item, status)),
+    () => searchSubstances(query, category).filter((item) => matchesLexiconStatus(item, status)),
     [query, category, status],
   );
 
@@ -81,7 +62,7 @@ export default function PeptideLexiconPage() {
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        {STATUS_FILTERS.map((filter) => (
+        {LEXICON_STATUS_FILTERS.map((filter) => (
           <button
             key={filter.id}
             type="button"
