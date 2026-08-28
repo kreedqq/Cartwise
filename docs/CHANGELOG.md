@@ -6,7 +6,8 @@ Only material changes. Dates are local project days.
 
 ### Fixed
 
-- Phase 10D: Radix Slot crash on lexicon detail and calculator (`Button asChild` always had a spinner sibling). `Slottable` wrap in `src/components/ui/button.tsx`. Tests `src/tests/button.test.tsx`. `docs/RESEARCH_UI_CRASH_FIX_PHASE_10D.md` — **UI_CRASH_FIXED**. Not deployed.
+- Phase 10D: Radix Slot crash on lexicon detail and calculator (`Button asChild` always had a spinner sibling). `Slottable` wrap in `src/components/ui/button.tsx`. Tests `src/tests/button.test.tsx`. `docs/RESEARCH_UI_CRASH_FIX_PHASE_10D.md` — **UI_CRASH_FIXED**.
+- Phase 10E: deployed that fix to `https://cartwise-zeta.vercel.app` (`pepsi7/cartwise`, `dpl_BTukrYBjxY1rAURuznPqgBhMxbHn`). Local commit `b079bbf`, not pushed. `docs/RESEARCH_UI_CRASH_FIX_DEPLOY_PHASE_10E.md` — **UI_FIX_DEPLOYED_AND_VERIFIED**. DB still 0029.
 
 ### Added
 

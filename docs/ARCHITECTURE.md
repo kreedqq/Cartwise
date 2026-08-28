@@ -12,7 +12,7 @@ Browser (Peptix SPA)
        ├─ Sources/studies/claims/regulatory live on cartwise-prod (0024–0029)
        ├─ Dual-read (Phase 7): optional `VITE_RESEARCH_DB_MODE=dual` compares Postgres; public UI stays files
        ├─ Admin Research (Phase 8): Postgres primary (`review_actions` append-only)
-       ├─ Production SPA: `https://cartwise-zeta.vercel.app` → `cartwise-prod` (Phase 10C). Phase 10D local Slot/`Button asChild` fix **UI_CRASH_FIXED**, not deployed.
+       ├─ Production SPA: `https://cartwise-zeta.vercel.app` → `cartwise-prod` (Phase 10E: Slot/`Button asChild` fix live, `button-Dq-9OMxe.js`)
        └─ Node scripts (official APIs) → cache → compile (not called from the browser)
 ```
 

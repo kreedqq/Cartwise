@@ -2,7 +2,7 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-08-29** (Phase 10D UI crash fix — **UI_CRASH_FIXED**, not deployed).
+Last documentation pass: **2026-08-29** (Phase 10E UI crash fix deployed — **UI_FIX_DEPLOYED_AND_VERIFIED**).
 
 ## Identity
 
@@ -20,7 +20,7 @@ Last documentation pass: **2026-08-29** (Phase 10D UI crash fix — **UI_CRASH_F
 |---|---|
 | Branch | `main` (tracks `origin/main`) |
 | Last backup commit | Phase 10A local release: `feat: persist research platform and admin workflow` (not pushed) |
-| Last documentation pass | Phase 10D UI crash fix **UI_CRASH_FIXED** (2026-08-29), not deployed |
+| Last documentation pass | Phase 10E UI crash fix **UI_FIX_DEPLOYED_AND_VERIFIED** (2026-08-29); commit `b079bbf` not pushed |
 | Nested copy | A nested `Cartwise/` tree may exist; do not treat it as the app source. Tests are scoped to `src/` (`vite.config.ts`). |
 
 Do not commit unless the user asks. Recommended backup commit (when requested): all intended app files **except** `.env*`, credentials, and nested gitlinks.
@@ -161,7 +161,8 @@ Not in the frontend; optional for later server-side research (names only):
 - Phase 10B production deploy preflight: **DEPLOYMENT_PREFLIGHT_PASS** (`docs/RESEARCH_DEPLOYMENT_PREFLIGHT_PHASE_10B.md`). SPA-only; do not re-apply 0024–0029. Not pushed/deployed.
 - Phase 10C production SPA deploy: **PRODUCTION_DEPLOY_SUCCESS_WITH_QA_LIMITATION** (`docs/RESEARCH_PRODUCTION_DEPLOY_PHASE_10C.md`). `https://cartwise-zeta.vercel.app` serves `baaa335`/`a21e838`. DB still 0029.
 - Logged-in production admin browser QA (2026-08-29): **BROWSER_QA_NOT_READY** (`docs/RESEARCH_PRODUCTION_ADMIN_BROWSER_QA.md`). Admin Research/Postgres counts, mapping, lexicon **list**/search, shop, and cart pass. **Lexicon detail and `/peptide/rechner` crash** on the **currently deployed** SPA (`Button asChild` + Radix Slot / `button-C9NJmCLl.js`).
-- Phase 10D local fix: **UI_CRASH_FIXED** (`docs/RESEARCH_UI_CRASH_FIX_PHASE_10D.md`). `Button` wraps children in `Slottable`. Not committed, not pushed, not deployed.
+- Phase 10D local fix: **UI_CRASH_FIXED** (`docs/RESEARCH_UI_CRASH_FIX_PHASE_10D.md`).
+- Phase 10E: **UI_FIX_DEPLOYED_AND_VERIFIED** (`docs/RESEARCH_UI_CRASH_FIX_DEPLOY_PHASE_10E.md`). Local commit `b079bbf` (`fix: resolve asChild button slot crash`), not pushed. Production `https://cartwise-zeta.vercel.app` serves `button-Dq-9OMxe.js`. Lexicon detail + calculator no longer crash. DB still 0029.
 - Browser research connectors are stubs; live fetch is Node scripts only
 - Reddit / forums / blogs: unavailable (by design without official API)
 - BfArM / MHRA not queried
@@ -177,7 +178,7 @@ Not in the frontend; optional for later server-side research (names only):
 1. Keep shop/auth stable.
 2. Do **not** start Research Batch 03 until asked.
 3. Dual-read is **DUAL_READ_READY**. Admin Research is **ADMIN_POSTGRES_READY**. Do **not** switch the public lexicon, enable `postgres` for the lexicon, start community, or Batch 03 until asked.
-4. Production lexicon **detail** + calculator are fixed locally (Phase 10D). Do **not** deploy until asked. Do not treat the crash as a reason to switch the lexicon to Postgres.
+4. Production lexicon **detail** + calculator are live after Phase 10E. Do **not** switch the public lexicon to Postgres. Do not push unless asked.
 5. Optional: resolve review items (gonadorelin title-restricted literature, Zadaxin primary label, Mazdutide NMPA, Orforglipron EMA).
 
 ### Architecture decisions (in force)

@@ -9,7 +9,8 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] Production deploy preflight (Phase 10B) — **DEPLOYMENT_PREFLIGHT_PASS** (`docs/RESEARCH_DEPLOYMENT_PREFLIGHT_PHASE_10B.md`); no push/deploy yet
 - [x] Production SPA deploy (Phase 10C) — **PRODUCTION_DEPLOY_SUCCESS_WITH_QA_LIMITATION** (`docs/RESEARCH_PRODUCTION_DEPLOY_PHASE_10C.md`)
 - [x] Logged-in production admin browser QA — **BROWSER_QA_NOT_READY** (`docs/RESEARCH_PRODUCTION_ADMIN_BROWSER_QA.md`); lexicon detail + calculator crash on hosted SPA
-- [x] Phase 10D local UI crash fix — **UI_CRASH_FIXED** (`docs/RESEARCH_UI_CRASH_FIX_PHASE_10D.md`); not deployed
+- [x] Phase 10D local UI crash fix — **UI_CRASH_FIXED** (`docs/RESEARCH_UI_CRASH_FIX_PHASE_10D.md`)
+- [x] Phase 10E commit + production deploy of UI crash fix — **UI_FIX_DEPLOYED_AND_VERIFIED** (`docs/RESEARCH_UI_CRASH_FIX_DEPLOY_PHASE_10E.md`); `b079bbf` not pushed
 - [x] Keep Discord OAuth `skipBrowserRedirect` / no `authorize.json` download
 - [x] Shop selling prices only via shop RPCs (not lexicon)
 
