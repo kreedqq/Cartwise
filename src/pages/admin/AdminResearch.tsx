@@ -110,7 +110,7 @@ export default function AdminResearchPage() {
       <section className="space-y-2">
         <h2 className="text-base font-semibold">Review Queue</h2>
         <p className="text-sm text-muted-foreground">
-          Der erste Batch ist als published kuratiert. Neue Live-Funde bleiben Draft, bis sie geprüft sind.
+          Der erste und zweite Research-Batch sind als published kuratiert. Neue Live-Funde bleiben Draft, bis sie geprüft sind.
         </p>
         {reviewQueue.length === 0 ? (
           <p className="text-sm text-muted-foreground">Keine offenen Review-Punkte in den veröffentlichten Profilen.</p>

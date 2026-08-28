@@ -29,8 +29,12 @@ describe("published research batch", () => {
     expect(getSubstanceBySlug("tb-500")?.slug).not.toBe(getSubstanceBySlug("thymosin-beta-4")?.slug);
     expect(getPublishedProfile("tb-500")?.evidenceLevel).toBe("F");
     expect(getPublishedProfile("tb-500")?.identity.casNumber).toBe("885340-08-9");
-    expect(getPublishedProfile("thymosin-beta-4")).toBeUndefined();
+    expect(getPublishedProfile("thymosin-beta-4")?.evidenceLevel).toBe("C");
+    expect(getPublishedProfile("thymosin-beta-4")?.regulatoryStatus).toBe("clinical-development");
     expect(getPublishedProfile("tb-500")?.studies.some((study) => study.clinicalTrialId === "NCT07487363")).toBe(false);
+    expect(getPublishedProfile("thymosin-beta-4")?.studies.some((study) => study.clinicalTrialId === "NCT07487363")).toBe(
+      false,
+    );
     expect(getPublishedProfile("tb-500")?.sources.some((source) => source.clinicalTrialId === "NCT07487363")).toBe(
       false,
     );
@@ -49,6 +53,10 @@ describe("published research batch", () => {
     );
     expect(getPublishedProfile("mots-c")?.studies.some((study) => study.clinicalTrialId === "NCT07505745")).toBe(false);
     expect(getPublishedProfile("mots-c")?.studies.some((study) => study.clinicalTrialId === "NCT04027712")).toBe(false);
+    expect(getPublishedProfile("melanotan-ii")?.studies.some((study) => study.clinicalTrialId === "NCT07437560")).toBe(
+      false,
+    );
+    expect(getPublishedProfile("melanotan-ii")?.studies.some((study) => study.sponsor === "Hudson Biotech")).toBe(false);
   });
 
   it("keeps orforglipron US-approved without claiming global approval", () => {
@@ -79,5 +87,33 @@ describe("published research batch", () => {
     ) as { connectors: { fda: { found: boolean }; clinicaltrials: { totalCount: number } } };
     expect(retatrutide.connectors.fda.found).toBe(false);
     expect(retatrutide.connectors.clinicaltrials.totalCount).toBeGreaterThan(0);
+  });
+
+  it("treats reviewStatus as a flag, not a second inventory row", () => {
+    expect(getPublishedProfile("gonadorelin")?.reviewStatus).toBe("review-required");
+    expect(getPublishedProfile("thymosin-alpha-1")?.reviewStatus).toBe("review-required");
+    expect(getPublishedProfile("igf-1-lr3")?.reviewStatus).toBe("review-recommended");
+    expect(getPublishedProfile("kpv")?.reviewStatus).toBe("fresh");
+    expect(getPublishedProfile("gonadorelin")?.evidenceLevel).toBe("E");
+    expect(getPublishedProfile("thymosin-alpha-1")?.evidenceLevel).toBe("C");
+  });
+
+  it("applies Batch 02 sourced overlays without merging related molecules", () => {
+    expect(listPublishedProfiles()).toHaveLength(27);
+    expect(getPublishedProfile("somatropin")?.evidenceLevel).toBe("A");
+    expect(getPublishedProfile("somatropin")?.regulatoryStatus).toBe("approved-specific");
+    expect(getPublishedProfile("somatropin")?.regulatoryRegions).toEqual(["US", "EU"]);
+    expect(getPublishedProfile("hcg")?.evidenceLevel).toBe("A");
+    expect(getPublishedProfile("hcg")?.regulatoryRegions).toEqual(["US"]);
+    expect(getPublishedProfile("hcg")?.sources.some((source) => /CID 1108/.test(source.title))).toBe(false);
+    expect(getPublishedProfile("igf-1-lr3")?.evidenceLevel).toBe("F");
+    expect(getPublishedProfile("igf-1-lr3")?.identity.identityNote).toMatch(/Mecasermin/i);
+    expect(getPublishedProfile("igf-1-lr3")?.sources.some((source) => source.pmid === "22227200")).toBe(false);
+    expect(getPublishedProfile("melanotan-ii")?.identity.identityNote).toMatch(/Afamelanotid|Scenesse/i);
+    expect(getPublishedProfile("glow-blend")?.identity.moleculeType).toBe("blend");
+    expect(getPublishedProfile("glow-blend")?.studies).toEqual([]);
+    expect(getPublishedProfile("selank")?.studies).toEqual([]);
+    expect(getPublishedProfile("gonadorelin")?.regulatoryStatus).toBe("insufficient");
+    expect(getPublishedProfile("kpv")?.evidenceLevel).toBe("D");
   });
 });

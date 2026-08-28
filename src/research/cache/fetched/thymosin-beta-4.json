@@ -1,0 +1,558 @@
+{
+  "slug": "thymosin-beta-4",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "thymosin beta-4",
+    "thymosin beta 4",
+    "TMSB4"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "thymosin beta-4",
+      "totalCount": 18,
+      "studies": [
+        {
+          "nctId": "NCT07586865",
+          "title": "Recombinant Human Thymosin Beta 4 for Injection(NL005) for Acute Myocardial Infarction",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Beijing Northland Biotech. Co., Ltd.",
+          "enrollment": 189,
+          "start": "2026-05-18",
+          "completion": "2028-05-17",
+          "lastUpdate": "2026-05-14",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07586865"
+        },
+        {
+          "nctId": "NCT07487363",
+          "title": "TB-500 (Thymosin Beta 4 17-23 Fragment) for Cardiovascular Biomarkers in Stable ASCVD",
+          "status": "RECRUITING",
+          "phase": "PHASE1, PHASE2",
+          "sponsor": "Hudson Biotech",
+          "enrollment": 80,
+          "start": "2026-02-05",
+          "completion": "2028-02-17",
+          "lastUpdate": "2026-03-23",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07487363"
+        },
+        {
+          "nctId": "NCT05555589",
+          "title": "Assessment of the Safety and Efficacy of 0.1% RGN-259 Ophthalmic Solution for the Treatment of NK: SEER-2",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "ReGenTree, LLC",
+          "enrollment": 70,
+          "start": "2023-04-11",
+          "completion": "2026-05-30",
+          "lastUpdate": "2025-12-23",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05555589"
+        },
+        {
+          "nctId": "NCT05984134",
+          "title": "Efficacy and Safety Study of Thymosin Beta 4 in Patients With Acute Myocardial Infarction",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Beijing Northland Biotech. Co., Ltd.",
+          "enrollment": 90,
+          "start": "2022-07-15",
+          "completion": "2023-05-29",
+          "lastUpdate": "2024-06-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05984134"
+        },
+        {
+          "nctId": "NCT05485818",
+          "title": "Safety and Efficacy Study of Thymosin Beta 4 in Patients With Acute Myocardial Infarction.Infarction",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Beijing Northland Biotech. Co., Ltd.",
+          "enrollment": 62,
+          "start": "2020-11-23",
+          "completion": "2021-11-18",
+          "lastUpdate": "2022-08-03",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05485818"
+        },
+        {
+          "nctId": "NCT03937882",
+          "title": "Assessment of the Safety and Efficacy of RGN-259 Ophthalmic Solutions for Dry Eye Syndrome: ARISE-3",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "ReGenTree, LLC",
+          "enrollment": 700,
+          "start": "2019-05-24",
+          "completion": "2021-10-07",
+          "lastUpdate": "2022-05-09",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT03937882"
+        },
+        {
+          "nctId": "NCT02974907",
+          "title": "Assessment of the Safety and Efficacy of RGN-259 Ophthalmic Solutions for Dry Eye Syndrome : ARISE-2",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "ReGenTree, LLC",
+          "enrollment": 601,
+          "start": "2016-11",
+          "completion": "2018-03",
+          "lastUpdate": "2022-01-05",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT02974907"
+        },
+        {
+          "nctId": "NCT01311518",
+          "title": "A Study of the Safety and Efficacy of Injectable Thymosin Beta 4 for Treating Acute Myocardial Infarction",
+          "status": "WITHDRAWN",
+          "phase": "PHASE2",
+          "sponsor": "RegeneRx Biopharmaceuticals, Inc.",
+          "enrollment": 0,
+          "start": "2019-07",
+          "completion": "2020-07",
+          "lastUpdate": "2021-09-22",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01311518"
+        },
+        {
+          "nctId": "NCT04555850",
+          "title": "A Phase 1b Study of Thymosin Beta 4 in Healthy Volunteers",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "Beijing Northland Biotech. Co., Ltd.",
+          "enrollment": 30,
+          "start": "2018-07-30",
+          "completion": "2019-07-26",
+          "lastUpdate": "2020-09-29",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04555850"
+        },
+        {
+          "nctId": "NCT04555824",
+          "title": "A Phase 1a Study of Thymosin Beta 4 in Healthy Volunteers",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "Beijing Northland Biotech. Co., Ltd.",
+          "enrollment": 54,
+          "start": "2017-07-17",
+          "completion": "2018-06-20",
+          "lastUpdate": "2020-09-29",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04555824"
+        },
+        {
+          "nctId": "NCT02597803",
+          "title": "Assessment of the Safety and Efficacy of RGN-259 Ophthalmic Solutions for Dry Eye Syndrome: ARISE-1",
+          "status": "COMPLETED",
+          "phase": "PHASE2, PHASE3",
+          "sponsor": "ReGenTree, LLC",
+          "enrollment": 317,
+          "start": "2015-09",
+          "completion": "2016-07",
+          "lastUpdate": "2019-10-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT02597803"
+        },
+        {
+          "nctId": "NCT00743769",
+          "title": "A Phase 1 Safety Study of the Intravenous Administration of Thymosin Beta in Healthy Volunteers",
+          "status": "WITHDRAWN",
+          "phase": "PHASE1",
+          "sponsor": "RegeneRx Biopharmaceuticals, Inc.",
+          "enrollment": 0,
+          "start": "2008-04",
+          "completion": "2017-01-01",
+          "lastUpdate": "2017-04-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT00743769"
+        },
+        {
+          "nctId": "NCT01393132",
+          "title": "Comparative Study of Thymosin Beta 4 Eye Drops vs. Vehicle in the Treatment of Severe Dry Eye",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Michigan Cornea Consultants, PC",
+          "enrollment": 9,
+          "start": "2011-03",
+          "completion": "2012-12",
+          "lastUpdate": "2015-12-23",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT01393132"
+        },
+        {
+          "nctId": "NCT01387347",
+          "title": "Safety and Efficacy of Thymosin Beta 4 Ophthalmic Solution in Patients With Dry Eye",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "ReGenTree, LLC",
+          "enrollment": 72,
+          "start": "2011-08",
+          "completion": "2011-12",
+          "lastUpdate": "2015-07-10",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT01387347"
+        },
+        {
+          "nctId": "NCT00598871",
+          "title": "A Phase 2 Study of the Safety and Efficacy of Thymosin Beta 4 for Treating Corneal Wounds",
+          "status": "TERMINATED",
+          "phase": "PHASE2",
+          "sponsor": "ReGenTree, LLC",
+          "enrollment": 12,
+          "start": "2007-12",
+          "completion": "2009-02",
+          "lastUpdate": "2015-07-08",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00598871"
+        },
+        {
+          "nctId": "NCT00311766",
+          "title": "A Phase 2 Study on Effect of Thymosin Beta 4 on Wound Healing in Patients With Epidermolysis Bullosa",
+          "status": "TERMINATED",
+          "phase": "PHASE2",
+          "sponsor": "RegeneRx Biopharmaceuticals, Inc.",
+          "enrollment": 30,
+          "start": "2006-02",
+          "completion": "2012-11",
+          "lastUpdate": "2014-05-12",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00311766"
+        },
+        {
+          "nctId": "NCT00832091",
+          "title": "Study of Thymosin Beta 4 in Patients With Venous Stasis Ulcers",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "RegeneRx Biopharmaceuticals, Inc.",
+          "enrollment": 72,
+          "start": "2006-07",
+          "completion": "2009-01",
+          "lastUpdate": "2010-03-30",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00832091"
+        },
+        {
+          "nctId": "NCT00382174",
+          "title": "Study of Thymosin Beta 4 in Patients With Pressure Ulcers",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "RegeneRx Biopharmaceuticals, Inc.",
+          "enrollment": 72,
+          "start": "2006-05",
+          "completion": "2008-12",
+          "lastUpdate": "2010-02-01",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00382174"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "thymosin beta-4 AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 68,
+      "articles": [
+        {
+          "pmid": "22074294",
+          "title": "Thymosin β4: a multi-functional regenerative peptide. Basic properties and clinical applications.",
+          "source": "Expert Opin Biol Ther",
+          "pubdate": "2012 Jan",
+          "authors": [
+            "Goldstein AL",
+            "Hannappel E",
+            "Sosne G",
+            "Kleinman HK"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1517/14712598.2012.634793",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22074294/"
+        },
+        {
+          "pmid": "42578445",
+          "title": "Peptide Supplements and Their Therapeutic Applications in Sports Medicine.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Aug 11",
+          "authors": [
+            "Tewari K",
+            "Liu TP",
+            "Im C",
+            "Hamad C",
+            "Petrigliano F",
+            "Cheung EC"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1177/03635465261464420",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42578445/"
+        },
+        {
+          "pmid": "41966639",
+          "title": "Safety and Efficacy of Approved and Unapproved Peptide Therapies for Musculoskeletal Injuries and Athletic Performance.",
+          "source": "Sports Med",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Mendias CL",
+            "Awan TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s40279-026-02437-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41966639/"
+        },
+        {
+          "pmid": "27450738",
+          "title": "Thymosin β4 Promotes Dermal Healing.",
+          "source": "Vitam Horm",
+          "pubdate": "2016",
+          "authors": [
+            "Kleinman HK",
+            "Sosne G"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1016/bs.vh.2016.04.005",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27450738/"
+        },
+        {
+          "pmid": "41229390",
+          "title": "Recombinant human thymosin beta 4 improves ischemic cardiac dysfunction in mice and patients with acute ST-segment elevation myocardial infarction after reperfusion.",
+          "source": "Cardiovasc Res",
+          "pubdate": "2025 Dec 31",
+          "authors": [
+            "Zhang Y",
+            "Dong Q",
+            "Bian X",
+            "Qiao Z",
+            "Cui C",
+            "Yang N"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1093/cvr/cvaf223",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41229390/"
+        },
+        {
+          "pmid": "33301106",
+          "title": "Thymosin β4 dynamics during chicken enteroid development.",
+          "source": "Mol Cell Biochem",
+          "pubdate": "2021 Feb",
+          "authors": [
+            "Acharya M",
+            "Liyanage R",
+            "Gupta A",
+            "Arsi K",
+            "Donoghue AM",
+            "Lay JO Jr"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1007/s11010-020-04008-x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33301106/"
+        },
+        {
+          "pmid": "29508629",
+          "title": "Thymosin beta 4 regulation of actin in sepsis.",
+          "source": "Expert Opin Biol Ther",
+          "pubdate": "2018 Jul",
+          "authors": [
+            "Belsky JB",
+            "Rivers EP",
+            "Filbin MR",
+            "Lee PJ",
+            "Morris DC"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1080/14712598.2018.1448381",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29508629/"
+        },
+        {
+          "pmid": "34183019",
+          "title": "Thymosin β4 reverses phenotypic polarization of glial cells and cognitive impairment via negative regulation of NF-κB signaling axis in APP/PS1 mice.",
+          "source": "J Neuroinflammation",
+          "pubdate": "2021 Jun 28",
+          "authors": [
+            "Wang M",
+            "Feng LR",
+            "Li ZL",
+            "Ma KG",
+            "Chang KW",
+            "Chen XL"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1186/s12974-021-02166-3",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34183019/"
+        },
+        {
+          "pmid": "41570941",
+          "title": "Thymosin beta 4: An emerging therapeutic candidate for kidney diseases.",
+          "source": "Peptides",
+          "pubdate": "2026 Jan",
+          "authors": [
+            "Di H",
+            "Huang J",
+            "Zhang D",
+            "Ni F",
+            "Zheng R",
+            "Geng H"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1016/j.peptides.2026.171467",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41570941/"
+        },
+        {
+          "pmid": "31819429",
+          "title": "Ethosomal Gel for Improving Transdermal Delivery of Thymosin β-4.",
+          "source": "Int J Nanomedicine",
+          "pubdate": "2019",
+          "authors": [
+            "Fu X",
+            "Shi Y",
+            "Wang H",
+            "Zhao X",
+            "Sun Q",
+            "Huang Y"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.2147/IJN.S228863",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31819429/"
+        },
+        {
+          "pmid": "42635865",
+          "title": "Peptides in Regenerative Medicine: A Comprehensive Review of Clinical Applications in Tissue Repair and Chronic Pain Management.",
+          "source": "Curr Pain Headache Rep",
+          "pubdate": "2026 Aug 24",
+          "authors": [
+            "Luansritisakul C",
+            "Chiang MC",
+            "Burns SL",
+            "Fonseca ACG"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s11916-026-01542-z",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42635865/"
+        },
+        {
+          "pmid": "25124811",
+          "title": "In vivo growth suppression of CT-26 mouse colorectal cancer cells by adenovirus-expressed small hairpin RNA specifically targeting thymosin beta-4 mRNA.",
+          "source": "Cancer Gene Ther",
+          "pubdate": "2014 Sep",
+          "authors": [
+            "Chao TC",
+            "Chan LC",
+            "Ju SY",
+            "Tang MC",
+            "Liu CY",
+            "Chen PM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1038/cgt.2014.43",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25124811/"
+        },
+        {
+          "pmid": "28442910",
+          "title": "Targeted delivery of thymosin beta 4 to the injured myocardium using CREKA-conjugated nanoparticles.",
+          "source": "Int J Nanomedicine",
+          "pubdate": "2017",
+          "authors": [
+            "Huang Z",
+            "Song Y",
+            "Pang Z",
+            "Zhang B",
+            "Yang H",
+            "Shi H"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.2147/IJN.S131949",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28442910/"
+        },
+        {
+          "pmid": "35462518",
+          "title": "[Research advances on thymosin β4 in promoting wound healing].",
+          "source": "Zhonghua Shao Shang Yu Chuang Mian Xiu Fu Za Zhi",
+          "pubdate": "2022 Apr 20",
+          "authors": [
+            "Gao YX",
+            "Wang LF",
+            "Ba SJ",
+            "Cao JL",
+            "Li F",
+            "Li B"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3760/cma.j.cn501120-20210221-00059",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35462518/"
+        },
+        {
+          "pmid": "41443105",
+          "title": "Thymosin β4-derived peptides alleviate neuroinflammation and neurite atrophy in both in vitro models and in vivo 5 × FAD mice: A potential therapy for memory improvement in Alzheimer's disease.",
+          "source": "Int Immunopharmacol",
+          "pubdate": "2026 Feb 1",
+          "authors": [
+            "Ou H",
+            "Chen R",
+            "Zhou L",
+            "Zhang Y",
+            "Zhao S",
+            "Yang Z"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1016/j.intimp.2025.116097",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41443105/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "thymosin beta-4",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 45382195,
+      "cas": null,
+      "formula": "C212H350N56O78S",
+      "iupac": "4-[[2-[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[1-[2-[[1-[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[[2-[2-[[2-[[2-[[1-[2-[[2-[(2-acetamido-3-hydroxypropanoyl)amino]-3-carboxypropanoyl]amino]-6-aminohexanoyl]pyrrolidine-2-carbonyl]amino]-3-carboxypropanoyl]amino]-4-methylsulfanylbutanoyl]amino]propanoylamino]-4-carboxybutanoyl]amino]-3-methylpentanoyl]amino]-4-carboxybutanoyl]amino]-6-aminohexanoyl]amino]-3-phenylpropanoyl]amino]-3-carboxypropanoyl]amino]-6-aminohexanoyl]amino]-3-hydroxypropanoyl]amino]-6-aminohexanoyl]amino]-4-methylpentanoyl]amino]-6-aminohexanoyl]amino]-6-aminohexanoyl]amino]-3-hydroxybutanoyl]amino]-4-carboxybutanoyl]amino]-3-hydroxybutanoyl]amino]-5-amino-5-oxopentanoyl]amino]-4-carboxybutanoyl]amino]-6-aminohexanoyl]amino]-4-amino-4-oxobutanoyl]pyrrolidine-2-carbonyl]amino]-4-methylpentanoyl]pyrrolidine-2-carbonyl]amino]-3-hydroxypropanoyl]amino]-6-aminohexanoyl]amino]-4-carboxybutanoyl]amino]-3-hydroxybutanoyl]amino]-3-methylpentanoyl]amino]-4-carboxybutanoyl]amino]-5-amino-5-oxopentanoyl]amino]-4-carboxybutanoyl]amino]-6-aminohexanoyl]amino]-5-amino-5-oxopentanoyl]amino]propanoylamino]acetyl]amino]-5-[(1-carboxy-2-hydroxyethyl)amino]-5-oxopentanoic acid"
+    }
+  }
+}

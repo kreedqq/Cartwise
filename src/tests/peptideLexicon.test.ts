@@ -27,6 +27,12 @@ describe("peptide lexicon identity", () => {
     expect(getSubstanceBySlug("tb-500")?.identityNote).toMatch(/nicht automatisch/i);
   });
 
+  it("keeps Melanotan II distinct from Afamelanotide and IGF-1 LR3 distinct from Mecasermin", () => {
+    expect(getSubstanceBySlug("melanotan-ii")?.identityNote).toMatch(/Afamelanotid|Scenesse/i);
+    expect(getSubstanceBySlug("igf-1-lr3")?.identityNote).toMatch(/Mecasermin/i);
+    expect(getSubstanceBySlug("glow-blend")?.blendComponentSlugs).toEqual(["ghk-cu", "tb-500", "bpc-157"]);
+  });
+
   it("maps RT-prefixed catalog codes to retatrutide and glow blends to components", () => {
     expect(substanceSlugForProduct({ code: "RT10", name: "Retatrutide 10mg" })).toBe("retatrutide");
     expect(substanceSlugForProduct({ code: "GLOW", name: "GHK-Cu TB-500 BPC-157" })).toBe("glow-blend");

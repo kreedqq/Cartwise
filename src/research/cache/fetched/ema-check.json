@@ -28,5 +28,35 @@
     "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/saxenda",
     "status": 200,
     "ok": true
+  },
+  {
+    "slug": "orforglipron-foundayo",
+    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/foundayo",
+    "status": 404,
+    "ok": false
+  },
+  {
+    "slug": "somatropin-omnitrope",
+    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/omnitrope",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "slug": "somatropin-norditropin",
+    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/norditropin",
+    "status": 404,
+    "ok": false
+  },
+  {
+    "slug": "hcg-ovitrelle",
+    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/ovitrelle",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "slug": "gonadorelin-lutrelef",
+    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/lutrelef",
+    "status": 404,
+    "ok": false
   }
 ]

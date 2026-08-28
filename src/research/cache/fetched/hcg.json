@@ -1,0 +1,626 @@
+{
+  "slug": "hcg",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "chorionic gonadotropin",
+    "choriogonadotropin"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "chorionic gonadotropin",
+      "totalCount": 749,
+      "studies": [
+        {
+          "nctId": "NCT07771283",
+          "title": "Purpose to Evaluate the Effectiveness of the Superovulation Stimulation Protocol Using Human Chorionic Gonadotropin (hCG) by Demonstrating Its Equivalence to Standard Controlled Ovarian Stimulation Protocols in Terms of Oocytes Retrieved, Blastulation While Maintaining an Economic Advantage",
+          "status": "ENROLLING_BY_INVITATION",
+          "phase": "NA",
+          "sponsor": "LTD \"EKODNIPRO\", Medical centre Medical Plaza Dnipro",
+          "enrollment": 360,
+          "start": "2026-08-17",
+          "completion": "2028-05-01",
+          "lastUpdate": "2026-08-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07771283"
+        },
+        {
+          "nctId": "NCT04549116",
+          "title": "Subcutaneous Progesterone in Frozen- Thawed Single Euploid Blastocyst Transfer.",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "IBSA Institut Biochimique SA",
+          "enrollment": 688,
+          "start": "2022-10-12",
+          "completion": "2026-08-25",
+          "lastUpdate": "2026-08-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04549116"
+        },
+        {
+          "nctId": "NCT06940973",
+          "title": "Study of Abnormally Fertilized Embryos",
+          "status": "RECRUITING",
+          "phase": null,
+          "sponsor": "Igenomix",
+          "enrollment": 300,
+          "start": "2025-07-02",
+          "completion": "2026-09",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06940973"
+        },
+        {
+          "nctId": "NCT07777640",
+          "title": "Intra-Ovarian PRP Compared With Gonadotropin for Ovarian Response in Letrozole-Resistant PCOS",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "Bangladesh Medical University",
+          "enrollment": 50,
+          "start": "2025-06-01",
+          "completion": "2026-05-28",
+          "lastUpdate": "2026-08-20",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07777640"
+        },
+        {
+          "nctId": "NCT07772375",
+          "title": "225 IU Versus 300 IU Starting FSH Dose in PPOS for Good-Prognosis Women",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "NA",
+          "sponsor": "Vietnam Military Medical University",
+          "enrollment": 380,
+          "start": "2026-08-15",
+          "completion": "2029-08-31",
+          "lastUpdate": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07772375"
+        },
+        {
+          "nctId": "NCT07358468",
+          "title": "Association Between Peri-Transfer Endometrial Peristalsis And Live Birth In Modified Natural Cycle Frozen Embryo Transfer: A Prospective Cohort Study",
+          "status": "RECRUITING",
+          "phase": null,
+          "sponsor": "Mỹ Đức Hospital",
+          "enrollment": 384,
+          "start": "2026-02-22",
+          "completion": "2027-12-01",
+          "lastUpdate": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07358468"
+        },
+        {
+          "nctId": "NCT07769476",
+          "title": "Comparison of Clomiphene Alone Versus Clomiphene Plus Sildenafil for Ovulation in Women With Polycystic Ovary Syndrome",
+          "status": "COMPLETED",
+          "phase": "PHASE4",
+          "sponsor": "Nishtar Medical University",
+          "enrollment": 98,
+          "start": "2025-07-01",
+          "completion": "2025-12-30",
+          "lastUpdate": "2026-08-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07769476"
+        },
+        {
+          "nctId": "NCT07706374",
+          "title": "E.N.D.E.A.V.O.R.: An Exemestane Needed Dose Efficacy and Verification as an Ovulation Induction Regimen Study",
+          "status": "RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "University of North Carolina, Chapel Hill",
+          "enrollment": 40,
+          "start": "2026-08",
+          "completion": "2030-01",
+          "lastUpdate": "2026-08-14",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07706374"
+        },
+        {
+          "nctId": "NCT07759765",
+          "title": "Embryo Transfer Catheter Rotation Effect on Pregnancy Rate",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "Kafrelsheikh University",
+          "enrollment": 310,
+          "start": "2024-07-12",
+          "completion": "2026-03-12",
+          "lastUpdate": "2026-08-12",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07759765"
+        },
+        {
+          "nctId": "NCT04298255",
+          "title": "Experimental Round Spermatid Injection (ROSI) to Treat Infertile Couples",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Wake Forest University Health Sciences",
+          "enrollment": 50,
+          "start": "2020-08-24",
+          "completion": "2028-07",
+          "lastUpdate": "2026-07-28",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04298255"
+        },
+        {
+          "nctId": "NCT06934785",
+          "title": "LE + CC vs. LE for Ovulation Induction",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Mỹ Đức Hospital",
+          "enrollment": 600,
+          "start": "2025-04-28",
+          "completion": "2027-06-30",
+          "lastUpdate": "2026-07-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06934785"
+        },
+        {
+          "nctId": "NCT06659692",
+          "title": "Pharmacokinetics of FSH and hCG Following Multiple Dose of Gonadotropins-IBSA.",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "IBSA Institut Biochimique SA",
+          "enrollment": 28,
+          "start": "2024-09-23",
+          "completion": "2025-08-29",
+          "lastUpdate": "2026-07-16",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06659692"
+        },
+        {
+          "nctId": "NCT05951777",
+          "title": "Autologous Adipose-Derived Mesenchymal Stem Cells for Chronic Traumatic Brain Injury",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Hope Biosciences LLC",
+          "enrollment": 51,
+          "start": "2024-04-16",
+          "completion": "2027-12",
+          "lastUpdate": "2026-07-15",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05951777"
+        },
+        {
+          "nctId": "NCT07700602",
+          "title": "Correlation Of Clinical Outcomes After Transfer Of Good-Quality Morphology Embryos In Patients With A Favorable Prognosis And Non-Invasive Preimplantation Genetic Testing For Aneuploidy (NiPGT-A) Results",
+          "status": "NOT_YET_RECRUITING",
+          "phase": null,
+          "sponsor": "Mỹ Đức Hospital",
+          "enrollment": 200,
+          "start": "2026-08-01",
+          "completion": "2029-12-31",
+          "lastUpdate": "2026-07-14",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07700602"
+        },
+        {
+          "nctId": "NCT07675213",
+          "title": "Endometrial Peristalsis and Pregnancy Outcomes in Hormone Replacement Therapy (HRT) - Frozen Embryo Transfer (FET) Cycles",
+          "status": "RECRUITING",
+          "phase": null,
+          "sponsor": "Mỹ Đức Hospital",
+          "enrollment": 442,
+          "start": "2026-06-30",
+          "completion": "2027-12-01",
+          "lastUpdate": "2026-07-09",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07675213"
+        },
+        {
+          "nctId": "NCT06165367",
+          "title": "Hyaluronan-enriched Medium and Euploid Blastocyst Transfers",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "ART Fertility Clinics LLC",
+          "enrollment": 783,
+          "start": "2024-01-15",
+          "completion": "2026-12-31",
+          "lastUpdate": "2026-06-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06165367"
+        },
+        {
+          "nctId": "NCT05473273",
+          "title": "Descriptive Analysis of Serum Immunological Markers During an Euploid Frozen Embryo Transfer in a Natural Cycle.",
+          "status": "RECRUITING",
+          "phase": null,
+          "sponsor": "ART Fertility Clinics LLC",
+          "enrollment": 40,
+          "start": "2023-04-24",
+          "completion": "2026-12-30",
+          "lastUpdate": "2026-06-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05473273"
+        },
+        {
+          "nctId": "NCT06790706",
+          "title": "IMMUNORARE5: A National Platform of 5 Academic Phase II Trials Coordinated by Lyon University Hospital to Assess the Safety and the Efficacy of the IMMUNOtherapy With Domvanalimab + Zimberelimab Combination in Patients With Advanced RARE Cancers",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Hospices Civils de Lyon",
+          "enrollment": 27,
+          "start": "2025-10-01",
+          "completion": "2031-06",
+          "lastUpdate": "2026-06-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06790706"
+        },
+        {
+          "nctId": "NCT06572930",
+          "title": "Serum FSH Monitoring for Identification of an Optimal Range During Ovarian Stimulation",
+          "status": "RECRUITING",
+          "phase": null,
+          "sponsor": "ART Fertility Clinics LLC",
+          "enrollment": 150,
+          "start": "2024-12-16",
+          "completion": "2026-12-01",
+          "lastUpdate": "2026-06-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06572930"
+        },
+        {
+          "nctId": "NCT07669584",
+          "title": "PKB171 Against Placebo in Couples With Mild Male Factor Infertility",
+          "status": "RECRUITING",
+          "phase": "PHASE2, PHASE3",
+          "sponsor": "Prokrea BCN, S.L.",
+          "enrollment": 732,
+          "start": "2025-10-28",
+          "completion": "2027-10-28",
+          "lastUpdate": "2026-06-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07669584"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "chorionic gonadotropin AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 3252,
+      "articles": [
+        {
+          "pmid": "38128110",
+          "title": "Gonadotropins for pubertal induction in males with hypogonadotropic hypogonadism: systematic review and meta-analysis.",
+          "source": "Eur J Endocrinol",
+          "pubdate": "2024 Jan 3",
+          "authors": [
+            "Alexander EC",
+            "Faruqi D",
+            "Farquhar R",
+            "Unadkat A",
+            "Ng Yin K",
+            "Hoskyns R"
+          ],
+          "pubtype": [
+            "Meta-Analysis",
+            "Systematic Review",
+            "Journal Article"
+          ],
+          "doi": "10.1093/ejendo/lvad166",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38128110/"
+        },
+        {
+          "pmid": "41286921",
+          "title": "Non-genetic risk factors of miscarriage: a comprehensive umbrella review of systematic review and meta-analysis.",
+          "source": "Reprod Health",
+          "pubdate": "2025 Nov 24",
+          "authors": [
+            "Arshadi M",
+            "Lotfi MH",
+            "Madadizadeh F",
+            "Javaheri A",
+            "Soodejani MT"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.1186/s12978-025-02180-1",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41286921/"
+        },
+        {
+          "pmid": "28776582",
+          "title": "Thyroid disease in pregnancy: new insights in diagnosis and clinical management.",
+          "source": "Nat Rev Endocrinol",
+          "pubdate": "2017 Oct",
+          "authors": [
+            "Korevaar TIM",
+            "Medici M",
+            "Visser TJ",
+            "Peeters RP"
+          ],
+          "pubtype": [
+            "Comparative Study",
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1038/nrendo.2017.93",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28776582/"
+        },
+        {
+          "pmid": "38944045",
+          "title": "Livebirth rate after one frozen embryo transfer in ovulatory women starting with natural, modified natural, or artificial endometrial preparation in Viet Nam: an open-label randomised controlled trial.",
+          "source": "Lancet",
+          "pubdate": "2024 Jul 20",
+          "authors": [
+            "Ho VNA",
+            "Pham TD",
+            "Nguyen NT",
+            "Wang R",
+            "Norman RJ",
+            "Mol BW"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1016/S0140-6736(24)00756-6",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38944045/"
+        },
+        {
+          "pmid": "40458990",
+          "title": "Cycle regimens for endometrial preparation prior to frozen embryo transfer.",
+          "source": "Cochrane Database Syst Rev",
+          "pubdate": "2025 Jun 3",
+          "authors": [
+            "Ghobara T",
+            "Gelbaya TA",
+            "Ayeleke RO"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review",
+            "Meta-Analysis"
+          ],
+          "doi": "10.1002/14651858.CD003414.pub4",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40458990/"
+        },
+        {
+          "pmid": "39547644",
+          "title": "Triggering oocyte maturation in in vitro fertilization treatment in healthy responders: a systematic review and network meta-analysis.",
+          "source": "Fertil Steril",
+          "pubdate": "2025 May",
+          "authors": [
+            "Beebeejaun Y",
+            "Copeland T",
+            "Duffy JMN",
+            "Sarris I",
+            "Showell M",
+            "Wang R"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Network Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1016/j.fertnstert.2024.11.011",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39547644/"
+        },
+        {
+          "pmid": "25198943",
+          "title": "[Modern management of cryptorchidism: which evidences?].",
+          "source": "Urologia",
+          "pubdate": "2014 Jul-Sep",
+          "authors": [
+            "Caione P",
+            "Tambucci R"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.5301/uro.5000086",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25198943/"
+        },
+        {
+          "pmid": "19072445",
+          "title": "Use of human chorionic gonadotropin in the prevention of breast cancer.",
+          "source": "Womens Health (Lond)",
+          "pubdate": "2008 Jan",
+          "authors": [
+            "Russo IH",
+            "Russo J"
+          ],
+          "pubtype": [
+            "Editorial",
+            "Research Support, N.I.H., Extramural"
+          ],
+          "doi": "10.2217/17455057.4.1.1",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19072445/"
+        },
+        {
+          "pmid": "28268103",
+          "title": "Cesarean Scar Pregnancy: A Systematic Review.",
+          "source": "J Minim Invasive Gynecol",
+          "pubdate": "2017 Jul-Aug",
+          "authors": [
+            "Gonzalez N",
+            "Tulandi T"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.1016/j.jmig.2017.02.020",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28268103/"
+        },
+        {
+          "pmid": "12087878",
+          "title": "Gateways to Clinical Trials.",
+          "source": "Methods Find Exp Clin Pharmacol",
+          "pubdate": "2002 Apr",
+          "authors": [
+            "Bayes M",
+            "Rabasseda X",
+            "Prous JR"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/12087878/"
+        },
+        {
+          "pmid": "22129170",
+          "title": "Corifollitropin alfa for female infertility.",
+          "source": "Expert Opin Biol Ther",
+          "pubdate": "2012 Jan",
+          "authors": [
+            "Rombauts L",
+            "Talmor A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1517/14712598.2012.641530",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22129170/"
+        },
+        {
+          "pmid": "12077540",
+          "title": "Treatment of Kaposi's sarcoma with human chorionic gonadotropin.",
+          "source": "Dermatology",
+          "pubdate": "2002",
+          "authors": [
+            "Simonart T",
+            "Van Vooren JP",
+            "Meuris S"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1159/000063378",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/12077540/"
+        },
+        {
+          "pmid": "17462056",
+          "title": "Efficacy and safety of hormonal treatment of cryptorchidism: current state of the art.",
+          "source": "Acta Paediatr",
+          "pubdate": "2007 May",
+          "authors": [
+            "Thorsson AV",
+            "Christiansen P",
+            "Ritzén M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1111/j.1651-2227.2007.00238.x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17462056/"
+        },
+        {
+          "pmid": "3119647",
+          "title": "Treatment of severe oligospermia with human chorionic gonadotropin/human menopausal gonadotropin: a placebo-controlled, double blind trial.",
+          "source": "J Clin Endocrinol Metab",
+          "pubdate": "1987 Dec",
+          "authors": [
+            "Knuth UA",
+            "Hönigl W",
+            "Bals-Pratsch M",
+            "Schleicher G",
+            "Nieschlag E"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1210/jcem-65-6-1081",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/3119647/"
+        },
+        {
+          "pmid": "8193250",
+          "title": "Corpus luteal insufficiency.",
+          "source": "Curr Opin Obstet Gynecol",
+          "pubdate": "1994 Apr",
+          "authors": [
+            "Dawood MY"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/8193250/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "chorionic gonadotropin",
+      "found": true,
+      "products": [
+        {
+          "sponsor": "FRESENIUS KABI USA",
+          "application": "BLA017067",
+          "products": [
+            {
+              "brand": "CHORIONIC GONADOTROPIN",
+              "active": [
+                {
+                  "name": "GONADOTROPIN, CHORIONIC",
+                  "strength": "20,000 UNITS/VIAL"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "CHORIONIC GONADOTROPIN",
+              "active": [
+                {
+                  "name": "GONADOTROPIN, CHORIONIC",
+                  "strength": "5,000 UNITS/VIAL"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "CHORIONIC GONADOTROPIN",
+              "active": [
+                {
+                  "name": "GONADOTROPIN, CHORIONIC",
+                  "strength": "15,000 UNITS/VIAL"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "CHORIONIC GONADOTROPIN",
+              "active": [
+                {
+                  "name": "GONADOTROPIN, CHORIONIC",
+                  "strength": "10,000 UNITS/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            }
+          ]
+        }
+      ],
+      "message": null
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 1108,
+      "cas": null,
+      "formula": "C17H28",
+      "iupac": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17-hexadecahydro-1H-cyclopenta[a]phenanthrene"
+    }
+  }
+}

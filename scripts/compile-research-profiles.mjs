@@ -2,9 +2,17 @@
  * Compiles fetched official-API cache + curated, cited summaries into published profiles.
  * Does not invent NCT/PMID/approvals. Excludes mock studies.
  */
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  BATCH_02_SLUGS,
+  CURATED_02,
+  EMA_02,
+  PINNED_NCTS_02,
+  PINNED_PMIDS_02,
+  compileGlowBlend,
+} from "./research-batch-02-curated.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const FETCHED = resolve(ROOT, "src/research/cache/fetched");
@@ -28,6 +36,7 @@ const BATCH = [
   "ghk-cu",
   "mots-c",
   "aod-9604",
+  ...BATCH_02_SLUGS,
 ];
 
 const PINNED_NCTS = {
@@ -38,6 +47,7 @@ const PINNED_NCTS = {
   "cjc-1295": ["NCT00267527"],
   ipamorelin: ["NCT00672074", "NCT01280344"],
   "bpc-157": ["NCT02637284"],
+  ...PINNED_NCTS_02,
 };
 
 const PINNED_PMIDS = {
@@ -48,6 +58,7 @@ const PINNED_PMIDS = {
   "cjc-1295": ["16352683"],
   cagrilintide: ["34798060"],
   retatrutide: ["37366315", "37385280", "42250575"],
+  ...PINNED_PMIDS_02,
 };
 
 const EXTRA_ARTICLES = {
@@ -74,6 +85,7 @@ const EMA = {
     { id: "ema-victoza", title: "Victoza EPAR", url: "https://www.ema.europa.eu/en/medicines/human/EPAR/victoza" },
     { id: "ema-saxenda", title: "Saxenda EPAR", url: "https://www.ema.europa.eu/en/medicines/human/EPAR/saxenda" },
   ],
+  ...EMA_02,
 };
 
 function cited(text, sourceIds) {
@@ -105,6 +117,36 @@ function keepStudy(slug, study) {
     if (/platelet|b-amyloid|mortality of type/i.test(title)) return false;
   }
   if (slug === "tb-500" && /thymosin beta 4(?! 17-23)/i.test(title) && !/fragment/i.test(title)) return false;
+  if (slug === "thymosin-beta-4") {
+    if (/tb-500/i.test(title) && /fragment/i.test(title)) return false;
+    return /thymosin beta|rgn-259|timbetasin|nl005/i.test(title);
+  }
+  if (slug === "thymosin-alpha-1") return /thymalfasin|thymosin.?alpha|tα1|ta1\b|zadaxin/i.test(title);
+  if (slug === "sermorelin") return /sermorelin|geref/i.test(title);
+  if (slug === "semax") return /semax/i.test(title);
+  if (slug === "selank") return /selank/i.test(title);
+  if (slug === "kpv") return /\bkpv\b|lys-pro-val|lysine-proline-valine/i.test(title);
+  if (slug === "igf-1-lr3") return /lr3|long r3/i.test(title);
+  if (slug === "melanotan-ii") return /melanotan/i.test(title) && !/afamelanotide|scenesse/i.test(title);
+  if (slug === "gonadorelin") return /gonadorelin|factrel|lutrelef/i.test(title);
+  if (slug === "hcg") return /chorionic gonadotropin|\bhcg\b|choriogonadotropin/i.test(title);
+  if (slug === "somatropin") return /somatropin|norditropin|omnitrope|humatrope|serostim|genotropin|nutropin|saizen/i.test(title);
+  return true;
+}
+
+function keepArticle(slug, article) {
+  const title = article.title ?? "";
+  if (slug === "selank") return /selank/i.test(title);
+  if (slug === "semax") return /semax/i.test(title);
+  if (slug === "sermorelin") return /sermorelin|geref|ghrh\s*\(?1-29|grf\s*\(?1-29/i.test(title);
+  if (slug === "melanotan-ii") return /melanotan/i.test(title) && !/afamelanotide|scenesse/i.test(title);
+  if (slug === "igf-1-lr3") return /lr3|long r3/i.test(title) && !/sheep|rumen/i.test(title);
+  if (slug === "kpv") return /\bkpv\b|lysine-proline-valine|lys-pro-val/i.test(title);
+  if (slug === "thymosin-beta-4") return /thymosin\s*beta|tβ4|rgn-259|timbetasin/i.test(title) && !/tb-500/i.test(title);
+  if (slug === "thymosin-alpha-1") return /thymosin\s*alpha|thymalfasin|zadaxin|tα1/i.test(title);
+  if (slug === "gonadorelin") return /gonadorelin|factrel|lutrelef/i.test(title);
+  if (slug === "hcg") return /chorionic gonadotropin|\bhcg\b|choriogonadotropin/i.test(title);
+  if (slug === "somatropin") return /somatropin|norditropin|omnitrope|humatrope|serostim|genotropin|nutropin|saizen/i.test(title);
   return true;
 }
 
@@ -983,6 +1025,7 @@ const CURATED = {
       },
     ],
   },
+  ...CURATED_02,
 };
 
 function makeIdHelpers(slug, sources) {
@@ -1066,6 +1109,14 @@ async function compileOne(slug) {
                     ? "fda-egrifta"
                     : slug === "orforglipron"
                       ? "fda-foundayo"
+                    : slug === "somatropin" && /norditropin/i.test(brand)
+                      ? "fda-norditropin"
+                    : slug === "somatropin" && /omnitrope/i.test(brand)
+                      ? "fda-omnitrope"
+                    : slug === "somatropin" && /serostim/i.test(brand)
+                      ? "fda-serostim"
+                    : slug === "hcg"
+                      ? "fda-hcg"
                       : `fda-${slug}-${setId.slice(0, 8)}`;
       if (sources.some((s) => s.id === id)) continue;
       sources.push({
@@ -1114,7 +1165,8 @@ async function compileOne(slug) {
     });
   }
 
-  if (pc?.cid) {
+  const skipPubchem = slug === "hcg" && String(pc?.cid) === "1108";
+  if (pc?.cid && !skipPubchem) {
     sources.push({
       id: `pubchem-${slug}`,
       title: `PubChem CID ${pc.cid}${pc.cas ? ` (CAS ${pc.cas})` : ""}`,
@@ -1175,7 +1227,7 @@ async function compileOne(slug) {
 
   const ranked = [...(pm.articles ?? [])]
     .map((a) => ({ ...a, ...pubmedQuality(a) }))
-    .filter((a) => a.keep && a.pmid)
+    .filter((a) => a.keep && a.pmid && keepArticle(slug, a))
     .sort((a, b) => a.rank - b.rank);
   const articles = [];
   for (const pmid of PINNED_PMIDS[slug] ?? []) {
@@ -1285,7 +1337,7 @@ async function compileOne(slug) {
 
 const profiles = {};
 for (const slug of BATCH) {
-  const profile = await compileOne(slug);
+  const profile = slug === "glow-blend" ? compileGlowBlend(ACCESS, COMMUNITY_MSG) : await compileOne(slug);
   const missing = JSON.stringify(profile).match(/missing-[a-z0-9-]+/gi) ?? [];
   if (missing.length) {
     console.warn(slug, "unresolved citations", [...new Set(missing)]);

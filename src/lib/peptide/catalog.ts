@@ -61,7 +61,7 @@ export const PEPTIDE_SUBSTANCES_IDENTITY: readonly PeptideSubstance[] = [
   substance("tesamorelin", "Tesamorelin", [], "growth-hormone", { moleculeType: "peptide" }),
   substance("cjc-1295", "CJC-1295", ["CJC1295", "CJC 1295"], "growth-hormone", { moleculeType: "peptide" }),
   substance("ipamorelin", "Ipamorelin", ["IPA"], "growth-hormone", { moleculeType: "peptide" }),
-  substance("sermorelin", "Sermorelin", [], "growth-hormone", { moleculeType: "peptide" }),
+  substance("sermorelin", "Sermorelin", ["Geref", "GRF 1-29"], "growth-hormone", { moleculeType: "peptide" }),
   substance("ghk-cu", "GHK-Cu", ["GHK", "Copper peptide"], "cosmetic", { moleculeType: "peptide" }),
   substance("bpc-157", "BPC-157", ["BPC157", "Body Protection Compound 157"], "recovery", { moleculeType: "peptide" }),
   substance("tb-500", "TB-500", ["TB500"], "recovery", {
@@ -75,15 +75,23 @@ export const PEPTIDE_SUBSTANCES_IDENTITY: readonly PeptideSubstance[] = [
   }),
   substance("mots-c", "MOTS-C", ["MOTS-c", "MOTSC"], "longevity", { moleculeType: "peptide" }),
   substance("aod-9604", "AOD-9604", ["AOD9604"], "glp-metabolic", { moleculeType: "peptide" }),
-  substance("semax", "Semax", [], "cognitive", { moleculeType: "peptide" }),
-  substance("selank", "Selank", [], "cognitive", { moleculeType: "peptide" }),
-  substance("thymosin-alpha-1", "Thymosin Alpha-1", ["Tα1", "Thymalfasin"], "immune", { moleculeType: "peptide" }),
-  substance("kpv", "KPV", [], "immune", { moleculeType: "peptide" }),
-  substance("igf-1-lr3", "IGF-1 LR3", ["IGF1 LR3", "Long R3 IGF-1"], "growth-hormone", { moleculeType: "peptide" }),
+  substance("semax", "Semax", ["ACTH(4-10) analogue"], "cognitive", { moleculeType: "peptide" }),
+  substance("selank", "Selank", ["tuftsin analogue"], "cognitive", { moleculeType: "peptide" }),
+  substance("thymosin-alpha-1", "Thymosin Alpha-1", ["Tα1", "Thymalfasin", "Zadaxin"], "immune", { moleculeType: "peptide" }),
+  substance("kpv", "KPV", ["Lys-Pro-Val", "alpha-MSH fragment"], "immune", { moleculeType: "peptide" }),
+  substance("igf-1-lr3", "IGF-1 LR3", ["IGF1 LR3", "Long R3 IGF-1"], "growth-hormone", {
+    identityNote:
+      "IGF-1 LR3 (Long R3 IGF-1) wird nicht automatisch mit rhIGF-1/Mecasermin (Increlex) gleichgesetzt.",
+    moleculeType: "peptide",
+  }),
   substance("somatropin", "Somatropin", ["HGH", "rhGH"], "growth-hormone", { moleculeType: "peptide" }),
-  substance("hcg", "Human Chorionic Gonadotropin", ["HCG"], "hormones", { moleculeType: "biologics" }),
-  substance("gonadorelin", "Gonadorelin", ["GnRH"], "hormones", { moleculeType: "peptide" }),
-  substance("melanotan-ii", "Melanotan II", ["MT-2", "MT2", "Melanotan"], "cosmetic", { moleculeType: "peptide" }),
+  substance("hcg", "Human Chorionic Gonadotropin", ["HCG", "chorionic gonadotropin"], "hormones", { moleculeType: "biologics" }),
+  substance("gonadorelin", "Gonadorelin", ["GnRH", "Factrel"], "hormones", { moleculeType: "peptide" }),
+  substance("melanotan-ii", "Melanotan II", ["MT-2", "MT2", "Melanotan"], "cosmetic", {
+    identityNote:
+      "Melanotan II wird nicht automatisch mit Afamelanotid (Scenesse, NDP-MSH) gleichgesetzt.",
+    moleculeType: "peptide",
+  }),
   substance("glow-blend", "GHK-Cu + TB-500 + BPC-157", ["GLOW", "Glow Blend"], "recovery", {
     blendComponentSlugs: ["ghk-cu", "tb-500", "bpc-157"],
     moleculeType: "blend",

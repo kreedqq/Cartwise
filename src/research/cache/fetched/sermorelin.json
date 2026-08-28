@@ -1,0 +1,599 @@
+{
+  "slug": "sermorelin",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "sermorelin",
+    "Geref"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "sermorelin",
+      "totalCount": 42,
+      "studies": [
+        {
+          "nctId": "NCT06701071",
+          "title": "Evaluation of a Long Versus Short Clomid Protocol for Controlled Ovarian Stimulation",
+          "status": "RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "University of Southern California",
+          "enrollment": 120,
+          "start": "2025-06-01",
+          "completion": "2028-06",
+          "lastUpdate": "2026-08-04",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06701071"
+        },
+        {
+          "nctId": "NCT06554717",
+          "title": "Tesamorelin as an Adjunct to Exercise for Improving Physical Function in HIV",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 100,
+          "start": "2025-07-10",
+          "completion": "2028-12-01",
+          "lastUpdate": "2026-05-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06554717"
+        },
+        {
+          "nctId": "NCT03226821",
+          "title": "Body Composition and Adipose Tissue in HIV",
+          "status": "TERMINATED",
+          "phase": "PHASE4",
+          "sponsor": "Columbia University",
+          "enrollment": 6,
+          "start": "2018-02-07",
+          "completion": "2025-04-30",
+          "lastUpdate": "2026-05-19",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT03226821"
+        },
+        {
+          "nctId": "NCT07481734",
+          "title": "Tesamorelin for Reduction of Liver Fat in Adults With Fatty Liver Disease (Mock Study)",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Hudson Biotech",
+          "enrollment": 120,
+          "start": "2026-02-02",
+          "completion": "2028-02-17",
+          "lastUpdate": "2026-03-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07481734"
+        },
+        {
+          "nctId": "NCT03375788",
+          "title": "Growth Hormone Releasing Hormone Analog to Improve Nonalcoholic Fatty Liver Disease and Associated Cardiovascular Risk",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 51,
+          "start": "2019-01-17",
+          "completion": "2025-01-10",
+          "lastUpdate": "2025-11-20",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT03375788"
+        },
+        {
+          "nctId": "NCT00720902",
+          "title": "Adult Growth Hormone Deficiency and Cardiovascular Risk",
+          "status": "TERMINATED",
+          "phase": "PHASE4",
+          "sponsor": "Columbia University",
+          "enrollment": 7,
+          "start": "2007-02",
+          "completion": "2011-05",
+          "lastUpdate": "2022-11-16",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00720902"
+        },
+        {
+          "nctId": "NCT00608023",
+          "title": "TH9507 Extension Study in Patients With HIV-Associated Lipodystrophy",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Theratechnologies",
+          "enrollment": 263,
+          "start": "2007-08",
+          "completion": "2008-10",
+          "lastUpdate": "2022-09-30",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00608023"
+        },
+        {
+          "nctId": "NCT00507104",
+          "title": "Pituitary Functions After Traumatic Brain Injury (TBI) and/or Subarachnoid Hemorrhage (SAH)",
+          "status": "COMPLETED",
+          "phase": null,
+          "sponsor": "University of Erlangen-Nürnberg Medical School",
+          "enrollment": 100,
+          "start": "2006-09",
+          "completion": "2008-11",
+          "lastUpdate": "2020-12-14",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT00507104"
+        },
+        {
+          "nctId": "NCT02196831",
+          "title": "Tesamorelin Effects on Liver Fat and Histology in HIV",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 61,
+          "start": "2015-07-01",
+          "completion": "2019-07-24",
+          "lastUpdate": "2020-01-27",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT02196831"
+        },
+        {
+          "nctId": "NCT02931474",
+          "title": "Impact of GHRH on Sleep Promotion and Endocrine Regulation in Service Members Who Sustained a Traumatic Brain Injury and Have Current Insomnia",
+          "status": "WITHDRAWN",
+          "phase": "PHASE2",
+          "sponsor": "National Institute of Nursing Research (NINR)",
+          "enrollment": 0,
+          "start": "2016-10-06",
+          "completion": "2017-03-08",
+          "lastUpdate": "2019-11-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT02931474"
+        },
+        {
+          "nctId": "NCT02553603",
+          "title": "The Effect of Growth Hormone Releasing Hormone on Cognitive Function in Individuals With Mild Cognitive Impairment",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "The University of Texas Medical Branch, Galveston",
+          "enrollment": 22,
+          "start": "2017-07-18",
+          "completion": "2019-01-17",
+          "lastUpdate": "2019-11-04",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT02553603"
+        },
+        {
+          "nctId": "NCT00448747",
+          "title": "Investigation of a New, Oral Growth Hormone Secretagogue, AEZS-130 as a Growth Hormone Stimulation Test.",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "AEterna Zentaris",
+          "enrollment": 101,
+          "start": "2007-06",
+          "completion": "2011-07",
+          "lastUpdate": "2019-07-23",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00448747"
+        },
+        {
+          "nctId": "NCT00791843",
+          "title": "The Effect of GHRH Therapy on Myocardial Structure and Function in Congestive Heart Failure",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "University of Pennsylvania",
+          "enrollment": 3,
+          "start": "2004-03",
+          "completion": "2011-08",
+          "lastUpdate": "2019-07-09",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00791843"
+        },
+        {
+          "nctId": "NCT01410799",
+          "title": "Three Month Treatment of Growth Hormone Releasing Hormone (GHRH) in the Elderly",
+          "status": "TERMINATED",
+          "phase": "PHASE2",
+          "sponsor": "University of Pennsylvania",
+          "enrollment": 13,
+          "start": "2011-05",
+          "completion": "2011-08",
+          "lastUpdate": "2019-05-24",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT01410799"
+        },
+        {
+          "nctId": "NCT01088412",
+          "title": "Observational Study of Somatropin Treatment in Children",
+          "status": "COMPLETED",
+          "phase": null,
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 22845,
+          "start": "1999-04",
+          "completion": "2015-09",
+          "lastUpdate": "2019-05-13",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT01088412"
+        },
+        {
+          "nctId": "NCT01237041",
+          "title": "Free Fatty Acids, Body Weight, and Growth Hormones Secretion in Children",
+          "status": "TERMINATED",
+          "phase": "PHASE1, PHASE2",
+          "sponsor": "Eunice Kennedy Shriver National Institute of Child Health and Human Development (NICHD)",
+          "enrollment": 37,
+          "start": "2011-07-01",
+          "completion": "2017-12-13",
+          "lastUpdate": "2018-12-17",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT01237041"
+        },
+        {
+          "nctId": "NCT01701973",
+          "title": "Effect of DPP4 Inhibition on Growth Hormone Secretion",
+          "status": "COMPLETED",
+          "phase": "PHASE4",
+          "sponsor": "Vanderbilt University",
+          "enrollment": 44,
+          "start": "2013-01",
+          "completion": "2017-05",
+          "lastUpdate": "2018-05-29",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT01701973"
+        },
+        {
+          "nctId": "NCT00675506",
+          "title": "Effectiveness of Growth Hormone Releasing Hormone in Reducing Abdominal Fat in People Who Are Obese",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 60,
+          "start": "2008-07",
+          "completion": "2012-01",
+          "lastUpdate": "2017-12-13",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00675506"
+        },
+        {
+          "nctId": "NCT01263717",
+          "title": "Effects of Growth Hormone Releasing Hormone in HIV",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "Massachusetts General Hospital",
+          "enrollment": 54,
+          "start": "2010-12",
+          "completion": "2014-02",
+          "lastUpdate": "2017-10-30",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT01263717"
+        },
+        {
+          "nctId": "NCT00006073",
+          "title": "Endocrine Studies in Health and Disease",
+          "status": "TERMINATED",
+          "phase": null,
+          "sponsor": "Eunice Kennedy Shriver National Institute of Child Health and Human Development (NICHD)",
+          "enrollment": 3090,
+          "start": "2000-07-19",
+          "completion": "2016-08-31",
+          "lastUpdate": "2017-10-06",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT00006073"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "sermorelin AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 54,
+      "articles": [
+        {
+          "pmid": "41490200",
+          "title": "Therapeutic Peptides in Orthopaedics: Applications, Challenges, and Future Directions.",
+          "source": "J Am Acad Orthop Surg Glob Res Rev",
+          "pubdate": "2026 Jan 1",
+          "authors": [
+            "Rahman OF",
+            "Lee SJ",
+            "Seeds WA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.5435/JAAOSGlobal-D-25-00236",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41490200/"
+        },
+        {
+          "pmid": "41966639",
+          "title": "Safety and Efficacy of Approved and Unapproved Peptide Therapies for Musculoskeletal Injuries and Athletic Performance.",
+          "source": "Sports Med",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Mendias CL",
+            "Awan TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s40279-026-02437-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41966639/"
+        },
+        {
+          "pmid": "41880199",
+          "title": "A new era of doping? Use of peptide and peptide-analog drugs in recreational and professional sport and bodybuilding: a critical review.",
+          "source": "J Sports Med Phys Fitness",
+          "pubdate": "2026 Jul",
+          "authors": [
+            "Coutinho LFD",
+            "DE Oliveira Neves LF",
+            "Camilo RP"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.23736/S0022-4707.26.17773-1",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41880199/"
+        },
+        {
+          "pmid": "14499707",
+          "title": "PEGylation of growth hormone-releasing hormone (GRF) analogues.",
+          "source": "Adv Drug Deliv Rev",
+          "pubdate": "2003 Sep 26",
+          "authors": [
+            "Esposito P",
+            "Barbero L",
+            "Caccia P",
+            "Caliceti P",
+            "D'Antonio M",
+            "Piquet G"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1016/s0169-409x(03)00109-1",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/14499707/"
+        },
+        {
+          "pmid": "9543138",
+          "title": "Growth hormone (GH)-releasing peptide-6 requires endogenous hypothalamic GH-releasing hormone for maximal GH stimulation.",
+          "source": "J Clin Endocrinol Metab",
+          "pubdate": "1998 Apr",
+          "authors": [
+            "Pandya N",
+            "DeMott-Friberg R",
+            "Bowers CY",
+            "Barkan AL",
+            "Jaffe CA"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, U.S. Gov't, Non-P.H.S.",
+            "Research Support, U.S. Gov't, P.H.S."
+          ],
+          "doi": "10.1210/jcem.83.4.4711",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9543138/"
+        },
+        {
+          "pmid": "8329825",
+          "title": "Pharmacokinetics of growth hormone-releasing hormone(1-29)-NH2 and stimulation of growth hormone secretion in healthy subjects after intravenous or intranasal administration.",
+          "source": "Acta Paediatr Suppl",
+          "pubdate": "1993 Mar",
+          "authors": [
+            "Wilton P",
+            "Chardet Y",
+            "Danielson K",
+            "Widlund L",
+            "Gunnarsson R"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Comparative Study",
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1111/j.1651-2227.1993.tb12827.x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/8329825/"
+        },
+        {
+          "pmid": "8590958",
+          "title": "Plasma GH responses to human GHRH-antagonist in normal subjects.",
+          "source": "Eur J Endocrinol",
+          "pubdate": "1996 Jan",
+          "authors": [
+            "Hanew K",
+            "Tanaka A",
+            "Utsumi A",
+            "Sugawara A",
+            "Abe K"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Controlled Clinical Trial",
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1530/eje.0.1340067",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/8590958/"
+        },
+        {
+          "pmid": "6240568",
+          "title": "Stimulation of growth hormone secretion with human growth hormone releasing factors (GRF1-44, GRF1-40, GRF1-29) in normal subjects.",
+          "source": "Klin Wochenschr",
+          "pubdate": "1984 Dec 3",
+          "authors": [
+            "Losa M",
+            "Schopohl J",
+            "Müller OA",
+            "von Werder K"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Controlled Clinical Trial",
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1007/BF01782473",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/6240568/"
+        },
+        {
+          "pmid": "15817669",
+          "title": "Human growth hormone-releasing factor (hGRF)1-29-albumin bioconjugates activate the GRF receptor on the anterior pituitary in rats: identification of CJC-1295 as a long-lasting GRF analog.",
+          "source": "Endocrinology",
+          "pubdate": "2005 Jul",
+          "authors": [
+            "Jetté L",
+            "Léger R",
+            "Thibaudeau K",
+            "Benquet C",
+            "Robitaille M",
+            "Pellerin I"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1210/en.2004-1286",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15817669/"
+        },
+        {
+          "pmid": "22971474",
+          "title": "New agonist- and antagonist-based treatment approaches for advanced prostate cancer.",
+          "source": "J Int Med Res",
+          "pubdate": "2012",
+          "authors": [
+            "Xu Y",
+            "Jiang YF",
+            "Wu B"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1177/147323001204000401",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22971474/"
+        },
+        {
+          "pmid": "42395176",
+          "title": "The emerging landscape of performance-enhancing peptides modulating GH-IGF1 axis: bridging the gap between clinical evidence and patient self-administration.",
+          "source": "Front Endocrinol (Lausanne)",
+          "pubdate": "2026",
+          "authors": [
+            "Dominikowski A",
+            "Rękoś Z",
+            "Olejarz M",
+            "Szczepanek-Parulska E",
+            "Domin R",
+            "RuchaŁa M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3389/fendo.2026.1822475",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42395176/"
+        },
+        {
+          "pmid": "2901302",
+          "title": "GH feedback occurs through modulation of hypothalamic somatostatin under cholinergic control: studies with pyridostigmine and GHRH.",
+          "source": "Clin Endocrinol (Oxf)",
+          "pubdate": "1987 Dec",
+          "authors": [
+            "Ross RJ",
+            "Tsagarakis S",
+            "Grossman A",
+            "Nhagafoong L",
+            "Touzel RJ",
+            "Rees LH"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Controlled Clinical Trial",
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1111/j.1365-2265.1987.tb02957.x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/2901302/"
+        },
+        {
+          "pmid": "2897260",
+          "title": "Growth hormone and prolactin secretion after growth hormone-releasing hormone administration, in anorexia nervosa patients, normal controls and tamoxifen-pretreated volunteers.",
+          "source": "Clin Endocrinol (Oxf)",
+          "pubdate": "1987 Nov",
+          "authors": [
+            "Casanueva FF",
+            "Borras CG",
+            "Burguera B",
+            "Lima L",
+            "Muruais C",
+            "Tresguerres JA"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1111/j.1365-2265.1987.tb01181.x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/2897260/"
+        },
+        {
+          "pmid": "2147600",
+          "title": "The interaction between clonidine and growth hormone releasing hormone in the stimulation of growth hormone secretion in man.",
+          "source": "Clin Endocrinol (Oxf)",
+          "pubdate": "1990 Sep",
+          "authors": [
+            "Suri D",
+            "Hindmarsh PC",
+            "Brain CE",
+            "Pringle PJ",
+            "Brook CG"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1111/j.1365-2265.1990.tb00505.x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/2147600/"
+        },
+        {
+          "pmid": "10594520",
+          "title": "Quantitative growth hormone secretion and final adult height.",
+          "source": "Clin Endocrinol (Oxf)",
+          "pubdate": "1999 Nov",
+          "authors": [
+            "Trainer PJ",
+            "Palermo M",
+            "Kirk JM",
+            "Fanciulli G",
+            "Perry LH",
+            "Delitala G"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1046/j.1365-2265.1999.00844.x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/10594520/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "sermorelin",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 16132413,
+      "cas": "86168-78-7",
+      "formula": "C149H246N44O42S",
+      "iupac": "(3S)-4-[[(2S)-1-[[(2S,3S)-1-[[(2S)-1-[[(2S,3R)-1-[[(2S)-4-amino-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-6-amino-1-[[(2S)-1-[[(2S)-1-[[2-[[(2S)-5-amino-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-6-amino-1-[[(2S)-1-[[(2S)-1-[[(2S)-5-amino-1-[[(2S)-1-[[(2S,3S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-amino-5-carbamimidamido-1-oxopentan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-4-methylsulfanyl-1-oxobutan-2-yl]amino]-3-methyl-1-oxopentan-2-yl]amino]-3-carboxy-1-oxopropan-2-yl]amino]-1,5-dioxopentan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-1-oxohexan-2-yl]amino]-5-carbamimidamido-1-oxopentan-2-yl]amino]-1-oxopropan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-1,5-dioxopentan-2-yl]amino]-2-oxoethyl]amino]-4-methyl-1-oxopentan-2-yl]amino]-3-methyl-1-oxobutan-2-yl]amino]-1-oxohexan-2-yl]amino]-5-carbamimidamido-1-oxopentan-2-yl]amino]-3-(4-hydroxyphenyl)-1-oxopropan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-1,4-dioxobutan-2-yl]amino]-3-hydroxy-1-oxobutan-2-yl]amino]-1-oxo-3-phenylpropan-2-yl]amino]-3-methyl-1-oxopentan-2-yl]amino]-1-oxopropan-2-yl]amino]-3-[[(2S)-2-[[(2S)-2-amino-3-(4-hydroxyphenyl)propanoyl]amino]propanoyl]amino]-4-oxobutanoic acid"
+    }
+  }
+}

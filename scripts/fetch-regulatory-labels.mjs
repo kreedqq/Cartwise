@@ -6,7 +6,18 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = resolve(ROOT, "src/research/cache/fetched");
 const UA = "PeptixResearch/1.0 (scientific catalog; official APIs only)";
 
-const NAMES = ["semaglutide", "tirzepatide", "liraglutide", "tesamorelin", "orforglipron"];
+const LABELS = [
+  { slug: "semaglutide", query: "semaglutide" },
+  { slug: "tirzepatide", query: "tirzepatide" },
+  { slug: "liraglutide", query: "liraglutide" },
+  { slug: "tesamorelin", query: "tesamorelin" },
+  { slug: "orforglipron", query: "orforglipron" },
+  { slug: "somatropin", query: "somatropin" },
+  { slug: "hcg", query: "chorionic gonadotropin" },
+  { slug: "gonadorelin", query: "gonadorelin" },
+  { slug: "sermorelin", query: "sermorelin" },
+  { slug: "thymosin-alpha-1", query: "thymalfasin" },
+];
 
 async function getJson(url) {
   const res = await fetch(url, { headers: { Accept: "application/json", "User-Agent": UA } });
@@ -19,8 +30,8 @@ function clip(value, max = 500) {
   return value.slice(0, max);
 }
 
-for (const name of NAMES) {
-  const url = `https://api.fda.gov/drug/label.json?search=${encodeURIComponent(`openfda.generic_name:"${name}"`)}&limit=3`;
+for (const { slug, query } of LABELS) {
+  const url = `https://api.fda.gov/drug/label.json?search=${encodeURIComponent(`openfda.generic_name:"${query}"`)}&limit=3`;
   const res = await getJson(url);
   const results = Array.isArray(res.body?.results) ? res.body.results : [];
   const labels = results.map((row) => ({
@@ -40,8 +51,8 @@ for (const name of NAMES) {
     clinicalPharm: clip(row.clinical_pharmacology?.[0], 400),
     dosageAdmin: clip(row.dosage_and_administration?.[0], 300),
   }));
-  await writeFile(resolve(OUT, `${name}.fda-label.json`), JSON.stringify({ name, status: res.status, labels }, null, 2));
-  console.log(name, res.status, labels.map((l) => (l.brand || []).join("/")).join(" | "));
+  await writeFile(resolve(OUT, `${slug}.fda-label.json`), JSON.stringify({ name: slug, query, status: res.status, labels }, null, 2));
+  console.log(slug, res.status, labels.map((l) => (l.brand || []).join("/")).join(" | ") || "(none)");
 }
 
 const ema = [
@@ -50,6 +61,11 @@ const ema = [
   ["tirzepatide", "https://www.ema.europa.eu/en/medicines/human/EPAR/mounjaro"],
   ["liraglutide", "https://www.ema.europa.eu/en/medicines/human/EPAR/victoza"],
   ["liraglutide-saxenda", "https://www.ema.europa.eu/en/medicines/human/EPAR/saxenda"],
+  ["orforglipron-foundayo", "https://www.ema.europa.eu/en/medicines/human/EPAR/foundayo"],
+  ["somatropin-omnitrope", "https://www.ema.europa.eu/en/medicines/human/EPAR/omnitrope"],
+  ["somatropin-norditropin", "https://www.ema.europa.eu/en/medicines/human/EPAR/norditropin"],
+  ["hcg-ovitrelle", "https://www.ema.europa.eu/en/medicines/human/EPAR/ovitrelle"],
+  ["gonadorelin-lutrelef", "https://www.ema.europa.eu/en/medicines/human/EPAR/lutrelef"],
 ];
 const emaOut = [];
 for (const [slug, url] of ema) {

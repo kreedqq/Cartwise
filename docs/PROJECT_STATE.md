@@ -2,7 +2,7 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-08-28** (Research Batch 01 quality audit).
+Last documentation pass: **2026-08-28** (Research Batch 02).
 
 ## Identity
 
@@ -19,15 +19,15 @@ Last documentation pass: **2026-08-28** (Research Batch 01 quality audit).
 | | |
 |---|---|
 | Branch | `main` (tracks `origin/main`) |
-| Last backup commit | `0da9c90` — *chore: backup current peptide platform state* |
-| Last documentation pass | Research Batch 01 quality audit (2026-08-28); audit corrections may be uncommitted vs that backup |
+| Last backup commit | `d09a29a` plus this working tree as *chore: backup research batch 02* |
+| Last documentation pass | Research Batch 02 consistency check + backup (2026-08-28) |
 | Nested copy | A nested `Cartwise/` tree may exist; do not treat it as the app source. Tests are scoped to `src/` (`vite.config.ts`). |
 
 Do not commit unless the user asks. Recommended backup commit (when requested): all intended app files **except** `.env*`, credentials, and nested gitlinks.
 
 ## Current development status
 
-The app is a React SPA on Vite with Supabase Auth + Postgres (RLS) + RPCs. Storefront, carts, checkout/orders, Discord OAuth, and admin catalog tools are implemented in code. Peptide hub/calculator/lexicon and a curated research batch (15 substances) are implemented **in the client** (TypeScript catalog + `published.json`), not as Postgres tables.
+The app is a React SPA on Vite with Supabase Auth + Postgres (RLS) + RPCs. Storefront, carts, checkout/orders, Discord OAuth, and admin catalog tools are implemented in code. Peptide hub/calculator/lexicon and curated research (27 substance overlays) are implemented **in the client** (TypeScript catalog + `published.json`), not as Postgres tables.
 
 Peptide routes sit behind `ProtectedRoute` (same login as shop).
 
@@ -88,10 +88,10 @@ Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/roles`, `/ad
 
 - Search (name, alias, development name, category)
 - Category + status filters
-- Identity catalog: 27 substances in `PEPTIDE_SUBSTANCES_IDENTITY`
-- Published research overlay for **15** slugs via `src/lib/peptide/profiles/published.json` (access date 2026-08-28; quality-audited 2026-08-28)
-- Remaining identity-only profiles stay evidence **F** / regulatory **insufficient** until sourced
-- TB-500 ≠ Thymosin Beta-4; fictional CT.gov NCT07487363 is not published as a study
+- Identity catalog: 27 substances in `PEPTIDE_SUBSTANCES_IDENTITY` (identity defaults remain F until overlay)
+- Published research overlay for **27** slugs via `src/lib/peptide/profiles/published.json` (access date 2026-08-28; Batch 01 audited + Batch 02 compiled)
+- TB-500 ≠ Thymosin Beta-4; fictional/Hudson CT.gov records are not published as studies
+- Glow-blend is a product blend (not a unique INN); Melanotan II ≠ afamelanotide; IGF-1 LR3 ≠ mecasermin
 - `regulatoryRegions` stored for approved-label products (US / EU as sourced)
 - Community block: anecdotal disclaimer; Reddit connector returns unavailable
 - Shop SKUs mapped by code prefix/name (`src/lib/peptide/mapping.ts`); no prices in UI
@@ -134,14 +134,14 @@ Not in the frontend; optional for later server-side research (names only):
 - `PUBMED_API_KEY` — optional (NCBI E-utilities works without; higher limits with key)
 - Reddit official API credentials — **not configured**; connector stays unavailable
 
-### Tests / quality (last local run 2026-08-28)
+### Tests / quality (last local run 2026-08-28, Batch 02)
 
 | Gate | Script | Last result |
 |---|---|---|
-| Tests | `npm test` | 280 passed / 23 files |
+| Tests | `npm test` | 283 passed / 23 files |
 | Typecheck | `npm run typecheck` | pass |
 | Lint | `npm run lint` | 0 errors, 5 `react-refresh/only-export-components` warnings (existing UI/auth files) |
-| Build | `npm run build` | pass; Vite warns main chunk > 500 kB; peptide catalog chunk includes `published.json` |
+| Build | `npm run build` | pass; Vite warns main chunk > 500 kB; peptide `catalog` chunk ~348 kB (`published.json`) |
 
 ### Known issues / gaps
 
@@ -153,15 +153,15 @@ Not in the frontend; optional for later server-side research (names only):
 - Excel `GENXELL_Warenkorb_8_Kunden_FINAL(1).xlsx` is **not** in the repository
 - GLP-1 CT.gov 12-cap lists can include class-adjacent trials; claims do not treat them as approved indications
 - Open Batch 01 review items: Mazdutide NMPA primary source, Orforglipron EMA, Hudson cluster, GHK X39
-- Identity-only leftover: Semax, Selank, Thymosin Alpha-1, KPV, IGF-1 LR3, Somatropin, HCG, Gonadorelin, Melanotan II, glow-blend (blend identity only)
+- Batch 02 leftovers: exclusive Partial = IGF-1 LR3; exclusive Review Required = thymosin-alpha-1 and gonadorelin (`reviewStatus` is a separate flag, not a second inventory count)
 - `package.json` name still `shared-cart-app`
 
 ### Current priority
 
 1. Keep shop/auth stable.
-2. Do **not** start Research Batch 02 until asked.
+2. Do **not** start Research Batch 03 until asked.
 3. Optional: persist research models in Supabase after review workflow.
-4. Optional: resolve Batch 01 Review Required items (NMPA primary, EMA FOUNDAYO).
+4. Optional: resolve review items (gonadorelin title-restricted literature, Zadaxin primary label, Mazdutide NMPA, Orforglipron EMA).
 
 ### Architecture decisions (in force)
 

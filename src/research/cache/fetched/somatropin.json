@@ -1,0 +1,975 @@
+{
+  "slug": "somatropin",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "somatropin"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "somatropin",
+      "totalCount": 1299,
+      "studies": [
+        {
+          "nctId": "NCT00663611",
+          "title": "Growth Hormone Administration and the Human Immune System",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "National Institute on Aging (NIA)",
+          "enrollment": 66,
+          "start": "2006-10-19",
+          "completion": "2014-10-06",
+          "lastUpdate": "2026-08-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT00663611"
+        },
+        {
+          "nctId": "NCT07791394",
+          "title": "Does Estrogen Blunt the Effects of Exercise Training on Glycemic Control",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "NA",
+          "sponsor": "University of Waterloo",
+          "enrollment": 24,
+          "start": "2026-08",
+          "completion": "2027-04",
+          "lastUpdate": "2026-08-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07791394"
+        },
+        {
+          "nctId": "NCT07789405",
+          "title": "Strong Minds: A Digital Intervention Targeting Body Image and Psychological Well-being Among Adolescent Male Fitness Club Members",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "NA",
+          "sponsor": "Norwegian School of Sport Sciences",
+          "enrollment": 260,
+          "start": "2028-01",
+          "completion": "2028-09",
+          "lastUpdate": "2026-08-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07789405"
+        },
+        {
+          "nctId": "NCT06907121",
+          "title": "Investigation of Growth Hormone and Platelet-Rich Plasma on Joint Health",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE2, PHASE3",
+          "sponsor": "Integrant Pty Ltd",
+          "enrollment": 192,
+          "start": "2026-11",
+          "completion": "2027-12",
+          "lastUpdate": "2026-08-26",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06907121"
+        },
+        {
+          "nctId": "NCT05994742",
+          "title": "An Adaptive Multi-arm Trial to Improve Clinical Outcomes Among Children Recovering From Complicated SAM",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Queen Mary University of London",
+          "enrollment": 674,
+          "start": "2024-07-15",
+          "completion": "2026-07-30",
+          "lastUpdate": "2026-08-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05994742"
+        },
+        {
+          "nctId": "NCT06368817",
+          "title": "A Study of Lower Radiotherapy Dose to Treat Children With CNS Germinoma",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Children's Oncology Group",
+          "enrollment": 240,
+          "start": "2024-10-22",
+          "completion": "2033-11-04",
+          "lastUpdate": "2026-08-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06368817"
+        },
+        {
+          "nctId": "NCT06668805",
+          "title": "A Study of Vosoritide in Children With Noonan Syndrome With Inadequate Growth During or After Human Growth Hormone Treatment",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "BioMarin Pharmaceutical",
+          "enrollment": 30,
+          "start": "2024-11-22",
+          "completion": "2041-09",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06668805"
+        },
+        {
+          "nctId": "NCT06930625",
+          "title": "A Study to Assess the Efficacy and Safety of Debio 4126 in Participants With Acromegaly Previously Treated With Somatostatin Analogs",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Debiopharm International SA",
+          "enrollment": 119,
+          "start": "2025-11-26",
+          "completion": "2029-03",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06930625"
+        },
+        {
+          "nctId": "NCT03831958",
+          "title": "Long-Term Follow-Up of Survivors of Pediatric Cushing Disease",
+          "status": "RECRUITING",
+          "phase": null,
+          "sponsor": "Eunice Kennedy Shriver National Institute of Child Health and Human Development (NICHD)",
+          "enrollment": 600,
+          "start": "2019-03-04",
+          "completion": "2040-01-03",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT03831958"
+        },
+        {
+          "nctId": "NCT06948214",
+          "title": "Phase 3 Study of LUM-201 in Children With Growth Hormone Deficiency",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Lumos Pharma",
+          "enrollment": 150,
+          "start": "2026-05-20",
+          "completion": "2028-01",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06948214"
+        },
+        {
+          "nctId": "NCT07643844",
+          "title": "AAVrh10-PCCA Gene Therapy for Propionic Acidemia",
+          "status": "RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "Mayo Clinic",
+          "enrollment": 9,
+          "start": "2026-07-20",
+          "completion": "2033-12",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07643844"
+        },
+        {
+          "nctId": "NCT04076462",
+          "title": "A Trial to Assess Efficacy and Safety of Octreotide Subcutaneous Depot in Patients With Acromegaly",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Camurus AB",
+          "enrollment": 72,
+          "start": "2019-08-19",
+          "completion": "2023-05-02",
+          "lastUpdate": "2026-08-20",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT04076462"
+        },
+        {
+          "nctId": "NCT07221851",
+          "title": "Trial Investigating the Efficacy and Safety of Weekly Lonapegsomatropin Compared to Daily Somatropin in Children and Adolescents With Short Stature or Growth Failure Due to Growth Hormone Sufficient Disorders",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Ascendis Pharma A/S",
+          "enrollment": 186,
+          "start": "2025-12-12",
+          "completion": "2029-03",
+          "lastUpdate": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07221851"
+        },
+        {
+          "nctId": "NCT00001452",
+          "title": "Defining the Genetic Basis for the Development of Primary Pigmented Nodular Adrenocortical Disease (PPNAD) and the Carney Complex",
+          "status": "COMPLETED",
+          "phase": null,
+          "sponsor": "Eunice Kennedy Shriver National Institute of Child Health and Human Development (NICHD)",
+          "enrollment": 1387,
+          "start": "1995-12-14",
+          "completion": null,
+          "lastUpdate": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT00001452"
+        },
+        {
+          "nctId": "NCT06455969",
+          "title": "Adaptions and Resiliency to Multi-Stressor OpeRations",
+          "status": "RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Bradley Nindl",
+          "enrollment": 120,
+          "start": "2024-07-15",
+          "completion": "2027-08",
+          "lastUpdate": "2026-08-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06455969"
+        },
+        {
+          "nctId": "NCT03812913",
+          "title": "Neuropsychological Assessment of Children and Adolescents With Turner Syndrome",
+          "status": "COMPLETED",
+          "phase": null,
+          "sponsor": "University Hospital, Angers",
+          "enrollment": 70,
+          "start": "2019-09-05",
+          "completion": "2025-05-27",
+          "lastUpdate": "2026-08-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT03812913"
+        },
+        {
+          "nctId": "NCT05470504",
+          "title": "Study of Growth Hormone Inhibition Using Pegvisomant in Severe Insulin Resistance",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "National Institute of Diabetes and Digestive and Kidney Diseases (NIDDK)",
+          "enrollment": 25,
+          "start": "2023-01-23",
+          "completion": "2028-01-30",
+          "lastUpdate": "2026-08-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05470504"
+        },
+        {
+          "nctId": "NCT06587035",
+          "title": "A Study to Learn About Somatrogon in Patients With Pediatric Growth Hormone Deficiency (p GHD) in India.",
+          "status": "RECRUITING",
+          "phase": null,
+          "sponsor": "Pfizer",
+          "enrollment": 50,
+          "start": "2025-01-30",
+          "completion": "2028-09-05",
+          "lastUpdate": "2026-08-14",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06587035"
+        },
+        {
+          "nctId": "NCT02769975",
+          "title": "Evaluation of Children With Endocrine and Metabolic-Related Conditions",
+          "status": "RECRUITING",
+          "phase": null,
+          "sponsor": "Eunice Kennedy Shriver National Institute of Child Health and Human Development (NICHD)",
+          "enrollment": 15000,
+          "start": "2016-07-12",
+          "completion": "2030-12-31",
+          "lastUpdate": "2026-08-13",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT02769975"
+        },
+        {
+          "nctId": "NCT07026175",
+          "title": "Unravelling Energy Issues Underpinning Low Energy Availability in High Performance Athletes",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Australian Catholic University",
+          "enrollment": 20,
+          "start": "2025-09-04",
+          "completion": "2027-06",
+          "lastUpdate": "2026-08-13",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07026175"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "somatropin AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 213,
+      "articles": [
+        {
+          "pmid": "35405011",
+          "title": "Efficacy and Safety of Weekly Somatrogon vs Daily Somatropin in Children With Growth Hormone Deficiency: A Phase 3 Study.",
+          "source": "J Clin Endocrinol Metab",
+          "pubdate": "2022 Jun 16",
+          "authors": [
+            "Deal CL",
+            "Steelman J",
+            "Vlachopapadopoulou E",
+            "Stawerska R",
+            "Silverman LA",
+            "Phillip M"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1210/clinem/dgac220",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35405011/"
+        },
+        {
+          "pmid": "36102184",
+          "title": "Safety and Efficacy of Pediatric Growth Hormone Therapy: Results From the Full KIGS Cohort.",
+          "source": "J Clin Endocrinol Metab",
+          "pubdate": "2022 Nov 25",
+          "authors": [
+            "Maghnie M",
+            "Ranke MB",
+            "Geffner ME",
+            "Vlachopapadopoulou E",
+            "Ibáñez L",
+            "Carlsson M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1210/clinem/dgac517",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36102184/"
+        },
+        {
+          "pmid": "22045529",
+          "title": "[Biosimilars].",
+          "source": "Ther Umsch",
+          "pubdate": "2011 Nov",
+          "authors": [
+            "Krämer I"
+          ],
+          "pubtype": [
+            "English Abstract",
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1024/0040-5930/a000227",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22045529/"
+        },
+        {
+          "pmid": "34272849",
+          "title": "Weekly Lonapegsomatropin in Treatment-Naïve Children With Growth Hormone Deficiency: The Phase 3 heiGHt Trial.",
+          "source": "J Clin Endocrinol Metab",
+          "pubdate": "2021 Oct 21",
+          "authors": [
+            "Thornton PS",
+            "Maniatis AK",
+            "Aghajanova E",
+            "Chertok E",
+            "Vlachopapadopoulou E",
+            "Lin Z"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1210/clinem/dgab529",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34272849/"
+        },
+        {
+          "pmid": "40049149",
+          "title": "Children with Growth Hormone Deficiency Treated with Lonapegsomatropin Demonstrated Sustained Height Improvements for up to 6 Years: enliGHten Trial Final Results.",
+          "source": "Horm Res Paediatr",
+          "pubdate": "2026",
+          "authors": [
+            "Maniatis AK",
+            "Thornton PS",
+            "Nadgir UM",
+            "Vlachopapadopoulou E",
+            "Malievskiy O",
+            "Aghajanova EM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Multicenter Study",
+            "Clinical Trial, Phase III"
+          ],
+          "doi": "10.1159/000545064",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40049149/"
+        },
+        {
+          "pmid": "24586019",
+          "title": "Intestinal adaptation following resection.",
+          "source": "JPEN J Parenter Enteral Nutr",
+          "pubdate": "2014 May",
+          "authors": [
+            "Tappenden KA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't",
+            "Review"
+          ],
+          "doi": "10.1177/0148607114525210",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24586019/"
+        },
+        {
+          "pmid": "35134048",
+          "title": "Lonapegsomatropin (Skytrofa) for growth hormone deficiency.",
+          "source": "Med Lett Drugs Ther",
+          "pubdate": "2022 Feb 7",
+          "authors": [],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35134048/"
+        },
+        {
+          "pmid": "36562240",
+          "title": "[Progress in intestinal adaptation after enterectomy].",
+          "source": "Zhonghua Wei Chang Wai Ke Za Zhi",
+          "pubdate": "2022 Dec 25",
+          "authors": [
+            "Sun HF",
+            "Zhou QB",
+            "Wang WX",
+            "Wang FQ",
+            "Zhang QQ",
+            "Sun ZQ"
+          ],
+          "pubtype": [
+            "English Abstract",
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3760/cma.j.cn441530-20220510-00208",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36562240/"
+        },
+        {
+          "pmid": "41420532",
+          "title": "Efficacy and Safety of Once-Weekly Lonapegsomatropin in Adults With Growth Hormone Deficiency: foresiGHt Trial Results.",
+          "source": "J Clin Endocrinol Metab",
+          "pubdate": "2026 May 19",
+          "authors": [
+            "Biller BMK",
+            "Gilis-Januszewska A",
+            "Doknic M",
+            "Pico AM",
+            "Fleseriu M",
+            "Raverot G"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Multicenter Study"
+          ],
+          "doi": "10.1210/clinem/dgaf680",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41420532/"
+        },
+        {
+          "pmid": "39371577",
+          "title": "Growth hormone treatment in children with Prader-Willi syndrome: safety and effectiveness data from the PATRO Children study.",
+          "source": "Ther Adv Endocrinol Metab",
+          "pubdate": "2024",
+          "authors": [
+            "Lämmer C",
+            "Backeljauw P",
+            "Tauber M",
+            "Kanumakala S",
+            "Loche S",
+            "Otfried Schwab K"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1177/20420188241264343",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39371577/"
+        },
+        {
+          "pmid": "20662327",
+          "title": "Systematic review of the clinical effectiveness of Genotropin (somatropin) in children with short stature.",
+          "source": "J Pediatr Endocrinol Metab",
+          "pubdate": "2010 Jun",
+          "authors": [
+            "Loftus J",
+            "Heatley R",
+            "Walsh C",
+            "Dimitri P"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't",
+            "Systematic Review"
+          ],
+          "doi": "10.1515/jpem.2010.092",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20662327/"
+        },
+        {
+          "pmid": "15200350",
+          "title": "Somatropin (Zorbtive): in short bowel syndrome.",
+          "source": "Drugs",
+          "pubdate": "2004",
+          "authors": [
+            "Keating GM",
+            "Wellington K"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.2165/00003495-200464120-00008",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15200350/"
+        },
+        {
+          "pmid": "40049670",
+          "title": "Somatrogon in pediatric growth hormone deficiency: a comprehensive review of clinical trials and real-world considerations.",
+          "source": "Ann Pediatr Endocrinol Metab",
+          "pubdate": "2025 Feb",
+          "authors": [
+            "Maniatis AK",
+            "Wajnrajch MP",
+            "Thomas M",
+            "Chung SB",
+            "Lee J"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.6065/apem.2448258.129",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40049670/"
+        },
+        {
+          "pmid": "34618894",
+          "title": "The Future of Somatostatin Receptor Ligands in Acromegaly.",
+          "source": "J Clin Endocrinol Metab",
+          "pubdate": "2022 Jan 18",
+          "authors": [
+            "Gadelha MR",
+            "Wildemberg LE",
+            "Kasuki L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1210/clinem/dgab726",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34618894/"
+        },
+        {
+          "pmid": "41183961",
+          "title": "Efficacy and safety of once-weekly somatrogon following up to 4 years of treatment in Japanese children with growth hormone deficiency: results from an open-label extension of a phase 3 study.",
+          "source": "Endocr J",
+          "pubdate": "2026 Jan 6",
+          "authors": [
+            "Horikawa R",
+            "Tanaka T",
+            "Hasegawa Y",
+            "Yorifuji T",
+            "Ng D",
+            "Rosenfeld RG"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Clinical Trial, Phase III",
+            "Randomized Controlled Trial",
+            "Multicenter Study"
+          ],
+          "doi": "10.1507/endocrj.EJ24-0625",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41183961/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "somatropin",
+      "found": true,
+      "products": [
+        {
+          "sponsor": "PHARMACIA",
+          "application": "BLA020280",
+          "products": [
+            {
+              "brand": "GENOTROPIN PRESERVATIVE FREE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "1.6MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "GENOTROPIN PRESERVATIVE FREE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "0.6MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "GENOTROPIN PRESERVATIVE FREE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "0.2MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "GENOTROPIN PRESERVATIVE FREE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "1MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "GENOTROPIN",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "5.8MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "GENOTROPIN PRESERVATIVE FREE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "1.8MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "GENOTROPIN PRESERVATIVE FREE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "1.5MG/VIAL"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "GENOTROPIN PRESERVATIVE FREE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "1.4MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            }
+          ]
+        },
+        {
+          "sponsor": "EMD SERONO",
+          "application": "BLA020604",
+          "products": [
+            {
+              "brand": "SEROSTIM",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "4MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "SEROSTIM",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "6MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "SEROSTIM",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "8.8MG/VIAL"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "SEROSTIM",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "5MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "SEROSTIM LQ",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "6MG/0.5ML (6MG/0.5ML)"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "SUBCUTANEOUS"
+            }
+          ]
+        },
+        {
+          "sponsor": "SANDOZ",
+          "application": "BLA021426",
+          "products": [
+            {
+              "brand": "OMNITROPE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "5MG/1.5ML"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "OMNITROPE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "5.8MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "OMNITROPE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "10MG/1.5ML"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "OMNITROPE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "1.5MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            }
+          ]
+        },
+        {
+          "sponsor": "LILLY",
+          "application": "BLA019640",
+          "products": [
+            {
+              "brand": "HUMATROPE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "2MG/VIAL"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "HUMATROPE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "12MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "HUMATROPE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "5MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "HUMATROPE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "24MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "HUMATROPE",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "6MG/VIAL"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            }
+          ]
+        },
+        {
+          "sponsor": "NOVO NORDISK INC",
+          "application": "BLA021148",
+          "products": [
+            {
+              "brand": "NORDITROPIN FLEXPRO",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "5MG/1.5ML"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "NORDITROPIN NORDIFLEX",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "15MG/1.5ML"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "NORDITROPIN NORDIFLEX",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "5MG/1.5ML"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "NORDITROPIN FLEXPRO",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "15MG/1.5ML"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "NORDITROPIN",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "10MG/1.5ML"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "NORDITROPIN FLEXPRO",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "10MG/1.5ML"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "NORDITROPIN NORDIFLEX",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "30MG/3ML"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            },
+            {
+              "brand": "NORDITROPIN NORDIFLEX",
+              "active": [
+                {
+                  "name": "SOMATROPIN",
+                  "strength": "10MG/1.5ML"
+                }
+              ],
+              "marketing": "Discontinued",
+              "dosageForm": "INJECTABLE",
+              "route": "INJECTION"
+            }
+          ]
+        }
+      ],
+      "message": null
+    },
+    "pubchem": {
+      "status": 404,
+      "httpStatus": 404,
+      "ok": false,
+      "cid": null,
+      "cas": null,
+      "formula": null,
+      "iupac": null
+    }
+  }
+}

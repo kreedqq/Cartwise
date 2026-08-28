@@ -12,7 +12,7 @@ const OUT = resolve(ROOT, "src/research/cache/fetched");
 const UA = "PeptixResearch/1.0 (scientific catalog; official APIs only)";
 const ACCESS = new Date().toISOString().slice(0, 10);
 
-const BATCH = [
+const BATCH_01 = [
   { slug: "retatrutide", terms: ["retatrutide", "LY3437943"], fda: ["retatrutide"] },
   { slug: "tirzepatide", terms: ["tirzepatide", "LY3298176"], fda: ["tirzepatide"] },
   { slug: "semaglutide", terms: ["semaglutide"], fda: ["semaglutide"] },
@@ -29,6 +29,23 @@ const BATCH = [
   { slug: "mots-c", terms: ["MOTS-c", "MOTS-C"], fda: ["MOTS-c"] },
   { slug: "aod-9604", terms: ["AOD9604", "AOD-9604"], fda: ["AOD-9604"] },
 ];
+
+const BATCH_02 = [
+  { slug: "sermorelin", terms: ["sermorelin", "Geref"], fda: ["sermorelin"] },
+  { slug: "thymosin-beta-4", terms: ["thymosin beta-4", "thymosin beta 4", "TMSB4"], fda: ["thymosin beta-4"] },
+  { slug: "semax", terms: ["semax"], fda: ["semax"] },
+  { slug: "selank", terms: ["selank"], fda: ["selank"] },
+  { slug: "thymosin-alpha-1", terms: ["thymosin alpha-1", "thymalfasin", "Zadaxin"], fda: ["thymalfasin"] },
+  { slug: "kpv", terms: ["KPV peptide", '"Lys-Pro-Val"'], fda: ["KPV"] },
+  { slug: "igf-1-lr3", terms: ["IGF-1 LR3", '"Long R3 IGF-1"', '"IGF-I Long R3"'], fda: ["IGF-1 LR3"] },
+  { slug: "somatropin", terms: ["somatropin"], fda: ["somatropin"] },
+  { slug: "hcg", terms: ["chorionic gonadotropin", "choriogonadotropin"], fda: ["chorionic gonadotropin"] },
+  { slug: "gonadorelin", terms: ["gonadorelin"], fda: ["gonadorelin"] },
+  { slug: "melanotan-ii", terms: ["melanotan II", "melanotan-II", "MT-II"], fda: ["melanotan"] },
+];
+
+const arg = process.argv[2] ?? "batch02";
+const BATCH = arg === "all" ? [...BATCH_01, ...BATCH_02] : arg === "batch01" ? BATCH_01 : BATCH_02;
 
 async function getJson(url) {
   const res = await fetch(url, { headers: { Accept: "application/json", "User-Agent": UA } });
@@ -228,4 +245,4 @@ for (const item of BATCH) {
   await sleep(500);
 }
 
-console.log("done", ACCESS);
+console.log("done", ACCESS, "batch", arg, "n", BATCH.length);

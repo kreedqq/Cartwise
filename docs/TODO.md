@@ -14,10 +14,11 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] Calculator without invented IU conversions
 - [x] First research batch with cited official sources (15 substances)
 - [x] TB-500 ≠ Thymosin Beta-4
-- [x] Research Batch 01 quality audit (no Batch 02)
-- [ ] Resolve Batch 01 Review Required: Mazdutide NMPA primary source, Orforglipron EMA, Hudson cluster
+- [x] Research Batch 01 quality audit (no Batch 02 at audit time)
+- [x] Research Batch 02 for remaining identity substances (12 slugs; exclusive: 9 complete, 1 partial igf-1-lr3, 2 review-required TA-1 + gonadorelin)
+- [ ] Resolve remaining Review Required: Mazdutide NMPA, Orforglipron EMA, Hudson cluster, Zadaxin primary label, gonadorelin title-restricted literature
 - [ ] Persist substance/source/study in Postgres with RLS + admin approve/reject of **new** drafts
-- [ ] Populate remaining identity substances (Semax, Selank, TA-1, KPV, IGF-1 LR3, Somatropin, HCG, Gonadorelin, Melanotan II) **only** with verified sources — not until asked to start Batch 02
+- [x] Populate remaining identity substances with verified sources (Batch 02; Partial: IGF-1 LR3; Review Required: gonadorelin, thymosin-alpha-1)
 - [ ] Server-side live connectors (no secrets in the client) if ongoing scans are required
 - [ ] Official Reddit API or keep connector unavailable (no scraping)
 
@@ -25,7 +26,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 
 - [ ] BfArM / MHRA connectors when a supported API exists
 - [ ] Numeric PK from labels only when the exact figure is extracted and cited
-- [ ] Glow-blend: scientific notes per component, still no shop prices
+- [x] Glow-blend: scientific notes per component, still no shop prices
 - [ ] Split or lazy-load `published.json` (catalog chunk size)
 - [ ] Logged-in browser QA of peptide + shop regression
 - [ ] Import `GENXELL_…xlsx` if the file is provided (file is not in the repo)

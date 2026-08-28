@@ -8313,6 +8313,4030 @@
         "community": "Unavailable",
         "conflicts": 0
       }
+    },
+    "sermorelin": {
+      "slug": "sermorelin",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "C",
+      "confidenceLevel": "low",
+      "regulatoryStatus": "investigational",
+      "reviewStatus": "review-recommended",
+      "regulatoryRegions": [],
+      "identity": {
+        "verified": true,
+        "casNumber": "86168-78-7",
+        "chemicalClass": "GHRH (1-29) analogue",
+        "moleculeType": "peptide",
+        "identityNote": "Sermorelin entspricht GRF(1-29)/Geref. In der openFDA-Drugs@FDA-Suche vom 28.08.2026 kein aktuelles Produkt. Fehlender Treffer ist kein Beweis, dass nie eine Zulassung bestand."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "not-found",
+          "note": "No matches found!"
+        },
+        {
+          "id": "ema",
+          "status": "unavailable",
+          "note": "EMA-Connector in diesem Batch nicht für diese Substanz abgefragt"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "checked",
+          "note": "42 studies for query sermorelin"
+        },
+        {
+          "id": "pubmed",
+          "status": "checked",
+          "note": "54 publications for filtered query"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "Sermorelin ist das Amid von GHRH(1-29). Eine randomisierte Humanstudie untersuchte Pharmakokinetik und GH-Stimulation nach intravenöser oder intranasaler Gabe von GHRH(1-29)-NH2.",
+          "sourceIds": [
+            "pmid-8329825",
+            "pubchem-sermorelin"
+          ]
+        },
+        "mechanism": {
+          "text": "Die zitierte Studie beschreibt GHRH(1-29)-NH2 als Stimulator der Wachstumshormonsekretion bei gesunden Probanden.",
+          "sourceIds": [
+            "pmid-8329825"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "ClinicalTrials.gov lieferte am 28.08.2026 42 Treffer zum Term sermorelin; viele Titel betreffen andere GHRH-Analoga. Nur titelgeprüfte Records werden veröffentlicht. PubMed-Query: 54 Treffer.",
+          "sourceIds": [
+            "ct-count-sermorelin",
+            "pm-count-sermorelin",
+            "pmid-8329825"
+          ]
+        },
+        "humanEvidence": {
+          "text": "Begrenzte Humanevidenz aus älteren GHRH(1-29)-Studien. Eine aktuelle Drugs@FDA-Zulassung war in dieser Abfrage nicht nachweisbar.",
+          "sourceIds": [
+            "pmid-8329825",
+            "fda-none-sermorelin"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "Keine separat kuratierte Präklinik-Primärquelle in diesem Scan.",
+          "sourceIds": [
+            "pmid-8329825"
+          ]
+        },
+        "safety": {
+          "text": "Keine aktuelle FDA-Fachinformation in dieser Abfrage. Sicherheitsdaten beschränken sich auf die zitierte ältere Literatur.",
+          "sourceIds": [
+            "fda-none-sermorelin",
+            "pmid-8329825"
+          ]
+        },
+        "currentResearch": {
+          "text": "Kein titelgeprüftes, laufendes Zulassungsprogramm unter Sermorelin/Geref in den kuratierten CT.gov-Treffern identifiziert. Stand: 28.08.2026.",
+          "sourceIds": [
+            "ct-count-sermorelin"
+          ]
+        },
+        "unknowns": {
+          "text": "Aktueller US-/EU-Zulassungsstatus, Langzeitsicherheit und Standarddosierung für Research-Produkte sind aus den geprüften Quellen nicht belegt.",
+          "sourceIds": [
+            "fda-none-sermorelin"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "human",
+          "severity": "unknown",
+          "text": "Keine aktuelle regulatorische Adverse-Event-Liste identifiziert.",
+          "sourceIds": [
+            "fda-none-sermorelin"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "unknown",
+          "text": "Keine etablierte Interaktionsliste aus einer aktuellen Fachinformation identifiziert.",
+          "sourceIds": [
+            "fda-none-sermorelin"
+          ]
+        }
+      ],
+      "reconstitution": null,
+      "studies": [],
+      "sources": [
+        {
+          "id": "ct-count-sermorelin",
+          "title": "ClinicalTrials.gov search: sermorelin",
+          "url": "https://clinicaltrials.gov/search?term=sermorelin",
+          "publisher": "ClinicalTrials.gov",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pm-count-sermorelin",
+          "title": "PubMed search: sermorelin AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=sermorelin%20AND%20(clinical%20trial%20OR%20randomized%20OR%20safety%20OR%20pharmacokinetics%20OR%20systematic%20review)",
+          "publisher": "NCBI PubMed",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "fda-none-sermorelin",
+          "title": "openFDA Drugs@FDA: no product match for sermorelin",
+          "url": "https://open.fda.gov/apis/drug/drugsfda/",
+          "publisher": "openFDA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pubchem-sermorelin",
+          "title": "PubChem CID 16132413 (CAS 86168-78-7)",
+          "url": "https://pubchem.ncbi.nlm.nih.gov/compound/16132413",
+          "publisher": "NCBI PubChem",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-8329825",
+          "title": "Pharmacokinetics of growth hormone-releasing hormone(1-29)-NH2 and stimulation of growth hormone secretion in healthy subjects after intravenous or intranasal administration.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/8329825/",
+          "publisher": "Acta Paediatr Suppl",
+          "publicationDate": "1993 Mar",
+          "accessDate": "2026-08-28",
+          "doi": "10.1111/j.1651-2227.1993.tb12827.x",
+          "pmid": "8329825",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-6240568",
+          "title": "Stimulation of growth hormone secretion with human growth hormone releasing factors (GRF1-44, GRF1-40, GRF1-29) in normal subjects.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/6240568/",
+          "publisher": "Klin Wochenschr",
+          "publicationDate": "1984 Dec 3",
+          "accessDate": "2026-08-28",
+          "doi": "10.1007/BF01782473",
+          "pmid": "6240568",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        }
+      ],
+      "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "sermorelin-historical-geref",
+          "priority": "Medium",
+          "topic": "Historische Geref-Zulassung vs. aktueller Drugs@FDA-Leerstand",
+          "note": "Die Identität Geref/GRF 1-29 ist katalogisiert. openFDA lieferte am 28.08.2026 keinen Produktmatch. Das ist kein Nachweis „never approved“. Historische Labels wurden in diesem Batch nicht als DailyMed-Set rekonstruiert.",
+          "sourceIds": [
+            "fda-none-sermorelin",
+            "pmid-8329825"
+          ]
+        }
+      ],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified",
+        "fda": "Checked — no Drugs@FDA match",
+        "ema": "Unavailable",
+        "clinicalTrials": 42,
+        "pubmed": 54,
+        "scientific": 2,
+        "community": "Unavailable",
+        "conflicts": 0
+      }
+    },
+    "thymosin-beta-4": {
+      "slug": "thymosin-beta-4",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "C",
+      "confidenceLevel": "moderate",
+      "regulatoryStatus": "clinical-development",
+      "reviewStatus": "review-recommended",
+      "regulatoryRegions": [],
+      "identity": {
+        "verified": true,
+        "casNumber": null,
+        "chemicalClass": "actin-sequestering peptide",
+        "moleculeType": "peptide",
+        "identityNote": "Vollständiges Thymosin Beta-4 (PubChem CID 45382195). Nicht identisch mit TB-500 (Fragment). RGN-259 ist eine ophthalmologische Formulierung von Thymosin Beta-4; das ist kein automatischer Beleg für Research-Vials."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "not-found",
+          "note": "No matches found!"
+        },
+        {
+          "id": "ema",
+          "status": "unavailable",
+          "note": "EMA-Connector in diesem Batch nicht für diese Substanz abgefragt"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "checked",
+          "note": "18 studies for query thymosin beta-4"
+        },
+        {
+          "id": "pubmed",
+          "status": "checked",
+          "note": "68 publications for filtered query"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "Thymosin β4 ist ein regeneratives Peptid. Übersichtsarbeiten beschreiben klinische Anwendungsversuche; eine FDA-Zulassung war in Drugs@FDA nicht nachweisbar.",
+          "sourceIds": [
+            "pmid-22074294",
+            "pubchem-thymosin-beta-4",
+            "fda-none-thymosin-beta-4"
+          ]
+        },
+        "mechanism": {
+          "text": "Die zitierte Übersicht ordnet Thymosin β4 regenerative und zellbiologische Funktionen zu; das ist keine zugelassene Fachinformation.",
+          "sourceIds": [
+            "pmid-22074294"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "ClinicalTrials.gov listete am 28.08.2026 18 Treffer zum Term thymosin beta-4, darunter Phase-1–3-Programme zu injizierbarem Thymosin Beta-4 und RGN-259. Der Hudson-Biotech-Record NCT07487363 (TB-500-Fragment, fiktives Beispielcluster) wird nicht veröffentlicht.",
+          "sourceIds": [
+            "nct-NCT04555850",
+            "nct-NCT05555589",
+            "nct-NCT05984134",
+            "ct-count-thymosin-beta-4"
+          ]
+        },
+        "humanEvidence": {
+          "text": "Humane Phase-1-Daten (gesunde Probanden) und kardiologische/ophthalmologische Studienprogramme sind registriert. Eine Publikation berichtet rhTB4 bei STEMI-Patientinnen und -Patienten sowie Mäusen. Keine FDA-Zulassung in dieser Abfrage.",
+          "sourceIds": [
+            "nct-NCT04555850",
+            "pmid-41229390",
+            "fda-none-thymosin-beta-4"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "PMID 41229390 enthält zusätzlich Mausdaten zur ischämischen kardialen Dysfunktion; das ist von den Humananteilen zu trennen.",
+          "sourceIds": [
+            "pmid-41229390"
+          ]
+        },
+        "safety": {
+          "text": "Keine FDA-Fachinformation. Sicherheitsdaten stammen aus registrierten Studien und Übersichten, nicht aus einem zugelassenen Label.",
+          "sourceIds": [
+            "fda-none-thymosin-beta-4",
+            "pmid-22074294"
+          ]
+        },
+        "currentResearch": {
+          "text": "Unter anderem SEER-2 (RGN-259, NCT05555589) und AMI-Programme (NCT05984134) waren zum Abfragedatum registriert.",
+          "sourceIds": [
+            "nct-NCT05555589",
+            "nct-NCT05984134",
+            "nct-NCT03937882"
+          ]
+        },
+        "unknowns": {
+          "text": "Übertragbarkeit von RGN-259-Augentropfen oder rhTB4-AMI-Programmen auf Research-Vials, Langzeitsicherheit und Zulassung bleiben offen.",
+          "sourceIds": [
+            "fda-none-thymosin-beta-4",
+            "nct-NCT05555589"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "human",
+          "severity": "unknown",
+          "text": "Keine zugelassene Adverse-Event-Liste; Humandaten nur aus Studien/Reviews.",
+          "sourceIds": [
+            "fda-none-thymosin-beta-4",
+            "pmid-22074294"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "unknown",
+          "text": "Keine etablierte Interaktionsliste identifiziert.",
+          "sourceIds": [
+            "fda-none-thymosin-beta-4"
+          ]
+        }
+      ],
+      "reconstitution": null,
+      "studies": [
+        {
+          "id": "NCT05555589",
+          "clinicalTrialId": "NCT05555589",
+          "title": "Assessment of the Safety and Efficacy of 0.1% RGN-259 Ophthalmic Solution for the Treatment of NK: SEER-2",
+          "phase": "PHASE3",
+          "status": "RECRUITING",
+          "sponsor": "ReGenTree, LLC",
+          "enrollment": 70,
+          "startDate": "2023-04-11",
+          "completionDate": "2026-05-30",
+          "lastUpdated": "2025-12-23",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05555589"
+        },
+        {
+          "id": "NCT04555850",
+          "clinicalTrialId": "NCT04555850",
+          "title": "A Phase 1b Study of Thymosin Beta 4 in Healthy Volunteers",
+          "phase": "PHASE1",
+          "status": "COMPLETED",
+          "sponsor": "Beijing Northland Biotech. Co., Ltd.",
+          "enrollment": 30,
+          "startDate": "2018-07-30",
+          "completionDate": "2019-07-26",
+          "lastUpdated": "2020-09-29",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04555850"
+        },
+        {
+          "id": "NCT05984134",
+          "clinicalTrialId": "NCT05984134",
+          "title": "Efficacy and Safety Study of Thymosin Beta 4 in Patients With Acute Myocardial Infarction",
+          "phase": "PHASE2",
+          "status": "COMPLETED",
+          "sponsor": "Beijing Northland Biotech. Co., Ltd.",
+          "enrollment": 90,
+          "startDate": "2022-07-15",
+          "completionDate": "2023-05-29",
+          "lastUpdated": "2024-06-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05984134"
+        },
+        {
+          "id": "NCT03937882",
+          "clinicalTrialId": "NCT03937882",
+          "title": "Assessment of the Safety and Efficacy of RGN-259 Ophthalmic Solutions for Dry Eye Syndrome: ARISE-3",
+          "phase": "PHASE3",
+          "status": "COMPLETED",
+          "sponsor": "ReGenTree, LLC",
+          "enrollment": 700,
+          "startDate": "2019-05-24",
+          "completionDate": "2021-10-07",
+          "lastUpdated": "2022-05-09",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT03937882"
+        },
+        {
+          "id": "NCT07586865",
+          "clinicalTrialId": "NCT07586865",
+          "title": "Recombinant Human Thymosin Beta 4 for Injection(NL005) for Acute Myocardial Infarction",
+          "phase": "PHASE2",
+          "status": "NOT_YET_RECRUITING",
+          "sponsor": "Beijing Northland Biotech. Co., Ltd.",
+          "enrollment": 189,
+          "startDate": "2026-05-18",
+          "completionDate": "2028-05-17",
+          "lastUpdated": "2026-05-14",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07586865"
+        },
+        {
+          "id": "NCT05485818",
+          "clinicalTrialId": "NCT05485818",
+          "title": "Safety and Efficacy Study of Thymosin Beta 4 in Patients With Acute Myocardial Infarction.Infarction",
+          "phase": "PHASE2",
+          "status": "COMPLETED",
+          "sponsor": "Beijing Northland Biotech. Co., Ltd.",
+          "enrollment": 62,
+          "startDate": "2020-11-23",
+          "completionDate": "2021-11-18",
+          "lastUpdated": "2022-08-03",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05485818"
+        },
+        {
+          "id": "NCT02974907",
+          "clinicalTrialId": "NCT02974907",
+          "title": "Assessment of the Safety and Efficacy of RGN-259 Ophthalmic Solutions for Dry Eye Syndrome : ARISE-2",
+          "phase": "PHASE3",
+          "status": "COMPLETED",
+          "sponsor": "ReGenTree, LLC",
+          "enrollment": 601,
+          "startDate": "2016-11",
+          "completionDate": "2018-03",
+          "lastUpdated": "2022-01-05",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT02974907"
+        },
+        {
+          "id": "NCT01311518",
+          "clinicalTrialId": "NCT01311518",
+          "title": "A Study of the Safety and Efficacy of Injectable Thymosin Beta 4 for Treating Acute Myocardial Infarction",
+          "phase": "PHASE2",
+          "status": "WITHDRAWN",
+          "sponsor": "RegeneRx Biopharmaceuticals, Inc.",
+          "enrollment": 0,
+          "startDate": "2019-07",
+          "completionDate": "2020-07",
+          "lastUpdated": "2021-09-22",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01311518"
+        },
+        {
+          "id": "NCT04555824",
+          "clinicalTrialId": "NCT04555824",
+          "title": "A Phase 1a Study of Thymosin Beta 4 in Healthy Volunteers",
+          "phase": "PHASE1",
+          "status": "COMPLETED",
+          "sponsor": "Beijing Northland Biotech. Co., Ltd.",
+          "enrollment": 54,
+          "startDate": "2017-07-17",
+          "completionDate": "2018-06-20",
+          "lastUpdated": "2020-09-29",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04555824"
+        },
+        {
+          "id": "NCT02597803",
+          "clinicalTrialId": "NCT02597803",
+          "title": "Assessment of the Safety and Efficacy of RGN-259 Ophthalmic Solutions for Dry Eye Syndrome: ARISE-1",
+          "phase": "PHASE2, PHASE3",
+          "status": "COMPLETED",
+          "sponsor": "ReGenTree, LLC",
+          "enrollment": 317,
+          "startDate": "2015-09",
+          "completionDate": "2016-07",
+          "lastUpdated": "2019-10-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT02597803"
+        },
+        {
+          "id": "NCT00743769",
+          "clinicalTrialId": "NCT00743769",
+          "title": "A Phase 1 Safety Study of the Intravenous Administration of Thymosin Beta in Healthy Volunteers",
+          "phase": "PHASE1",
+          "status": "WITHDRAWN",
+          "sponsor": "RegeneRx Biopharmaceuticals, Inc.",
+          "enrollment": 0,
+          "startDate": "2008-04",
+          "completionDate": "2017-01-01",
+          "lastUpdated": "2017-04-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT00743769"
+        },
+        {
+          "id": "NCT01393132",
+          "clinicalTrialId": "NCT01393132",
+          "title": "Comparative Study of Thymosin Beta 4 Eye Drops vs. Vehicle in the Treatment of Severe Dry Eye",
+          "phase": "PHASE2",
+          "status": "COMPLETED",
+          "sponsor": "Michigan Cornea Consultants, PC",
+          "enrollment": 9,
+          "startDate": "2011-03",
+          "completionDate": "2012-12",
+          "lastUpdated": "2015-12-23",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT01393132"
+        }
+      ],
+      "sources": [
+        {
+          "id": "ct-count-thymosin-beta-4",
+          "title": "ClinicalTrials.gov search: thymosin beta-4",
+          "url": "https://clinicaltrials.gov/search?term=thymosin%20beta-4",
+          "publisher": "ClinicalTrials.gov",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pm-count-thymosin-beta-4",
+          "title": "PubMed search: thymosin beta-4 AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=thymosin%20beta-4%20AND%20(clinical%20trial%20OR%20randomized%20OR%20safety%20OR%20pharmacokinetics%20OR%20systematic%20review)",
+          "publisher": "NCBI PubMed",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "fda-none-thymosin-beta-4",
+          "title": "openFDA Drugs@FDA: no product match for thymosin beta-4",
+          "url": "https://open.fda.gov/apis/drug/drugsfda/",
+          "publisher": "openFDA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pubchem-thymosin-beta-4",
+          "title": "PubChem CID 45382195",
+          "url": "https://pubchem.ncbi.nlm.nih.gov/compound/45382195",
+          "publisher": "NCBI PubChem",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 4
+        },
+        {
+          "id": "nct-NCT05555589",
+          "title": "Assessment of the Safety and Efficacy of 0.1% RGN-259 Ophthalmic Solution for the Treatment of NK: SEER-2",
+          "url": "https://clinicaltrials.gov/study/NCT05555589",
+          "publisher": "ReGenTree, LLC",
+          "publicationDate": "2025-12-23",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT05555589",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT04555850",
+          "title": "A Phase 1b Study of Thymosin Beta 4 in Healthy Volunteers",
+          "url": "https://clinicaltrials.gov/study/NCT04555850",
+          "publisher": "Beijing Northland Biotech. Co., Ltd.",
+          "publicationDate": "2020-09-29",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT04555850",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT05984134",
+          "title": "Efficacy and Safety Study of Thymosin Beta 4 in Patients With Acute Myocardial Infarction",
+          "url": "https://clinicaltrials.gov/study/NCT05984134",
+          "publisher": "Beijing Northland Biotech. Co., Ltd.",
+          "publicationDate": "2024-06-21",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT05984134",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT03937882",
+          "title": "Assessment of the Safety and Efficacy of RGN-259 Ophthalmic Solutions for Dry Eye Syndrome: ARISE-3",
+          "url": "https://clinicaltrials.gov/study/NCT03937882",
+          "publisher": "ReGenTree, LLC",
+          "publicationDate": "2022-05-09",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT03937882",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT07586865",
+          "title": "Recombinant Human Thymosin Beta 4 for Injection(NL005) for Acute Myocardial Infarction",
+          "url": "https://clinicaltrials.gov/study/NCT07586865",
+          "publisher": "Beijing Northland Biotech. Co., Ltd.",
+          "publicationDate": "2026-05-14",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT07586865",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT05485818",
+          "title": "Safety and Efficacy Study of Thymosin Beta 4 in Patients With Acute Myocardial Infarction.Infarction",
+          "url": "https://clinicaltrials.gov/study/NCT05485818",
+          "publisher": "Beijing Northland Biotech. Co., Ltd.",
+          "publicationDate": "2022-08-03",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT05485818",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT02974907",
+          "title": "Assessment of the Safety and Efficacy of RGN-259 Ophthalmic Solutions for Dry Eye Syndrome : ARISE-2",
+          "url": "https://clinicaltrials.gov/study/NCT02974907",
+          "publisher": "ReGenTree, LLC",
+          "publicationDate": "2022-01-05",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT02974907",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT01311518",
+          "title": "A Study of the Safety and Efficacy of Injectable Thymosin Beta 4 for Treating Acute Myocardial Infarction",
+          "url": "https://clinicaltrials.gov/study/NCT01311518",
+          "publisher": "RegeneRx Biopharmaceuticals, Inc.",
+          "publicationDate": "2021-09-22",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT01311518",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT04555824",
+          "title": "A Phase 1a Study of Thymosin Beta 4 in Healthy Volunteers",
+          "url": "https://clinicaltrials.gov/study/NCT04555824",
+          "publisher": "Beijing Northland Biotech. Co., Ltd.",
+          "publicationDate": "2020-09-29",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT04555824",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT02597803",
+          "title": "Assessment of the Safety and Efficacy of RGN-259 Ophthalmic Solutions for Dry Eye Syndrome: ARISE-1",
+          "url": "https://clinicaltrials.gov/study/NCT02597803",
+          "publisher": "ReGenTree, LLC",
+          "publicationDate": "2019-10-17",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT02597803",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT00743769",
+          "title": "A Phase 1 Safety Study of the Intravenous Administration of Thymosin Beta in Healthy Volunteers",
+          "url": "https://clinicaltrials.gov/study/NCT00743769",
+          "publisher": "RegeneRx Biopharmaceuticals, Inc.",
+          "publicationDate": "2017-04-17",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT00743769",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT01393132",
+          "title": "Comparative Study of Thymosin Beta 4 Eye Drops vs. Vehicle in the Treatment of Severe Dry Eye",
+          "url": "https://clinicaltrials.gov/study/NCT01393132",
+          "publisher": "Michigan Cornea Consultants, PC",
+          "publicationDate": "2015-12-23",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT01393132",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-22074294",
+          "title": "Thymosin β4: a multi-functional regenerative peptide. Basic properties and clinical applications.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22074294/",
+          "publisher": "Expert Opin Biol Ther",
+          "publicationDate": "2012 Jan",
+          "accessDate": "2026-08-28",
+          "doi": "10.1517/14712598.2012.634793",
+          "pmid": "22074294",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-41229390",
+          "title": "Recombinant human thymosin beta 4 improves ischemic cardiac dysfunction in mice and patients with acute ST-segment elevation myocardial infarction after reperfusion.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41229390/",
+          "publisher": "Cardiovasc Res",
+          "publicationDate": "2025 Dec 31",
+          "accessDate": "2026-08-28",
+          "doi": "10.1093/cvr/cvaf223",
+          "pmid": "41229390",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-29508629",
+          "title": "Thymosin beta 4 regulation of actin in sepsis.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29508629/",
+          "publisher": "Expert Opin Biol Ther",
+          "publicationDate": "2018 Jul",
+          "accessDate": "2026-08-28",
+          "doi": "10.1080/14712598.2018.1448381",
+          "pmid": "29508629",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-41570941",
+          "title": "Thymosin beta 4: An emerging therapeutic candidate for kidney diseases.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41570941/",
+          "publisher": "Peptides",
+          "publicationDate": "2026 Jan",
+          "accessDate": "2026-08-28",
+          "doi": "10.1016/j.peptides.2026.171467",
+          "pmid": "41570941",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-25124811",
+          "title": "In vivo growth suppression of CT-26 mouse colorectal cancer cells by adenovirus-expressed small hairpin RNA specifically targeting thymosin beta-4 mRNA.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25124811/",
+          "publisher": "Cancer Gene Ther",
+          "publicationDate": "2014 Sep",
+          "accessDate": "2026-08-28",
+          "doi": "10.1038/cgt.2014.43",
+          "pmid": "25124811",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-28442910",
+          "title": "Targeted delivery of thymosin beta 4 to the injured myocardium using CREKA-conjugated nanoparticles.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28442910/",
+          "publisher": "Int J Nanomedicine",
+          "publicationDate": "2017",
+          "accessDate": "2026-08-28",
+          "doi": "10.2147/IJN.S131949",
+          "pmid": "28442910",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        }
+      ],
+      "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "tb4-rgn259-not-tb500",
+          "priority": "High",
+          "topic": "RGN-259 und TB-500 nicht mit Thymosin Beta-4-Vials vermengen",
+          "note": "RGN-259-Studien (z. B. NCT05555589) untersuchen eine ophthalmologische Formulierung. TB-500 bleibt ein getrennter Identity-Record. NCT07487363 ist Hudson Biotech und wird nicht veröffentlicht.",
+          "sourceIds": [
+            "nct-NCT05555589",
+            "ct-count-thymosin-beta-4"
+          ]
+        }
+      ],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified",
+        "fda": "Checked — no Drugs@FDA match",
+        "ema": "Unavailable",
+        "clinicalTrials": 18,
+        "pubmed": 68,
+        "scientific": 6,
+        "community": "Unavailable",
+        "conflicts": 0
+      }
+    },
+    "semax": {
+      "slug": "semax",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "C",
+      "confidenceLevel": "low",
+      "regulatoryStatus": "investigational",
+      "reviewStatus": "review-recommended",
+      "regulatoryRegions": [],
+      "identity": {
+        "verified": true,
+        "casNumber": "80714-61-0",
+        "chemicalClass": "ACTH(4-10) analogue",
+        "moleculeType": "peptide",
+        "identityNote": "PubChem CID 9811102. ClinicalTrials.gov-Suche „semax“ am 28.08.2026: 0 Studien. 0 CT.gov-Treffer ist kein Beweis für fehlende Humanforschung."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "not-found",
+          "note": "No matches found!"
+        },
+        {
+          "id": "ema",
+          "status": "unavailable",
+          "note": "EMA-Connector in diesem Batch nicht für diese Substanz abgefragt"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "checked",
+          "note": "0 studies for query semax"
+        },
+        {
+          "id": "pubmed",
+          "status": "checked",
+          "note": "23 publications for filtered query"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "Semax ist ein ACTH(4-10)-Analog. Russischsprachige klinische Publikationen beschreiben den Einsatz bei ischämischem Schlaganfall; eine FDA-Zulassung war nicht nachweisbar.",
+          "sourceIds": [
+            "pmid-29798983",
+            "pubchem-semax",
+            "fda-none-semax"
+          ]
+        },
+        "mechanism": {
+          "text": "Die zitierte klinische Arbeit betrifft Wirksamkeit in Stadien des ischämischen Schlaganfalls; detaillierte Rezeptorpharmakologie stammt in diesem Scan nicht aus einer Fachinformation.",
+          "sourceIds": [
+            "pmid-29798983"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "PubMed-Query: 23 Treffer (28.08.2026). ClinicalTrials.gov: 0 Treffer. Titelgefiltert bleiben u. a. klinische Semax-Publikationen.",
+          "sourceIds": [
+            "pm-count-semax",
+            "ct-count-semax",
+            "pmid-29798983"
+          ]
+        },
+        "humanEvidence": {
+          "text": "Begrenzte Humanevidenz aus klinischen Publikationen (u. a. ischämischer Schlaganfall). Keine bei ClinicalTrials.gov registrierte Studie unter diesem Term. Keine FDA-Zulassung in dieser Abfrage.",
+          "sourceIds": [
+            "pmid-29798983",
+            "ct-count-semax",
+            "fda-none-semax"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "Weitere PubMed-Treffer betreffen u. a. Rattenhirn-Bindung und Proteolyse; sie werden nicht als Humanwirksamkeit gewertet.",
+          "sourceIds": [
+            "pm-count-semax"
+          ]
+        },
+        "safety": {
+          "text": "Keine FDA-Fachinformation. Eine vollständige, behördlich geprüfte Sicherheitsliste liegt in den geprüften Quellen nicht vor.",
+          "sourceIds": [
+            "fda-none-semax"
+          ]
+        },
+        "currentResearch": {
+          "text": "Kein CT.gov-Programm unter Semax identifiziert. Die Humanliteratur liegt überwiegend außerhalb von ClinicalTrials.gov.",
+          "sourceIds": [
+            "ct-count-semax",
+            "pmid-29798983"
+          ]
+        },
+        "unknowns": {
+          "text": "Unabhängige Replikation, englischsprachige RCTs, Langzeitsicherheit und regulatorischer Status in US/EU sind nicht als abgeschlossen belegt.",
+          "sourceIds": [
+            "fda-none-semax",
+            "ct-count-semax"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "human",
+          "severity": "unknown",
+          "text": "Keine regulatorische Adverse-Event-Liste identifiziert.",
+          "sourceIds": [
+            "fda-none-semax"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "unknown",
+          "text": "Keine etablierte Interaktionsliste identifiziert.",
+          "sourceIds": [
+            "fda-none-semax"
+          ]
+        }
+      ],
+      "reconstitution": null,
+      "studies": [],
+      "sources": [
+        {
+          "id": "ct-count-semax",
+          "title": "ClinicalTrials.gov search: semax",
+          "url": "https://clinicaltrials.gov/search?term=semax",
+          "publisher": "ClinicalTrials.gov",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pm-count-semax",
+          "title": "PubMed search: semax AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=semax%20AND%20(clinical%20trial%20OR%20randomized%20OR%20safety%20OR%20pharmacokinetics%20OR%20systematic%20review)",
+          "publisher": "NCBI PubMed",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "fda-none-semax",
+          "title": "openFDA Drugs@FDA: no product match for semax",
+          "url": "https://open.fda.gov/apis/drug/drugsfda/",
+          "publisher": "openFDA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pubchem-semax",
+          "title": "PubChem CID 9811102 (CAS 80714-61-0)",
+          "url": "https://pubchem.ncbi.nlm.nih.gov/compound/9811102",
+          "publisher": "NCBI PubChem",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-29798983",
+          "title": "[The efficacy of semax in the tretament of patients at different stages of ischemic stroke].",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29798983/",
+          "publisher": "Zh Nevrol Psikhiatr Im S S Korsakova",
+          "publicationDate": "2018",
+          "accessDate": "2026-08-28",
+          "doi": "10.17116/jnevro20181183261-68",
+          "pmid": "29798983",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-11517472",
+          "title": "[Effectiveness of semax in acute period of hemispheric ischemic stroke (a clinical and electrophysiological study)].",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11517472/",
+          "publisher": "Zh Nevrol Psikhiatr Im S S Korsakova",
+          "publicationDate": "1997",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": "11517472",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-23652441",
+          "title": "Stability of Semax acetyl to proteolysis in various biological media.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23652441/",
+          "publisher": "Dokl Biol Sci",
+          "publicationDate": "2013 Mar",
+          "accessDate": "2026-08-28",
+          "doi": "10.1134/S0012496613020166",
+          "pmid": "23652441",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-17278839",
+          "title": "Specific binding of semax in different regions of the rat brain.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17278839/",
+          "publisher": "Dokl Biol Sci",
+          "publicationDate": "2006 Sep-Oct",
+          "accessDate": "2026-08-28",
+          "doi": "10.1134/s0012496606050085",
+          "pmid": "17278839",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-14556513",
+          "title": "The heptapeptide SEMAX stimulates BDNF expression in different areas of the rat brain in vivo.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/14556513/",
+          "publisher": "Dokl Biol Sci",
+          "publicationDate": "2003 Jul-Aug",
+          "accessDate": "2026-08-28",
+          "doi": "10.1023/a:1025177812262",
+          "pmid": "14556513",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-23821053",
+          "title": "Study of proteolysis of Semax analogues with different N-terminal amino acids by carboxypeptidases.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23821053/",
+          "publisher": "Dokl Biol Sci",
+          "publicationDate": "2013 May",
+          "accessDate": "2026-08-28",
+          "doi": "10.1134/S0012496613030101",
+          "pmid": "23821053",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-15678666",
+          "title": "[An experimental substantiation for using the \"Semax\" neuroprotector in the treatment of optic-nerve diseases].",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15678666/",
+          "publisher": "Vestn Oftalmol",
+          "publicationDate": "2004 Nov-Dec",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": "15678666",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        }
+      ],
+      "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "semax-ctgov-zero",
+          "priority": "Medium",
+          "topic": "0 CT.gov-Treffer ≠ keine Humanforschung",
+          "note": "Die Abfrage semax lieferte 0 ClinicalTrials.gov-Treffer. PMID 29798983 und weitere titelgeprüfte PubMed-Einträge belegen Humanliteratur außerhalb dieses Registers.",
+          "sourceIds": [
+            "ct-count-semax",
+            "pmid-29798983"
+          ]
+        }
+      ],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified",
+        "fda": "Checked — no Drugs@FDA match",
+        "ema": "Unavailable",
+        "clinicalTrials": 0,
+        "pubmed": 23,
+        "scientific": 7,
+        "community": "Unavailable",
+        "conflicts": 0
+      }
+    },
+    "selank": {
+      "slug": "selank",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "C",
+      "confidenceLevel": "low",
+      "regulatoryStatus": "investigational",
+      "reviewStatus": "review-recommended",
+      "regulatoryRegions": [],
+      "identity": {
+        "verified": true,
+        "casNumber": "129954-34-3",
+        "chemicalClass": "tuftsin analogue",
+        "moleculeType": "peptide",
+        "identityNote": "PubChem CID 11765600. ClinicalTrials.gov lieferte 10 Treffer zum Term selank; die gecachten Titel enthalten nicht Selank (Substring-/Noise-Hits) und werden nicht veröffentlicht."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "not-found",
+          "note": "No matches found!"
+        },
+        {
+          "id": "ema",
+          "status": "unavailable",
+          "note": "EMA-Connector in diesem Batch nicht für diese Substanz abgefragt"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "checked",
+          "note": "10 studies for query selank"
+        },
+        {
+          "id": "pubmed",
+          "status": "checked",
+          "note": "7 publications for filtered query"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "Selank ist ein Tuftsin-Analog. Russischsprachige klinische Arbeiten vergleichen u. a. anxiolytische Wirkung mit Phenazepam; eine FDA-Zulassung war nicht nachweisbar.",
+          "sourceIds": [
+            "pmid-25176261",
+            "pubchem-selank",
+            "fda-none-selank"
+          ]
+        },
+        "mechanism": {
+          "text": "PMID 18454096 diskutiert mögliche Wirkmechanismen bei generalisierten Angststörungen und Neurasthenie; das ist keine Fachinformation.",
+          "sourceIds": [
+            "pmid-18454096"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "PubMed-Query: titelgeprüfte klinische und tierexperimentelle Selank-Arbeiten. Die 10 CT.gov-Treffer vom 28.08.2026 werden wegen fehlender Substanz im Titel nicht als Selank-Studien veröffentlicht.",
+          "sourceIds": [
+            "pmid-25176261",
+            "pmid-26356395",
+            "ct-count-selank",
+            "pm-count-selank"
+          ]
+        },
+        "humanEvidence": {
+          "text": "Begrenzte Humanevidenz aus klinischen Publikationen zu Angststörungen. Keine titelgeprüfte ClinicalTrials.gov-Studie. Keine FDA-Zulassung in dieser Abfrage.",
+          "sourceIds": [
+            "pmid-25176261",
+            "pmid-18454096",
+            "fda-none-selank"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "PMID 26356395 vergleicht pharmakologische Effekte nach intranasaler vs. intraperitonealer Gabe bei Mäusen — präklinisch, nicht Humanwirksamkeit.",
+          "sourceIds": [
+            "pmid-26356395"
+          ]
+        },
+        "safety": {
+          "text": "Die Phenazepam-Vergleichsarbeit spricht Verträglichkeit an; eine regulatorische Fachinformation fehlt.",
+          "sourceIds": [
+            "pmid-25176261",
+            "fda-none-selank"
+          ]
+        },
+        "currentResearch": {
+          "text": "Kein valides CT.gov-Programm unter Selank in diesem Scan. Humanliteratur liegt außerhalb des Registers bzw. in nicht-englischen Journals.",
+          "sourceIds": [
+            "ct-count-selank"
+          ]
+        },
+        "unknowns": {
+          "text": "Unabhängige westliche RCTs, Langzeitsicherheit und US-/EU-Zulassung sind nicht belegt.",
+          "sourceIds": [
+            "fda-none-selank",
+            "ct-count-selank"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "human",
+          "severity": "unknown",
+          "text": "Keine FDA-Adverse-Event-Liste; Verträglichkeit nur aus zitierter klinischer Literatur.",
+          "sourceIds": [
+            "fda-none-selank",
+            "pmid-25176261"
+          ]
+        },
+        {
+          "domain": "animal",
+          "severity": "unknown",
+          "text": "Mausdaten zur Applikationsroute sind nicht auf Human-Sicherheit übertragbar.",
+          "sourceIds": [
+            "pmid-26356395"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "unknown",
+          "text": "Keine etablierte Interaktionsliste identifiziert.",
+          "sourceIds": [
+            "fda-none-selank"
+          ]
+        }
+      ],
+      "reconstitution": null,
+      "studies": [],
+      "sources": [
+        {
+          "id": "ct-count-selank",
+          "title": "ClinicalTrials.gov search: selank",
+          "url": "https://clinicaltrials.gov/search?term=selank",
+          "publisher": "ClinicalTrials.gov",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pm-count-selank",
+          "title": "PubMed search: selank AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=selank%20AND%20(clinical%20trial%20OR%20randomized%20OR%20safety%20OR%20pharmacokinetics%20OR%20systematic%20review)",
+          "publisher": "NCBI PubMed",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "fda-none-selank",
+          "title": "openFDA Drugs@FDA: no product match for selank",
+          "url": "https://open.fda.gov/apis/drug/drugsfda/",
+          "publisher": "openFDA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pubchem-selank",
+          "title": "PubChem CID 11765600 (CAS 129954-34-3)",
+          "url": "https://pubchem.ncbi.nlm.nih.gov/compound/11765600",
+          "publisher": "NCBI PubChem",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-25176261",
+          "title": "[A comparison of the anxiolytic effect and tolerability of selank and phenazepam in the treatment of anxiety disorders].",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25176261/",
+          "publisher": "Zh Nevrol Psikhiatr Im S S Korsakova",
+          "publicationDate": "2014",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": "25176261",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-18454096",
+          "title": "[Efficacy and possible mechanisms of action of a new peptide anxiolytic selank in the therapy of generalized anxiety disorders and neurasthenia].",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18454096/",
+          "publisher": "Zh Nevrol Psikhiatr Im S S Korsakova",
+          "publicationDate": "2008",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": "18454096",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-26356395",
+          "title": "[Optimization of the treatment of anxiety disorders with selank].",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26356395/",
+          "publisher": "Zh Nevrol Psikhiatr Im S S Korsakova",
+          "publicationDate": "2015",
+          "accessDate": "2026-08-28",
+          "doi": "10.17116/jnevro20151156133-40",
+          "pmid": "26356395",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-29787664",
+          "title": "[COMPARISON OF PHARMACOLOGICAL EFFECTS OF HEPTAPEPTIDE SELANK AFTER INTRANASAL AND INTRAPERITONEAL ADMINISTRATION TO BALB/c AND C57BL/6 MICE.].",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29787664/",
+          "publisher": "Eksp Klin Farmakol",
+          "publicationDate": "2016",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": "29787664",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-24605419",
+          "title": "[Protective effect of selank on the model of mnestic function violation induced by pharmacological blockade of protein synthesis].",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24605419/",
+          "publisher": "Eksp Klin Farmakol",
+          "publicationDate": "2013",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": "24605419",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        }
+      ],
+      "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "selank-ctgov-noise",
+          "priority": "High",
+          "topic": "CT.gov-Treffer ohne Selank im Titel",
+          "note": "10 ClinicalTrials.gov-Hits zum Term selank betrafen in den gecachten Titeln andere kognitive/neurologische Interventionen. Sie werden nicht veröffentlicht. 10 Noise-Hits ≠ 10 Selank-Studien.",
+          "sourceIds": [
+            "ct-count-selank"
+          ]
+        }
+      ],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified",
+        "fda": "Checked — no Drugs@FDA match",
+        "ema": "Unavailable",
+        "clinicalTrials": 10,
+        "pubmed": 7,
+        "scientific": 5,
+        "community": "Unavailable",
+        "conflicts": 0
+      }
+    },
+    "thymosin-alpha-1": {
+      "slug": "thymosin-alpha-1",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "C",
+      "confidenceLevel": "moderate",
+      "regulatoryStatus": "clinical-development",
+      "reviewStatus": "review-required",
+      "regulatoryRegions": [],
+      "identity": {
+        "verified": true,
+        "casNumber": "62304-98-7",
+        "chemicalClass": "thymic peptide",
+        "moleculeType": "peptide",
+        "identityNote": "Thymalfasin / Zadaxin / Tα1 (PubChem CID 16130571). Drugs@FDA-Suche thymalfasin am 28.08.2026 ohne Match. Das belegt nicht, dass in anderen Regionen keine Zulassung besteht — ohne Primärquelle kein regionales Approved."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "not-found",
+          "note": "No matches found!"
+        },
+        {
+          "id": "ema",
+          "status": "unavailable",
+          "note": "EMA-Connector in diesem Batch nicht für diese Substanz abgefragt"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "checked",
+          "note": "66 studies for query thymosin alpha-1"
+        },
+        {
+          "id": "pubmed",
+          "status": "checked",
+          "note": "113 publications for filtered query"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "Thymosin Alpha-1 (Thymalfasin) ist ein thymisches Peptid. Ein als Systematic Review indexierter Überblick fasst Sicherheit und Wirksamkeit in Humanstudien zusammen. Eine FDA-Zulassung war in dieser Abfrage nicht nachweisbar.",
+          "sourceIds": [
+            "pmid-38308608",
+            "pubchem-thymosin-alpha-1",
+            "fda-none-thymosin-alpha-1"
+          ]
+        },
+        "mechanism": {
+          "text": "Die zitierte Übersicht und die registrierten Studien behandeln immunmodulatorische Anwendungen; eine FDA-Fachinformation liegt nicht vor.",
+          "sourceIds": [
+            "pmid-38308608"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "ClinicalTrials.gov: 66 Treffer zum Term thymosin alpha-1 (28.08.2026), darunter COVID-Booster (NCT06821100), Dialyse/COVID-Prävention (NCT04428008) und onkologische Kombinationen (NCT07780721).",
+          "sourceIds": [
+            "nct-NCT06821100",
+            "nct-NCT04428008",
+            "nct-NCT07780721",
+            "ct-count-thymosin-alpha-1"
+          ]
+        },
+        "humanEvidence": {
+          "text": "Mehrere Humanstudien und ein Systematic Review. Keine Drugs@FDA-Zulassung in dieser Abfrage. Regionale Zulassungen (z. B. historische Zadaxin-Nennungen) ohne Primärbehörde bleiben ungeprüft.",
+          "sourceIds": [
+            "pmid-38308608",
+            "nct-NCT04428008",
+            "fda-none-thymosin-alpha-1"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "Zusätzliche Literatur kann präklinisch sein; in diesem Scan werden Humanstudien und der Review priorisiert.",
+          "sourceIds": [
+            "pmid-38308608"
+          ]
+        },
+        "safety": {
+          "text": "Keine FDA-Fachinformation. Sicherheitsaussagen des Reviews ersetzen kein Label.",
+          "sourceIds": [
+            "pmid-38308608",
+            "fda-none-thymosin-alpha-1"
+          ]
+        },
+        "currentResearch": {
+          "text": "Laufende und abgeschlossene CT.gov-Programme zu Impfantwort, Infektion und Onkologie (Stand 28.08.2026).",
+          "sourceIds": [
+            "nct-NCT06821100",
+            "nct-NCT04428008",
+            "nct-NCT07780721"
+          ]
+        },
+        "unknowns": {
+          "text": "US-/EU-Zulassungsstatus, Standardindikation und Übertragbarkeit auf Research-Vials sind nicht als abgeschlossen belegt.",
+          "sourceIds": [
+            "fda-none-thymosin-alpha-1"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "human",
+          "severity": "unknown",
+          "text": "Keine FDA-Adverse-Event-Liste; Human-Sicherheit nur aus Studien/Review.",
+          "sourceIds": [
+            "fda-none-thymosin-alpha-1",
+            "pmid-38308608"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "unknown",
+          "text": "Keine etablierte Interaktionsliste aus einer FDA-Fachinformation identifiziert.",
+          "sourceIds": [
+            "fda-none-thymosin-alpha-1"
+          ]
+        }
+      ],
+      "reconstitution": null,
+      "studies": [
+        {
+          "id": "NCT06821100",
+          "clinicalTrialId": "NCT06821100",
+          "title": "Thymalfasin (Thymosin Alpha 1; Ta1) as an Enhancer of Vaccine Response Among Older Adults Receiving Booster Doses of COVID-19 Vaccine",
+          "phase": "PHASE1",
+          "status": "RECRUITING",
+          "sponsor": "The Methodist Hospital Research Institute",
+          "enrollment": 75,
+          "startDate": "2024-12-02",
+          "completionDate": "2026-12-01",
+          "lastUpdated": "2026-07-16",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06821100"
+        },
+        {
+          "id": "NCT04428008",
+          "clinicalTrialId": "NCT04428008",
+          "title": "Thymosin Alpha 1 to Prevent COVID-19 Infection in Renal Dialysis Patients",
+          "phase": "PHASE2",
+          "status": "COMPLETED",
+          "sponsor": "William B. Ershler, MD",
+          "enrollment": 189,
+          "startDate": "2021-01-12",
+          "completionDate": "2023-01-19",
+          "lastUpdated": "2026-04-21",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT04428008"
+        },
+        {
+          "id": "NCT07780721",
+          "clinicalTrialId": "NCT07780721",
+          "title": "Study of Adebrelimab Combined With Thymalfasin and Chemotherapy for Neoadjuvant Treatment of Esophageal Cancer",
+          "phase": "PHASE2",
+          "status": "NOT_YET_RECRUITING",
+          "sponsor": "The Affiliated Hospital of Putian University",
+          "enrollment": 31,
+          "startDate": "2026-08-30",
+          "completionDate": "2029-02-01",
+          "lastUpdated": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07780721"
+        },
+        {
+          "id": "NCT06024356",
+          "clinicalTrialId": "NCT06024356",
+          "title": "Neoadjuvant Chemoradiotherapy Combined With PD-1 Inhibitor and Thymalfasin for Locally Advanced Mid-low Rectal Cancer",
+          "phase": null,
+          "status": "COMPLETED",
+          "sponsor": "Beijing Friendship Hospital",
+          "enrollment": 47,
+          "startDate": "2023-09-20",
+          "completionDate": "2026-05-15",
+          "lastUpdated": "2026-06-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06024356"
+        },
+        {
+          "id": "NCT07644897",
+          "clinicalTrialId": "NCT07644897",
+          "title": "Thymosin Alpha 1 Combined With Anti-PD-1 Monoclonal Antibody in Elderly Patients With Advanced Melanoma",
+          "phase": "PHASE2",
+          "status": "RECRUITING",
+          "sponsor": "Sun Yat-sen University",
+          "enrollment": 55,
+          "startDate": "2023-05-30",
+          "completionDate": "2027-09-30",
+          "lastUpdated": "2026-06-12",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07644897"
+        },
+        {
+          "id": "NCT07277439",
+          "clinicalTrialId": "NCT07277439",
+          "title": "Phase II Trial of Neoadjuvant Thymalfasin, PD-1 Inhibitor, and Chemoradiotherapy for cStage III GEJ Adenocarcinoma",
+          "phase": "PHASE2",
+          "status": "RECRUITING",
+          "sponsor": "The First Affiliated Hospital with Nanjing Medical University",
+          "enrollment": 48,
+          "startDate": "2025-12-16",
+          "completionDate": "2029-02-16",
+          "lastUpdated": "2026-03-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07277439"
+        },
+        {
+          "id": "NCT06461910",
+          "clinicalTrialId": "NCT06461910",
+          "title": "Efficacy and Safety of Anti-PD-1, Thymalfasin, and SOX in Neoadjuvant Treatment of cStage III Gastric/Gastroesophageal Junction Adenocarcinoma",
+          "phase": "PHASE2",
+          "status": "RECRUITING",
+          "sponsor": "Zekuan Xu",
+          "enrollment": 30,
+          "startDate": "2024-06-14",
+          "completionDate": "2027-12",
+          "lastUpdated": "2026-03-03",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06461910"
+        },
+        {
+          "id": "NCT06056804",
+          "clinicalTrialId": "NCT06056804",
+          "title": "Neoadjuvant Chemoradiotherapy Combined With PD-1 Inhibitor and Thymalfasin for pMMR/MSS Locally Advanced Mid-low Rectal Cancer",
+          "phase": "PHASE2",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "sponsor": "Beijing Friendship Hospital",
+          "enrollment": 20,
+          "startDate": "2024-01-03",
+          "completionDate": "2027-07-01",
+          "lastUpdated": "2025-04-02",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06056804"
+        },
+        {
+          "id": "NCT06829355",
+          "clinicalTrialId": "NCT06829355",
+          "title": "\"Thymalfasin Immunotherapy Study with Triple Regimen in Advanced MSS/pMMR Colorectal Cancer\"",
+          "phase": "PHASE2",
+          "status": "RECRUITING",
+          "sponsor": "Beijing Friendship Hospital",
+          "enrollment": 52,
+          "startDate": "2025-02-11",
+          "completionDate": "2027-12-31",
+          "lastUpdated": "2025-02-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06829355"
+        },
+        {
+          "id": "NCT06607926",
+          "clinicalTrialId": "NCT06607926",
+          "title": "Neoadjuvant With Tα1 Plus Immuno-chemotherapy for Resectable NSCLC",
+          "phase": "NA",
+          "status": "NOT_YET_RECRUITING",
+          "sponsor": "Xuanwu Hospital, Beijing",
+          "enrollment": 40,
+          "startDate": "2024-10-15",
+          "completionDate": "2025-12-30",
+          "lastUpdated": "2024-09-23",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06607926"
+        }
+      ],
+      "sources": [
+        {
+          "id": "ct-count-thymosin-alpha-1",
+          "title": "ClinicalTrials.gov search: thymosin alpha-1",
+          "url": "https://clinicaltrials.gov/search?term=thymosin%20alpha-1",
+          "publisher": "ClinicalTrials.gov",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pm-count-thymosin-alpha-1",
+          "title": "PubMed search: thymosin alpha-1 AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=thymosin%20alpha-1%20AND%20(clinical%20trial%20OR%20randomized%20OR%20safety%20OR%20pharmacokinetics%20OR%20systematic%20review)",
+          "publisher": "NCBI PubMed",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "fda-none-thymosin-alpha-1",
+          "title": "openFDA Drugs@FDA: no product match for thymalfasin",
+          "url": "https://open.fda.gov/apis/drug/drugsfda/",
+          "publisher": "openFDA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pubchem-thymosin-alpha-1",
+          "title": "PubChem CID 16130571 (CAS 62304-98-7)",
+          "url": "https://pubchem.ncbi.nlm.nih.gov/compound/16130571",
+          "publisher": "NCBI PubChem",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 4
+        },
+        {
+          "id": "nct-NCT06821100",
+          "title": "Thymalfasin (Thymosin Alpha 1; Ta1) as an Enhancer of Vaccine Response Among Older Adults Receiving Booster Doses of COVID-19 Vaccine",
+          "url": "https://clinicaltrials.gov/study/NCT06821100",
+          "publisher": "The Methodist Hospital Research Institute",
+          "publicationDate": "2026-07-16",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT06821100",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT04428008",
+          "title": "Thymosin Alpha 1 to Prevent COVID-19 Infection in Renal Dialysis Patients",
+          "url": "https://clinicaltrials.gov/study/NCT04428008",
+          "publisher": "William B. Ershler, MD",
+          "publicationDate": "2026-04-21",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT04428008",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT07780721",
+          "title": "Study of Adebrelimab Combined With Thymalfasin and Chemotherapy for Neoadjuvant Treatment of Esophageal Cancer",
+          "url": "https://clinicaltrials.gov/study/NCT07780721",
+          "publisher": "The Affiliated Hospital of Putian University",
+          "publicationDate": "2026-08-21",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT07780721",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT06024356",
+          "title": "Neoadjuvant Chemoradiotherapy Combined With PD-1 Inhibitor and Thymalfasin for Locally Advanced Mid-low Rectal Cancer",
+          "url": "https://clinicaltrials.gov/study/NCT06024356",
+          "publisher": "Beijing Friendship Hospital",
+          "publicationDate": "2026-06-18",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT06024356",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT07644897",
+          "title": "Thymosin Alpha 1 Combined With Anti-PD-1 Monoclonal Antibody in Elderly Patients With Advanced Melanoma",
+          "url": "https://clinicaltrials.gov/study/NCT07644897",
+          "publisher": "Sun Yat-sen University",
+          "publicationDate": "2026-06-12",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT07644897",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT07277439",
+          "title": "Phase II Trial of Neoadjuvant Thymalfasin, PD-1 Inhibitor, and Chemoradiotherapy for cStage III GEJ Adenocarcinoma",
+          "url": "https://clinicaltrials.gov/study/NCT07277439",
+          "publisher": "The First Affiliated Hospital with Nanjing Medical University",
+          "publicationDate": "2026-03-19",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT07277439",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT06461910",
+          "title": "Efficacy and Safety of Anti-PD-1, Thymalfasin, and SOX in Neoadjuvant Treatment of cStage III Gastric/Gastroesophageal Junction Adenocarcinoma",
+          "url": "https://clinicaltrials.gov/study/NCT06461910",
+          "publisher": "Zekuan Xu",
+          "publicationDate": "2026-03-03",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT06461910",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT06056804",
+          "title": "Neoadjuvant Chemoradiotherapy Combined With PD-1 Inhibitor and Thymalfasin for pMMR/MSS Locally Advanced Mid-low Rectal Cancer",
+          "url": "https://clinicaltrials.gov/study/NCT06056804",
+          "publisher": "Beijing Friendship Hospital",
+          "publicationDate": "2025-04-02",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT06056804",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT06829355",
+          "title": "\"Thymalfasin Immunotherapy Study with Triple Regimen in Advanced MSS/pMMR Colorectal Cancer\"",
+          "url": "https://clinicaltrials.gov/study/NCT06829355",
+          "publisher": "Beijing Friendship Hospital",
+          "publicationDate": "2025-02-17",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT06829355",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT06607926",
+          "title": "Neoadjuvant With Tα1 Plus Immuno-chemotherapy for Resectable NSCLC",
+          "url": "https://clinicaltrials.gov/study/NCT06607926",
+          "publisher": "Xuanwu Hospital, Beijing",
+          "publicationDate": "2024-09-23",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT06607926",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-38308608",
+          "title": "Comprehensive Review of the Safety and Efficacy of Thymosin Alpha 1 in Human Clinical Trials.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38308608/",
+          "publisher": "Altern Ther Health Med",
+          "publicationDate": "2024 Jan",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": "38308608",
+          "clinicalTrialId": null,
+          "sourceType": "review",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-33076834",
+          "title": "The clinical efficacy and adverse effects of Entecavir plus Thymosin alpha-1 combination therapy versus Entecavir Monotherapy in HBV-related cirrhosis: a systematic review and meta-analysis.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33076834/",
+          "publisher": "BMC Gastroenterol",
+          "publicationDate": "2020 Oct 19",
+          "accessDate": "2026-08-28",
+          "doi": "10.1186/s12876-020-01477-8",
+          "pmid": "33076834",
+          "clinicalTrialId": null,
+          "sourceType": "meta_analysis",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-39648386",
+          "title": "Thymosin Alpha 1 Plus Routine Treatment for the Acute Exacerbation of Chronic Obstructive Pulmonary Disease: A Systematic Review and Meta-Analysis.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39648386/",
+          "publisher": "J Coll Physicians Surg Pak",
+          "publicationDate": "2024 Dec",
+          "accessDate": "2026-08-28",
+          "doi": "10.29271/jcpsp.2024.12.1497",
+          "pmid": "39648386",
+          "clinicalTrialId": null,
+          "sourceType": "meta_analysis",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-37845598",
+          "title": "The efficacy of thymosin alpha-1 therapy in moderate to critical COVID-19 patients: a systematic review, meta-analysis, and meta-regression.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37845598/",
+          "publisher": "Inflammopharmacology",
+          "publicationDate": "2023 Dec",
+          "accessDate": "2026-08-28",
+          "doi": "10.1007/s10787-023-01354-2",
+          "pmid": "37845598",
+          "clinicalTrialId": null,
+          "sourceType": "meta_analysis",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-40599771",
+          "title": "Thymosin alpha 1 alleviates inflammation and prevents infection in patients with severe acute pancreatitis through immune regulation: a systematic review and meta-analysis.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40599771/",
+          "publisher": "Front Immunol",
+          "publicationDate": "2025",
+          "accessDate": "2026-08-28",
+          "doi": "10.3389/fimmu.2025.1571456",
+          "pmid": "40599771",
+          "clinicalTrialId": null,
+          "sourceType": "meta_analysis",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-11381492",
+          "title": "Thymosin alpha-1.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11381492/",
+          "publisher": "Am J Health Syst Pharm",
+          "publicationDate": "2001 May 15",
+          "accessDate": "2026-08-28",
+          "doi": "10.1093/ajhp/58.10.886",
+          "pmid": "11381492",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-41373628",
+          "title": "Aging and Thymosin Alpha-1.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41373628/",
+          "publisher": "Int J Mol Sci",
+          "publicationDate": "2025 Nov 27",
+          "accessDate": "2026-08-28",
+          "doi": "10.3390/ijms262311470",
+          "pmid": "41373628",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-28106477",
+          "title": "Thymosin alpha 1 and HIV-1: recent advances and future perspectives.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28106477/",
+          "publisher": "Future Microbiol",
+          "publicationDate": "2017 Feb",
+          "accessDate": "2026-08-28",
+          "doi": "10.2217/fmb-2016-0125",
+          "pmid": "28106477",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-20536460",
+          "title": "Thymosin alpha 1: past clinical experience and future promise.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20536460/",
+          "publisher": "Ann N Y Acad Sci",
+          "publicationDate": "2010 Apr",
+          "accessDate": "2026-08-28",
+          "doi": "10.1111/j.1749-6632.2010.05482.x",
+          "pmid": "20536460",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-20536461",
+          "title": "Thymosin alpha 1 for treatment of hepatitis C virus: promise and proof.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20536461/",
+          "publisher": "Ann N Y Acad Sci",
+          "publicationDate": "2010 Apr",
+          "accessDate": "2026-08-28",
+          "doi": "10.1111/j.1749-6632.2010.05460.x",
+          "pmid": "20536461",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-7922706",
+          "title": "Thymosin alpha-1 as adjunct for conventional therapy of malignant tumors: a review.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/7922706/",
+          "publisher": "Cancer Invest",
+          "publicationDate": "1994",
+          "accessDate": "2026-08-28",
+          "doi": "10.3109/07357909409021409",
+          "pmid": "7922706",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-36871535",
+          "title": "Thymosin alpha 1 - Reimagine its broader applications in the immuno-oncology era.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36871535/",
+          "publisher": "Int Immunopharmacol",
+          "publicationDate": "2023 Apr",
+          "accessDate": "2026-08-28",
+          "doi": "10.1016/j.intimp.2023.109952",
+          "pmid": "36871535",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        }
+      ],
+      "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "ta1-zadaxin-non-us",
+          "priority": "High",
+          "topic": "Zadaxin/Thymalfasin außerhalb Drugs@FDA",
+          "note": "Alias Zadaxin ist katalogisiert. openFDA/thymalfasin war am 28.08.2026 ohne Match. Ohne EMA/NMPA/andere Primärquelle kein regionales Approved. Status bleibt klinische Entwicklung / insufficient für US-Label.",
+          "sourceIds": [
+            "fda-none-thymosin-alpha-1",
+            "pmid-38308608"
+          ]
+        }
+      ],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified",
+        "fda": "Checked — no Drugs@FDA match",
+        "ema": "Unavailable",
+        "clinicalTrials": 66,
+        "pubmed": 113,
+        "scientific": 12,
+        "community": "Unavailable",
+        "conflicts": 0
+      }
+    },
+    "kpv": {
+      "slug": "kpv",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "D",
+      "confidenceLevel": "low",
+      "regulatoryStatus": "investigational",
+      "reviewStatus": "fresh",
+      "regulatoryRegions": [],
+      "identity": {
+        "verified": true,
+        "casNumber": null,
+        "chemicalClass": "alpha-MSH fragment (Lys-Pro-Val)",
+        "moleculeType": "peptide",
+        "identityNote": "KPV = Lys-Pro-Val, C-terminales α-MSH-Fragment. ClinicalTrials.gov-Suche „KPV peptide“ am 28.08.2026: 0 Studien. PubChem ohne CID in diesem Scan."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "not-found",
+          "note": "No matches found!"
+        },
+        {
+          "id": "ema",
+          "status": "unavailable",
+          "note": "EMA-Connector in diesem Batch nicht für diese Substanz abgefragt"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "checked",
+          "note": "0 studies for query KPV peptide"
+        },
+        {
+          "id": "pubmed",
+          "status": "checked",
+          "note": "7 publications for filtered query"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "KPV ist das Tripeptid Lys-Pro-Val. Publizierte Arbeiten betreffen vor allem Formulierung, transdermale Iontophorese an humaner Haut (ex vivo) und präklinische Nanodrug-Modelle. Keine FDA-Zulassung nachweisbar.",
+          "sourceIds": [
+            "pmid-28343991",
+            "pmid-39252648",
+            "fda-none-kpv"
+          ]
+        },
+        "mechanism": {
+          "text": "KPV wird in der Literatur als α-MSH-bezogenes Fragment mit antiinflammatorischem Forschungskontext geführt; das ist keine Fachinformation.",
+          "sourceIds": [
+            "pmid-28343991"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "PubMed-Query: 7 Treffer. ClinicalTrials.gov: 0 Treffer. 0 Registertreffer ist kein Beweis für weltweit fehlende Humanstudien, zeigt aber keine registrierte KPV-Studie unter diesem Term.",
+          "sourceIds": [
+            "pm-count-kpv",
+            "ct-count-kpv",
+            "pmid-39252648"
+          ]
+        },
+        "humanEvidence": {
+          "text": "PMID 28343991 untersucht Iontophorese über mikroporierte humane Haut — Ex-vivo-Permeation, keine klinische Wirksamkeitsstudie. Keine CT.gov-Humanstudie unter diesem Term.",
+          "sourceIds": [
+            "pmid-28343991",
+            "ct-count-kpv"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "PMID 39252648 beschreibt selbstassemblierte KPV/RAPA-Nanodrugs in einem vaskulären Kalzifikationsmodell — präklinisch.",
+          "sourceIds": [
+            "pmid-39252648"
+          ]
+        },
+        "safety": {
+          "text": "Keine FDA-Fachinformation und keine ausreichenden belastbaren Human-Sicherheitsdaten aus zugelassenen Labels.",
+          "sourceIds": [
+            "fda-none-kpv"
+          ]
+        },
+        "currentResearch": {
+          "text": "Kein CT.gov-Programm unter KPV peptide identifiziert (28.08.2026).",
+          "sourceIds": [
+            "ct-count-kpv"
+          ]
+        },
+        "unknowns": {
+          "text": "Klinische Wirksamkeit, Humandosierung, Rekonstitution und Zulassung bleiben ungeklärt.",
+          "sourceIds": [
+            "fda-none-kpv",
+            "ct-count-kpv"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "human",
+          "severity": "unknown",
+          "text": "Keine ausreichenden Human-Sicherheitsdaten aus Fachinformationen.",
+          "sourceIds": [
+            "fda-none-kpv"
+          ]
+        },
+        {
+          "domain": "in-vitro",
+          "severity": "unknown",
+          "text": "Ex-vivo-Hautpermeation (PMID 28343991) ist keine klinische Sicherheitsstudie.",
+          "sourceIds": [
+            "pmid-28343991"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "unknown",
+          "text": "Keine etablierte Interaktionsliste identifiziert.",
+          "sourceIds": [
+            "fda-none-kpv"
+          ]
+        }
+      ],
+      "reconstitution": null,
+      "studies": [],
+      "sources": [
+        {
+          "id": "ct-count-kpv",
+          "title": "ClinicalTrials.gov search: KPV peptide",
+          "url": "https://clinicaltrials.gov/search?term=KPV%20peptide",
+          "publisher": "ClinicalTrials.gov",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pm-count-kpv",
+          "title": "PubMed search: KPV peptide AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=KPV%20peptide%20AND%20(clinical%20trial%20OR%20randomized%20OR%20safety%20OR%20pharmacokinetics%20OR%20systematic%20review)",
+          "publisher": "NCBI PubMed",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "fda-none-kpv",
+          "title": "openFDA Drugs@FDA: no product match for KPV",
+          "url": "https://open.fda.gov/apis/drug/drugsfda/",
+          "publisher": "openFDA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-39252648",
+          "title": "KPV and RAPA Self-Assembled into Carrier-Free Nanodrugs for Vascular Calcification Therapy.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39252648/",
+          "publisher": "Adv Healthc Mater",
+          "publicationDate": "2024 Dec",
+          "accessDate": "2026-08-28",
+          "doi": "10.1002/adhm.202402320",
+          "pmid": "39252648",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-28343991",
+          "title": "Transdermal Iontophoretic Delivery of Lysine-Proline-Valine (KPV) Peptide Across Microporated Human Skin.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28343991/",
+          "publisher": "J Pharm Sci",
+          "publicationDate": "2017 Jul",
+          "accessDate": "2026-08-28",
+          "doi": "10.1016/j.xphs.2017.03.017",
+          "pmid": "28343991",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-18061177",
+          "title": "PepT1-mediated tripeptide KPV uptake reduces intestinal inflammation.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18061177/",
+          "publisher": "Gastroenterology",
+          "publicationDate": "2008 Jan",
+          "accessDate": "2026-08-28",
+          "doi": "10.1053/j.gastro.2007.10.026",
+          "pmid": "18061177",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-29953505",
+          "title": "Structural modification of the tripeptide KPV by reductive \"glycoalkylation\" of the lysine residue.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29953505/",
+          "publisher": "PLoS One",
+          "publicationDate": "2018",
+          "accessDate": "2026-08-28",
+          "doi": "10.1371/journal.pone.0199686",
+          "pmid": "29953505",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        }
+      ],
+      "conflicts": [],
+      "reviewItems": [],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified",
+        "fda": "Checked — no Drugs@FDA match",
+        "ema": "Unavailable",
+        "clinicalTrials": 0,
+        "pubmed": 7,
+        "scientific": 4,
+        "community": "Unavailable",
+        "conflicts": 0
+      }
+    },
+    "igf-1-lr3": {
+      "slug": "igf-1-lr3",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "F",
+      "confidenceLevel": "insufficient",
+      "regulatoryStatus": "investigational",
+      "reviewStatus": "review-recommended",
+      "regulatoryRegions": [],
+      "identity": {
+        "verified": true,
+        "casNumber": null,
+        "chemicalClass": "IGF-1 analogue (Long R3)",
+        "moleculeType": "peptide",
+        "identityNote": "IGF-1 LR3 (Long R3 IGF-1) wird nicht mit rhIGF-1/Mecasermin (Increlex) gleichgesetzt. PubChem ohne CID in diesem Scan. PMID 22227200 (Schaf-Pansenepithel, IGF-1) wurde als Fehlzuordnung ausgeschlossen."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "not-found",
+          "note": "No matches found!"
+        },
+        {
+          "id": "ema",
+          "status": "unavailable",
+          "note": "EMA-Connector in diesem Batch nicht für diese Substanz abgefragt"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "checked",
+          "note": "0 studies for query IGF-1 LR3"
+        },
+        {
+          "id": "pubmed",
+          "status": "checked",
+          "note": "2 publications for filtered query"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "IGF-1 LR3 ist ein Long-R3-Analogon von IGF-1. In diesem Scan keine Drugs@FDA-Zulassung und 0 ClinicalTrials.gov-Treffer unter „IGF-1 LR3“. Ein Review zur GH-IGF1-Achse und Self-Administration erwähnt performance-enhancing peptides, belegt aber keine LR3-Zulassung.",
+          "sourceIds": [
+            "pmid-42395176",
+            "fda-none-igf-1-lr3",
+            "ct-count-igf-1-lr3"
+          ]
+        },
+        "mechanism": {
+          "text": "Der zitierte Review diskutiert Peptide der GH-IGF1-Achse im Spannungsfeld klinischer Evidenz vs. Self-Administration; das ersetzt keine LR3-Fachinformation.",
+          "sourceIds": [
+            "pmid-42395176"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "PubMed-Query: 2 Treffer. Davon PMID 22227200 ausgeschlossen (Schaf, nicht LR3). ClinicalTrials.gov: 0 Treffer. 0 Registertreffer ≠ Nachweis, dass nirgends Humanforschung existiert.",
+          "sourceIds": [
+            "pm-count-igf-1-lr3",
+            "ct-count-igf-1-lr3",
+            "pmid-42395176"
+          ]
+        },
+        "humanEvidence": {
+          "text": "Keine titelgeprüfte Humanstudie speziell zu IGF-1 LR3 in diesem Scan. Mecasermin-Literatur wird nicht als LR3-Evidenz verwendet.",
+          "sourceIds": [
+            "pmid-42395176",
+            "ct-count-igf-1-lr3",
+            "fda-none-igf-1-lr3"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "Keine separat kuratierte LR3-Präklinik-Primärquelle nach Ausschluss der Schaf-IGF-1-Arbeit.",
+          "sourceIds": [
+            "pmid-42395176"
+          ]
+        },
+        "safety": {
+          "text": "Keine FDA-Fachinformation für IGF-1 LR3. Keine ausreichenden belastbaren Human-Sicherheitsdaten in den geprüften Quellen.",
+          "sourceIds": [
+            "fda-none-igf-1-lr3"
+          ]
+        },
+        "currentResearch": {
+          "text": "Kein CT.gov-Programm unter IGF-1 LR3 identifiziert (28.08.2026).",
+          "sourceIds": [
+            "ct-count-igf-1-lr3"
+          ]
+        },
+        "unknowns": {
+          "text": "Humane PK, Sicherheit, Dosis und regulatorischer Status von IGF-1 LR3 bleiben ungeklärt. Increlex ist ein anderes Produkt.",
+          "sourceIds": [
+            "fda-none-igf-1-lr3",
+            "ct-count-igf-1-lr3"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "human",
+          "severity": "unknown",
+          "text": "Keine ausreichenden belastbaren Human-Sicherheitsdaten für IGF-1 LR3.",
+          "sourceIds": [
+            "fda-none-igf-1-lr3"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "unknown",
+          "text": "Keine etablierte Interaktionsliste identifiziert.",
+          "sourceIds": [
+            "fda-none-igf-1-lr3"
+          ]
+        }
+      ],
+      "reconstitution": null,
+      "studies": [],
+      "sources": [
+        {
+          "id": "ct-count-igf-1-lr3",
+          "title": "ClinicalTrials.gov search: IGF-1 LR3",
+          "url": "https://clinicaltrials.gov/search?term=IGF-1%20LR3",
+          "publisher": "ClinicalTrials.gov",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pm-count-igf-1-lr3",
+          "title": "PubMed search: IGF-1 LR3 AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=IGF-1%20LR3%20AND%20(clinical%20trial%20OR%20randomized%20OR%20safety%20OR%20pharmacokinetics%20OR%20systematic%20review)",
+          "publisher": "NCBI PubMed",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "fda-none-igf-1-lr3",
+          "title": "openFDA Drugs@FDA: no product match for IGF-1 LR3",
+          "url": "https://open.fda.gov/apis/drug/drugsfda/",
+          "publisher": "openFDA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-42395176",
+          "title": "The emerging landscape of performance-enhancing peptides modulating GH-IGF1 axis: bridging the gap between clinical evidence and patient self-administration.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42395176/",
+          "publisher": "Front Endocrinol (Lausanne)",
+          "publicationDate": "2026",
+          "accessDate": "2026-08-28",
+          "doi": "10.3389/fendo.2026.1822475",
+          "pmid": "42395176",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        }
+      ],
+      "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "igf-lr3-not-mecasermin",
+          "priority": "High",
+          "topic": "Nicht mit Mecasermin/Increlex zusammenführen",
+          "note": "0 CT.gov- und 0 FDA-Treffer für IGF-1 LR3. rhIGF-1-Zulassungen gelten nicht automatisch für Long R3. PMID 22227200 (Schaf) bleibt ausgeschlossen.",
+          "sourceIds": [
+            "fda-none-igf-1-lr3",
+            "ct-count-igf-1-lr3",
+            "pmid-42395176"
+          ]
+        }
+      ],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified",
+        "fda": "Checked — no Drugs@FDA match",
+        "ema": "Unavailable",
+        "clinicalTrials": 0,
+        "pubmed": 2,
+        "scientific": 1,
+        "community": "Unavailable",
+        "conflicts": 0
+      }
+    },
+    "somatropin": {
+      "slug": "somatropin",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "A",
+      "confidenceLevel": "high",
+      "regulatoryStatus": "approved-specific",
+      "reviewStatus": "fresh",
+      "regulatoryRegions": [
+        "US",
+        "EU"
+      ],
+      "identity": {
+        "verified": true,
+        "casNumber": null,
+        "chemicalClass": "recombinant human growth hormone",
+        "moleculeType": "peptide",
+        "identityNote": "Rekombinantes humanes Wachstumshormon. FDA-Labels u. a. Norditropin (BLA021148), Omnitrope, Serostim. EMA-EPAR Omnitrope HTTP 200 am 28.08.2026. EPAR-URL Norditropin lieferte 404 — kein globales „Approved“ über nicht geprüfte Marken."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "checked",
+          "note": "Drugs@FDA match"
+        },
+        {
+          "id": "ema",
+          "status": "checked",
+          "note": "EPAR pages HTTP 200 on 2026-08-28"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "checked",
+          "note": "1299 studies for query somatropin"
+        },
+        {
+          "id": "pubmed",
+          "status": "checked",
+          "note": "213 publications for filtered query"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "Somatropin ist rekombinantes humanes Wachstumshormon. Zugelassene US-Fertigprodukte umfassen laut FDA-Fachinformation u. a. Norditropin (pädiatrische und weitere gelistete Indikationen), Omnitrope und Serostim. In der EU ist Omnitrope über ein EMA-EPAR dokumentiert.",
+          "sourceIds": [
+            "fda-norditropin",
+            "fda-omnitrope",
+            "fda-serostim",
+            "ema-omnitrope"
+          ]
+        },
+        "mechanism": {
+          "text": "Laut Norditropin-Fachinformation bindet Somatropin dimere GH-Rezeptoren und induziert u. a. IGF-1-abhängige Transkription; direkte Gewebe- und Stoffwechseleffekte werden im Label beschrieben.",
+          "sourceIds": [
+            "fda-norditropin"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "Zugelassene Indikationen stehen in den jeweiligen Labels (nicht alle Marken teilen dieselben Indikationen; Serostim vs. Norditropin nicht gleichsetzen). ClinicalTrials.gov listete am 28.08.2026 1299 Treffer zum Term somatropin — nur titelgeprüfte Records werden als Studienzeilen veröffentlicht.",
+          "sourceIds": [
+            "fda-norditropin",
+            "fda-serostim",
+            "ct-count-somatropin"
+          ]
+        },
+        "humanEvidence": {
+          "text": "Starke Humanevidenz über zugelassene FDA-Labels und das EMA-EPAR Omnitrope.",
+          "sourceIds": [
+            "fda-norditropin",
+            "ema-omnitrope"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "Labels enthalten tierexperimentelle Warnhinweise im Umfang der Fachinformation; Research-Vials sind davon nicht abgedeckt.",
+          "sourceIds": [
+            "fda-norditropin"
+          ]
+        },
+        "safety": {
+          "text": "Norditropin-Label: u. a. erhöhtes Mortalitätsrisiko bei akut kritisch Kranken, plötzlicher Tod bei bestimmten Prader-Willi-Konstellationen, Neoplasien, Glukoseintoleranz/Diabetes. Vollständige Listen stehen in der Fachinformation.",
+          "sourceIds": [
+            "fda-norditropin"
+          ]
+        },
+        "currentResearch": {
+          "text": "Umfangreiche CT.gov- und PubMed-Treffer zum Term somatropin (28.08.2026). Labels bleiben die primäre Indikationsquelle.",
+          "sourceIds": [
+            "ct-count-somatropin",
+            "pm-count-somatropin",
+            "fda-norditropin"
+          ]
+        },
+        "unknowns": {
+          "text": "Nicht zugelassene Compounded- oder Research-Produkte sind durch diese Labels nicht abgedeckt. Norditropin-EPAR-URL war 404; andere EU-Marken wurden nicht vollständig geprüft.",
+          "sourceIds": [
+            "fda-norditropin",
+            "ema-omnitrope"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "human",
+          "severity": "warning",
+          "text": "Norditropin kontraindiziert u. a. bei akut kritischer Krankheit nach großen Operationen/Trauma oder akutem Atemversagen wegen erhöhter Mortalität unter pharmakologischen Somatropin-Dosen.",
+          "sourceIds": [
+            "fda-norditropin"
+          ]
+        },
+        {
+          "domain": "human",
+          "severity": "warning",
+          "text": "Label: Glukoseintoleranz und Diabetes mellitus; Monitoring laut Fachinformation.",
+          "sourceIds": [
+            "fda-norditropin"
+          ]
+        },
+        {
+          "domain": "human",
+          "severity": "warning",
+          "text": "Label: erhöhtes Neoplasierisiko / Zweitneoplasien bei manchen Kinderkrebs-Überlebenden; vorbestehende Tumoren überwachen.",
+          "sourceIds": [
+            "fda-norditropin"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "potential",
+          "text": "Glukosestoffwechsel: Somatropin kann die Insulinsensitivität senken (Norditropin-Warnhinweise). Weitere Interaktionen nur im Umfang der jeweiligen Fachinformation.",
+          "sourceIds": [
+            "fda-norditropin"
+          ]
+        }
+      ],
+      "reconstitution": {
+        "text": "Zugelassene Produkte werden laut FDA-Label subkutan angewendet (Norditropin: u. a. Oberarm, Abdomen, Gesäß, Oberschenkel, Rotationsschema). Offizielle Zubereitung steht in der jeweiligen Fachinformation. Keine unabhängige Research-Vial-Standardanweisung.",
+        "sourceIds": [
+          "fda-norditropin"
+        ]
+      },
+      "studies": [
+        {
+          "id": "NCT07221851",
+          "clinicalTrialId": "NCT07221851",
+          "title": "Trial Investigating the Efficacy and Safety of Weekly Lonapegsomatropin Compared to Daily Somatropin in Children and Adolescents With Short Stature or Growth Failure Due to Growth Hormone Sufficient Disorders",
+          "phase": "PHASE3",
+          "status": "RECRUITING",
+          "sponsor": "Ascendis Pharma A/S",
+          "enrollment": 186,
+          "startDate": "2025-12-12",
+          "completionDate": "2029-03",
+          "lastUpdated": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07221851"
+        }
+      ],
+      "sources": [
+        {
+          "id": "ct-count-somatropin",
+          "title": "ClinicalTrials.gov search: somatropin",
+          "url": "https://clinicaltrials.gov/search?term=somatropin",
+          "publisher": "ClinicalTrials.gov",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pm-count-somatropin",
+          "title": "PubMed search: somatropin AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=somatropin%20AND%20(clinical%20trial%20OR%20randomized%20OR%20safety%20OR%20pharmacokinetics%20OR%20systematic%20review)",
+          "publisher": "NCBI PubMed",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "fda-norditropin",
+          "title": "Norditropin (SOMATROPIN) FDA prescribing information",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1058e17c-9261-459c-a3e6-fae38d196c14",
+          "publisher": "FDA / DailyMed",
+          "publicationDate": "20250707",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "fda-omnitrope",
+          "title": "Omnitrope (SOMATROPIN) FDA prescribing information",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=58d84ffa-4056-4e36-ad67-7bd4aef444a5",
+          "publisher": "FDA / DailyMed",
+          "publicationDate": "20250710",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "fda-serostim",
+          "title": "Serostim (SOMATROPIN) FDA prescribing information",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=62b01d29-90f0-45b2-a0c4-3a750ba36c8a",
+          "publisher": "FDA / DailyMed",
+          "publicationDate": "20260728",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "ema-omnitrope",
+          "title": "Omnitrope EPAR",
+          "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/omnitrope",
+          "publisher": "EMA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT07221851",
+          "title": "Trial Investigating the Efficacy and Safety of Weekly Lonapegsomatropin Compared to Daily Somatropin in Children and Adolescents With Short Stature or Growth Failure Due to Growth Hormone Sufficient Disorders",
+          "url": "https://clinicaltrials.gov/study/NCT07221851",
+          "publisher": "Ascendis Pharma A/S",
+          "publicationDate": "2026-08-19",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT07221851",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-20662327",
+          "title": "Systematic review of the clinical effectiveness of Genotropin (somatropin) in children with short stature.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20662327/",
+          "publisher": "J Pediatr Endocrinol Metab",
+          "publicationDate": "2010 Jun",
+          "accessDate": "2026-08-28",
+          "doi": "10.1515/jpem.2010.092",
+          "pmid": "20662327",
+          "clinicalTrialId": null,
+          "sourceType": "review",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-35405011",
+          "title": "Efficacy and Safety of Weekly Somatrogon vs Daily Somatropin in Children With Growth Hormone Deficiency: A Phase 3 Study.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35405011/",
+          "publisher": "J Clin Endocrinol Metab",
+          "publicationDate": "2022 Jun 16",
+          "accessDate": "2026-08-28",
+          "doi": "10.1210/clinem/dgac220",
+          "pmid": "35405011",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-34272849",
+          "title": "Weekly Lonapegsomatropin in Treatment-Naïve Children With Growth Hormone Deficiency: The Phase 3 heiGHt Trial.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34272849/",
+          "publisher": "J Clin Endocrinol Metab",
+          "publicationDate": "2021 Oct 21",
+          "accessDate": "2026-08-28",
+          "doi": "10.1210/clinem/dgab529",
+          "pmid": "34272849",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-40049149",
+          "title": "Children with Growth Hormone Deficiency Treated with Lonapegsomatropin Demonstrated Sustained Height Improvements for up to 6 Years: enliGHten Trial Final Results.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40049149/",
+          "publisher": "Horm Res Paediatr",
+          "publicationDate": "2026",
+          "accessDate": "2026-08-28",
+          "doi": "10.1159/000545064",
+          "pmid": "40049149",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-41420532",
+          "title": "Efficacy and Safety of Once-Weekly Lonapegsomatropin in Adults With Growth Hormone Deficiency: foresiGHt Trial Results.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41420532/",
+          "publisher": "J Clin Endocrinol Metab",
+          "publicationDate": "2026 May 19",
+          "accessDate": "2026-08-28",
+          "doi": "10.1210/clinem/dgaf680",
+          "pmid": "41420532",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-15200350",
+          "title": "Somatropin (Zorbtive): in short bowel syndrome.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15200350/",
+          "publisher": "Drugs",
+          "publicationDate": "2004",
+          "accessDate": "2026-08-28",
+          "doi": "10.2165/00003495-200464120-00008",
+          "pmid": "15200350",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-35134048",
+          "title": "Lonapegsomatropin (Skytrofa) for growth hormone deficiency.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35134048/",
+          "publisher": "Med Lett Drugs Ther",
+          "publicationDate": "2022 Feb 7",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": "35134048",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        }
+      ],
+      "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "somatropin-norditropin-ema-404",
+          "priority": "Low",
+          "topic": "Norditropin-EPAR-URL 404",
+          "note": "https://www.ema.europa.eu/en/medicines/human/EPAR/norditropin lieferte HTTP 404. EU-Region stützt sich in diesem Batch auf Omnitrope EPAR (200), nicht auf die fehlgeschlagene Norditropin-URL.",
+          "sourceIds": [
+            "ema-omnitrope"
+          ]
+        }
+      ],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified",
+        "fda": "Checked",
+        "ema": "Checked",
+        "clinicalTrials": 1299,
+        "pubmed": 213,
+        "scientific": 7,
+        "community": "Unavailable",
+        "conflicts": 0
+      }
+    },
+    "hcg": {
+      "slug": "hcg",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "A",
+      "confidenceLevel": "high",
+      "regulatoryStatus": "approved-specific",
+      "reviewStatus": "review-recommended",
+      "regulatoryRegions": [
+        "US"
+      ],
+      "identity": {
+        "verified": true,
+        "casNumber": null,
+        "chemicalClass": "glycoprotein hormone (chorionic gonadotropin)",
+        "moleculeType": "biologics",
+        "identityNote": "Urinäres/chorionisches Gonadotropin (FDA DailyMed, BLA017067). Rekombinantes Choriogonadotropin alfa (Ovitrelle, EMA EPAR) ist verwandt, aber nicht dasselbe INN. PubChem CID 1108 aus der Namenssuche wurde als Fehlzuordnung verworfen."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "checked",
+          "note": "Drugs@FDA match"
+        },
+        {
+          "id": "ema",
+          "status": "checked",
+          "note": "EPAR pages HTTP 200 on 2026-08-28"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "checked",
+          "note": "749 studies for query chorionic gonadotropin"
+        },
+        {
+          "id": "pubmed",
+          "status": "checked",
+          "note": "3252 publications for filtered query"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "Humanes Choriongonadotropin (hCG) wirkt laut FDA-Fachinformation weitgehend LH-gleich und stimuliert die gonadale Steroidproduktion. Zugelassene US-Indikationen in der geprüften DailyMed-Information umfassen u. a. präpubertären Kryptorchismus ohne anatomische Obstruktion. Das Label stellt ausdrücklich fest, dass hCG nicht als wirksame adjuvante Adipositastherapie belegt ist.",
+          "sourceIds": [
+            "fda-hcg"
+          ]
+        },
+        "mechanism": {
+          "text": "Laut Label ist die Wirkung praktisch identisch mit hypophysärem LH, mit geringer FSH-Aktivität; Stimulation der Leydig-Zellen bzw. des Corpus luteum.",
+          "sourceIds": [
+            "fda-hcg"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "US-Labelindikationen und die explizite Nicht-Indikation Adipositas. ClinicalTrials.gov und PubMed liefern sehr große Trefferzahlen zum Term chorionic gonadotropin; nur titelgeprüfte Records werden veröffentlicht. EMA-EPAR Ovitrelle (Choriogonadotropin alfa) ist eine verwandte, nicht identische Zubereitung (EU).",
+          "sourceIds": [
+            "fda-hcg",
+            "ct-count-hcg",
+            "pm-count-hcg",
+            "ema-ovitrelle"
+          ]
+        },
+        "humanEvidence": {
+          "text": "Starke Humanevidenz für die im US-Label genannten Indikationen. Für Gewichtsverlust widerspricht das Label einer evidenzbasierten Nutzung.",
+          "sourceIds": [
+            "fda-hcg"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "Mechanismusangaben stehen im Label; separate Präklinik wurde in diesem Scan nicht extra kuratiert.",
+          "sourceIds": [
+            "fda-hcg"
+          ]
+        },
+        "safety": {
+          "text": "Label: u. a. Kopfschmerz, Reizbarkeit, Ödeme, vorzeitige Pubertät, Gynäkomastie, Injektionsschmerz; Kontraindikationen vorzeitige Pubertät, androgenabhängige Neoplasien, allergische Reaktion. Zusammen mit Menotropinen OHSS-Risiko.",
+          "sourceIds": [
+            "fda-hcg"
+          ]
+        },
+        "currentResearch": {
+          "text": "Sehr große CT.gov-/PubMed-Trefferzahlen (28.08.2026) sind nicht mit zusätzlichen zugelassenen Indikationen gleichzusetzen. Primär bleibt das US-Label.",
+          "sourceIds": [
+            "ct-count-hcg",
+            "pm-count-hcg",
+            "fda-hcg"
+          ]
+        },
+        "unknowns": {
+          "text": "Research-/Compounded-hCG ist durch BLA017067 nicht abgedeckt. EU-Status von urinärem hCG wurde nicht als eigenes EPAR geprüft; Ovitrelle ist rekombinantes alfa.",
+          "sourceIds": [
+            "fda-hcg",
+            "ema-ovitrelle"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "human",
+          "severity": "common",
+          "text": "Label: Kopfschmerz, Reizbarkeit, Unruhe, Depression, Müdigkeit, Ödem, vorzeitige Pubertät, Gynäkomastie, Injektionsschmerz.",
+          "sourceIds": [
+            "fda-hcg"
+          ]
+        },
+        {
+          "domain": "human",
+          "severity": "serious",
+          "text": "Label: ovarielles Überstimulationssyndrom als ernstes Risiko in Kombination mit Menotropinen.",
+          "sourceIds": [
+            "fda-hcg"
+          ]
+        },
+        {
+          "domain": "human",
+          "severity": "warning",
+          "text": "Kontraindiziert bei vorzeitiger Pubertät, Prostatakarzinom oder anderer androgenabhängiger Neoplasie sowie bekannter hCG-Allergie.",
+          "sourceIds": [
+            "fda-hcg"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "established",
+          "text": "Label: Kombination mit humanen menopausalen Gonadotropinen nur durch in der Infertilität erfahrene Ärztinnen/Ärzte; OHSS-Risiko.",
+          "sourceIds": [
+            "fda-hcg"
+          ]
+        }
+      ],
+      "reconstitution": {
+        "text": "Laut FDA-Fachinformation intramuskuläre Anwendung; Dosierungsregimes stehen in der DailyMed-Information. Keine unabhängige Research-Vial-Standardanweisung.",
+        "sourceIds": [
+          "fda-hcg"
+        ]
+      },
+      "studies": [
+        {
+          "id": "NCT07771283",
+          "clinicalTrialId": "NCT07771283",
+          "title": "Purpose to Evaluate the Effectiveness of the Superovulation Stimulation Protocol Using Human Chorionic Gonadotropin (hCG) by Demonstrating Its Equivalence to Standard Controlled Ovarian Stimulation Protocols in Terms of Oocytes Retrieved, Blastulation While Maintaining an Economic Advantage",
+          "phase": "NA",
+          "status": "ENROLLING_BY_INVITATION",
+          "sponsor": "LTD \"EKODNIPRO\", Medical centre Medical Plaza Dnipro",
+          "enrollment": 360,
+          "startDate": "2026-08-17",
+          "completionDate": "2028-05-01",
+          "lastUpdated": "2026-08-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07771283"
+        },
+        {
+          "id": "NCT06659692",
+          "clinicalTrialId": "NCT06659692",
+          "title": "Pharmacokinetics of FSH and hCG Following Multiple Dose of Gonadotropins-IBSA.",
+          "phase": "PHASE1",
+          "status": "COMPLETED",
+          "sponsor": "IBSA Institut Biochimique SA",
+          "enrollment": 28,
+          "startDate": "2024-09-23",
+          "completionDate": "2025-08-29",
+          "lastUpdated": "2026-07-16",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06659692"
+        }
+      ],
+      "sources": [
+        {
+          "id": "ct-count-hcg",
+          "title": "ClinicalTrials.gov search: chorionic gonadotropin",
+          "url": "https://clinicaltrials.gov/search?term=chorionic%20gonadotropin",
+          "publisher": "ClinicalTrials.gov",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pm-count-hcg",
+          "title": "PubMed search: chorionic gonadotropin AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=chorionic%20gonadotropin%20AND%20(clinical%20trial%20OR%20randomized%20OR%20safety%20OR%20pharmacokinetics%20OR%20systematic%20review)",
+          "publisher": "NCBI PubMed",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "fda-hcg",
+          "title": "Chorionic Gonadotropin (CHORIONIC GONADOTROPIN) FDA prescribing information",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=312ee87a-c6c3-6111-e063-6394a90ad8d7",
+          "publisher": "FDA / DailyMed",
+          "publicationDate": "20250325",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "ema-ovitrelle",
+          "title": "Ovitrelle EPAR (choriogonadotropin alfa; related recombinant, not urinary hCG)",
+          "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/ovitrelle",
+          "publisher": "EMA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT07771283",
+          "title": "Purpose to Evaluate the Effectiveness of the Superovulation Stimulation Protocol Using Human Chorionic Gonadotropin (hCG) by Demonstrating Its Equivalence to Standard Controlled Ovarian Stimulation Protocols in Terms of Oocytes Retrieved, Blastulation While Maintaining an Economic Advantage",
+          "url": "https://clinicaltrials.gov/study/NCT07771283",
+          "publisher": "LTD \"EKODNIPRO\", Medical centre Medical Plaza Dnipro",
+          "publicationDate": "2026-08-27",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT07771283",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT06659692",
+          "title": "Pharmacokinetics of FSH and hCG Following Multiple Dose of Gonadotropins-IBSA.",
+          "url": "https://clinicaltrials.gov/study/NCT06659692",
+          "publisher": "IBSA Institut Biochimique SA",
+          "publicationDate": "2026-07-16",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT06659692",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pmid-3119647",
+          "title": "Treatment of severe oligospermia with human chorionic gonadotropin/human menopausal gonadotropin: a placebo-controlled, double blind trial.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/3119647/",
+          "publisher": "J Clin Endocrinol Metab",
+          "publicationDate": "1987 Dec",
+          "accessDate": "2026-08-28",
+          "doi": "10.1210/jcem-65-6-1081",
+          "pmid": "3119647",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-12077540",
+          "title": "Treatment of Kaposi's sarcoma with human chorionic gonadotropin.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/12077540/",
+          "publisher": "Dermatology",
+          "publicationDate": "2002",
+          "accessDate": "2026-08-28",
+          "doi": "10.1159/000063378",
+          "pmid": "12077540",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-19072445",
+          "title": "Use of human chorionic gonadotropin in the prevention of breast cancer.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19072445/",
+          "publisher": "Womens Health (Lond)",
+          "publicationDate": "2008 Jan",
+          "accessDate": "2026-08-28",
+          "doi": "10.2217/17455057.4.1.1",
+          "pmid": "19072445",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        }
+      ],
+      "conflicts": [
+        {
+          "topic": "Urinäres hCG vs. rekombinantes Choriogonadotropin alfa",
+          "note": "US-DailyMed beschreibt chorionic gonadotropin (BLA017067). EMA-EPAR Ovitrelle betrifft choriogonadotropin alfa. Nicht als identische Substanz zusammenführen.",
+          "sourceIds": [
+            "fda-hcg",
+            "ema-ovitrelle"
+          ]
+        }
+      ],
+      "reviewItems": [
+        {
+          "id": "hcg-ovitrelle-identity",
+          "priority": "Medium",
+          "topic": "Ovitrelle nicht als urinäres hCG-Label werten",
+          "note": "EU-EPAR Ovitrelle (HTTP 200) ist als verwandte rekombinante Quelle hinterlegt, erweitert aber nicht automatisch die US-Indikationen und setzt regulatoryRegions nicht auf EU für urinäres hCG.",
+          "sourceIds": [
+            "fda-hcg",
+            "ema-ovitrelle"
+          ]
+        }
+      ],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified",
+        "fda": "Checked",
+        "ema": "Checked",
+        "clinicalTrials": 749,
+        "pubmed": 3252,
+        "scientific": 3,
+        "community": "Unavailable",
+        "conflicts": 1
+      }
+    },
+    "gonadorelin": {
+      "slug": "gonadorelin",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "E",
+      "confidenceLevel": "low",
+      "regulatoryStatus": "insufficient",
+      "reviewStatus": "review-required",
+      "regulatoryRegions": [],
+      "identity": {
+        "verified": true,
+        "casNumber": "33515-09-2",
+        "chemicalClass": "GnRH / LHRH",
+        "moleculeType": "peptide",
+        "identityNote": "Gonadorelin (PubChem CID 638793); Aliase Factrel, historisch Lutrelef. openFDA-Suche gonadorelin am 28.08.2026: kein Match. EMA-URL /EPAR/lutrelef: HTTP 404. CT.gov- und PubMed-Queries sind stark verrauscht (GnRH-Klasse, hCG, Onkologie)."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "not-found",
+          "note": "No matches found!"
+        },
+        {
+          "id": "ema",
+          "status": "unavailable",
+          "note": "EMA-Connector in diesem Batch nicht für diese Substanz abgefragt"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "checked",
+          "note": "1331 studies for query gonadorelin"
+        },
+        {
+          "id": "pubmed",
+          "status": "checked",
+          "note": "95 publications for filtered query"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "Gonadorelin ist natives GnRH. In diesem Scan keine aktuelle FDA-Fachinformation und kein erreichbares Lutrelef-EPAR unter der geprüften URL. PubChem bestätigt eine Compound-Identität (CID 638793).",
+          "sourceIds": [
+            "pubchem-gonadorelin",
+            "fda-none-gonadorelin"
+          ]
+        },
+        "mechanism": {
+          "text": "Die chemische Klasse ist GnRH/LHRH laut Identity/PubChem; eine zitierfähige Fachinformations-Mechanismuspassage liegt in diesem Scan nicht vor.",
+          "sourceIds": [
+            "pubchem-gonadorelin"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "ClinicalTrials.gov: 1331 Treffer zum Term gonadorelin (28.08.2026); die gecachten Titel betreffen überwiegend andere Interventionen. PubMed-Query: 95 Treffer, ohne titelgeprüftes „gonadorelin“ in den gecachten Artikeln. Weder 1331 noch 95 Treffer werden als Gonadorelin-Studien veröffentlicht.",
+          "sourceIds": [
+            "ct-count-gonadorelin",
+            "pm-count-gonadorelin"
+          ]
+        },
+        "humanEvidence": {
+          "text": "Historische Arzneimittelnamen (Factrel/Lutrelef) sind katalogisiert, aber ohne bestätigte aktuelle Behördenseite in diesem Scan. Keine titelgeprüfte Humanstudie aus dem Cache veröffentlicht. Das ist begrenzte bis unzureichende kuratierte Humanevidenz, nicht der Nachweis fehlender Weltliteratur.",
+          "sourceIds": [
+            "fda-none-gonadorelin",
+            "ct-count-gonadorelin",
+            "pm-count-gonadorelin"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "Keine separat kuratierte Präklinik-Primärquelle nach Titel-Filter.",
+          "sourceIds": [
+            "pubchem-gonadorelin"
+          ]
+        },
+        "safety": {
+          "text": "Keine FDA- oder EMA-Fachinformation in den geprüften Endpunkten. Keine Adverse-Event-Liste aus Label.",
+          "sourceIds": [
+            "fda-none-gonadorelin"
+          ]
+        },
+        "currentResearch": {
+          "text": "Kein titelgeprüftes CT.gov-Programm. Die Roh-Trefferzahl dokumentiert Query-Rauschen, nicht ein Gonadorelin-Entwicklungsprogramm.",
+          "sourceIds": [
+            "ct-count-gonadorelin"
+          ]
+        },
+        "unknowns": {
+          "text": "Aktueller Zulassungsstatus (US/EU/UK), PK und Sicherheit aus Labels sowie valide Registerstudien bleiben in diesem Batch ungeprüft bzw. ungefiltert zu verrauscht.",
+          "sourceIds": [
+            "fda-none-gonadorelin",
+            "ct-count-gonadorelin"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "human",
+          "severity": "unknown",
+          "text": "Keine Label-Sicherheitsliste identifiziert.",
+          "sourceIds": [
+            "fda-none-gonadorelin"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "unknown",
+          "text": "Keine etablierte Interaktionsliste identifiziert.",
+          "sourceIds": [
+            "fda-none-gonadorelin"
+          ]
+        }
+      ],
+      "reconstitution": null,
+      "studies": [],
+      "sources": [
+        {
+          "id": "ct-count-gonadorelin",
+          "title": "ClinicalTrials.gov search: gonadorelin",
+          "url": "https://clinicaltrials.gov/search?term=gonadorelin",
+          "publisher": "ClinicalTrials.gov",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pm-count-gonadorelin",
+          "title": "PubMed search: gonadorelin AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=gonadorelin%20AND%20(clinical%20trial%20OR%20randomized%20OR%20safety%20OR%20pharmacokinetics%20OR%20systematic%20review)",
+          "publisher": "NCBI PubMed",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "fda-none-gonadorelin",
+          "title": "openFDA Drugs@FDA: no product match for gonadorelin",
+          "url": "https://open.fda.gov/apis/drug/drugsfda/",
+          "publisher": "openFDA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pubchem-gonadorelin",
+          "title": "PubChem CID 638793 (CAS 33515-09-2)",
+          "url": "https://pubchem.ncbi.nlm.nih.gov/compound/638793",
+          "publisher": "NCBI PubChem",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 4
+        }
+      ],
+      "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "gonadorelin-query-noise",
+          "priority": "High",
+          "topic": "CT.gov/PubMed-Rauschen und fehlende aktuelle Labels",
+          "note": "Factrel/Lutrelef sind Identity-Aliase. FDA 404 und EMA lutrelef 404 sind keine globale Nicht-Zulassung. 1331 CT.gov-Treffer ohne „gonadorelin“ im Titel dürfen nicht als Studienlage gelten. Nächste Recherche: Title-restricted PubMed und alternative EPAR-Slugs.",
+          "sourceIds": [
+            "fda-none-gonadorelin",
+            "ct-count-gonadorelin",
+            "pm-count-gonadorelin"
+          ]
+        }
+      ],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified",
+        "fda": "Checked — no Drugs@FDA match",
+        "ema": "Unavailable",
+        "clinicalTrials": 1331,
+        "pubmed": 95,
+        "scientific": 0,
+        "community": "Unavailable",
+        "conflicts": 0
+      }
+    },
+    "melanotan-ii": {
+      "slug": "melanotan-ii",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "F",
+      "confidenceLevel": "low",
+      "regulatoryStatus": "investigational",
+      "reviewStatus": "review-recommended",
+      "regulatoryRegions": [],
+      "identity": {
+        "verified": true,
+        "casNumber": "121062-08-6",
+        "chemicalClass": "melanocortin receptor agonist",
+        "moleculeType": "peptide",
+        "identityNote": "Melanotan II (PubChem CID 92432) ist nicht Afamelanotid/Scenesse (NDP-MSH). Der einzige CT.gov-Treffer NCT07437560 (Hudson Biotech) wird nicht veröffentlicht."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "not-found",
+          "note": "No matches found!"
+        },
+        {
+          "id": "ema",
+          "status": "unavailable",
+          "note": "EMA-Connector in diesem Batch nicht für diese Substanz abgefragt"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "checked",
+          "note": "1 studies for query melanotan II"
+        },
+        {
+          "id": "pubmed",
+          "status": "checked",
+          "note": "26 publications for filtered query"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "Melanotan II ist ein melanotropes Analog, das in Entwicklungsübersichten neben Melanotan-I beschrieben wird. Keine FDA-Zulassung in dieser Abfrage. Nicht mit Afamelanotid gleichsetzen.",
+          "sourceIds": [
+            "pmid-9760697",
+            "pubchem-melanotan-ii",
+            "fda-none-melanotan-ii"
+          ]
+        },
+        "mechanism": {
+          "text": "Die zitierte Entwicklungsübersicht ordnet Melanotan-I und -II melanogenen Forschungsprogrammen zu; das ist keine aktuelle Fachinformation.",
+          "sourceIds": [
+            "pmid-9760697"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "ClinicalTrials.gov: 1 Treffer (NCT07437560, Hudson Biotech) — ausgeschlossen. PubMed-Query: 26 Treffer; titelgeprüft u. a. Entwicklungsreview und ein Case Report zu Melanotan-assoziiertem Melanoma in situ.",
+          "sourceIds": [
+            "ct-count-melanotan-ii",
+            "pm-count-melanotan-ii",
+            "pmid-9760697",
+            "pmid-22724573"
+          ]
+        },
+        "humanEvidence": {
+          "text": "Keine validierte registrierte Humanstudie in diesem Scan. Ein Case Report beschreibt Melanoma in situ im Zusammenhang mit Melanotan — das ist keine Wirksamkeits-Evidenz und keine Häufigkeitsangabe.",
+          "sourceIds": [
+            "pmid-22724573",
+            "ct-count-melanotan-ii",
+            "fda-none-melanotan-ii"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "Historische Entwicklungsarbeiten existieren; in diesem Scan keine separat als RCT kuratierte Präklinik-Primärquelle neben dem Review.",
+          "sourceIds": [
+            "pmid-9760697"
+          ]
+        },
+        "safety": {
+          "text": "Keine FDA-Fachinformation. Der Case Report ist ein humanes Sicherheitssignal auf Einzelfallniveau, kein Beleg für Inzidenz.",
+          "sourceIds": [
+            "fda-none-melanotan-ii",
+            "pmid-22724573"
+          ]
+        },
+        "currentResearch": {
+          "text": "Kein veröffentlichtes CT.gov-Programm nach Ausschluss des Hudson-Records (28.08.2026).",
+          "sourceIds": [
+            "ct-count-melanotan-ii"
+          ]
+        },
+        "unknowns": {
+          "text": "Belastbare Human-Sicherheits- und Wirksamkeitsdaten, PK und Zulassung fehlen in den geprüften Quellen. Scenesse-Daten gelten nicht automatisch.",
+          "sourceIds": [
+            "fda-none-melanotan-ii",
+            "ct-count-melanotan-ii"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "human",
+          "severity": "unknown",
+          "text": "Keine Label-Sicherheitsliste. Case Report: Melanotan-assoziiertes Melanoma in situ (Einzelfall).",
+          "sourceIds": [
+            "fda-none-melanotan-ii",
+            "pmid-22724573"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "unknown",
+          "text": "Keine etablierte Interaktionsliste identifiziert.",
+          "sourceIds": [
+            "fda-none-melanotan-ii"
+          ]
+        }
+      ],
+      "reconstitution": null,
+      "studies": [],
+      "sources": [
+        {
+          "id": "ct-count-melanotan-ii",
+          "title": "ClinicalTrials.gov search: melanotan II",
+          "url": "https://clinicaltrials.gov/search?term=melanotan%20II",
+          "publisher": "ClinicalTrials.gov",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pm-count-melanotan-ii",
+          "title": "PubMed search: melanotan II AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=melanotan%20II%20AND%20(clinical%20trial%20OR%20randomized%20OR%20safety%20OR%20pharmacokinetics%20OR%20systematic%20review)",
+          "publisher": "NCBI PubMed",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "fda-none-melanotan-ii",
+          "title": "openFDA Drugs@FDA: no product match for melanotan",
+          "url": "https://open.fda.gov/apis/drug/drugsfda/",
+          "publisher": "openFDA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        },
+        {
+          "id": "pubchem-melanotan-ii",
+          "title": "PubChem CID 92432 (CAS 121062-08-6)",
+          "url": "https://pubchem.ncbi.nlm.nih.gov/compound/92432",
+          "publisher": "NCBI PubChem",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-9760697",
+          "title": "Discovery and development of novel melanogenic drugs. Melanotan-I and -II.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9760697/",
+          "publisher": "Pharm Biotechnol",
+          "publicationDate": "1998",
+          "accessDate": "2026-08-28",
+          "doi": "10.1007/0-306-47384-4_25",
+          "pmid": "9760697",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-22724573",
+          "title": "Melanotan-associated melanoma in situ.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22724573/",
+          "publisher": "Australas J Dermatol",
+          "publicationDate": "2012 Nov",
+          "accessDate": "2026-08-28",
+          "doi": "10.1111/j.1440-0960.2012.00915.x",
+          "pmid": "22724573",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pmid-8637402",
+          "title": "Evaluation of melanotan-II, a superpotent cyclic melanotropic peptide in a pilot phase-I clinical study.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/8637402/",
+          "publisher": "Life Sci",
+          "publicationDate": "1996",
+          "accessDate": "2026-08-28",
+          "doi": "10.1016/0024-3205(96)00160-9",
+          "pmid": "8637402",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pmid-32674774",
+          "title": "Combining MALDI mass spectrometry imaging and droplet-base surface sampling analysis for tissue distribution, metabolite profiling, and relative quantification of cyclic peptide melanotan II.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32674774/",
+          "publisher": "Anal Chim Acta",
+          "publicationDate": "2020 Aug 15",
+          "accessDate": "2026-08-28",
+          "doi": "10.1016/j.aca.2020.05.050",
+          "pmid": "32674774",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        }
+      ],
+      "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "mt2-hudson-and-afamelanotide",
+          "priority": "High",
+          "topic": "Hudson-NCT ausgeschlossen; nicht Afamelanotid",
+          "note": "NCT07437560 ist Hudson Biotech und wird nicht veröffentlicht. Melanotan II bleibt von Afamelanotid/Scenesse getrennt. 1 ausgeschlossener CT.gov-Hit ≠ Nachweis fehlender weltweiter Humanforschung, zeigt aber kein valides Registerprogramm in diesem Scan.",
+          "sourceIds": [
+            "ct-count-melanotan-ii",
+            "pmid-9760697"
+          ]
+        }
+      ],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified",
+        "fda": "Checked — no Drugs@FDA match",
+        "ema": "Unavailable",
+        "clinicalTrials": 1,
+        "pubmed": 26,
+        "scientific": 4,
+        "community": "Unavailable",
+        "conflicts": 0
+      }
+    },
+    "glow-blend": {
+      "slug": "glow-blend",
+      "publicationStatus": "published",
+      "lastReviewedAt": "2026-08-28",
+      "lastResearchScanAt": "2026-08-28",
+      "lastCommunityScanAt": null,
+      "evidenceLevel": "F",
+      "confidenceLevel": "insufficient",
+      "regulatoryStatus": "insufficient",
+      "reviewStatus": "fresh",
+      "regulatoryRegions": [],
+      "identity": {
+        "verified": true,
+        "casNumber": null,
+        "chemicalClass": "product blend (GHK-Cu + TB-500 + BPC-157)",
+        "moleculeType": "blend",
+        "identityNote": "Shop-Blend, keine eigenständige wissenschaftliche INN. Wissenschaftliche Aussagen stehen auf den Komponentenprofilen GHK-Cu, TB-500 und BPC-157. TB-500 bleibt von Thymosin Beta-4 getrennt."
+      },
+      "connectors": [
+        {
+          "id": "fda",
+          "status": "not-found",
+          "note": "Blend not queried as a unique NDA/INN"
+        },
+        {
+          "id": "ema",
+          "status": "unavailable",
+          "note": "No blend EPAR"
+        },
+        {
+          "id": "bfarm",
+          "status": "unavailable",
+          "note": "BfArM-Connector nicht konfiguriert"
+        },
+        {
+          "id": "mhra",
+          "status": "unavailable",
+          "note": "MHRA-Connector nicht konfiguriert"
+        },
+        {
+          "id": "clinicaltrials",
+          "status": "unavailable",
+          "note": "Blends are not unique trial interventions in this catalog"
+        },
+        {
+          "id": "pubmed",
+          "status": "unavailable",
+          "note": "Literature is attached to component substances"
+        },
+        {
+          "id": "reddit",
+          "status": "unavailable",
+          "note": "Reddit community data temporarily unavailable."
+        }
+      ],
+      "summary": {
+        "whatIsIt": {
+          "text": "GHK-Cu + TB-500 + BPC-157 ist ein Shop-Produktblend aus drei getrennten Substanzen. Es wird nicht als eigenes INN oder als synergistisches Arzneimittel recherchiert.",
+          "sourceIds": [
+            "identity-glow-blend",
+            "pubchem-ghk-cu-component",
+            "pubchem-tb-500-component",
+            "pubchem-bpc-157-component"
+          ]
+        },
+        "mechanism": {
+          "text": "Es gibt keinen blend-eigenen, behördlich geprüften Mechanismus. Mechanismen — sofern belegt — stehen in den Komponentenprofilen.",
+          "sourceIds": [
+            "identity-glow-blend",
+            "pubchem-ghk-cu-component",
+            "pubchem-tb-500-component",
+            "pubchem-bpc-157-component"
+          ]
+        },
+        "whatHasBeenStudied": {
+          "text": "Studien und Labels wurden nicht dem Blend als Ganzes zugeordnet. Siehe GHK-Cu, TB-500 und BPC-157.",
+          "sourceIds": [
+            "identity-glow-blend"
+          ]
+        },
+        "humanEvidence": {
+          "text": "Keine Humanevidenz für die Dreierkombination als eigene Intervention in diesem Scan. Komponenten-Evidenz darf nicht addiert werden.",
+          "sourceIds": [
+            "identity-glow-blend",
+            "fda-none-glow-blend"
+          ]
+        },
+        "preclinicalEvidence": {
+          "text": "Keine Blend-Präklinik kuratiert.",
+          "sourceIds": [
+            "identity-glow-blend"
+          ]
+        },
+        "safety": {
+          "text": "Keine Fachinformation für das Blend. Sicherheitsdaten der Komponenten gelten nicht automatisch für die Kombination.",
+          "sourceIds": [
+            "fda-none-glow-blend"
+          ]
+        },
+        "currentResearch": {
+          "text": "Kein eigenes CT.gov-/Label-Programm für diesen Shop-Blend identifiziert.",
+          "sourceIds": [
+            "fda-none-glow-blend"
+          ]
+        },
+        "unknowns": {
+          "text": "Wechselwirkungen der drei Peptide in einer gemeinsamen Zubereitung, Dosierung und Qualität von Research-Blends sind nicht regulatorisch bewertet.",
+          "sourceIds": [
+            "fda-none-glow-blend",
+            "identity-glow-blend"
+          ]
+        }
+      },
+      "pharmacology": [],
+      "safetyItems": [
+        {
+          "domain": "theoretical",
+          "severity": "unknown",
+          "text": "Keine Label-Sicherheitsliste für das Blend; Komponentenprofile nicht als Kombinationssicherheit lesen.",
+          "sourceIds": [
+            "fda-none-glow-blend",
+            "identity-glow-blend"
+          ]
+        }
+      ],
+      "interactions": [
+        {
+          "category": "unknown",
+          "text": "Keine etablierte Interaktionsliste für die Dreierkombination identifiziert.",
+          "sourceIds": [
+            "fda-none-glow-blend"
+          ]
+        }
+      ],
+      "reconstitution": null,
+      "studies": [],
+      "sources": [
+        {
+          "id": "identity-glow-blend",
+          "title": "Identity mapping: shop blend GHK-Cu + TB-500 + BPC-157 (not a unique INN)",
+          "url": "https://pubchem.ncbi.nlm.nih.gov/",
+          "publisher": "Peptix identity catalog",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 3
+        },
+        {
+          "id": "pubchem-ghk-cu-component",
+          "title": "Component identity GHK-Cu: PubChem CID 139035031",
+          "url": "https://pubchem.ncbi.nlm.nih.gov/compound/139035031",
+          "publisher": "NCBI PubChem",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pubchem-tb-500-component",
+          "title": "Component identity TB-500: PubChem CID 62707662 (CAS 885340-08-9)",
+          "url": "https://pubchem.ncbi.nlm.nih.gov/compound/62707662",
+          "publisher": "NCBI PubChem",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 4
+        },
+        {
+          "id": "pubchem-bpc-157-component",
+          "title": "Component identity BPC-157: PubChem CID 9941957 (CAS 137525-51-0)",
+          "url": "https://pubchem.ncbi.nlm.nih.gov/compound/9941957",
+          "publisher": "NCBI PubChem",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "scientific",
+          "sourceQuality": 4
+        },
+        {
+          "id": "fda-none-glow-blend",
+          "title": "openFDA Drugs@FDA: blend products are not a unique INN; no blend NDA searched as a single substance",
+          "url": "https://open.fda.gov/apis/drug/drugsfda/",
+          "publisher": "openFDA",
+          "publicationDate": null,
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": null,
+          "sourceType": "regulatory",
+          "sourceQuality": 5
+        }
+      ],
+      "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "glow-blend-components-only",
+          "priority": "Low",
+          "topic": "Wissenschaft nur über Komponenten",
+          "note": "Research Complete für den Blend bedeutet: Identity und Mapping geprüft, keine Pseudo-INN-Recherche. Neue wissenschaftliche Aussagen gehören in die drei Komponentenprofile.",
+          "sourceIds": [
+            "identity-glow-blend",
+            "pubchem-ghk-cu-component",
+            "pubchem-tb-500-component",
+            "pubchem-bpc-157-component"
+          ]
+        }
+      ],
+      "community": {
+        "available": false,
+        "message": "Reddit community data temporarily unavailable."
+      },
+      "researchReport": {
+        "identity": "Verified (blend mapping)",
+        "fda": "Checked — blend is not a unique INN",
+        "ema": "Unavailable",
+        "clinicalTrials": 0,
+        "pubmed": 0,
+        "scientific": 0,
+        "community": "Unavailable",
+        "conflicts": 0
+      }
     }
   }
 }

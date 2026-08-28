@@ -1,0 +1,328 @@
+{
+  "slug": "melanotan-ii",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "melanotan II",
+    "melanotan-II",
+    "MT-II"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "melanotan II",
+      "totalCount": 1,
+      "studies": [
+        {
+          "nctId": "NCT07437560",
+          "title": "Melanotan II (MT-II) as an Adjunct to NB-UVB Phototherapy for Repigmentation in Stable Nonsegmental Vitiligo",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Hudson Biotech",
+          "enrollment": 60,
+          "start": "2026-02-02",
+          "completion": "2028-02-17",
+          "lastUpdate": "2026-02-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07437560"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "melanotan II AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 26,
+      "articles": [
+        {
+          "pmid": "12574617",
+          "title": "Having it all.",
+          "source": "Science",
+          "pubdate": "2003 Feb 7",
+          "authors": [
+            "Gura T"
+          ],
+          "pubtype": [
+            "News"
+          ],
+          "doi": "10.1126/science.299.5608.850",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/12574617/"
+        },
+        {
+          "pmid": "9760697",
+          "title": "Discovery and development of novel melanogenic drugs. Melanotan-I and -II.",
+          "source": "Pharm Biotechnol",
+          "pubdate": "1998",
+          "authors": [
+            "Hadley ME",
+            "Hruby VJ",
+            "Blanchard J",
+            "Dorr RT",
+            "Levine N",
+            "Dawson BV"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, U.S. Gov't, P.H.S.",
+            "Review"
+          ],
+          "doi": "10.1007/0-306-47384-4_25",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9760697/"
+        },
+        {
+          "pmid": "22724573",
+          "title": "Melanotan-associated melanoma in situ.",
+          "source": "Australas J Dermatol",
+          "pubdate": "2012 Nov",
+          "authors": [
+            "Ong S",
+            "Bowling J"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1111/j.1440-0960.2012.00915.x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22724573/"
+        },
+        {
+          "pmid": "39302005",
+          "title": "Barbie drug identification: Not a child's play.",
+          "source": "J Forensic Sci",
+          "pubdate": "2024 Nov",
+          "authors": [
+            "Deville M",
+            "Charlier C"
+          ],
+          "pubtype": [
+            "Case Reports",
+            "Journal Article"
+          ],
+          "doi": "10.1111/1556-4029.15633",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39302005/"
+        },
+        {
+          "pmid": "30165334",
+          "title": "Falsification of biotechnology drugs: current dangers and/or future disasters?",
+          "source": "J Pharm Biomed Anal",
+          "pubdate": "2018 Nov 30",
+          "authors": [
+            "Janvier S",
+            "De Spiegeleer B",
+            "Vanhee C",
+            "Deconinck E"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1016/j.jpba.2018.08.037",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30165334/"
+        },
+        {
+          "pmid": "41890775",
+          "title": "Insights into Tanning Biology and Tanning Products.",
+          "source": "J Clin Aesthet Dermatol",
+          "pubdate": "2026 Feb",
+          "authors": [
+            "Resnick G",
+            "Khajeh-Afzaly M",
+            "Yousefian F",
+            "Raza A",
+            "Issa NT"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41890775/"
+        },
+        {
+          "pmid": "16422967",
+          "title": "Pharmacotherapy for erectile dysfunction.",
+          "source": "J Sex Med",
+          "pubdate": "2004 Sep",
+          "authors": [
+            "Padma-Nathan H",
+            "Christ G",
+            "Adaikan G",
+            "Becher E",
+            "Brock G",
+            "Carrier S"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1111/j.1743-6109.2004.04021.x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16422967/"
+        },
+        {
+          "pmid": "20545686",
+          "title": "Melanotropic peptides: more than just 'Barbie drugs' and 'sun-tan jabs'?",
+          "source": "Br J Dermatol",
+          "pubdate": "2010 Sep",
+          "authors": [
+            "Langan EA",
+            "Nie Z",
+            "Rhodes LE"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1111/j.1365-2133.2010.09891.x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20545686/"
+        },
+        {
+          "pmid": "16412534",
+          "title": "Melanocortin peptide therapeutics: historical milestones, clinical studies and commercialization.",
+          "source": "Peptides",
+          "pubdate": "2006 Apr",
+          "authors": [
+            "Hadley ME",
+            "Dorr RT"
+          ],
+          "pubtype": [
+            "Historical Article",
+            "Journal Article",
+            "Research Support, N.I.H., Extramural",
+            "Research Support, Non-U.S. Gov't",
+            "Review"
+          ],
+          "doi": "10.1016/j.peptides.2005.01.029",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16412534/"
+        },
+        {
+          "pmid": "28266027",
+          "title": "Risks of unregulated use of alpha-melanocyte-stimulating hormone analogues: a review.",
+          "source": "Int J Dermatol",
+          "pubdate": "2017 Oct",
+          "authors": [
+            "Habbema L",
+            "Halk AB",
+            "Neumann M",
+            "Bergman W"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1111/ijd.13585",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28266027/"
+        },
+        {
+          "pmid": "26806443",
+          "title": "The injecting use of image and performance-enhancing drugs (IPED) in the general population: a systematic review.",
+          "source": "Health Soc Care Community",
+          "pubdate": "2017 Sep",
+          "authors": [
+            "Brennan R",
+            "Wells JSG",
+            "Van Hout MC"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.1111/hsc.12326",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26806443/"
+        },
+        {
+          "pmid": "23774329",
+          "title": "The melanocortin-4 receptor as target for obesity treatment: a systematic review of emerging pharmacological therapeutic options.",
+          "source": "Int J Obes (Lond)",
+          "pubdate": "2014 Feb",
+          "authors": [
+            "Fani L",
+            "Bak S",
+            "Delhanty P",
+            "van Rossum EF",
+            "van den Akker EL"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.1038/ijo.2013.80",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23774329/"
+        },
+        {
+          "pmid": "8637402",
+          "title": "Evaluation of melanotan-II, a superpotent cyclic melanotropic peptide in a pilot phase-I clinical study.",
+          "source": "Life Sci",
+          "pubdate": "1996",
+          "authors": [
+            "Dorr RT",
+            "Lines R",
+            "Levine N",
+            "Brooks C",
+            "Xiang L",
+            "Hruby VJ"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Clinical Trial, Phase I",
+            "Controlled Clinical Trial",
+            "Journal Article",
+            "Research Support, U.S. Gov't, P.H.S."
+          ],
+          "doi": "10.1016/0024-3205(96)00160-9",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/8637402/"
+        },
+        {
+          "pmid": "32674774",
+          "title": "Combining MALDI mass spectrometry imaging and droplet-base surface sampling analysis for tissue distribution, metabolite profiling, and relative quantification of cyclic peptide melanotan II.",
+          "source": "Anal Chim Acta",
+          "pubdate": "2020 Aug 15",
+          "authors": [
+            "Chen B",
+            "Vavrek M",
+            "Gundersdorf R",
+            "Zhong W",
+            "Cancilla MT"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1016/j.aca.2020.05.050",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32674774/"
+        },
+        {
+          "pmid": "26344647",
+          "title": "Inconsistencies in the hypophagic action of intracerebroventricular insulin in mice.",
+          "source": "Physiol Behav",
+          "pubdate": "2015 Nov 1",
+          "authors": [
+            "Mc Allister E",
+            "Pacheco-Lopez G",
+            "Woods SC",
+            "Langhans W"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, N.I.H., Extramural"
+          ],
+          "doi": "10.1016/j.physbeh.2015.08.038",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26344647/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "melanotan",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 92432,
+      "cas": "121062-08-6",
+      "formula": "C50H69N15O9",
+      "iupac": "(3S,6S,9R,12S,15S,23S)-15-[[(2S)-2-acetamidohexanoyl]amino]-9-benzyl-6-[3-(diaminomethylideneamino)propyl]-12-(1H-imidazol-5-ylmethyl)-3-(1H-indol-3-ylmethyl)-2,5,8,11,14,17-hexaoxo-1,4,7,10,13,18-hexazacyclotricosane-23-carboxamide"
+    }
+  }
+}

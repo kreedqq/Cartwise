@@ -1,0 +1,173 @@
+{
+  "slug": "kpv",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "KPV peptide",
+    "\"Lys-Pro-Val\""
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "KPV peptide",
+      "totalCount": 0,
+      "studies": []
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "KPV peptide AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 7,
+      "articles": [
+        {
+          "pmid": "41880199",
+          "title": "A new era of doping? Use of peptide and peptide-analog drugs in recreational and professional sport and bodybuilding: a critical review.",
+          "source": "J Sports Med Phys Fitness",
+          "pubdate": "2026 Jul",
+          "authors": [
+            "Coutinho LFD",
+            "DE Oliveira Neves LF",
+            "Camilo RP"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.23736/S0022-4707.26.17773-1",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41880199/"
+        },
+        {
+          "pmid": "39252648",
+          "title": "KPV and RAPA Self-Assembled into Carrier-Free Nanodrugs for Vascular Calcification Therapy.",
+          "source": "Adv Healthc Mater",
+          "pubdate": "2024 Dec",
+          "authors": [
+            "Zhang L",
+            "Li D",
+            "Aierken Y",
+            "Zhang J",
+            "Liu Z",
+            "Lin Z"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1002/adhm.202402320",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39252648/"
+        },
+        {
+          "pmid": "28343991",
+          "title": "Transdermal Iontophoretic Delivery of Lysine-Proline-Valine (KPV) Peptide Across Microporated Human Skin.",
+          "source": "J Pharm Sci",
+          "pubdate": "2017 Jul",
+          "authors": [
+            "Pawar K",
+            "Kolli CS",
+            "Rangari VK",
+            "Babu RJ"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, U.S. Gov't, Non-P.H.S."
+          ],
+          "doi": "10.1016/j.xphs.2017.03.017",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28343991/"
+        },
+        {
+          "pmid": "21222263",
+          "title": "Terminal signal: anti-inflammatory effects of α-melanocyte-stimulating hormone related peptides beyond the pharmacophore.",
+          "source": "Adv Exp Med Biol",
+          "pubdate": "2010",
+          "authors": [
+            "Brzoska T",
+            "Böhm M",
+            "Lügering A",
+            "Loser K",
+            "Luger TA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/978-1-4419-6354-3_8",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21222263/"
+        },
+        {
+          "pmid": "18061177",
+          "title": "PepT1-mediated tripeptide KPV uptake reduces intestinal inflammation.",
+          "source": "Gastroenterology",
+          "pubdate": "2008 Jan",
+          "authors": [
+            "Dalmasso G",
+            "Charrier-Hisamuddin L",
+            "Nguyen HT",
+            "Yan Y",
+            "Sitaraman S",
+            "Merlin D"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, N.I.H., Extramural"
+          ],
+          "doi": "10.1053/j.gastro.2007.10.026",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18061177/"
+        },
+        {
+          "pmid": "29953505",
+          "title": "Structural modification of the tripeptide KPV by reductive \"glycoalkylation\" of the lysine residue.",
+          "source": "PLoS One",
+          "pubdate": "2018",
+          "authors": [
+            "Songok AC",
+            "Panta P",
+            "Doerrler WT",
+            "Macnaughtan MA",
+            "Taylor CM"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1371/journal.pone.0199686",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29953505/"
+        },
+        {
+          "pmid": "11990926",
+          "title": "Changes in glucocorticoid and mineralocorticoid receptors of liver and kidney cytosols after pathologic stress and its regulation in rats.",
+          "source": "Crit Care Med",
+          "pubdate": "2002 Mar",
+          "authors": [
+            "Liu DH",
+            "Su YP",
+            "Zhang W",
+            "Lu SF",
+            "Ran XZ",
+            "Gao JS"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1097/00003246-200203000-00022",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11990926/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "KPV",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 404,
+      "httpStatus": 404,
+      "ok": false,
+      "cid": null,
+      "cas": null,
+      "formula": null,
+      "iupac": null
+    }
+  }
+}

@@ -69,7 +69,19 @@ Postgres `products`. Lexicon only stores `PeptideProductRef` (code, name, streng
 
 Curated in `published.json`: title, URL, publisher, dates, DOI, PMID, NCT, `sourceType`, `sourceQuality` 1–5, `accessDate`. Search-count rows are `scientific` (not primary trials). Community types: blog, reddit, forum, community.
 
-Approved-label profiles store `regulatoryRegions` (e.g. US, EU). Audit findings that are not auto-resolved are `reviewItems` (priority, topic, note, sourceIds) and appear in Admin Research.
+Approved-label profiles store `regulatoryRegions` (e.g. US, EU). Audit findings that are not auto-resolved are `reviewItems` (priority, topic, note, sourceIds) and appear in Admin Research. Batch 02 compile applies title/sponsor filters (`keepStudy` / `keepArticle`) so noisy CT.gov/PubMed hits are not published. Shop blends (`glow-blend`) compile as mapping-only profiles, not unique INNs.
+
+**Completeness vs review (two layers, not one enum):**
+
+There is **no** TypeScript field `researchComplete` / `partial`. Published profiles store `reviewStatus`: `fresh` | `recently-updated` | `review-recommended` | `review-required` | `incomplete`.
+
+Batch reports may also assign a **mutually exclusive primary research status** (documentation only):
+
+1. If `reviewStatus === "review-required"` → **Review Required** (wins even if the file is otherwise thin or well sourced).
+2. Else if validated substance-specific literature/trials are too thin or too noisy → **Partial**.
+3. Else (workflow done: identity, sources, evidence, regulatory without inventing “not approved”, citations, `lastReviewedAt`) → **Research Complete**.
+
+`review-recommended` is **not** Review Required. A substance is not counted twice: gonadorelin is Review Required (and the file is also thin); thymosin-alpha-1 is Review Required (workflow otherwise complete); igf-1-lr3 is Partial (`review-recommended` only).
 
 ### STUDY (`ProfileStudy` / `PeptideStudy`)
 
@@ -102,7 +114,7 @@ Scientific (browser stubs): FDA, EMA, BfArM, MHRA, ClinicalTrials.gov, PubMed, l
 
 Community stubs: Reddit, forum, blog.
 
-Node (not bundled as live client calls): `scripts/fetch-research-sources.mjs`, `scripts/fetch-regulatory-labels.mjs`, `scripts/compile-research-profiles.mjs`.
+Node (not bundled as live client calls): `scripts/fetch-research-sources.mjs` (`batch01` / `batch02` / `all`), `scripts/fetch-regulatory-labels.mjs`, `scripts/compile-research-profiles.mjs` + `scripts/research-batch-02-curated.mjs`.
 
 ## Caching
 

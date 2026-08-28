@@ -1,0 +1,80 @@
+{
+  "slug": "igf-1-lr3",
+  "accessDate": "2026-08-28",
+  "queries": [
+    "IGF-1 LR3",
+    "\"Long R3 IGF-1\"",
+    "\"IGF-I Long R3\""
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "IGF-1 LR3",
+      "totalCount": 0,
+      "studies": []
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "IGF-1 LR3 AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 2,
+      "articles": [
+        {
+          "pmid": "42395176",
+          "title": "The emerging landscape of performance-enhancing peptides modulating GH-IGF1 axis: bridging the gap between clinical evidence and patient self-administration.",
+          "source": "Front Endocrinol (Lausanne)",
+          "pubdate": "2026",
+          "authors": [
+            "Dominikowski A",
+            "Rękoś Z",
+            "Olejarz M",
+            "Szczepanek-Parulska E",
+            "Domin R",
+            "RuchaŁa M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3389/fendo.2026.1822475",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42395176/"
+        },
+        {
+          "pmid": "22227200",
+          "title": "Na+ transport across rumen epithelium of hay-fed sheep is acutely stimulated by the peptide IGF-1 in vitro.",
+          "source": "Exp Physiol",
+          "pubdate": "2012 Apr",
+          "authors": [
+            "Shen Z",
+            "Martens H",
+            "Schweigel-Röntgen M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1113/expphysiol.2011.061580",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22227200/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "IGF-1 LR3",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 404,
+      "httpStatus": 404,
+      "ok": false,
+      "cid": null,
+      "cas": null,
+      "formula": null,
+      "iupac": null
+    }
+  }
+}

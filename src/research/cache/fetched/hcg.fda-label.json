@@ -1,0 +1,57 @@
+{
+  "name": "hcg",
+  "query": "chorionic gonadotropin",
+  "status": 200,
+  "labels": [
+    {
+      "id": "312ef3fd-bb47-dd83-e063-6294a90a262a",
+      "setId": "312ee87a-c6c3-6111-e063-6394a90ad8d7",
+      "effectiveTime": "20250325",
+      "brand": [
+        "Chorionic Gonadotropin"
+      ],
+      "generic": [
+        "CHORIONIC GONADOTROPIN"
+      ],
+      "manufacturer": [
+        "NuCare Pharmaceuticals,Inc."
+      ],
+      "application": [
+        "BLA017067"
+      ],
+      "route": [],
+      "indications": "INDICATIONS AND USAGE: HCG HAS NOT BEEN DEMONSTRATED TO BE EFFECTIVE ADJUNCTIVE THERAPY IN THE TREATMENT OF OBESITY. THERE IS NO SUBSTANTIAL EVIDENCE THAT IT INCREASES WEIGHT LOSS BEYOND THAT RESULTING FROM CALORIC RESTRICTION, THAT IT CAUSES A MORE ATTRACTIVE OR ‘‘NORMAL’’ DISTRIBUTION OF FAT, OR THAT IT DECREASES THE HUNGER AND DISCOMFORT ASSOCIATED WITH CALORIE-RESTRICTED DIETS. Prepubertal cryptorchidism not due to anatomical obstruction. In general, HCG is thought to induce testicular desce",
+      "boxedWarning": null,
+      "contraindications": "CONTRAINDICATIONS: Precocious puberty, prostatic carcinoma or other androgen-dependent neoplasm, prior allergic reaction to HCG.",
+      "warnings": "WARNINGS: HCG should be used in conjunction with human menopausal gonadotropins only by physicians experienced with infertility problems who are familiar with the criteria for patient selection, contraindications, warnings, precautions and adverse reactions described in the package insert for menotropins. The principal serious adverse reactions are: (1) Ovarian hyperstimulation, a syndrome of sudd",
+      "adverse": "ADVERSE REACTIONS: Headache, irritability, restlessness, depression, fatigue, edema, precocious puberty, gynecomastia and pain at the site of injection.",
+      "clinicalPharm": "CLINICAL PHARMACOLOGY: The action of HCG is virtually identical to that of pituitary LH, although HCG appears to have a small degree of FSH activity as well. It stimulates production of gonadal steroid hormones by stimulating the interstitial cells (Leydig cells) of the testis to produce androgens and the corpus luteum of the ovary to produce progesterone. Androgen stimulation in the male leads to",
+      "dosageAdmin": "DOSAGE AND ADMINISTRATION: Intramuscular Use Only The dosage regimen employed in any particular case will depend upon the indication for use, the age and weight of the patient and the physician’s preference. The following regimens have been advocated by various authorities. Prepubertal Cryptorchidis"
+    },
+    {
+      "id": "386cd061-6485-428c-aec1-a4f58d90d339",
+      "setId": "f93b2baa-03ac-4650-b35a-20b818d712d6",
+      "effectiveTime": "20250411",
+      "brand": [
+        "Chorionic Gonadotropin"
+      ],
+      "generic": [
+        "CHORIONIC GONADOTROPIN"
+      ],
+      "manufacturer": [
+        "Fresenius Kabi USA, LLC"
+      ],
+      "application": [
+        "BLA017067"
+      ],
+      "route": [],
+      "indications": "INDICATIONS AND USAGE: HCG HAS NOT BEEN DEMONSTRATED TO BE EFFECTIVE ADJUNCTIVE THERAPY IN THE TREATMENT OF OBESITY. THERE IS NO SUBSTANTIAL EVIDENCE THAT IT INCREASES WEIGHT LOSS BEYOND THAT RESULTING FROM CALORIC RESTRICTION, THAT IT CAUSES A MORE ATTRACTIVE OR ‘‘NORMAL’’ DISTRIBUTION OF FAT, OR THAT IT DECREASES THE HUNGER AND DISCOMFORT ASSOCIATED WITH CALORIE-RESTRICTED DIETS. 1. Prepubertal cryptorchidism not due to anatomical obstruction. In general, HCG is thought to induce testicular de",
+      "boxedWarning": null,
+      "contraindications": "CONTRAINDICATIONS: Precocious puberty, prostatic carcinoma or other androgen-dependent neoplasm, prior allergic reaction to HCG.",
+      "warnings": "WARNINGS: HCG should be used in conjunction with human menopausal gonadotropins only by physicians experienced with infertility problems who are familiar with the criteria for patient selection, contraindications, warnings, precautions and adverse reactions described in the package insert for menotropins. The principal serious adverse reactions are: (1) Ovarian hyperstimulation, a syndrome of sudd",
+      "adverse": "ADVERSE REACTIONS: Headache, irritability, restlessness, depression, fatigue, edema, precocious puberty, gynecomastia and pain at the site of injection.",
+      "clinicalPharm": "CLINICAL PHARMACOLOGY: The action of HCG is virtually identical to that of pituitary LH, although HCG appears to have a small degree of FSH activity as well. It stimulates production of gonadal steroid hormones by stimulating the interstitial cells (Leydig cells) of the testis to produce androgens and the corpus luteum of the ovary to produce progesterone. Androgen stimulation in the male leads to",
+      "dosageAdmin": "DOSAGE AND ADMINISTRATION: Intramuscular Use Only The dosage regimen employed in any particular case will depend upon the indication for use, the age and weight of the patient and the physician’s preference. The following regimens have been advocated by various authorities. Prepubertal Cryptorchidis"
+    }
+  ]
+}

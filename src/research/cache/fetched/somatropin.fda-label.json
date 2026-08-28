@@ -1,0 +1,88 @@
+{
+  "name": "somatropin",
+  "query": "somatropin",
+  "status": 200,
+  "labels": [
+    {
+      "id": "b67c2419-4feb-4ce1-b97e-88760a8e1aee",
+      "setId": "1058e17c-9261-459c-a3e6-fae38d196c14",
+      "effectiveTime": "20250707",
+      "brand": [
+        "Norditropin"
+      ],
+      "generic": [
+        "SOMATROPIN"
+      ],
+      "manufacturer": [
+        "Novo Nordisk"
+      ],
+      "application": [
+        "BLA021148"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE NORDITROPIN is a recombinant human growth hormone indicated for: • Pediatric : Treatment of pediatric patients with growth failure due to inadequate secretion of endogenous growth hormone (GH), short stature associated with Noonan syndrome, short stature associated with Turner syndrome, short stature born small for gestational age (SGA) with no catch-up growth by age 2 to 4 years, Idiopathic Short Stature (ISS), and growth failure due to Prader-Willi Syndrome ( 1.1 ) • Ad",
+      "boxedWarning": null,
+      "contraindications": "4 CONTRAINDICATIONS NORDITROPIN is contraindicated in patients with: • Acute critical illness after open heart surgery, abdominal surgery or multiple accidental trauma, or those with acute respiratory failure due to the risk of increased mortality with use of pharmacologic doses of somatropin [see Warnings and Precautions (5.1) ]. • Pediatric patients with Prader-Willi syndrome who are severely ob",
+      "warnings": "5 WARNINGS AND PRECAUTIONS • Increased Risk of Neoplasms : Second neoplasms have occurred in childhood cancer survivors. Monitor patients with preexisting tumors for progression or recurrence. ( 5.3 ) • Glucose Intolerance and Diabetes Mellitus : NORDITROPIN may decrease insulin sensitivity, particularly at higher doses. Monitor glucose levels periodically in all patients receiving NORDITROPIN, es",
+      "adverse": "6 ADVERSE REACTIONS The following important adverse reactions are also described elsewhere in the labeling: • Increased mortality in patients with acute critical illness [see Warnings and Precautions (5.1) ] • Sudden death in children with Prader-Willi syndrome [see Warnings and Precautions (5.2) ] • Neoplasms [see Warnings and Precautions (5.3) ] • Glucose intolerance and diabetes mellitus [see W",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Somatropin binds to dimeric GH receptors located within the cell membranes of target tissue cells. This interaction results in intracellular signal transduction and subsequent induction of transcription and translation of GH-dependent proteins including IGF-1, IGF BP-3 and acid-labile subunit. Somatropin has direct tissue and metabolic effects or m",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION • Administer by subcutaneous injection to the back of upper arm, abdomen, buttock, or thigh with regular rotation of injection sites ( 2.1 ) • Pediatric Dosage - divide the calculated weekly dosage into equal doses given either 6, or 7 days per week o GHD: 0.17 mg/kg/week"
+    },
+    {
+      "id": "22eba20c-aa55-440d-846e-a1235440fecb",
+      "setId": "58d84ffa-4056-4e36-ad67-7bd4aef444a5",
+      "effectiveTime": "20250710",
+      "brand": [
+        "Omnitrope"
+      ],
+      "generic": [
+        "SOMATROPIN"
+      ],
+      "manufacturer": [
+        "Sandoz Inc"
+      ],
+      "application": [
+        "BLA021426"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE OMNITROPE is a recombinant human growth hormone indicated for: • Pediatric: Treatment of children with growth failure due to growth hormone deficiency (GHD), Prader-Willi Syndrome, Small for Gestational Age, Turner Syndrome, and Idiopathic Short Stature ( 1.1 ) • Adult: Treatment of adults with either adult onset or childhood onset GHD ( 1.2 ) 1.1 Pediatric Patients OMNITROPE is indicated for the treatment of children with growth failure due to inadequate secretion of end",
+      "boxedWarning": null,
+      "contraindications": "4 CONTRAINDICATIONS OMNITROPE is contraindicated in patients with: • Acute Critical Illness Treatment with pharmacologic amounts of somatropin is contraindicated in patients with acute critical illness due to complications following open heart surgery, abdominal surgery or multiple accidental trauma, or those with acute respiratory failure [see Warnings and Precautions ( 5.1 )] . • Prader-Willi Sy",
+      "warnings": "5 WARNINGS AND PRECAUTIONS • Acute Critical Illness: Potential benefit of treatment continuation should be weighed against the potential risk ( 5.1 ) • Prader-Willi Syndrome in children: Evaluate for signs of upper airway obstruction and sleep apnea before initiation of treatment. Discontinue treatment if these signs occur ( 5.2 ) • Neoplasm: Monitor patients with preexisting tumors for progressio",
+      "adverse": "6 ADVERSE REACTIONS Other common somatropin-related adverse reactions include injection site reactions/rashes and lipoatrophy ( 6.1 ) and headaches ( 6.2 ). To report SUSPECTED ADVERSE REACTIONS, contact Sandoz Inc. at 1-800-525-8747 or FDA at 1-800-FDA-1088 or http://www.fda.gov/medwatch The following important adverse reactions are also described elsewhere in labeling: • Increased mortality in p",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Somatropin (as well as endogenous GH) binds to a dimeric GH receptor in the cell membrane of target cells resulting in intracellular signal transduction and a host of pharmacodynamic effects. Some of these pharmacodynamic effects are primarily mediated by IGF-1 produced in the liver and also locally (e.g., skeletal growth, protein synthesis), while",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION The weekly dose should be divided over 6 or 7 days of subcutaneous injections. Therapy with OMNITROPE should be supervised by a physician who is experienced in the diagnosis and management of pediatric patients with short stature associated with GHD, Prader-Willi Syndrome"
+    },
+    {
+      "id": "4ca63d8e-15cf-4690-b148-2ad415bd0640",
+      "setId": "62b01d29-90f0-45b2-a0c4-3a750ba36c8a",
+      "effectiveTime": "20260728",
+      "brand": [
+        "Serostim"
+      ],
+      "generic": [
+        "SOMATROPIN"
+      ],
+      "manufacturer": [
+        "EMD Serono, Inc."
+      ],
+      "application": [
+        "BLA020604"
+      ],
+      "route": [
+        "SUBCUTANEOUS"
+      ],
+      "indications": "1 INDICATIONS AND USAGE SEROSTIM (somatropin) is indicated for the treatment of adults with HIV and wasting or cachexia to increase lean body mass and body weight, and improve physical endurance. Concomitant antiretroviral therapy is necessary. SEROSTIM is a human growth hormone (somatropin) indicated for the treatment of adults with HIV and wasting or cachexia to increase lean body mass and body weight, and improve physical endurance ( 1 )",
+      "boxedWarning": null,
+      "contraindications": "4 CONTRAINDICATIONS Acute Critical Illness Growth hormone therapy should not be initiated in patients with acute critical illness due to complications following open heart or abdominal surgery, multiple accidental trauma or acute respiratory failure [see Warnings and Precautions (5.1) ]. Active Malignancy In general, somatropin is contraindicated in the presence of active malignancy. Any preexisti",
+      "warnings": "5 WARNINGS AND PRECAUTIONS Acute Critical Illness: Increased mortality in patients with acute critical illness following open heart surgery, abdominal surgery or multiple accidental trauma, or those with acute respiratory failure has been reported after treatment with pharmacologic amounts of somatropin ( 5.1 ) Concomitant Antiretroviral Therapy: In vitro experimental systems have demonstrated the",
+      "adverse": "6 ADVERSE REACTIONS The following important adverse reactions are also described elsewhere in the labeling: Acute Critical Illness [see Warnings and Precautions (5.1) ] Neoplasms [see Warnings and Precautions (5.3) ] Impaired glucose tolerance and diabetes mellitus [see Warnings and Precautions (5.4) ] Intracranial hypertension [see Warnings and Precautions (5.5) ] Severe hypersensitivity [see War",
+      "clinicalPharm": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Somatropin is an anabolic and anticatabolic agent which exerts its influence by interacting with growth hormone receptors on a variety of cell types including myocytes, hepatocytes, adipocytes, lymphocytes, and hematopoietic cells. Some, but not all of its effects, are mediated by insulin-like growth factor-1 (IGF-1). 12.2 Pharmacodynamics Effects ",
+      "dosageAdmin": "2 DOSAGE AND ADMINISTRATION SEROSTIM is administered by subcutaneous injection. SEROSTIM therapy should be carried out under the regular guidance of a physician who is experienced in the diagnosis and management of HIV infection. The recommended dosage of SEROSTIM is 0.1 mg/kg subcutaneously once da"
+    }
+  ]
+}
