@@ -90,6 +90,9 @@ export default function PeptideLexiconDetailPage() {
         <Badge variant={substance.regulatoryStatus.startsWith("approved") ? "success" : "warning"}>
           {REGULATORY_LABELS[substance.regulatoryStatus]}
         </Badge>
+        {profile?.regulatoryRegions?.length ? (
+          <Badge variant="outline">Region: {profile.regulatoryRegions.join(", ")}</Badge>
+        ) : null}
         <Badge variant="outline">Review: {substance.reviewStatus}</Badge>
       </div>
 
@@ -209,6 +212,19 @@ export default function PeptideLexiconDetailPage() {
               {profile.conflicts.map((item) => (
                 <p key={item.topic} className="text-sm text-muted-foreground">
                   {item.topic}: {item.note} <CiteLinks ids={item.sourceIds} sources={sourceById} />
+                </p>
+              ))}
+            </section>
+          )}
+          {profile.reviewItems.length > 0 && (
+            <section className="space-y-2">
+              <h2 className="text-lg font-semibold">Review Required</h2>
+              {profile.reviewItems.map((item) => (
+                <p key={item.id} className="text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">
+                    {item.priority}: {item.topic}
+                  </span>{" "}
+                  {item.note} <CiteLinks ids={item.sourceIds} sources={sourceById} />
                 </p>
               ))}
             </section>

@@ -30,6 +30,39 @@ describe("published research batch", () => {
     expect(getPublishedProfile("tb-500")?.evidenceLevel).toBe("F");
     expect(getPublishedProfile("tb-500")?.identity.casNumber).toBe("885340-08-9");
     expect(getPublishedProfile("thymosin-beta-4")).toBeUndefined();
+    expect(getPublishedProfile("tb-500")?.studies.some((study) => study.clinicalTrialId === "NCT07487363")).toBe(false);
+    expect(getPublishedProfile("tb-500")?.sources.some((source) => source.clinicalTrialId === "NCT07487363")).toBe(
+      false,
+    );
+  });
+
+  it("does not publish Hudson Biotech or mismatched intervention studies", () => {
+    for (const profile of listPublishedProfiles()) {
+      expect(profile.studies.some((study) => study.sponsor === "Hudson Biotech")).toBe(false);
+      expect(profile.studies.some((study) => /mock study|fictional study/i.test(study.title))).toBe(false);
+    }
+    expect(getPublishedProfile("ipamorelin")?.studies.some((study) => study.clinicalTrialId === "NCT07717866")).toBe(
+      false,
+    );
+    expect(getPublishedProfile("tesamorelin")?.studies.some((study) => study.clinicalTrialId === "NCT02553603")).toBe(
+      false,
+    );
+    expect(getPublishedProfile("mots-c")?.studies.some((study) => study.clinicalTrialId === "NCT07505745")).toBe(false);
+    expect(getPublishedProfile("mots-c")?.studies.some((study) => study.clinicalTrialId === "NCT04027712")).toBe(false);
+  });
+
+  it("keeps orforglipron US-approved without claiming global approval", () => {
+    const profile = getPublishedProfile("orforglipron");
+    expect(profile?.regulatoryStatus).toBe("approved-specific");
+    expect(profile?.regulatoryRegions).toEqual(["US"]);
+    expect(profile?.evidenceLevel).toBe("A");
+  });
+
+  it("does not treat mazdutide secondary NMPA reports as FDA/global approval", () => {
+    const profile = getPublishedProfile("mazdutide");
+    expect(profile?.regulatoryStatus).toBe("clinical-development");
+    expect(profile?.reviewStatus).toBe("review-required");
+    expect(profile?.sources.some((source) => source.pmid === "41028652")).toBe(true);
   });
 
   it("cites every published scientific statement and excludes mock trials", () => {

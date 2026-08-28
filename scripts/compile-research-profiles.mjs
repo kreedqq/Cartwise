@@ -38,19 +38,30 @@ const PINNED_NCTS = {
   "cjc-1295": ["NCT00267527"],
   ipamorelin: ["NCT00672074", "NCT01280344"],
   "bpc-157": ["NCT02637284"],
-  "tb-500": ["NCT07487363"],
-  "ghk-cu": ["NCT07706361"],
-  "mots-c": ["NCT07505745"],
 };
 
 const PINNED_PMIDS = {
-  mazdutide: ["36247927", "38092790"],
+  mazdutide: ["36247927", "38092790", "41028652"],
   ipamorelin: ["9733496"],
   "ghk-cu": ["25731775", "18350235"],
   "mots-c": ["39160573", "41593376", "34445477"],
   "cjc-1295": ["16352683"],
   cagrilintide: ["34798060"],
   retatrutide: ["37366315", "37385280", "42250575"],
+};
+
+const EXTRA_ARTICLES = {
+  mazdutide: [
+    {
+      pmid: "41028652",
+      title: "Mazdutide: First Approval.",
+      source: "Drugs",
+      pubdate: "2025 Dec",
+      doi: "10.1007/s40265-025-02249-y",
+      url: "https://pubmed.ncbi.nlm.nih.gov/41028652/",
+      pubtype: ["Journal Article", "Review"],
+    },
+  ],
 };
 
 const EMA = {
@@ -80,12 +91,18 @@ async function readJson(path) {
 function keepStudy(slug, study) {
   if (!study?.nctId || !/^NCT\d{8}$/.test(study.nctId)) return false;
   const title = study.title ?? "";
-  if (/mock study/i.test(title)) return false;
+  if (/mock study|fictional study|example of a ClinicalTrials\.gov-style/i.test(title)) return false;
+  if (study.sponsor === "Hudson Biotech") return false;
   if (slug === "ghk-cu" && !/ghk/i.test(title)) return false;
+  if (slug === "ghk-cu" && /x39 patch/i.test(title)) return false;
   if (slug === "bpc-157" && /gummies/i.test(title)) return false;
+  if (slug === "ipamorelin" && !/ipamorelin/i.test(title)) return false;
+  if (slug === "tesamorelin" && !/tesamorelin|egrifta|th9507/i.test(title)) return false;
+  if (slug === "orforglipron" && !/orforglipron|ly3502970|foundayo/i.test(title)) return false;
   if (slug === "mots-c") {
     if (!/mots/i.test(title)) return false;
     if (/anesthesia|fasting|breast cancer|sglt2/i.test(title) && !/mots-c for /i.test(title)) return false;
+    if (/platelet|b-amyloid|mortality of type/i.test(title)) return false;
   }
   if (slug === "tb-500" && /thymosin beta 4(?! 17-23)/i.test(title) && !/fragment/i.test(title)) return false;
   return true;
@@ -107,6 +124,8 @@ const CURATED = {
     evidenceLevel: "B",
     confidenceLevel: "moderate",
     regulatoryStatus: "clinical-development",
+    reviewStatus: "review-recommended",
+    regulatoryRegions: [],
     chemicalClass: "GIP/GLP-1/glucagon receptor agonist",
     moleculeType: "peptide",
     identityNote: "Entwicklungsname LY3437943. In der FDA-Drugs@FDA-Suche vom 28.08.2026 kein zugelassenes Produkt gefunden.",
@@ -150,11 +169,22 @@ const CURATED = {
     interactions: (ids) => [{ category: "unknown", text: "Keine etablierte Interaktionsliste aus einer zugelassenen Fachinformation identifiziert.", sourceIds: [ids.fdaNone] }],
     reconstitution: () => null,
     conflicts: [],
+    reviewItems: (ids) => [
+      {
+        id: "retatrutide-reg-recency",
+        priority: "Medium",
+        topic: "Phase-3-Recency vs. fehlende Zulassung",
+        note: "Phase-3-Programme und eine TRANSCEND-T2D-1-Publikation existieren. Eine FDA-/EMA-Zulassung war in den geprüften Behördquellen nicht nachweisbar. Status bleibt klinische Entwicklung, nicht zugelassen.",
+        sourceIds: [ids.pmid("42250575"), ids.fdaNone],
+      },
+    ],
   },
   tirzepatide: {
     evidenceLevel: "A",
     confidenceLevel: "high",
     regulatoryStatus: "approved-specific",
+    reviewStatus: "fresh",
+    regulatoryRegions: ["US", "EU"],
     chemicalClass: "GIP/GLP-1 receptor agonist",
     moleculeType: "peptide",
     identityNote: "FDA-zugelassene Fertigarzneimittel u. a. Mounjaro (NDA215866) und Zepbound (NDA217806). Compounded/non-approved Formen sind damit nicht gleichzusetzen.",
@@ -206,11 +236,14 @@ const CURATED = {
         [ids.fda("fda-mounjaro")],
       ),
     conflicts: [],
+    reviewItems: () => [],
   },
   semaglutide: {
     evidenceLevel: "A",
     confidenceLevel: "high",
     regulatoryStatus: "approved-specific",
+    reviewStatus: "fresh",
+    regulatoryRegions: ["US", "EU"],
     chemicalClass: "GLP-1 receptor agonist",
     moleculeType: "peptide",
     identityNote: "FDA-Labels u. a. für Ozempic (s.c., NDA209637) und orale Semaglutid-Tabletten (NDA213051). EMA-EPARs für Ozempic und Wegovy waren am 28.08.2026 erreichbar.",
@@ -262,11 +295,14 @@ const CURATED = {
         [ids.fda("fda-ozempic")],
       ),
     conflicts: [],
+    reviewItems: () => [],
   },
   liraglutide: {
     evidenceLevel: "A",
     confidenceLevel: "high",
     regulatoryStatus: "approved-specific",
+    reviewStatus: "fresh",
+    regulatoryRegions: ["US", "EU"],
     chemicalClass: "GLP-1 receptor agonist",
     moleculeType: "peptide",
     identityNote: "FDA-zugelassen in mehreren Labels (u. a. glykämische Kontrolle und Gewichtsmanagement). EMA-EPARs Victoza und Saxenda waren am 28.08.2026 erreichbar.",
@@ -317,11 +353,14 @@ const CURATED = {
         [ids.fda("fda-liraglutide-t2d")],
       ),
     conflicts: [],
+    reviewItems: () => [],
   },
   cagrilintide: {
     evidenceLevel: "C",
     confidenceLevel: "moderate",
     regulatoryStatus: "clinical-development",
+    reviewStatus: "review-recommended",
+    regulatoryRegions: [],
     chemicalClass: "long-acting amylin analogue",
     moleculeType: "peptide",
     identityNote: "In Drugs@FDA am 28.08.2026 kein zugelassenes Produkt. Phase-1- bis Phase-3-Studien sind bei ClinicalTrials.gov registriert.",
@@ -365,11 +404,22 @@ const CURATED = {
     interactions: (ids) => [{ category: "unknown", text: "Keine etablierte Interaktionsliste aus einer Fachinformation identifiziert.", sourceIds: [ids.fdaNone] }],
     reconstitution: () => null,
     conflicts: [],
+    reviewItems: (ids) => [
+      {
+        id: "cagrilintide-evidence-b",
+        priority: "Medium",
+        topic: "Evidence C vs. mögliche B",
+        note: "Humane randomisierte Daten und Phase-3-Registrierungen existieren. Ohne abgeschlossenes Zulassungsprogramm bleibt Evidence C; ein Upgrade auf B wäre nach Review weiterer Phase-3-Publikationen zu prüfen.",
+        sourceIds: [ids.pmid("34798060"), ids.nct("NCT07220642")],
+      },
+    ],
   },
   mazdutide: {
     evidenceLevel: "C",
     confidenceLevel: "moderate",
     regulatoryStatus: "clinical-development",
+    reviewStatus: "review-required",
+    regulatoryRegions: [],
     chemicalClass: "GLP-1/glucagon receptor dual agonist",
     moleculeType: "peptide",
     identityNote: "Auch als IBI362 / LY3305677 referenziert. FDA-Drugs@FDA am 28.08.2026 ohne Treffer. Eine Nicht-FDA-Zulassung wird hier nicht behauptet, weil kein NMPA/EMA-Connector-Ergebnis als Quelle hinterlegt ist.",
@@ -403,8 +453,8 @@ const CURATED = {
         [ids.ctCount],
       ),
       unknowns: cited(
-        "Regulatorischer Status außerhalb Drugs@FDA (z. B. andere Behörden) wurde in diesem Scan nicht als belastbare Quelle angebunden.",
-        [ids.fdaNone],
+        "Regulatorischer Status außerhalb Drugs@FDA (z. B. andere Behörden) wurde in diesem Scan nicht als belastbare Behördquelle angebunden. Eine peer-reviewed First-Approval-Übersicht berichtet eine NMPA-Zulassung in China; ohne primäre NMPA-Quelle wird hier kein regionaler Approved-Status gesetzt.",
+        [ids.fdaNone, ids.pmid("41028652")],
       ),
     }),
     safetyItems: (ids) => [
@@ -413,11 +463,22 @@ const CURATED = {
     interactions: (ids) => [{ category: "unknown", text: "Keine etablierte Interaktionsliste identifiziert.", sourceIds: [ids.fdaNone] }],
     reconstitution: () => null,
     conflicts: [],
+    reviewItems: (ids) => [
+      {
+        id: "mazdutide-nmpa",
+        priority: "High",
+        topic: "Möglicher China-NMPA-Status ohne primäre Behördquelle",
+        note: "PMID 41028652 (Drugs, First Approval) berichtet eine NMPA-Zulassung in China. Das ist eine wissenschaftliche Sekundärquelle, keine NMPA-Primärquelle. Regulatory bleibt clinical-development, nicht global approved.",
+        sourceIds: [ids.pmid("41028652"), ids.fdaNone],
+      },
+    ],
   },
   orforglipron: {
     evidenceLevel: "A",
     confidenceLevel: "high",
     regulatoryStatus: "approved-specific",
+    reviewStatus: "review-required",
+    regulatoryRegions: ["US"],
     chemicalClass: "small-molecule GLP-1 receptor agonist",
     moleculeType: "small-molecule",
     identityNote: "Entwicklungsname LY3502970. FDA-Label FOUNDAYO (NDA220934), oral, Stand Label effective_time 20260729. EMA-EPAR für FOUNDAYO wurde in diesem Scan nicht geprüft.",
@@ -467,11 +528,22 @@ const CURATED = {
         [ids.fda("fda-foundayo")],
       ),
     conflicts: [],
+    reviewItems: (ids) => [
+      {
+        id: "orforglipron-ema",
+        priority: "High",
+        topic: "EMA-/Nicht-US-Zulassungsstatus",
+        note: "FDA-Label FOUNDAYO (NDA220934, US) ist die belastbare Zulassungsquelle. EMA/BfArM/MHRA wurden für FOUNDAYO in diesem Batch nicht als EPAR/Behördquelle geprüft. Kein globales Approved.",
+        sourceIds: [ids.fda("fda-foundayo")],
+      },
+    ],
   },
   tesamorelin: {
     evidenceLevel: "A",
     confidenceLevel: "high",
     regulatoryStatus: "approved-specific",
+    reviewStatus: "fresh",
+    regulatoryRegions: ["US"],
     chemicalClass: "GHRH analogue",
     moleculeType: "peptide",
     identityNote: "FDA BLA022505, Markennamen EGRIFTA SV / EGRIFTA WR. Indikation laut Label: Reduktion überschüssigen Abdominalfetts bei HIV-infizierten Erwachsenen mit Lipodystrophie — nicht als allgemeines Gewichtsmanagement.",
@@ -521,11 +593,14 @@ const CURATED = {
         [ids.fda("fda-egrifta")],
       ),
     conflicts: [],
+    reviewItems: () => [],
   },
   "cjc-1295": {
     evidenceLevel: "C",
     confidenceLevel: "low",
     regulatoryStatus: "investigational",
+    reviewStatus: "fresh",
+    regulatoryRegions: [],
     chemicalClass: "long-acting GHRH analogue",
     moleculeType: "peptide",
     identityNote: "CAS 446262-90-4 (PubChem CID 91971820). FDA ohne Treffer. Eine Phase-2-Studie bei HIV-viszeraler Adipositas wurde terminiert.",
@@ -569,11 +644,14 @@ const CURATED = {
     interactions: (ids) => [{ category: "unknown", text: "Keine etablierte Interaktionsliste identifiziert.", sourceIds: [ids.fdaNone] }],
     reconstitution: () => null,
     conflicts: [],
+    reviewItems: () => [],
   },
   ipamorelin: {
     evidenceLevel: "C",
     confidenceLevel: "low",
     regulatoryStatus: "investigational",
+    reviewStatus: "fresh",
+    regulatoryRegions: [],
     chemicalClass: "ghrelin receptor agonist / GHRP analogue",
     moleculeType: "peptide",
     identityNote: "CAS 170851-70-4 (PubChem). FDA ohne Treffer. Historische Phase-2-Studien zur postoperativen Ileus-Behandlung.",
@@ -615,11 +693,14 @@ const CURATED = {
     interactions: (ids) => [{ category: "unknown", text: "Keine etablierte Interaktionsliste identifiziert.", sourceIds: [ids.fdaNone] }],
     reconstitution: () => null,
     conflicts: [],
+    reviewItems: () => [],
   },
   "bpc-157": {
     evidenceLevel: "D",
     confidenceLevel: "low",
     regulatoryStatus: "investigational",
+    reviewStatus: "fresh",
+    regulatoryRegions: [],
     chemicalClass: "synthetic gastric pentadecapeptide",
     moleculeType: "peptide",
     identityNote: "CAS 137525-51-0 (PubChem CID 9941957). FDA ohne Treffer. Überwiegend präklinische Literatur; humane Daten sehr begrenzt.",
@@ -663,31 +744,34 @@ const CURATED = {
     interactions: (ids) => [{ category: "unknown", text: "Keine etablierte Interaktionsliste identifiziert.", sourceIds: [ids.fdaNone] }],
     reconstitution: () => null,
     conflicts: [],
+    reviewItems: () => [],
   },
   "tb-500": {
     evidenceLevel: "F",
     confidenceLevel: "insufficient",
     regulatoryStatus: "insufficient",
+    reviewStatus: "review-required",
+    regulatoryRegions: [],
     chemicalClass: "synthetic thymosin-beta-4 fragment analogue",
     moleculeType: "peptide",
     identityNote:
-      "TB-500 wird nicht automatisch mit vollständigem Thymosin Beta-4 gleichgesetzt. PubChem CID 62707662 / CAS 885340-08-9 beschreibt ein acetyliertes Fragmentpeptid, nicht das Vollprotein. Die CT.gov-Registrierung NCT07487363 bezeichnet explizit das Fragment 17–23.",
+      "TB-500 wird nicht automatisch mit vollständigem Thymosin Beta-4 gleichgesetzt. PubChem CID 62707662 / CAS 885340-08-9 beschreibt ein acetyliertes Fragmentpeptid, nicht das Vollprotein. Die CT.gov-Registrierung NCT07487363 kennzeichnet sich selbst als fiktives Beispielrecord und wird nicht als Studie gewertet.",
     summary: (ids) => ({
       whatIsIt: cited(
         "TB-500 wird in chemischen Datenbanken als synthetisches Fragmentpeptid geführt, nicht als identisches Vollmolekül Thymosin Beta-4. Eine FDA-Zulassung war nicht nachweisbar.",
-        [ids.pubchem, ids.fdaNone, ids.nct("NCT07487363")],
+        [ids.pubchem, ids.fdaNone],
       ),
       mechanism: cited(
         "Keine belastbare, substanzspezifische Human-Mechanismus-Fachinformation identifiziert. Mechanismusangaben für vollständiges Thymosin Beta-4 dürfen nicht automatisch übertragen werden.",
         [ids.pubchem],
       ),
       whatHasBeenStudied: cited(
-        "PubMed-Abfrage zum Term TB-500 lieferte wenige Treffer, überwiegend Übersichtsarbeiten zu Peptidtherapien, nicht notwendigerweise RCTs von TB-500. ClinicalTrials.gov: 1 Registrierung (Fragment 17–23), ohne Results in der Abfrage.",
-        [ids.pmCount, ids.nct("NCT07487363")],
+        "PubMed-Abfrage zum Term TB-500 lieferte wenige Treffer, überwiegend Übersichtsarbeiten zu Peptidtherapien, nicht notwendigerweise RCTs von TB-500. Die einzige ClinicalTrials.gov-Registrierung unter diesem Term (NCT07487363) kennzeichnet sich im Brief Summary als fiktives Beispielrecord und wird nicht als Studie gewertet.",
+        [ids.pmCount, ids.ctCount],
       ),
       humanEvidence: cited(
         "Keine ausreichenden belastbaren Human-Sicherheits- oder Wirksamkeitsdaten identifiziert.",
-        [ids.fdaNone, ids.nct("NCT07487363")],
+        [ids.fdaNone],
       ),
       preclinicalEvidence: cited(
         "Präklinische Befunde zu Thymosin Beta-4 sind nicht automatisch Befunde zu TB-500.",
@@ -698,8 +782,8 @@ const CURATED = {
         [ids.fdaNone],
       ),
       currentResearch: cited(
-        "Eine registrierte Studie zum Fragment existiert; ohne publizierte Ergebnisse keine klinische Aussage.",
-        [ids.nct("NCT07487363")],
+        "Keine belastbare, nicht-fiktive CT.gov-Interventionsstudie für TB-500 identifiziert. Reviews zu Peptidtherapien ersetzen keine TB-500-spezifischen Human-RCTs.",
+        [ids.pmCount, ids.ctCount],
       ),
       unknowns: cited(
         "Identitätsverwirrung mit Thymosin Beta-4, fehlende Human-RCTs und fehlende regulatorische Bewertung.",
@@ -715,7 +799,16 @@ const CURATED = {
       {
         topic: "Identität TB-500 vs. Thymosin Beta-4",
         note: "Quellen und Datenbanken unterscheiden ein Fragmentpeptid (TB-500) vom Vollprotein. Keine automatische Zusammenführung.",
-        sourceIds: ["pubchem-tb-500", "nct-NCT07487363"],
+        sourceIds: ["pubchem-tb-500"],
+      },
+    ],
+    reviewItems: (ids) => [
+      {
+        id: "tb-500-fictional-nct",
+        priority: "High",
+        topic: "Fiktive CT.gov-Registrierung NCT07487363",
+        note: "ClinicalTrials.gov Brief Summary von NCT07487363 beginnt mit „This fictional study is an example of a ClinicalTrials.gov-style record.“ Sponsor Hudson Biotech. Der Record bleibt im Rohcache, wird aber nicht als Studie oder Human-Evidenz veröffentlicht.",
+        sourceIds: [ids.ctCount],
       },
     ],
   },
@@ -723,6 +816,8 @@ const CURATED = {
     evidenceLevel: "D",
     confidenceLevel: "low",
     regulatoryStatus: "insufficient",
+    reviewStatus: "review-required",
+    regulatoryRegions: [],
     chemicalClass: "copper-binding tripeptide complex",
     moleculeType: "peptide",
     identityNote: "PubChem führt ein Kupfer-Komplex-Record (CID 139035031). FDA ohne Treffer. Kein zugelassenes systemisches Arzneimittel in Drugs@FDA.",
@@ -736,8 +831,8 @@ const CURATED = {
         [ids.pmid("25731775")],
       ),
       whatHasBeenStudied: cited(
-        "PubMed: 15 Treffer zur kombinierten Query. ClinicalTrials.gov-Treffer nur übernommen, wenn GHK im Titel steht.",
-        [ids.pmCount, ids.nct("NCT07706361")],
+        "PubMed: 15 Treffer zur kombinierten Query. ClinicalTrials.gov-Treffer, die GHK nur als Biomarker (z. B. X39-Patch) oder unter dem Sponsor Hudson Biotech führen, wurden nicht als GHK-Cu-Interventionsstudien übernommen.",
+        [ids.pmCount, ids.ctCount],
       ),
       humanEvidence: cited(
         "Begrenzte humane/kosmetische Daten in der Literatur; keine Arzneimittel-Zulassung.",
@@ -752,8 +847,8 @@ const CURATED = {
         [ids.fdaNone],
       ),
       currentResearch: cited(
-        "Registrierte Studien existieren; ohne Results keine Wirksamkeitsaussage.",
-        [ids.nct("NCT07706361")],
+        "Keine belastbare, klar als GHK-Cu-Gabe identifizierte CT.gov-Interventionsstudie in diesem Batch übernommen.",
+        [ids.ctCount],
       ),
       unknowns: cited(
         "Systemische Anwendung, Reinheit und Langzeitsicherheit von Research-Produkten sind nicht durch ein Label belegt.",
@@ -764,11 +859,22 @@ const CURATED = {
     interactions: (ids) => [{ category: "unknown", text: "Keine etablierte Interaktionsliste identifiziert.", sourceIds: [ids.fdaNone] }],
     reconstitution: () => null,
     conflicts: [],
+    reviewItems: (ids) => [
+      {
+        id: "ghk-cu-x39-nct",
+        priority: "Medium",
+        topic: "NCT07706361 misst GHK-Spiegel, gibt kein GHK-Cu",
+        note: "Die Registrierung untersucht ein X39-Patch und zirkulierende GHK/GHK-Cu-Spiegel. Das ist keine Interventionsstudie mit GHK-Cu-Peptidgabe und wird nicht als solche veröffentlicht.",
+        sourceIds: [ids.ctCount],
+      },
+    ],
   },
   "mots-c": {
     evidenceLevel: "D",
     confidenceLevel: "low",
     regulatoryStatus: "investigational",
+    reviewStatus: "review-required",
+    regulatoryRegions: [],
     chemicalClass: "mitochondrial-derived peptide",
     moleculeType: "peptide",
     identityNote: "CAS 1627580-64-6 (PubChem CID 146675088). FDA ohne Treffer. Viele CT.gov-Treffer messen endogenes MOTS-c als Biomarker und sind keine Interventionsstudien mit MOTS-c.",
@@ -782,7 +888,7 @@ const CURATED = {
         [ids.pmid("39160573"), ids.pmid("41593376")],
       ),
       whatHasBeenStudied: cited(
-        "ClinicalTrials.gov-Rohtreffer: 9. Nach Filter bleiben Studien, in denen MOTS-c als Intervention erkennbar ist. PubMed: 13 Treffer zur Query.",
+        "ClinicalTrials.gov-Rohtreffer: 9. Nach Filter bleiben keine belastbaren MOTS-c-Interventionsstudien (Hudson-Cluster ausgeschlossen; Biomarker-Messungen ausgeschlossen). PubMed: 13 Treffer zur Query.",
         [ids.ctCount, ids.pmCount],
       ),
       humanEvidence: cited(
@@ -798,8 +904,8 @@ const CURATED = {
         [ids.fdaNone],
       ),
       currentResearch: cited(
-        "Mindestens eine registrierte Interventionsstudie existiert; ohne Results keine klinische Aussage.",
-        [ids.nct("NCT07505745")],
+        "Mindestens eine CT.gov-Registrierung (NCT07505745, Sponsor Hudson Biotech) gehört zum selben Sponsor-Cluster wie der als fiktiv gekennzeichnete TB-500-Record. Sie wird nicht als belastbare Humanstudie veröffentlicht.",
+        [ids.ctCount],
       ),
       unknowns: cited(
         "Humane Dosierung, Sicherheit und Wirksamkeit einer exogenen MOTS-c-Gabe bleiben offen.",
@@ -810,11 +916,22 @@ const CURATED = {
     interactions: (ids) => [{ category: "unknown", text: "Keine etablierte Interaktionsliste identifiziert.", sourceIds: [ids.fdaNone] }],
     reconstitution: () => null,
     conflicts: [],
+    reviewItems: (ids) => [
+      {
+        id: "mots-c-hudson-nct",
+        priority: "High",
+        topic: "Hudson-Biotech-Registrierung NCT07505745",
+        note: "NCT07505745 hat denselben Sponsor und dieselbe Kontakt-/Standortsignatur wie NCT07487363, dessen Brief Summary sich als fiktives Beispielrecord ausweist. Ohne unabhängige Bestätigung nicht als Humanstudie werten.",
+        sourceIds: [ids.ctCount],
+      },
+    ],
   },
   "aod-9604": {
     evidenceLevel: "E",
     confidenceLevel: "low",
     regulatoryStatus: "investigational",
+    reviewStatus: "review-recommended",
+    regulatoryRegions: [],
     chemicalClass: "hGH fragment analogue",
     moleculeType: "peptide",
     identityNote: "CAS 221231-10-3 (PubChem CID 71300630). FDA ohne Treffer. ClinicalTrials.gov-Suche nach AOD9604 am 28.08.2026: 0 Studien.",
@@ -856,6 +973,15 @@ const CURATED = {
     interactions: (ids) => [{ category: "unknown", text: "Keine etablierte Interaktionsliste identifiziert.", sourceIds: [ids.fdaNone] }],
     reconstitution: () => null,
     conflicts: [],
+    reviewItems: (ids) => [
+      {
+        id: "aod-9604-ct-zero",
+        priority: "Low",
+        topic: "0 CT.gov-Treffer ist kein Beweis für fehlende Humanstudien",
+        note: "Die Abfrage AOD9604 lieferte 0 ClinicalTrials.gov-Treffer. Ältere Literatur kann Humanstudien außerhalb dieses Terms enthalten. Evidence E bleibt, bis weitere belastbare Humanquellen kuratiert sind.",
+        sourceIds: [ids.ctCount, ids.pmid("15134286")],
+      },
+    ],
   },
 };
 
@@ -894,8 +1020,8 @@ async function compileOne(slug) {
     doi: null,
     pmid: null,
     clinicalTrialId: null,
-    sourceType: "clinical_trial",
-    sourceQuality: 5,
+    sourceType: "scientific",
+    sourceQuality: 3,
   });
   sources.push({
     id: `pm-count-${slug}`,
@@ -907,8 +1033,8 @@ async function compileOne(slug) {
     doi: null,
     pmid: null,
     clinicalTrialId: null,
-    sourceType: "pubmed",
-    sourceQuality: 4,
+    sourceType: "scientific",
+    sourceQuality: 3,
   });
 
   if (fda.found) {
@@ -1021,8 +1147,11 @@ async function compileOne(slug) {
   const keptStudies = (ct.studies ?? []).filter((s) => keepStudy(slug, s));
   const studies = [];
   for (const nct of PINNED_NCTS[slug] ?? []) {
-    const hit = keptStudies.find((s) => s.nctId === nct);
-    if (hit) studies.push(hit);
+    const hit = (ct.studies ?? []).find((s) => s.nctId === nct);
+    if (!hit) continue;
+    if (hit.sponsor === "Hudson Biotech") continue;
+    if (/mock study|fictional study|example of a ClinicalTrials\.gov-style/i.test(hit.title ?? "")) continue;
+    if (!studies.some((row) => row.nctId === hit.nctId)) studies.push(hit);
   }
   for (const study of keptStudies) {
     if (studies.length >= 12) break;
@@ -1050,11 +1179,18 @@ async function compileOne(slug) {
     .sort((a, b) => a.rank - b.rank);
   const articles = [];
   for (const pmid of PINNED_PMIDS[slug] ?? []) {
-    const hit = ranked.find((a) => a.pmid === pmid) ?? (pm.articles ?? []).find((a) => a.pmid === pmid);
-    if (hit && !articles.some((a) => a.pmid === hit.pmid)) articles.push({ ...hit, ...pubmedQuality(hit) });
+    const hit =
+      ranked.find((a) => a.pmid === pmid) ??
+      (pm.articles ?? []).find((a) => a.pmid === pmid) ??
+      (EXTRA_ARTICLES[slug] ?? []).find((a) => a.pmid === pmid);
+    if (hit && hit.title && !articles.some((a) => a.pmid === hit.pmid)) articles.push({ ...hit, ...pubmedQuality(hit) });
+  }
+  for (const extra of EXTRA_ARTICLES[slug] ?? []) {
+    if (extra.title && !articles.some((a) => a.pmid === extra.pmid)) articles.push({ ...extra, ...pubmedQuality(extra) });
   }
   for (const article of ranked) {
     if (articles.length >= 12) break;
+    if (!article.title) continue;
     if (!articles.some((a) => a.pmid === article.pmid)) articles.push(article);
   }
   for (const article of articles) {
@@ -1080,6 +1216,7 @@ async function compileOne(slug) {
   const ids = makeIdHelpers(slug, sources);
   const summary = curated.summary(ids);
   const reconstitution = curated.reconstitution(ids);
+  const reviewItems = typeof curated.reviewItems === "function" ? curated.reviewItems(ids) : [];
 
   const connectors = [
     { id: "fda", status: fda.status === "checked" ? (fda.found ? "checked" : "not-found") : "unavailable", note: fda.found ? "Drugs@FDA match" : fda.message ?? "checked" },
@@ -1100,7 +1237,8 @@ async function compileOne(slug) {
     evidenceLevel: curated.evidenceLevel,
     confidenceLevel: curated.confidenceLevel,
     regulatoryStatus: curated.regulatoryStatus,
-    reviewStatus: "fresh",
+    reviewStatus: curated.reviewStatus ?? "fresh",
+    regulatoryRegions: curated.regulatoryRegions ?? [],
     identity: {
       verified: true,
       casNumber: pc?.cas ?? null,
@@ -1130,6 +1268,7 @@ async function compileOne(slug) {
     })),
     sources,
     conflicts: curated.conflicts,
+    reviewItems,
     community: { available: false, message: COMMUNITY_MSG },
     researchReport: {
       identity: "Verified",

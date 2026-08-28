@@ -26,8 +26,10 @@ Community darf Evidence Level nicht anheben.
 Aktuelle Substanzprofile starten als **Identitätsdatensätze**.
 Für den ersten Research-Batch (Retatrutide bis AOD-9604) wurden am 28.08.2026
 offizielle APIs abgefragt (ClinicalTrials.gov, PubMed E-utilities, openFDA,
-PubChem, EMA-EPAR-HTTP-Check). Kuratierte Aussagen sind nur mit Source-IDs
-veröffentlicht. Community/Reddit bleibt unavailable.
+PubChem, EMA-EPAR-HTTP-Check). Am selben Tag lief ein Quality Audit
+(`docs/RESEARCH_AUDIT_BATCH_01.md`): kuratierte Aussagen bleiben nur mit
+Source-IDs veröffentlicht; fiktive/fehlzugeordnete NCT-Einträge sind nicht
+mehr im published-Set. Community/Reddit bleibt unavailable.
 
 Live-Abrufe laufen **nicht** im Browser. Rohcache: `src/research/cache/fetched/`.
 Publizierte Profile: `src/lib/peptide/profiles/published.json`.

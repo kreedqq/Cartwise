@@ -10,7 +10,8 @@
       "evidenceLevel": "B",
       "confidenceLevel": "moderate",
       "regulatoryStatus": "clinical-development",
-      "reviewStatus": "fresh",
+      "reviewStatus": "review-recommended",
+      "regulatoryRegions": [],
       "identity": {
         "verified": true,
         "casNumber": null,
@@ -319,8 +320,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-retatrutide",
@@ -332,8 +333,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-none-retatrutide",
@@ -675,6 +676,18 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "retatrutide-reg-recency",
+          "priority": "Medium",
+          "topic": "Phase-3-Recency vs. fehlende Zulassung",
+          "note": "Phase-3-Programme und eine TRANSCEND-T2D-1-Publikation existieren. Eine FDA-/EMA-Zulassung war in den geprüften Behördquellen nicht nachweisbar. Status bleibt klinische Entwicklung, nicht zugelassen.",
+          "sourceIds": [
+            "pmid-42250575",
+            "fda-none-retatrutide"
+          ]
+        }
+      ],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -700,6 +713,10 @@
       "confidenceLevel": "high",
       "regulatoryStatus": "approved-specific",
       "reviewStatus": "fresh",
+      "regulatoryRegions": [
+        "US",
+        "EU"
+      ],
       "identity": {
         "verified": true,
         "casNumber": "2023788-19-2",
@@ -1023,8 +1040,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-tirzepatide",
@@ -1036,8 +1053,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-mounjaro",
@@ -1405,6 +1422,7 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -1430,6 +1448,10 @@
       "confidenceLevel": "high",
       "regulatoryStatus": "approved-specific",
       "reviewStatus": "fresh",
+      "regulatoryRegions": [
+        "US",
+        "EU"
+      ],
       "identity": {
         "verified": true,
         "casNumber": "910463-68-2",
@@ -1753,8 +1775,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-semaglutide",
@@ -1766,8 +1788,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-semaglutide-27f15fac",
@@ -2161,6 +2183,7 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -2186,6 +2209,10 @@
       "confidenceLevel": "high",
       "regulatoryStatus": "approved-specific",
       "reviewStatus": "fresh",
+      "regulatoryRegions": [
+        "US",
+        "EU"
+      ],
       "identity": {
         "verified": true,
         "casNumber": "204656-20-2",
@@ -2500,8 +2527,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-liraglutide",
@@ -2513,8 +2540,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-liraglutide-0450d8a2",
@@ -2908,6 +2935,7 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -2932,7 +2960,8 @@
       "evidenceLevel": "C",
       "confidenceLevel": "moderate",
       "regulatoryStatus": "clinical-development",
-      "reviewStatus": "fresh",
+      "reviewStatus": "review-recommended",
+      "regulatoryRegions": [],
       "identity": {
         "verified": true,
         "casNumber": "1415456-99-3",
@@ -3234,8 +3263,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-cagrilintide",
@@ -3247,8 +3276,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-none-cagrilintide",
@@ -3590,6 +3619,18 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "cagrilintide-evidence-b",
+          "priority": "Medium",
+          "topic": "Evidence C vs. mögliche B",
+          "note": "Humane randomisierte Daten und Phase-3-Registrierungen existieren. Ohne abgeschlossenes Zulassungsprogramm bleibt Evidence C; ein Upgrade auf B wäre nach Review weiterer Phase-3-Publikationen zu prüfen.",
+          "sourceIds": [
+            "pmid-34798060",
+            "nct-NCT07220642"
+          ]
+        }
+      ],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -3614,7 +3655,8 @@
       "evidenceLevel": "C",
       "confidenceLevel": "moderate",
       "regulatoryStatus": "clinical-development",
-      "reviewStatus": "fresh",
+      "reviewStatus": "review-required",
+      "regulatoryRegions": [],
       "identity": {
         "verified": true,
         "casNumber": "2259884-03-0",
@@ -3708,9 +3750,10 @@
           ]
         },
         "unknowns": {
-          "text": "Regulatorischer Status außerhalb Drugs@FDA (z. B. andere Behörden) wurde in diesem Scan nicht als belastbare Quelle angebunden.",
+          "text": "Regulatorischer Status außerhalb Drugs@FDA (z. B. andere Behörden) wurde in diesem Scan nicht als belastbare Behördquelle angebunden. Eine peer-reviewed First-Approval-Übersicht berichtet eine NMPA-Zulassung in China; ohne primäre NMPA-Quelle wird hier kein regionaler Approved-Status gesetzt.",
           "sourceIds": [
-            "fda-none-mazdutide"
+            "fda-none-mazdutide",
+            "pmid-41028652"
           ]
         }
       },
@@ -3916,8 +3959,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-mazdutide",
@@ -3929,8 +3972,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-none-mazdutide",
@@ -4141,6 +4184,19 @@
           "sourceQuality": 4
         },
         {
+          "id": "pmid-41028652",
+          "title": "Mazdutide: First Approval.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41028652/",
+          "publisher": "Drugs",
+          "publicationDate": "2025 Dec",
+          "accessDate": "2026-08-28",
+          "doi": "10.1007/s40265-025-02249-y",
+          "pmid": "41028652",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
+        },
+        {
           "id": "pmid-39305981",
           "title": "Seven glucagon-like peptide-1 receptor agonists and polyagonists for weight loss in patients with obesity or overweight: an updated systematic review and network meta-analysis of randomized controlled trials.",
           "url": "https://pubmed.ncbi.nlm.nih.gov/39305981/",
@@ -4256,22 +4312,21 @@
           "clinicalTrialId": null,
           "sourceType": "pubmed",
           "sourceQuality": 4
-        },
-        {
-          "id": "pmid-41407859",
-          "title": "Mazdutide versus placebo in Chinese adults with type 2 diabetes.",
-          "url": "https://pubmed.ncbi.nlm.nih.gov/41407859/",
-          "publisher": "Nature",
-          "publicationDate": "2026 Apr",
-          "accessDate": "2026-08-28",
-          "doi": "10.1038/s41586-025-10026-w",
-          "pmid": "41407859",
-          "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
         }
       ],
       "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "mazdutide-nmpa",
+          "priority": "High",
+          "topic": "Möglicher China-NMPA-Status ohne primäre Behördquelle",
+          "note": "PMID 41028652 (Drugs, First Approval) berichtet eine NMPA-Zulassung in China. Das ist eine wissenschaftliche Sekundärquelle, keine NMPA-Primärquelle. Regulatory bleibt clinical-development, nicht global approved.",
+          "sourceIds": [
+            "pmid-41028652",
+            "fda-none-mazdutide"
+          ]
+        }
+      ],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -4296,7 +4351,10 @@
       "evidenceLevel": "A",
       "confidenceLevel": "high",
       "regulatoryStatus": "approved-specific",
-      "reviewStatus": "fresh",
+      "reviewStatus": "review-required",
+      "regulatoryRegions": [
+        "US"
+      ],
       "identity": {
         "verified": true,
         "casNumber": "2212020-52-3",
@@ -4479,20 +4537,6 @@
           "url": "https://clinicaltrials.gov/study/NCT06672939"
         },
         {
-          "id": "NCT06672549",
-          "clinicalTrialId": "NCT06672549",
-          "title": "A Platform Trial for Pediatric Participants With Obesity or Overweight (LY900040)",
-          "phase": "PHASE3",
-          "status": "RECRUITING",
-          "sponsor": "Eli Lilly and Company",
-          "enrollment": 125,
-          "startDate": "2024-11-18",
-          "completionDate": "2027-03",
-          "lastUpdated": "2026-08-24",
-          "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT06672549"
-        },
-        {
           "id": "NCT07613307",
           "clinicalTrialId": "NCT07613307",
           "title": "A Study of Orforglipron (LY3502970) in Participants With Type 2 Diabetes Who Observe Ramadan Fasting",
@@ -4591,18 +4635,32 @@
           "url": "https://clinicaltrials.gov/study/NCT06993792"
         },
         {
-          "id": "NCT07739537",
-          "clinicalTrialId": "NCT07739537",
-          "title": "PATHS-T2D: A Recall-by-Genotype Study of Physiologic and Pharmacologic Responses",
-          "phase": "PHASE4",
-          "status": "NOT_YET_RECRUITING",
-          "sponsor": "Massachusetts General Hospital",
-          "enrollment": 100,
-          "startDate": "2026-10-01",
-          "completionDate": "2030-09-30",
-          "lastUpdated": "2026-07-31",
+          "id": "NCT06972459",
+          "clinicalTrialId": "NCT06972459",
+          "title": "A Study of Orforglipron (LY3502970) in Participants With Obesity or Overweight and at Least One Weight-Related Comorbidity",
+          "phase": "PHASE3",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 800,
+          "startDate": "2025-05-15",
+          "completionDate": "2027-08",
+          "lastUpdated": "2026-07-29",
           "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT07739537"
+          "url": "https://clinicaltrials.gov/study/NCT06972459"
+        },
+        {
+          "id": "NCT05931380",
+          "clinicalTrialId": "NCT05931380",
+          "title": "A Study of Once-Daily Oral Orforglipron (LY3502970) in Japanese Adult Participants With Obesity Disease",
+          "phase": "PHASE3",
+          "status": "COMPLETED",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 238,
+          "startDate": "2023-07-31",
+          "completionDate": "2025-06-19",
+          "lastUpdated": "2026-07-20",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT05931380"
         }
       ],
       "sources": [
@@ -4616,8 +4674,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-orforglipron",
@@ -4629,8 +4687,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-foundayo",
@@ -4694,19 +4752,6 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": "NCT06672939",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
-        },
-        {
-          "id": "nct-NCT06672549",
-          "title": "A Platform Trial for Pediatric Participants With Obesity or Overweight (LY900040)",
-          "url": "https://clinicaltrials.gov/study/NCT06672549",
-          "publisher": "Eli Lilly and Company",
-          "publicationDate": "2026-08-24",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT06672549",
           "sourceType": "clinical_trial",
           "sourceQuality": 5
         },
@@ -4802,15 +4847,28 @@
           "sourceQuality": 5
         },
         {
-          "id": "nct-NCT07739537",
-          "title": "PATHS-T2D: A Recall-by-Genotype Study of Physiologic and Pharmacologic Responses",
-          "url": "https://clinicaltrials.gov/study/NCT07739537",
-          "publisher": "Massachusetts General Hospital",
-          "publicationDate": "2026-07-31",
+          "id": "nct-NCT06972459",
+          "title": "A Study of Orforglipron (LY3502970) in Participants With Obesity or Overweight and at Least One Weight-Related Comorbidity",
+          "url": "https://clinicaltrials.gov/study/NCT06972459",
+          "publisher": "Eli Lilly and Company",
+          "publicationDate": "2026-07-29",
           "accessDate": "2026-08-28",
           "doi": null,
           "pmid": null,
-          "clinicalTrialId": "NCT07739537",
+          "clinicalTrialId": "NCT06972459",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT05931380",
+          "title": "A Study of Once-Daily Oral Orforglipron (LY3502970) in Japanese Adult Participants With Obesity Disease",
+          "url": "https://clinicaltrials.gov/study/NCT05931380",
+          "publisher": "Eli Lilly and Company",
+          "publicationDate": "2026-07-20",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT05931380",
           "sourceType": "clinical_trial",
           "sourceQuality": 5
         },
@@ -4972,6 +5030,17 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "orforglipron-ema",
+          "priority": "High",
+          "topic": "EMA-/Nicht-US-Zulassungsstatus",
+          "note": "FDA-Label FOUNDAYO (NDA220934, US) ist die belastbare Zulassungsquelle. EMA/BfArM/MHRA wurden für FOUNDAYO in diesem Batch nicht als EPAR/Behördquelle geprüft. Kein globales Approved.",
+          "sourceIds": [
+            "fda-foundayo"
+          ]
+        }
+      ],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -4997,6 +5066,9 @@
       "confidenceLevel": "high",
       "regulatoryStatus": "approved-specific",
       "reviewStatus": "fresh",
+      "regulatoryRegions": [
+        "US"
+      ],
       "identity": {
         "verified": true,
         "casNumber": "218949-48-5",
@@ -5165,20 +5237,6 @@
           "url": "https://clinicaltrials.gov/study/NCT03375788"
         },
         {
-          "id": "NCT03226821",
-          "clinicalTrialId": "NCT03226821",
-          "title": "Body Composition and Adipose Tissue in HIV",
-          "phase": "PHASE4",
-          "status": "TERMINATED",
-          "sponsor": "Columbia University",
-          "enrollment": 6,
-          "startDate": "2018-02-07",
-          "completionDate": "2025-04-30",
-          "lastUpdated": "2026-05-19",
-          "hasResults": true,
-          "url": "https://clinicaltrials.gov/study/NCT03226821"
-        },
-        {
           "id": "NCT02572323",
           "clinicalTrialId": "NCT02572323",
           "title": "Phase II Trial of Tesamorelin for Cognition in Aging HIV-Infected Persons",
@@ -5221,20 +5279,6 @@
           "url": "https://clinicaltrials.gov/study/NCT00608023"
         },
         {
-          "id": "NCT03826160",
-          "clinicalTrialId": "NCT03826160",
-          "title": "Growth Hormone Dynamics and Cardiac Steatosis in HIV",
-          "phase": null,
-          "status": "COMPLETED",
-          "sponsor": "Massachusetts General Hospital",
-          "enrollment": 23,
-          "startDate": "2019-01-30",
-          "completionDate": "2022-04-19",
-          "lastUpdated": "2022-07-19",
-          "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT03826160"
-        },
-        {
           "id": "NCT01388920",
           "clinicalTrialId": "NCT01388920",
           "title": "Efficacy and Safety Study of Tesamorelin in Chronic Obstructive Pulmonary Disease (COPD) Subjects With Muscle Wasting",
@@ -5263,34 +5307,6 @@
           "url": "https://clinicaltrials.gov/study/NCT02196831"
         },
         {
-          "id": "NCT02931474",
-          "clinicalTrialId": "NCT02931474",
-          "title": "Impact of GHRH on Sleep Promotion and Endocrine Regulation in Service Members Who Sustained a Traumatic Brain Injury and Have Current Insomnia",
-          "phase": "PHASE2",
-          "status": "WITHDRAWN",
-          "sponsor": "National Institute of Nursing Research (NINR)",
-          "enrollment": 0,
-          "startDate": "2016-10-06",
-          "completionDate": "2017-03-08",
-          "lastUpdated": "2019-11-19",
-          "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT02931474"
-        },
-        {
-          "id": "NCT02553603",
-          "clinicalTrialId": "NCT02553603",
-          "title": "The Effect of Growth Hormone Releasing Hormone on Cognitive Function in Individuals With Mild Cognitive Impairment",
-          "phase": "PHASE1",
-          "status": "COMPLETED",
-          "sponsor": "The University of Texas Medical Branch, Galveston",
-          "enrollment": 22,
-          "startDate": "2017-07-18",
-          "completionDate": "2019-01-17",
-          "lastUpdated": "2019-11-04",
-          "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT02553603"
-        },
-        {
           "id": "NCT01591902",
           "clinicalTrialId": "NCT01591902",
           "title": "Diabetic Retinopathy in HIV Subjects Treated With EGRIFTA®",
@@ -5303,6 +5319,34 @@
           "lastUpdated": "2018-09-11",
           "hasResults": false,
           "url": "https://clinicaltrials.gov/study/NCT01591902"
+        },
+        {
+          "id": "NCT01579695",
+          "clinicalTrialId": "NCT01579695",
+          "title": "Long-term Observational Study in HIV Subjects Exposed to EGRIFTA®",
+          "phase": null,
+          "status": "TERMINATED",
+          "sponsor": "Theratechnologies",
+          "enrollment": 391,
+          "startDate": "2013-02",
+          "completionDate": "2018-08",
+          "lastUpdated": "2018-09-11",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01579695"
+        },
+        {
+          "id": "NCT01788462",
+          "clinicalTrialId": "NCT01788462",
+          "title": "Egrifta Replacement and Sleep Disordered Breathing",
+          "phase": null,
+          "status": "WITHDRAWN",
+          "sponsor": "Johns Hopkins University",
+          "enrollment": 0,
+          "startDate": "2012-05",
+          "completionDate": "2020-01",
+          "lastUpdated": "2017-03-03",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01788462"
         }
       ],
       "sources": [
@@ -5316,8 +5360,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-tesamorelin",
@@ -5329,8 +5373,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-egrifta",
@@ -5385,19 +5429,6 @@
           "sourceQuality": 5
         },
         {
-          "id": "nct-NCT03226821",
-          "title": "Body Composition and Adipose Tissue in HIV",
-          "url": "https://clinicaltrials.gov/study/NCT03226821",
-          "publisher": "Columbia University",
-          "publicationDate": "2026-05-19",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT03226821",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
-        },
-        {
           "id": "nct-NCT02572323",
           "title": "Phase II Trial of Tesamorelin for Cognition in Aging HIV-Infected Persons",
           "url": "https://clinicaltrials.gov/study/NCT02572323",
@@ -5437,19 +5468,6 @@
           "sourceQuality": 5
         },
         {
-          "id": "nct-NCT03826160",
-          "title": "Growth Hormone Dynamics and Cardiac Steatosis in HIV",
-          "url": "https://clinicaltrials.gov/study/NCT03826160",
-          "publisher": "Massachusetts General Hospital",
-          "publicationDate": "2022-07-19",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT03826160",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
-        },
-        {
           "id": "nct-NCT01388920",
           "title": "Efficacy and Safety Study of Tesamorelin in Chronic Obstructive Pulmonary Disease (COPD) Subjects With Muscle Wasting",
           "url": "https://clinicaltrials.gov/study/NCT01388920",
@@ -5476,32 +5494,6 @@
           "sourceQuality": 5
         },
         {
-          "id": "nct-NCT02931474",
-          "title": "Impact of GHRH on Sleep Promotion and Endocrine Regulation in Service Members Who Sustained a Traumatic Brain Injury and Have Current Insomnia",
-          "url": "https://clinicaltrials.gov/study/NCT02931474",
-          "publisher": "National Institute of Nursing Research (NINR)",
-          "publicationDate": "2019-11-19",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT02931474",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
-        },
-        {
-          "id": "nct-NCT02553603",
-          "title": "The Effect of Growth Hormone Releasing Hormone on Cognitive Function in Individuals With Mild Cognitive Impairment",
-          "url": "https://clinicaltrials.gov/study/NCT02553603",
-          "publisher": "The University of Texas Medical Branch, Galveston",
-          "publicationDate": "2019-11-04",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT02553603",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
-        },
-        {
           "id": "nct-NCT01591902",
           "title": "Diabetic Retinopathy in HIV Subjects Treated With EGRIFTA®",
           "url": "https://clinicaltrials.gov/study/NCT01591902",
@@ -5511,6 +5503,32 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": "NCT01591902",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT01579695",
+          "title": "Long-term Observational Study in HIV Subjects Exposed to EGRIFTA®",
+          "url": "https://clinicaltrials.gov/study/NCT01579695",
+          "publisher": "Theratechnologies",
+          "publicationDate": "2018-09-11",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT01579695",
+          "sourceType": "clinical_trial",
+          "sourceQuality": 5
+        },
+        {
+          "id": "nct-NCT01788462",
+          "title": "Egrifta Replacement and Sleep Disordered Breathing",
+          "url": "https://clinicaltrials.gov/study/NCT01788462",
+          "publisher": "Johns Hopkins University",
+          "publicationDate": "2017-03-03",
+          "accessDate": "2026-08-28",
+          "doi": null,
+          "pmid": null,
+          "clinicalTrialId": "NCT01788462",
           "sourceType": "clinical_trial",
           "sourceQuality": 5
         },
@@ -5632,19 +5650,6 @@
           "sourceQuality": 3
         },
         {
-          "id": "pmid-30920787",
-          "title": "",
-          "url": "https://pubmed.ncbi.nlm.nih.gov/30920787/",
-          "publisher": "",
-          "publicationDate": "2016 Aug",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": "30920787",
-          "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 3
-        },
-        {
           "id": "pmid-21668043",
           "title": "Tesamorelin: a review of its use in the management of HIV-associated lipodystrophy.",
           "url": "https://pubmed.ncbi.nlm.nih.gov/21668043/",
@@ -5669,9 +5674,23 @@
           "clinicalTrialId": null,
           "sourceType": "pubmed",
           "sourceQuality": 3
+        },
+        {
+          "id": "pmid-21283099",
+          "title": "Tesamorelin.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21283099/",
+          "publisher": "Nat Rev Drug Discov",
+          "publicationDate": "2011 Feb",
+          "accessDate": "2026-08-28",
+          "doi": "10.1038/nrd3362",
+          "pmid": "21283099",
+          "clinicalTrialId": null,
+          "sourceType": "pubmed",
+          "sourceQuality": 3
         }
       ],
       "conflicts": [],
+      "reviewItems": [],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -5697,6 +5716,7 @@
       "confidenceLevel": "low",
       "regulatoryStatus": "investigational",
       "reviewStatus": "fresh",
+      "regulatoryRegions": [],
       "identity": {
         "verified": true,
         "casNumber": "446262-90-4",
@@ -5845,8 +5865,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-cjc-1295",
@@ -5858,8 +5878,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-none-cjc-1295",
@@ -6058,6 +6078,7 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -6083,6 +6104,7 @@
       "confidenceLevel": "low",
       "regulatoryStatus": "investigational",
       "reviewStatus": "fresh",
+      "regulatoryRegions": [],
       "identity": {
         "verified": true,
         "casNumber": "170851-70-4",
@@ -6231,20 +6253,6 @@
           "lastUpdated": "2017-04-13",
           "hasResults": false,
           "url": "https://clinicaltrials.gov/study/NCT01280344"
-        },
-        {
-          "id": "NCT07717866",
-          "clinicalTrialId": "NCT07717866",
-          "title": "Trifecta Research Study",
-          "phase": null,
-          "status": "ACTIVE_NOT_RECRUITING",
-          "sponsor": "Axial Therapeutic Research",
-          "enrollment": 52,
-          "startDate": "2022-08-01",
-          "completionDate": "2026-11",
-          "lastUpdated": "2026-07-21",
-          "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT07717866"
         }
       ],
       "sources": [
@@ -6258,8 +6266,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-ipamorelin",
@@ -6271,8 +6279,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-none-ipamorelin",
@@ -6323,19 +6331,6 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": "NCT01280344",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
-        },
-        {
-          "id": "nct-NCT07717866",
-          "title": "Trifecta Research Study",
-          "url": "https://clinicaltrials.gov/study/NCT07717866",
-          "publisher": "Axial Therapeutic Research",
-          "publicationDate": "2026-07-21",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT07717866",
           "sourceType": "clinical_trial",
           "sourceQuality": 5
         },
@@ -6497,6 +6492,7 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -6522,6 +6518,7 @@
       "confidenceLevel": "low",
       "regulatoryStatus": "investigational",
       "reviewStatus": "fresh",
+      "regulatoryRegions": [],
       "identity": {
         "verified": true,
         "casNumber": "137525-51-0",
@@ -6657,20 +6654,6 @@
           "lastUpdated": "2015-12-22",
           "hasResults": false,
           "url": "https://clinicaltrials.gov/study/NCT02637284"
-        },
-        {
-          "id": "NCT07437547",
-          "clinicalTrialId": "NCT07437547",
-          "title": "BPC 157 for Acute Hamstring Muscle Strain Repair",
-          "phase": "PHASE2",
-          "status": "RECRUITING",
-          "sponsor": "Hudson Biotech",
-          "enrollment": 120,
-          "startDate": "2026-02-02",
-          "completionDate": "2028-02-17",
-          "lastUpdated": "2026-02-27",
-          "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT07437547"
         }
       ],
       "sources": [
@@ -6684,8 +6667,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-bpc-157",
@@ -6697,8 +6680,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-none-bpc-157",
@@ -6736,19 +6719,6 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": "NCT02637284",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
-        },
-        {
-          "id": "nct-NCT07437547",
-          "title": "BPC 157 for Acute Hamstring Muscle Strain Repair",
-          "url": "https://clinicaltrials.gov/study/NCT07437547",
-          "publisher": "Hudson Biotech",
-          "publicationDate": "2026-02-27",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT07437547",
           "sourceType": "clinical_trial",
           "sourceQuality": 5
         },
@@ -6910,6 +6880,7 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -6934,13 +6905,14 @@
       "evidenceLevel": "F",
       "confidenceLevel": "insufficient",
       "regulatoryStatus": "insufficient",
-      "reviewStatus": "fresh",
+      "reviewStatus": "review-required",
+      "regulatoryRegions": [],
       "identity": {
         "verified": true,
         "casNumber": "885340-08-9",
         "chemicalClass": "synthetic thymosin-beta-4 fragment analogue",
         "moleculeType": "peptide",
-        "identityNote": "TB-500 wird nicht automatisch mit vollständigem Thymosin Beta-4 gleichgesetzt. PubChem CID 62707662 / CAS 885340-08-9 beschreibt ein acetyliertes Fragmentpeptid, nicht das Vollprotein. Die CT.gov-Registrierung NCT07487363 bezeichnet explizit das Fragment 17–23."
+        "identityNote": "TB-500 wird nicht automatisch mit vollständigem Thymosin Beta-4 gleichgesetzt. PubChem CID 62707662 / CAS 885340-08-9 beschreibt ein acetyliertes Fragmentpeptid, nicht das Vollprotein. Die CT.gov-Registrierung NCT07487363 kennzeichnet sich selbst als fiktives Beispielrecord und wird nicht als Studie gewertet."
       },
       "connectors": [
         {
@@ -6984,8 +6956,7 @@
           "text": "TB-500 wird in chemischen Datenbanken als synthetisches Fragmentpeptid geführt, nicht als identisches Vollmolekül Thymosin Beta-4. Eine FDA-Zulassung war nicht nachweisbar.",
           "sourceIds": [
             "pubchem-tb-500",
-            "fda-none-tb-500",
-            "nct-NCT07487363"
+            "fda-none-tb-500"
           ]
         },
         "mechanism": {
@@ -6995,17 +6966,16 @@
           ]
         },
         "whatHasBeenStudied": {
-          "text": "PubMed-Abfrage zum Term TB-500 lieferte wenige Treffer, überwiegend Übersichtsarbeiten zu Peptidtherapien, nicht notwendigerweise RCTs von TB-500. ClinicalTrials.gov: 1 Registrierung (Fragment 17–23), ohne Results in der Abfrage.",
+          "text": "PubMed-Abfrage zum Term TB-500 lieferte wenige Treffer, überwiegend Übersichtsarbeiten zu Peptidtherapien, nicht notwendigerweise RCTs von TB-500. Die einzige ClinicalTrials.gov-Registrierung unter diesem Term (NCT07487363) kennzeichnet sich im Brief Summary als fiktives Beispielrecord und wird nicht als Studie gewertet.",
           "sourceIds": [
             "pm-count-tb-500",
-            "nct-NCT07487363"
+            "ct-count-tb-500"
           ]
         },
         "humanEvidence": {
           "text": "Keine ausreichenden belastbaren Human-Sicherheits- oder Wirksamkeitsdaten identifiziert.",
           "sourceIds": [
-            "fda-none-tb-500",
-            "nct-NCT07487363"
+            "fda-none-tb-500"
           ]
         },
         "preclinicalEvidence": {
@@ -7021,9 +6991,10 @@
           ]
         },
         "currentResearch": {
-          "text": "Eine registrierte Studie zum Fragment existiert; ohne publizierte Ergebnisse keine klinische Aussage.",
+          "text": "Keine belastbare, nicht-fiktive CT.gov-Interventionsstudie für TB-500 identifiziert. Reviews zu Peptidtherapien ersetzen keine TB-500-spezifischen Human-RCTs.",
           "sourceIds": [
-            "nct-NCT07487363"
+            "pm-count-tb-500",
+            "ct-count-tb-500"
           ]
         },
         "unknowns": {
@@ -7055,22 +7026,7 @@
         }
       ],
       "reconstitution": null,
-      "studies": [
-        {
-          "id": "NCT07487363",
-          "clinicalTrialId": "NCT07487363",
-          "title": "TB-500 (Thymosin Beta 4 17-23 Fragment) for Cardiovascular Biomarkers in Stable ASCVD",
-          "phase": "PHASE1, PHASE2",
-          "status": "RECRUITING",
-          "sponsor": "Hudson Biotech",
-          "enrollment": 80,
-          "startDate": "2026-02-05",
-          "completionDate": "2028-02-17",
-          "lastUpdated": "2026-03-23",
-          "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT07487363"
-        }
-      ],
+      "studies": [],
       "sources": [
         {
           "id": "ct-count-tb-500",
@@ -7082,8 +7038,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-tb-500",
@@ -7095,8 +7051,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-none-tb-500",
@@ -7123,19 +7079,6 @@
           "clinicalTrialId": null,
           "sourceType": "scientific",
           "sourceQuality": 4
-        },
-        {
-          "id": "nct-NCT07487363",
-          "title": "TB-500 (Thymosin Beta 4 17-23 Fragment) for Cardiovascular Biomarkers in Stable ASCVD",
-          "url": "https://clinicaltrials.gov/study/NCT07487363",
-          "publisher": "Hudson Biotech",
-          "publicationDate": "2026-03-23",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT07487363",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
         },
         {
           "id": "pmid-33318598",
@@ -7260,8 +7203,18 @@
           "topic": "Identität TB-500 vs. Thymosin Beta-4",
           "note": "Quellen und Datenbanken unterscheiden ein Fragmentpeptid (TB-500) vom Vollprotein. Keine automatische Zusammenführung.",
           "sourceIds": [
-            "pubchem-tb-500",
-            "nct-NCT07487363"
+            "pubchem-tb-500"
+          ]
+        }
+      ],
+      "reviewItems": [
+        {
+          "id": "tb-500-fictional-nct",
+          "priority": "High",
+          "topic": "Fiktive CT.gov-Registrierung NCT07487363",
+          "note": "ClinicalTrials.gov Brief Summary von NCT07487363 beginnt mit „This fictional study is an example of a ClinicalTrials.gov-style record.“ Sponsor Hudson Biotech. Der Record bleibt im Rohcache, wird aber nicht als Studie oder Human-Evidenz veröffentlicht.",
+          "sourceIds": [
+            "ct-count-tb-500"
           ]
         }
       ],
@@ -7289,7 +7242,8 @@
       "evidenceLevel": "D",
       "confidenceLevel": "low",
       "regulatoryStatus": "insufficient",
-      "reviewStatus": "fresh",
+      "reviewStatus": "review-required",
+      "regulatoryRegions": [],
       "identity": {
         "verified": true,
         "casNumber": null,
@@ -7350,10 +7304,10 @@
           ]
         },
         "whatHasBeenStudied": {
-          "text": "PubMed: 15 Treffer zur kombinierten Query. ClinicalTrials.gov-Treffer nur übernommen, wenn GHK im Titel steht.",
+          "text": "PubMed: 15 Treffer zur kombinierten Query. ClinicalTrials.gov-Treffer, die GHK nur als Biomarker (z. B. X39-Patch) oder unter dem Sponsor Hudson Biotech führen, wurden nicht als GHK-Cu-Interventionsstudien übernommen.",
           "sourceIds": [
             "pm-count-ghk-cu",
-            "nct-NCT07706361"
+            "ct-count-ghk-cu"
           ]
         },
         "humanEvidence": {
@@ -7377,9 +7331,9 @@
           ]
         },
         "currentResearch": {
-          "text": "Registrierte Studien existieren; ohne Results keine Wirksamkeitsaussage.",
+          "text": "Keine belastbare, klar als GHK-Cu-Gabe identifizierte CT.gov-Interventionsstudie in diesem Batch übernommen.",
           "sourceIds": [
-            "nct-NCT07706361"
+            "ct-count-ghk-cu"
           ]
         },
         "unknowns": {
@@ -7410,36 +7364,7 @@
         }
       ],
       "reconstitution": null,
-      "studies": [
-        {
-          "id": "NCT07706361",
-          "clinicalTrialId": "NCT07706361",
-          "title": "Two-Part Study of the Effects of the X39 Patch on Circulating GHK and GHK-Cu Levels in Healthy Adults",
-          "phase": "NA",
-          "status": "NOT_YET_RECRUITING",
-          "sponsor": "LifeWave, Inc.",
-          "enrollment": 100,
-          "startDate": "2027-01",
-          "completionDate": "2027-04",
-          "lastUpdated": "2026-07-15",
-          "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT07706361"
-        },
-        {
-          "id": "NCT07437586",
-          "clinicalTrialId": "NCT07437586",
-          "title": "Topical GHK-Cu Gel for Acute Skin Wound Healing",
-          "phase": "PHASE2",
-          "status": "RECRUITING",
-          "sponsor": "Hudson Biotech",
-          "enrollment": 60,
-          "startDate": "2026-02-02",
-          "completionDate": "2028-03-17",
-          "lastUpdated": "2026-02-27",
-          "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT07437586"
-        }
-      ],
+      "studies": [],
       "sources": [
         {
           "id": "ct-count-ghk-cu",
@@ -7451,8 +7376,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-ghk-cu",
@@ -7464,8 +7389,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-none-ghk-cu",
@@ -7492,32 +7417,6 @@
           "clinicalTrialId": null,
           "sourceType": "scientific",
           "sourceQuality": 4
-        },
-        {
-          "id": "nct-NCT07706361",
-          "title": "Two-Part Study of the Effects of the X39 Patch on Circulating GHK and GHK-Cu Levels in Healthy Adults",
-          "url": "https://clinicaltrials.gov/study/NCT07706361",
-          "publisher": "LifeWave, Inc.",
-          "publicationDate": "2026-07-15",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT07706361",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
-        },
-        {
-          "id": "nct-NCT07437586",
-          "title": "Topical GHK-Cu Gel for Acute Skin Wound Healing",
-          "url": "https://clinicaltrials.gov/study/NCT07437586",
-          "publisher": "Hudson Biotech",
-          "publicationDate": "2026-02-27",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT07437586",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
         },
         {
           "id": "pmid-25731775",
@@ -7677,6 +7576,17 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "ghk-cu-x39-nct",
+          "priority": "Medium",
+          "topic": "NCT07706361 misst GHK-Spiegel, gibt kein GHK-Cu",
+          "note": "Die Registrierung untersucht ein X39-Patch und zirkulierende GHK/GHK-Cu-Spiegel. Das ist keine Interventionsstudie mit GHK-Cu-Peptidgabe und wird nicht als solche veröffentlicht.",
+          "sourceIds": [
+            "ct-count-ghk-cu"
+          ]
+        }
+      ],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -7701,7 +7611,8 @@
       "evidenceLevel": "D",
       "confidenceLevel": "low",
       "regulatoryStatus": "investigational",
-      "reviewStatus": "fresh",
+      "reviewStatus": "review-required",
+      "regulatoryRegions": [],
       "identity": {
         "verified": true,
         "casNumber": "1627580-64-6",
@@ -7762,7 +7673,7 @@
           ]
         },
         "whatHasBeenStudied": {
-          "text": "ClinicalTrials.gov-Rohtreffer: 9. Nach Filter bleiben Studien, in denen MOTS-c als Intervention erkennbar ist. PubMed: 13 Treffer zur Query.",
+          "text": "ClinicalTrials.gov-Rohtreffer: 9. Nach Filter bleiben keine belastbaren MOTS-c-Interventionsstudien (Hudson-Cluster ausgeschlossen; Biomarker-Messungen ausgeschlossen). PubMed: 13 Treffer zur Query.",
           "sourceIds": [
             "ct-count-mots-c",
             "pm-count-mots-c"
@@ -7788,9 +7699,9 @@
           ]
         },
         "currentResearch": {
-          "text": "Mindestens eine registrierte Interventionsstudie existiert; ohne Results keine klinische Aussage.",
+          "text": "Mindestens eine CT.gov-Registrierung (NCT07505745, Sponsor Hudson Biotech) gehört zum selben Sponsor-Cluster wie der als fiktiv gekennzeichnete TB-500-Record. Sie wird nicht als belastbare Humanstudie veröffentlicht.",
           "sourceIds": [
-            "nct-NCT07505745"
+            "ct-count-mots-c"
           ]
         },
         "unknowns": {
@@ -7821,36 +7732,7 @@
         }
       ],
       "reconstitution": null,
-      "studies": [
-        {
-          "id": "NCT07505745",
-          "clinicalTrialId": "NCT07505745",
-          "title": "MOTS-c for Improving Insulin Sensitivity in Adults With Prediabetes and Overweight/Obesity",
-          "phase": "PHASE2",
-          "status": "RECRUITING",
-          "sponsor": "Hudson Biotech",
-          "enrollment": 120,
-          "startDate": "2026-02-02",
-          "completionDate": "2028-05-17",
-          "lastUpdated": "2026-04-01",
-          "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT07505745"
-        },
-        {
-          "id": "NCT04027712",
-          "clinicalTrialId": "NCT04027712",
-          "title": "Platelet Reactivity, B-amyloid, MOTS-c and Mortality of Type II Diabetics With CAD",
-          "phase": null,
-          "status": "UNKNOWN",
-          "sponsor": "University of Athens",
-          "enrollment": 120,
-          "startDate": "2014-01-01",
-          "completionDate": "2021-12-31",
-          "lastUpdated": "2019-07-23",
-          "hasResults": false,
-          "url": "https://clinicaltrials.gov/study/NCT04027712"
-        }
-      ],
+      "studies": [],
       "sources": [
         {
           "id": "ct-count-mots-c",
@@ -7862,8 +7744,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-mots-c",
@@ -7875,8 +7757,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-none-mots-c",
@@ -7903,32 +7785,6 @@
           "clinicalTrialId": null,
           "sourceType": "scientific",
           "sourceQuality": 4
-        },
-        {
-          "id": "nct-NCT07505745",
-          "title": "MOTS-c for Improving Insulin Sensitivity in Adults With Prediabetes and Overweight/Obesity",
-          "url": "https://clinicaltrials.gov/study/NCT07505745",
-          "publisher": "Hudson Biotech",
-          "publicationDate": "2026-04-01",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT07505745",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
-        },
-        {
-          "id": "nct-NCT04027712",
-          "title": "Platelet Reactivity, B-amyloid, MOTS-c and Mortality of Type II Diabetics With CAD",
-          "url": "https://clinicaltrials.gov/study/NCT04027712",
-          "publisher": "University of Athens",
-          "publicationDate": "2019-07-23",
-          "accessDate": "2026-08-28",
-          "doi": null,
-          "pmid": null,
-          "clinicalTrialId": "NCT04027712",
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
         },
         {
           "id": "pmid-39160573",
@@ -8088,6 +7944,17 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "mots-c-hudson-nct",
+          "priority": "High",
+          "topic": "Hudson-Biotech-Registrierung NCT07505745",
+          "note": "NCT07505745 hat denselben Sponsor und dieselbe Kontakt-/Standortsignatur wie NCT07487363, dessen Brief Summary sich als fiktives Beispielrecord ausweist. Ohne unabhängige Bestätigung nicht als Humanstudie werten.",
+          "sourceIds": [
+            "ct-count-mots-c"
+          ]
+        }
+      ],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."
@@ -8112,7 +7979,8 @@
       "evidenceLevel": "E",
       "confidenceLevel": "low",
       "regulatoryStatus": "investigational",
-      "reviewStatus": "fresh",
+      "reviewStatus": "review-recommended",
+      "regulatoryRegions": [],
       "identity": {
         "verified": true,
         "casNumber": "221231-10-3",
@@ -8245,8 +8113,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "clinical_trial",
-          "sourceQuality": 5
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "pm-count-aod-9604",
@@ -8258,8 +8126,8 @@
           "doi": null,
           "pmid": null,
           "clinicalTrialId": null,
-          "sourceType": "pubmed",
-          "sourceQuality": 4
+          "sourceType": "scientific",
+          "sourceQuality": 3
         },
         {
           "id": "fda-none-aod-9604",
@@ -8419,6 +8287,18 @@
         }
       ],
       "conflicts": [],
+      "reviewItems": [
+        {
+          "id": "aod-9604-ct-zero",
+          "priority": "Low",
+          "topic": "0 CT.gov-Treffer ist kein Beweis für fehlende Humanstudien",
+          "note": "Die Abfrage AOD9604 lieferte 0 ClinicalTrials.gov-Treffer. Ältere Literatur kann Humanstudien außerhalb dieses Terms enthalten. Evidence E bleibt, bis weitere belastbare Humanquellen kuratiert sind.",
+          "sourceIds": [
+            "ct-count-aod-9604",
+            "pmid-15134286"
+          ]
+        }
+      ],
       "community": {
         "available": false,
         "message": "Reddit community data temporarily unavailable."

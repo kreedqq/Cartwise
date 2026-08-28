@@ -67,7 +67,9 @@ Postgres `products`. Lexicon only stores `PeptideProductRef` (code, name, streng
 
 ### SOURCE (`ProfileSource` / `PeptideSource`)
 
-Curated in `published.json`: title, URL, publisher, dates, DOI, PMID, NCT, `sourceType`, `sourceQuality` 1–5, `accessDate`. Community types: blog, reddit, forum, community.
+Curated in `published.json`: title, URL, publisher, dates, DOI, PMID, NCT, `sourceType`, `sourceQuality` 1–5, `accessDate`. Search-count rows are `scientific` (not primary trials). Community types: blog, reddit, forum, community.
+
+Approved-label profiles store `regulatoryRegions` (e.g. US, EU). Audit findings that are not auto-resolved are `reviewItems` (priority, topic, note, sourceIds) and appear in Admin Research.
 
 ### STUDY (`ProfileStudy` / `PeptideStudy`)
 

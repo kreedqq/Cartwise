@@ -80,6 +80,14 @@ export interface SubstanceProfile {
   studies: ProfileStudy[];
   sources: ProfileSource[];
   conflicts: Array<{ topic: string; note: string; sourceIds: string[] }>;
+  reviewItems: Array<{
+    id: string;
+    priority: "High" | "Medium" | "Low";
+    topic: string;
+    note: string;
+    sourceIds: string[];
+  }>;
+  regulatoryRegions: string[];
   community: { available: false; message: string };
   researchReport: {
     identity: string;
@@ -110,6 +118,9 @@ export function everyStatementCited(profile: SubstanceProfile): boolean {
   }
   for (const block of blocks) {
     if (block.sourceIds.length === 0 || block.sourceIds.some((id) => !ids.has(id))) return false;
+  }
+  for (const item of profile.reviewItems ?? []) {
+    if (item.sourceIds.length === 0 || item.sourceIds.some((id) => !ids.has(id))) return false;
   }
   return true;
 }

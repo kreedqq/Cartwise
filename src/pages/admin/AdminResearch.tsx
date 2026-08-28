@@ -18,7 +18,13 @@ export default function AdminResearchPage() {
   }, []);
 
   const incomplete = PEPTIDE_SUBSTANCES.filter((item) => item.reviewStatus === "incomplete").length;
+  const reviewRequired = PEPTIDE_SUBSTANCES.filter(
+    (item) => item.reviewStatus === "review-required" || item.reviewStatus === "review-recommended",
+  ).length;
   const fresh = PEPTIDE_SUBSTANCES.filter((item) => item.reviewStatus === "fresh").length;
+  const reviewQueue = published.flatMap((profile) =>
+    (profile.reviewItems ?? []).map((item) => ({ slug: profile.slug, ...item })),
+  );
 
   return (
     <div className="space-y-6">
@@ -31,7 +37,7 @@ export default function AdminResearchPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Total Substances" value={PEPTIDE_SUBSTANCES.length} />
         <Stat label="Fresh Profiles" value={fresh} />
-        <Stat label="Review Required" value={incomplete} />
+        <Stat label="Review Required" value={reviewRequired + incomplete} />
         <Stat label="Sources" value={publishedSourceCount()} />
         <Stat label="Published profiles" value={published.length} />
         <Stat label="New Clinical Trials" value={published.reduce((sum, p) => sum + p.researchReport.clinicalTrials, 0)} />
@@ -106,6 +112,22 @@ export default function AdminResearchPage() {
         <p className="text-sm text-muted-foreground">
           Der erste Batch ist als published kuratiert. Neue Live-Funde bleiben Draft, bis sie geprüft sind.
         </p>
+        {reviewQueue.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Keine offenen Review-Punkte in den veröffentlichten Profilen.</p>
+        ) : (
+          <ul className="space-y-2 text-sm">
+            {reviewQueue.map((item) => (
+              <li key={`${item.slug}-${item.id}`} className="rounded-lg border border-border/70 px-3 py-2">
+                <span className="font-medium">{item.slug}</span>
+                {" · "}
+                <Badge variant={item.priority === "High" ? "warning" : "outline"}>{item.priority}</Badge>
+                {" · "}
+                {item.topic}
+                <span className="mt-1 block text-xs text-muted-foreground">{item.note}</span>
+              </li>
+            ))}
+          </ul>
+        )}
         <ul className="grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
           {RESEARCH_PIPELINE.map((step) => (
             <li key={step.id}>

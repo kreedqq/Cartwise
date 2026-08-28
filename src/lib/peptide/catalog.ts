@@ -50,8 +50,14 @@ export const PEPTIDE_SUBSTANCES_IDENTITY: readonly PeptideSubstance[] = [
   substance("semaglutide", "Semaglutide", ["Semaglutid"], "glp-metabolic", { moleculeType: "peptide" }),
   substance("liraglutide", "Liraglutide", ["Liraglutid"], "glp-metabolic", { moleculeType: "peptide" }),
   substance("cagrilintide", "Cagrilintide", [], "glp-metabolic", { moleculeType: "peptide" }),
-  substance("mazdutide", "Mazdutide", [], "glp-metabolic", { moleculeType: "peptide" }),
-  substance("orforglipron", "Orforglipron", [], "glp-metabolic", { moleculeType: "research-compounds" }),
+  substance("mazdutide", "Mazdutide", [], "glp-metabolic", {
+    developmentNames: ["IBI362", "LY3305677"],
+    moleculeType: "peptide",
+  }),
+  substance("orforglipron", "Orforglipron", [], "glp-metabolic", {
+    developmentNames: ["LY3502970"],
+    moleculeType: "small-molecule",
+  }),
   substance("tesamorelin", "Tesamorelin", [], "growth-hormone", { moleculeType: "peptide" }),
   substance("cjc-1295", "CJC-1295", ["CJC1295", "CJC 1295"], "growth-hormone", { moleculeType: "peptide" }),
   substance("ipamorelin", "Ipamorelin", ["IPA"], "growth-hormone", { moleculeType: "peptide" }),
