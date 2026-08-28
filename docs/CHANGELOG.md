@@ -6,6 +6,8 @@ Only material changes. Dates are local project days.
 
 ### Added
 
+- Phase 10B production deploy preflight: `docs/RESEARCH_DEPLOYMENT_PREFLIGHT_PHASE_10B.md` — **DEPLOYMENT_PREFLIGHT_PASS**. Peptix domain `https://cartwise-zeta.vercel.app` (`pepsi7/cartwise`). No migration on Vercel build. `VITE_RESEARCH_DB_MODE` unset → legacy. No push/deploy.
+
 - Phase 10A local release backup commit `feat: persist research platform and admin workflow` — dual-read, admin Postgres UI, research migrations 0025–0029 in git (already live), Phase 9/9B docs. Not pushed. Not deployed. Public lexicon still files.
 
 ### Added (Phase 9, earlier this day)

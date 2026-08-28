@@ -2,7 +2,7 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-08-28** (Deployment readiness Phase 9B — DEPLOYMENT_READY).
+Last documentation pass: **2026-08-28** (Deployment preflight Phase 10B — DEPLOYMENT_PREFLIGHT_PASS).
 
 ## Identity
 
@@ -20,7 +20,7 @@ Last documentation pass: **2026-08-28** (Deployment readiness Phase 9B — DEPLO
 |---|---|
 | Branch | `main` (tracks `origin/main`) |
 | Last backup commit | Phase 10A local release: `feat: persist research platform and admin workflow` (not pushed) |
-| Last documentation pass | Deployment readiness Phase 9B DEPLOYMENT_READY (2026-08-28) |
+| Last documentation pass | Deployment preflight Phase 10B DEPLOYMENT_PREFLIGHT_PASS (2026-08-28) |
 | Nested copy | A nested `Cartwise/` tree may exist; do not treat it as the app source. Tests are scoped to `src/` (`vite.config.ts`). |
 
 Do not commit unless the user asks. Recommended backup commit (when requested): all intended app files **except** `.env*`, credentials, and nested gitlinks.
@@ -158,6 +158,7 @@ Not in the frontend; optional for later server-side research (names only):
 - Admin Research reads Postgres in the working tree (`docs/RESEARCH_ADMIN_POSTGRES_PHASE_8.md`); public lexicon still files. `research_updates` table does not exist.
 - Phase 9 production browser QA: **BROWSER_QA_PASS_WITH_LIMITATIONS** (`docs/RESEARCH_PRODUCTION_BROWSER_QA_PHASE_9.md`). No admin session in the QA browser; hosted SPA is `https://cartwise-zeta.vercel.app` (predates uncommitted Phase 8 UI).
 - Phase 9B deployment readiness: **DEPLOYMENT_READY** (`docs/RESEARCH_DEPLOYMENT_READINESS_PHASE_9B.md`). No commit/push/deploy in that audit.
+- Phase 10B production deploy preflight: **DEPLOYMENT_PREFLIGHT_PASS** (`docs/RESEARCH_DEPLOYMENT_PREFLIGHT_PHASE_10B.md`). SPA-only; do not re-apply 0024–0029. Not pushed/deployed.
 - Browser research connectors are stubs; live fetch is Node scripts only
 - Reddit / forums / blogs: unavailable (by design without official API)
 - BfArM / MHRA not queried

@@ -12,7 +12,7 @@ Browser (Peptix SPA)
        ├─ Sources/studies/claims/regulatory live on cartwise-prod (0024–0029)
        ├─ Dual-read (Phase 7): optional `VITE_RESEARCH_DB_MODE=dual` compares Postgres; public UI stays files
        ├─ Admin Research (Phase 8): Postgres primary (`review_actions` append-only)
-       ├─ Production SPA: `https://cartwise-zeta.vercel.app` → `cartwise-prod` (Phase 9 QA: session-limited; Phase 9B: local tree DEPLOYMENT_READY, SPA not yet updated)
+       ├─ Production SPA: `https://cartwise-zeta.vercel.app` → `cartwise-prod` (Phase 10B preflight PASS; SPA not updated yet)
        └─ Node scripts (official APIs) → cache → compile (not called from the browser)
 ```
 

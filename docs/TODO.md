@@ -6,6 +6,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 
 - [x] User-approved git backup of the dirty `main` working tree (`0da9c90`; do not commit unless asked)
 - [x] Phase 10A local release backup (`feat: persist research platform and admin workflow`; not pushed)
+- [x] Production deploy preflight (Phase 10B) — **DEPLOYMENT_PREFLIGHT_PASS** (`docs/RESEARCH_DEPLOYMENT_PREFLIGHT_PHASE_10B.md`); no push/deploy yet
 - [x] Keep Discord OAuth `skipBrowserRedirect` / no `authorize.json` download
 - [x] Shop selling prices only via shop RPCs (not lexicon)
 
