@@ -1,12 +1,21 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, Link } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
+import { legacyPublicLexiconCatalog } from "@/lib/peptide/lexicon";
 import PeptideCalculatorPage from "@/pages/peptide/PeptideCalculator";
 import PeptideLexiconDetailPage from "@/pages/peptide/PeptideLexiconDetail";
+
+vi.mock("@/hooks/usePublicLexicon", () => ({
+  usePublicLexicon: () => ({
+    data: legacyPublicLexiconCatalog(),
+    isLoading: false,
+    isError: false,
+  }),
+}));
 
 describe("Button", () => {
   it("renders a native button with its label", () => {

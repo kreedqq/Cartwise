@@ -248,10 +248,11 @@ describe("research persistence phase 4 sql payload", () => {
   });
 });
 
-describe("research persistence phase 4 dual-read still legacy", () => {
-  it("does not switch the lexicon to Postgres", () => {
-    expect(researchDbMode({})).toBe("legacy");
-    expect(lexiconUsesPostgresRegulatory({})).toBe(false);
+describe("research persistence phase 4 dual-read still supports emergency legacy", () => {
+  it("defaults to postgres and rolls back with VITE_RESEARCH_DB_MODE=legacy", () => {
+    expect(researchDbMode({})).toBe("postgres");
+    expect(lexiconUsesPostgresRegulatory({})).toBe(true);
+    expect(lexiconUsesPostgresRegulatory({ VITE_RESEARCH_DB_MODE: "legacy" })).toBe(false);
     expect(lexiconUsesPostgresRegulatory({ VITE_RESEARCH_DB_MODE: "postgres" })).toBe(true);
   });
 });

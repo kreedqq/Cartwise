@@ -134,11 +134,15 @@ describe("research persistence phase 5 readiness", () => {
     expect(MIGRATIONS[3]).not.toMatch(/review_actions_delete/);
   });
 
-  it("does not treat the lexicon as switched and scores content ready-with-review", () => {
-    expect(researchDbMode({})).toBe("legacy");
-    expect(lexiconUsesPostgresIdentity({})).toBe(false);
+  it("does not treat the Phase 5 audit as a live lexicon switch", () => {
     expect(report.contentReadiness).toBe("READY_WITH_REVIEW");
     expect(report.lexiconSwitchReadiness).toBe("NOT_READY");
     expect(report.deployedMigrationsAppliedThrough).toBe("0023");
+  });
+
+  it("uses postgres as the live public lexicon default after Phase 11", () => {
+    expect(researchDbMode({})).toBe("postgres");
+    expect(lexiconUsesPostgresIdentity({})).toBe(true);
+    expect(lexiconUsesPostgresIdentity({ VITE_RESEARCH_DB_MODE: "legacy" })).toBe(false);
   });
 });

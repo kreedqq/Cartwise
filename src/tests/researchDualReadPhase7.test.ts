@@ -56,15 +56,18 @@ function mockClientFromBundle() {
 }
 
 describe("phase 7 dual-read mode", () => {
-  it("defaults to legacy and does not switch the lexicon display", () => {
-    expect(researchDbMode({})).toBe("legacy");
+  it("defaults to postgres for public display and keeps emergency legacy rollback", () => {
+    expect(researchDbMode({})).toBe("postgres");
     expect(researchDbMode({ VITE_RESEARCH_DB_MODE: "dual" })).toBe("dual");
     expect(researchDbMode({ VITE_RESEARCH_DB_MODE: "postgres" })).toBe("postgres");
-    expect(lexiconUsesPostgresIdentity({})).toBe(false);
-    expect(lexiconUsesPostgresIdentity({ VITE_RESEARCH_DB_MODE: "dual" })).toBe(false);
+    expect(researchDbMode({ VITE_RESEARCH_DB_MODE: "legacy" })).toBe("legacy");
+    expect(lexiconUsesPostgresIdentity({})).toBe(true);
+    expect(lexiconUsesPostgresIdentity({ VITE_RESEARCH_DB_MODE: "dual" })).toBe(true);
+    expect(lexiconUsesPostgresIdentity({ VITE_RESEARCH_DB_MODE: "legacy" })).toBe(false);
     expect(shouldCompareResearchReads({ VITE_RESEARCH_DB_MODE: "dual" })).toBe(true);
-    expect(shouldCompareResearchReads({})).toBe(false);
-    expect(lexiconDisplaySource()).toBe("legacy");
+    expect(shouldCompareResearchReads({ VITE_RESEARCH_DB_MODE: "legacy" })).toBe(false);
+    expect(lexiconDisplaySource({})).toBe("postgres");
+    expect(lexiconDisplaySource({ VITE_RESEARCH_DB_MODE: "legacy" })).toBe("legacy");
   });
 
   it("keeps catalog.ts and published.json in the tree", () => {
@@ -283,7 +286,7 @@ describe("phase 7 readiness and safety", () => {
     const { report } = seedParityReport();
     expect(report.criticalCount).toBe(0);
     expect(report.verdict).toBe("DUAL_READ_READY");
-    expect(report.displaySource).toBe("legacy");
+    expect(report.displaySource).toBe("postgres");
   });
 
   it("does not log secrets", () => {
@@ -307,7 +310,8 @@ describe("phase 7 readiness and safety", () => {
     const lexicon = readFileSync(resolve(process.cwd(), "src/pages/peptide/PeptideLexicon.tsx"), "utf8");
     const detail = readFileSync(resolve(process.cwd(), "src/pages/peptide/PeptideLexiconDetail.tsx"), "utf8");
     expect(`${lexicon}\n${detail}`).not.toMatch(/in den Warenkorb/i);
-    expect(lexicon).toMatch(/getPublishedProfile|PEPTIDE_SUBSTANCES|searchSubstances/);
-    expect(detail).toMatch(/getPublishedProfile|getSubstanceBySlug/);
+    expect(lexicon).toMatch(/usePublicLexicon|searchLexiconSubstances/);
+    expect(detail).toMatch(/usePublicLexicon/);
+    expect(lexicon).toMatch(/keine Shoppreise/);
   });
 });

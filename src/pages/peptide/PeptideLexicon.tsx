@@ -4,11 +4,12 @@ import { Link } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CATEGORY_LABELS, PEPTIDE_SUBSTANCES, REGULATORY_LABELS, SAFETY_DISCLAIMER } from "@/lib/peptide/catalog";
+import { CATEGORY_LABELS, REGULATORY_LABELS, SAFETY_DISCLAIMER } from "@/lib/peptide/catalog";
 import { LEXICON_STATUS_FILTERS, matchesLexiconStatus, type LexiconStatusFilter } from "@/lib/peptide/lexiconFilters";
 import { formatReviewedDate } from "@/lib/peptide/profiles";
-import { searchSubstances } from "@/lib/peptide/search";
+import { searchLexiconSubstances } from "@/lib/peptide/search";
 import type { PeptideCategory } from "@/lib/peptide/types";
+import { usePublicLexicon } from "@/hooks/usePublicLexicon";
 
 const FILTERS: Array<{ id: "all" | PeptideCategory; label: string }> = [
   { id: "all", label: "Alle" },
@@ -16,12 +17,14 @@ const FILTERS: Array<{ id: "all" | PeptideCategory; label: string }> = [
 ];
 
 export default function PeptideLexiconPage() {
+  const lexiconQuery = usePublicLexicon();
   const [query, setQuery] = React.useState("");
   const [category, setCategory] = React.useState<"all" | PeptideCategory>("all");
   const [status, setStatus] = React.useState<LexiconStatusFilter>("all");
+  const substances = React.useMemo(() => lexiconQuery.data?.substances ?? [], [lexiconQuery.data?.substances]);
   const items = React.useMemo(
-    () => searchSubstances(query, category).filter((item) => matchesLexiconStatus(item, status)),
-    [query, category, status],
+    () => searchLexiconSubstances(substances, query, category).filter((item) => matchesLexiconStatus(item, status)),
+    [substances, query, category, status],
   );
 
   React.useEffect(() => {
@@ -78,33 +81,41 @@ export default function PeptideLexiconPage() {
         ))}
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        {items.length} von {PEPTIDE_SUBSTANCES.length} Profilen · keine Shoppreise
-      </p>
+      {lexiconQuery.isLoading ? (
+        <p className="text-sm text-muted-foreground">Lexikon wird geladen…</p>
+      ) : lexiconQuery.isError && !lexiconQuery.data ? (
+        <p className="text-sm text-destructive">Lexikon konnte nicht geladen werden. Bitte später erneut versuchen.</p>
+      ) : (
+        <>
+          <p className="text-xs text-muted-foreground">
+            {items.length} von {substances.length} Profilen · keine Shoppreise
+          </p>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {items.map((item) => (
-          <Link
-            key={item.slug}
-            to={`/peptide/lexikon/${item.slug}`}
-            className="rounded-xl border border-border/70 bg-card p-5 transition-colors hover:border-primary/40"
-          >
-            <div className="flex flex-wrap gap-1.5">
-              <Badge variant="secondary">{CATEGORY_LABELS[item.category]}</Badge>
-              <Badge variant="outline">Evidence {item.evidenceLevel}</Badge>
-            </div>
-            <h2 className="mt-3 text-base font-semibold tracking-tight">{item.displayName}</h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {[...item.aliases, ...item.developmentNames].slice(0, 3).join(" · ") || "Keine Aliase hinterlegt"}
-            </p>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Status: {REGULATORY_LABELS[item.regulatoryStatus]} · Evidence {item.evidenceLevel}
-              {item.lastReviewedAt ? ` · Last reviewed: ${formatReviewedDate(item.lastReviewedAt)}` : " · Last reviewed: —"}
-            </p>
-            <span className="mt-3 inline-block text-sm font-medium text-primary">Profil öffnen</span>
-          </Link>
-        ))}
-      </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {items.map((item) => (
+              <Link
+                key={item.slug}
+                to={`/peptide/lexikon/${item.slug}`}
+                className="rounded-xl border border-border/70 bg-card p-5 transition-colors hover:border-primary/40"
+              >
+                <div className="flex flex-wrap gap-1.5">
+                  <Badge variant="secondary">{CATEGORY_LABELS[item.category]}</Badge>
+                  <Badge variant="outline">Evidence {item.evidenceLevel}</Badge>
+                </div>
+                <h2 className="mt-3 text-base font-semibold tracking-tight">{item.displayName}</h2>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {[...item.aliases, ...item.developmentNames].slice(0, 3).join(" · ") || "Keine Aliase hinterlegt"}
+                </p>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Status: {REGULATORY_LABELS[item.regulatoryStatus]} · Evidence {item.evidenceLevel}
+                  {item.lastReviewedAt ? ` · Last reviewed: ${formatReviewedDate(item.lastReviewedAt)}` : " · Last reviewed: —"}
+                </p>
+                <span className="mt-3 inline-block text-sm font-medium text-primary">Profil öffnen</span>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

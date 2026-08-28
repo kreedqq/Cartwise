@@ -4,14 +4,15 @@ Only material changes. Dates are local project days.
 
 ## 2026-08-29
 
+### Added
+
+- Phase 11 public lexicon Postgres cutover (local commit, not pushed/deployed): `docs/RESEARCH_PUBLIC_LEXICON_CUTOVER_PHASE_11.md` — **LEXICON_CUTOVER_READY**. Phase 11A release audit: `docs/RESEARCH_LEXICON_CUTOVER_RELEASE_AUDIT.md` — **LEXICON_RELEASE_READY**. Public list/detail read Postgres (`usePublicLexicon`) with exclusive full-legacy fallback. Default `VITE_RESEARCH_DB_MODE=postgres`. Emergency rollback `legacy`. Tests `src/tests/researchPublicLexiconCutoverPhase11.test.ts`. Production SPA remains Phase 10E files until deploy.
+- Logged-in production admin browser QA: `docs/RESEARCH_PRODUCTION_ADMIN_BROWSER_QA.md` — **BROWSER_QA_NOT_READY**. Admin Research (Postgres), mapping, lexicon list/search, shop, and cart pass. Lexicon detail pages and `/peptide/rechner` crash on the hosted SPA (`Slot failed to slot onto its children` in `button-C9NJmCLl.js`). No mutation, no deploy, no commit.
+
 ### Fixed
 
 - Phase 10D: Radix Slot crash on lexicon detail and calculator (`Button asChild` always had a spinner sibling). `Slottable` wrap in `src/components/ui/button.tsx`. Tests `src/tests/button.test.tsx`. `docs/RESEARCH_UI_CRASH_FIX_PHASE_10D.md` — **UI_CRASH_FIXED**.
 - Phase 10E: deployed that fix to `https://cartwise-zeta.vercel.app` (`pepsi7/cartwise`, `dpl_BTukrYBjxY1rAURuznPqgBhMxbHn`). Local commit `b079bbf`, not pushed. `docs/RESEARCH_UI_CRASH_FIX_DEPLOY_PHASE_10E.md` — **UI_FIX_DEPLOYED_AND_VERIFIED**. DB still 0029.
-
-### Added
-
-- Logged-in production admin browser QA: `docs/RESEARCH_PRODUCTION_ADMIN_BROWSER_QA.md` — **BROWSER_QA_NOT_READY**. Admin Research (Postgres), mapping, lexicon list/search, shop, and cart pass. Lexicon detail pages and `/peptide/rechner` crash on the hosted SPA (`Slot failed to slot onto its children` in `button-C9NJmCLl.js`). No mutation, no deploy, no commit.
 
 ## 2026-08-28
 

@@ -181,9 +181,10 @@ describe("research persistence phase 2 SQL migration", () => {
 });
 
 describe("research persistence phase 2 dual-read flag", () => {
-  it("defaults to legacy so the lexicon does not switch to Postgres sources", () => {
-    expect(researchDbMode({})).toBe("legacy");
-    expect(lexiconUsesPostgresScience({})).toBe(false);
+  it("defaults to postgres for public science reads with emergency legacy rollback", () => {
+    expect(researchDbMode({})).toBe("postgres");
+    expect(lexiconUsesPostgresScience({})).toBe(true);
+    expect(lexiconUsesPostgresScience({ VITE_RESEARCH_DB_MODE: "legacy" })).toBe(false);
     expect(lexiconUsesPostgresScience({ VITE_RESEARCH_DB_MODE: "postgres" })).toBe(true);
   });
 });

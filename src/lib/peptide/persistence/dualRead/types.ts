@@ -210,7 +210,7 @@ export type DualReadVerdict = "DUAL_READ_READY" | "DUAL_READ_NOT_READY";
 
 export interface DualReadReport {
   mode: "legacy" | "dual" | "postgres";
-  displaySource: "legacy";
+  displaySource: "legacy" | "postgres";
   fallback: DualReadFallbackKind;
   fallbackMessage: string | null;
   differences: DualReadDifference[];

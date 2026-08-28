@@ -37,8 +37,16 @@ export function matchesSubstanceSearch(
   return substanceSearchHaystack(substance).includes(needle);
 }
 
+export function searchLexiconSubstances(
+  items: readonly PeptideSubstance[],
+  query: string,
+  category: PeptideCategory | "all" = "all",
+): PeptideSubstance[] {
+  return items.filter((item) => matchesSubstanceSearch(item, query, category));
+}
+
 export function searchSubstances(query: string, category: PeptideCategory | "all" = "all"): PeptideSubstance[] {
-  return PEPTIDE_SUBSTANCES.filter((item) => matchesSubstanceSearch(item, query, category));
+  return searchLexiconSubstances(PEPTIDE_SUBSTANCES, query, category);
 }
 
 export const PRODUCT_CODE_PREFIX_RULES: Array<{ test: RegExp; slug: string }> = [

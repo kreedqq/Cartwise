@@ -7,12 +7,13 @@ Browser (Peptix SPA)
   ├─ Auth (GoTrue) ── Discord OAuth / email
   ├─ RPCs / tables (shop, carts, orders) ── RLS
   ├─ Edge: get-exchange-rate, set-user-role
-  └─ Peptide platform (client modules + published.json)
-       ├─ Identity also seeded to Postgres (Phase 1; lexicon still reads files)
+  └─ Peptide platform
+       ├─ Public lexicon (Phase 11): Postgres primary + exclusive file fallback
+       ├─ Identity also in catalog.ts (fallback + category overlay)
        ├─ Sources/studies/claims/regulatory live on cartwise-prod (0024–0029)
-       ├─ Dual-read (Phase 7): optional `VITE_RESEARCH_DB_MODE=dual` compares Postgres; public UI stays files
+       ├─ Dual-read (Phase 7): `VITE_RESEARCH_DB_MODE=dual|postgres` compares; public UI follows postgres unless fallback
        ├─ Admin Research (Phase 8): Postgres primary (`review_actions` append-only)
-       ├─ Production SPA: `https://cartwise-zeta.vercel.app` → `cartwise-prod` (Phase 10E: Slot/`Button asChild` fix live, `button-Dq-9OMxe.js`)
+       ├─ Production SPA until Phase 11 deploy: still files (`https://cartwise-zeta.vercel.app`, Phase 10E Slot fix)
        └─ Node scripts (official APIs) → cache → compile (not called from the browser)
 ```
 
@@ -25,7 +26,7 @@ Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PA
 - `src/components/shop|cart|orders|auth|admin|ui/`
 - `src/hooks/` — React Query wrappers
 - `src/services/` — Supabase RPC/table access for shop and admin research
-- `src/lib/peptide/` — calculator, identity catalog, mapping, published profiles, dual-read, admin research workflow
+- `src/lib/peptide/` — calculator, identity catalog, mapping, published profiles, dual-read, public lexicon read, admin research workflow
 - `src/research/` — connector types, engine, queries, fetch cache
 
 ## Authentication
@@ -34,11 +35,11 @@ Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PA
 
 ## Shop vs peptide
 
-| Shop (Postgres) | Lexicon (client files) / Admin Research (Postgres) |
+| Shop (Postgres) | Lexicon (Postgres public read + file fallback) / Admin Research (Postgres) |
 |---|---|
-| `products` SKU, `price_usd`, bulk, availability | `PeptideSubstance` + `SubstanceProfile` from `catalog.ts` + `published.json` |
+| `products` SKU, `price_usd`, bulk, availability | `PeptideSubstance` + `SubstanceProfile` from Postgres (`usePublicLexicon`) or exclusive `catalog.ts` + `published.json` fallback |
 | Cart / checkout / orders | Sources, studies, evidence, community disclaimer |
-| `list_shop_products` | File overlay; Postgres identity is **not** the lexicon display path |
+| `list_shop_products` | Public path: approved claims/evidence/regulatory only |
 | `product_substances` (SKU → substance, no prices; live after 0024+0029) | Client `substanceSlugForProduct` prefix/name mapping still used by lexicon (legacy fallback) |
 
 Mapping is dual: client prefix/name **legacy fallback** and `product_substances` (intended SoT after apply). Lexicon UI must not render prices or cart actions. Unresolved shop labels (TB-500/TB4 mix, Melanotan I, Klow, multi-INN blends) stay unmapped in Postgres.
@@ -65,13 +66,13 @@ Defined in `supabase/migrations/` (0001–0029 in Git). Hand-mirrored in `src/ty
 
 **Research claims (Phase 3, 0026):** `claims`, `claim_sources`, `evidence_assessments`. Cited blocks from `published.json` (one claim per slot/item; summary paragraphs not split). A–F lives on assessments, not on `claims`.
 
-**Research regulatory + review (Phase 4, 0027):** `regulatory_records`, `regulatory_history`, `review_actions`. Imported from published regulatory sources (41 records). Empty FDA/EMA search is never `not_approved`. Community remains unpublished as SQL. Dual-read: `VITE_RESEARCH_DB_MODE` (`legacy` default; `dual` compares; `postgres` prepared). Live apply **done** (0024–0029). Lexicon still files. Phase 7: `docs/RESEARCH_DUAL_READ_PHASE_7.md`. **0028** tightens evidence SELECT. **0029** explicit `product_substances` manuals.
+**Research regulatory + review (Phase 4, 0027):** `regulatory_records`, `regulatory_history`, `review_actions`. Imported from published regulatory sources (41 records). Empty FDA/EMA search is never `not_approved`. Community remains unpublished as SQL. Dual-read: `VITE_RESEARCH_DB_MODE` (`postgres` default after Phase 11; `dual` compares; `legacy` emergency public rollback). Live apply **done** (0024–0029). Public lexicon (local) reads Postgres; files remain exclusive fallback. Phase 7: `docs/RESEARCH_DUAL_READ_PHASE_7.md`. Phase 11: `docs/RESEARCH_PUBLIC_LEXICON_CUTOVER_PHASE_11.md`. **0028** tightens evidence SELECT. **0029** explicit `product_substances` manuals.
 
 ## Peptide / research data models
 
 ### SUBSTANCE (`PeptideSubstance` + overlay)
 
-Identity fields live in `catalog.ts` (always start at evidence F / regulatory insufficient). `applyPublishedProfile` overwrites evidence, regulatory, CAS, dates, description when a published profile exists.
+Identity fields live in `catalog.ts` (always start at evidence F / regulatory insufficient). Public Postgres mapping uses approved humanEvidence assessments for A–F; otherwise F. `applyPublishedProfile` still builds the **legacy fallback** catalog.
 
 ### PRODUCT (shop)
 
@@ -112,13 +113,13 @@ Type + `createResearchDraft` / `canPublish` in `src/research/engine.ts`. There i
 ```
 Product.code ──client prefix/name──► Substance.slug (catalog.ts)
 Product.id   ──product_substances──► substances.id (Postgres, Phase 1)
-Substance ──n:n──► Source          (Postgres source_substances; lexicon still published.json)
-Substance ──n:n──► Study (NCT)     (Postgres study_substances; lexicon still published.json)
+Substance ──n:n──► Source          (Postgres source_substances; public lexicon maps approved/sourced only)
+Substance ──n:n──► Study (NCT)     (Postgres study_substances; Hudson NCTs excluded publicly)
 Study ──n:n──► Source              (study_sources)
-Substance ──1:n──► Claim            (Postgres claims; lexicon still published.json)
+Substance ──1:n──► Claim            (Postgres claims; public: approved + source)
 Claim ──n:n──► Source               (claim_sources)
-Claim ──1:1──► EvidenceAssessment   (A–F not on the claim row)
-Substance ──1:n──► RegulatoryRecord (region + product; lexicon still published.json)
+Claim ──1:1──► EvidenceAssessment   (A–F not on the claim row; public: approved only)
+Substance ──1:n──► RegulatoryRecord (region + product; public: current + approved)
 RegulatoryRecord ──1:n──► RegulatoryHistory
 ReviewAction ──admin──► claim | evidence | regulatory | research_update | substance
 Substance ──1:n──► CommunityReport (none published)
@@ -139,10 +140,11 @@ Node (not bundled as live client calls): `scripts/fetch-research-sources.mjs` (`
 
 - Shop/orders: React Query `staleTime` 30s
 - Exchange rate: DB + edge function
-- Research: file cache `src/research/cache/fetched/` + compiled `published.json` (content not re-fetched on page load)
+- Public lexicon: React Query `staleTime` 30s (`QUERY_KEYS.publicLexicon`); exclusive file fallback stays in the bundle
+- Research compile cache: `src/research/cache/fetched/` + compiled `published.json` (legacy fallback, not mixed into a Postgres response)
 
 ## Security notes
 
 - No service_role in `src/`
-- External HTML is not injected from connector payloads; lexicon text is curated JSON
+- External HTML is not injected from connector payloads; public lexicon text is mapped from approved Postgres claims or exclusive curated JSON fallback
 - JSON-LD on lexicon detail is `WebPage` only (no fake ratings)

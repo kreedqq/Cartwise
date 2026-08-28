@@ -86,9 +86,10 @@ describe("research persistence phase 1 product mapping", () => {
 });
 
 describe("research persistence phase 1 dual-read flag", () => {
-  it("defaults to legacy so the lexicon does not switch to Postgres", () => {
-    expect(researchDbMode({ })).toBe("legacy");
-    expect(lexiconUsesPostgresIdentity({ })).toBe(false);
+  it("defaults to postgres for the public lexicon with emergency legacy rollback", () => {
+    expect(researchDbMode({ })).toBe("postgres");
+    expect(lexiconUsesPostgresIdentity({ })).toBe(true);
+    expect(lexiconUsesPostgresIdentity({ VITE_RESEARCH_DB_MODE: "legacy" })).toBe(false);
     expect(researchDbMode({ VITE_RESEARCH_DB_MODE: "postgres" })).toBe("postgres");
   });
 });

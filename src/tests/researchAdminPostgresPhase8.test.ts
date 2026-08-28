@@ -170,16 +170,17 @@ describe("phase 8 rls and public lexicon isolation", () => {
     expect(ADMIN_PAGE).not.toMatch(/in den Warenkorb/i);
   });
 
-  it("keeps the public lexicon on catalog.ts and published.json", () => {
-    expect(LEXICON).toContain('from "@/lib/peptide/catalog"');
-    expect(LEXICON).toContain("searchSubstances");
-    expect(DETAIL).toContain("getPublishedProfile");
-    expect(DETAIL).toContain("getSubstanceBySlug");
+  it("keeps catalog files as exclusive fallback while the public lexicon reads via usePublicLexicon", () => {
+    expect(LEXICON).toContain("usePublicLexicon");
+    expect(DETAIL).toContain("usePublicLexicon");
+    expect(DETAIL).not.toContain("getPublishedProfile");
+    expect(DETAIL).not.toContain("getSubstanceBySlug");
     expect(DETAIL).not.toContain("fetchAdminResearchDashboard");
     expect(ADMIN_PAGE).toContain("useAdminResearchDashboard");
     expect(ADMIN_PAGE).toContain("Postgres ist die Admin-Quelle");
-    expect(researchDbMode({})).toBe("legacy");
-    expect(lexiconDisplaySource()).toBe("legacy");
+    expect(researchDbMode({})).toBe("postgres");
+    expect(lexiconDisplaySource({})).toBe("postgres");
+    expect(lexiconDisplaySource({ VITE_RESEARCH_DB_MODE: "legacy" })).toBe("legacy");
   });
 });
 

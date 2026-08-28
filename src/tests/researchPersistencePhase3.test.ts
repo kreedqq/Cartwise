@@ -136,9 +136,10 @@ describe("research persistence phase 3 SQL migration", () => {
 });
 
 describe("research persistence phase 3 dual-read flag", () => {
-  it("defaults to legacy so the lexicon does not switch to Postgres claims", () => {
-    expect(researchDbMode({})).toBe("legacy");
-    expect(lexiconUsesPostgresScience({})).toBe(false);
+  it("defaults to postgres for public claims with emergency legacy rollback", () => {
+    expect(researchDbMode({})).toBe("postgres");
+    expect(lexiconUsesPostgresScience({})).toBe(true);
+    expect(lexiconUsesPostgresScience({ VITE_RESEARCH_DB_MODE: "legacy" })).toBe(false);
   });
 });
 

@@ -17,6 +17,7 @@ import type {
   NormalizedResearchSnapshot,
 } from "@/lib/peptide/persistence/dualRead/types";
 import { HUDSON_NCTS, KNOWN_UNRESOLVED_REGULATORY } from "@/lib/peptide/persistence/dualRead/types";
+import { lexiconDisplaySource } from "@/lib/peptide/persistence/researchDbMode";
 
 const SEARCH_QUERIES = [
   "Reta",
@@ -473,7 +474,7 @@ export function compareResearchSnapshots(
 
   return {
     mode: extras?.mode ?? "dual",
-    displaySource: "legacy",
+    displaySource: lexiconDisplaySource({ VITE_RESEARCH_DB_MODE: extras?.mode ?? "dual" }),
     fallback,
     fallbackMessage: extras?.fallbackMessage ?? null,
     differences: diffs,

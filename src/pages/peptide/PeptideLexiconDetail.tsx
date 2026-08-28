@@ -13,19 +13,20 @@ import {
   NO_STANDARD_DOSE,
   REGULATORY_LABELS,
   SAFETY_DISCLAIMER,
-  getSubstanceBySlug,
 } from "@/lib/peptide/catalog";
 import { parseMgStrength } from "@/lib/peptide/search";
 import { groupVariantsBySubstance } from "@/lib/peptide/mapping";
-import { formatReviewedDate, getPublishedProfile } from "@/lib/peptide/profiles";
+import { formatReviewedDate } from "@/lib/peptide/profiles";
 import type { CitedText, ProfileSource } from "@/lib/peptide/profiles/types";
+import { usePublicLexicon } from "@/hooks/usePublicLexicon";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { redditConnector } from "@/research/connectors";
 
 export default function PeptideLexiconDetailPage() {
   const { slug = "" } = useParams();
-  const substance = getSubstanceBySlug(slug);
-  const profile = getPublishedProfile(slug);
+  const lexiconQuery = usePublicLexicon();
+  const substance = lexiconQuery.data?.substances.find((item) => item.slug === slug);
+  const profile = slug ? lexiconQuery.data?.profiles.get(slug) : undefined;
   const productsQuery = useShopProducts();
   const [redditMessage, setRedditMessage] = React.useState("Reddit community data temporarily unavailable.");
 
@@ -49,6 +50,16 @@ export default function PeptideLexiconDetailPage() {
     if (!ogTitle.parentElement) document.head.appendChild(ogTitle);
     void redditConnector.search({ name: substance.name }).then((result) => setRedditMessage(result.message));
   }, [substance]);
+
+  if (lexiconQuery.isLoading) {
+    return <p className="text-sm text-muted-foreground">Lexikon wird geladen…</p>;
+  }
+
+  if (lexiconQuery.isError && !lexiconQuery.data) {
+    return (
+      <p className="text-sm text-destructive">Lexikon konnte nicht geladen werden. Bitte später erneut versuchen.</p>
+    );
+  }
 
   if (!substance) return <Navigate to="/peptide/lexikon" replace />;
 

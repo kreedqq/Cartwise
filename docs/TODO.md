@@ -11,6 +11,9 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] Logged-in production admin browser QA — **BROWSER_QA_NOT_READY** (`docs/RESEARCH_PRODUCTION_ADMIN_BROWSER_QA.md`); lexicon detail + calculator crash on hosted SPA
 - [x] Phase 10D local UI crash fix — **UI_CRASH_FIXED** (`docs/RESEARCH_UI_CRASH_FIX_PHASE_10D.md`)
 - [x] Phase 10E commit + production deploy of UI crash fix — **UI_FIX_DEPLOYED_AND_VERIFIED** (`docs/RESEARCH_UI_CRASH_FIX_DEPLOY_PHASE_10E.md`); `b079bbf` not pushed
+- [x] Phase 11 public lexicon Postgres cutover — **LEXICON_CUTOVER_READY** (`docs/RESEARCH_PUBLIC_LEXICON_CUTOVER_PHASE_11.md`); local commit, not pushed/deployed
+- [x] Phase 11A lexicon cutover release audit — **LEXICON_RELEASE_READY** (`docs/RESEARCH_LEXICON_CUTOVER_RELEASE_AUDIT.md`)
+- [x] Phase 11B local commit `feat: switch public lexicon to postgres` — no push, no deploy
 - [x] Keep Discord OAuth `skipBrowserRedirect` / no `authorize.json` download
 - [x] Shop selling prices only via shop RPCs (not lexicon)
 
@@ -31,11 +34,11 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] Phase 6A production apply readiness (GO_WITH_FIXES; 0024–0027 not applied; 0028 prepared for evidence SELECT)
 - [x] Phase 6B pre-apply fixes (0028 evidence RLS; 0029 explicit product mappings; READY_TO_APPLY; not applied)
 - [x] Phase 6C production apply 0024–0029 — **PRODUCTION_APPLY_SUCCESS** (`docs/RESEARCH_PRODUCTION_APPLY_0024_0029.md`)
-- [x] Dual-read legacy vs Postgres (Phase 7) — **DUAL_READ_READY**; lexicon still files (`docs/RESEARCH_DUAL_READ_PHASE_7.md`)
-- [x] Admin Research Postgres read + review actions (Phase 8) — **ADMIN_POSTGRES_READY**; public lexicon still files (`docs/RESEARCH_ADMIN_POSTGRES_PHASE_8.md`)
+- [x] Dual-read legacy vs Postgres (Phase 7) — **DUAL_READ_READY**; public lexicon later switched in Phase 11 (`docs/RESEARCH_DUAL_READ_PHASE_7.md`)
+- [x] Admin Research Postgres read + review actions (Phase 8) — **ADMIN_POSTGRES_READY** (`docs/RESEARCH_ADMIN_POSTGRES_PHASE_8.md`)
 - [x] Production browser QA (Phase 9) — **BROWSER_QA_PASS_WITH_LIMITATIONS** (`docs/RESEARCH_PRODUCTION_BROWSER_QA_PHASE_9.md`); logged-in admin/lexicon/shop still needs a human session
 - [x] Deployment readiness audit (Phase 9B) — **DEPLOYMENT_READY** (`docs/RESEARCH_DEPLOYMENT_READINESS_PHASE_9B.md`); no commit/push/deploy yet
-- [ ] Persist community in Postgres / switch lexicon read path — later phases; see `docs/RESEARCH_PERSISTENCE_PHASE_5_READINESS.md`
+- [ ] Persist community in Postgres — later; see `docs/RESEARCH_PERSISTENCE_PHASE_5_READINESS.md`
 - [x] Populate remaining identity substances with verified sources (Batch 02; Partial: IGF-1 LR3; Review Required: gonadorelin, thymosin-alpha-1)
 - [ ] Server-side live connectors (no secrets in the client) if ongoing scans are required
 - [ ] Official Reddit API or keep connector unavailable (no scraping)
