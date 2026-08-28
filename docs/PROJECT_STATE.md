@@ -2,7 +2,7 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-08-28** (Research Batch 02).
+Last documentation pass: **2026-08-28** (Research Persistence Phase 1).
 
 ## Identity
 
@@ -19,15 +19,15 @@ Last documentation pass: **2026-08-28** (Research Batch 02).
 | | |
 |---|---|
 | Branch | `main` (tracks `origin/main`) |
-| Last backup commit | `d09a29a` plus this working tree as *chore: backup research batch 02* |
-| Last documentation pass | Research Batch 02 consistency check + backup (2026-08-28) |
+| Last backup commit | `837b155` (*chore: backup research batch 02*; local, not pushed) |
+| Last documentation pass | Research Persistence Phase 1 (2026-08-28) |
 | Nested copy | A nested `Cartwise/` tree may exist; do not treat it as the app source. Tests are scoped to `src/` (`vite.config.ts`). |
 
 Do not commit unless the user asks. Recommended backup commit (when requested): all intended app files **except** `.env*`, credentials, and nested gitlinks.
 
 ## Current development status
 
-The app is a React SPA on Vite with Supabase Auth + Postgres (RLS) + RPCs. Storefront, carts, checkout/orders, Discord OAuth, and admin catalog tools are implemented in code. Peptide hub/calculator/lexicon and curated research (27 substance overlays) are implemented **in the client** (TypeScript catalog + `published.json`), not as Postgres tables.
+The app is a React SPA on Vite with Supabase Auth + Postgres (RLS) + RPCs. Storefront, carts, checkout/orders, Discord OAuth, and admin catalog tools are implemented in code. Peptide hub/calculator/lexicon still read **the client catalog** (`catalog.ts` + `published.json`). Phase 1 added Postgres **identity + product mapping** tables (`substances`, `substance_aliases`, `substance_components`, `product_substances`) as a parallel source of truth. The lexicon is **not** switched to Postgres.
 
 Peptide routes sit behind `ProtectedRoute` (same login as shop).
 
@@ -94,7 +94,8 @@ Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/roles`, `/ad
 - Glow-blend is a product blend (not a unique INN); Melanotan II ≠ afamelanotide; IGF-1 LR3 ≠ mecasermin
 - `regulatoryRegions` stored for approved-label products (US / EU as sourced)
 - Community block: anecdotal disclaimer; Reddit connector returns unavailable
-- Shop SKUs mapped by code prefix/name (`src/lib/peptide/mapping.ts`); no prices in UI
+- Shop SKUs mapped by code prefix/name (`src/lib/peptide/mapping.ts` / `substanceSlugForProduct`); no prices in UI
+- Parallel Postgres mapping: `product_substances` (migration 0024). Client prefix/name mapper is not removed.
 
 ### Research system
 
@@ -112,9 +113,9 @@ Products, CSV/XLSX/PDF import, import history, users, audit log, customer roles 
 
 ### Database (Postgres / Supabase)
 
-Migrations `0001`–`0023` under `supabase/migrations/`. Types: `src/types/database.ts`.
+Migrations `0001`–`0024` under `supabase/migrations/`. Types: `src/types/database.ts`.
 
-Shop tables exist. **No** `substances` / `sources` / `studies` SQL tables yet — peptide research is file-based.
+Shop tables unchanged. Research identity tables: `substances`, `substance_aliases`, `substance_components`, `product_substances`. **No** `sources` / `studies` / claims / evidence SQL tables — published science is still `published.json`.
 
 Edge functions in repo: `get-exchange-rate`, `set-user-role`.
 
@@ -128,24 +129,27 @@ Required in client (`.env.example`):
 Optional build:
 
 - `VITE_BASE_PATH` — Vite `base` (GitHub Pages workflow)
+- `VITE_RESEARCH_DB_MODE` — optional; `legacy` (default) or `postgres`. Phase 1 lexicon ignores this and stays on `catalog.ts`.
 
 Not in the frontend; optional for later server-side research (names only):
 
 - `PUBMED_API_KEY` — optional (NCBI E-utilities works without; higher limits with key)
 - Reddit official API credentials — **not configured**; connector stays unavailable
 
-### Tests / quality (last local run 2026-08-28, Batch 02)
+### Tests / quality (last local run 2026-08-28, Persistence Phase 1)
 
 | Gate | Script | Last result |
 |---|---|---|
-| Tests | `npm test` | 283 passed / 23 files |
+| Tests | `npm test` | 290 passed / 24 files |
 | Typecheck | `npm run typecheck` | pass |
 | Lint | `npm run lint` | 0 errors, 5 `react-refresh/only-export-components` warnings (existing UI/auth files) |
 | Build | `npm run build` | pass; Vite warns main chunk > 500 kB; peptide `catalog` chunk ~348 kB (`published.json`) |
 
 ### Known issues / gaps
 
-- Peptide research not persisted in Postgres; no RLS for sources
+- Peptide **science** (sources/studies/claims/evidence) not persisted in Postgres; identity + product mapping is (Phase 1)
+- Lexicon still reads `catalog.ts` + `published.json` (no Postgres switch)
+- Live `product_substances` row counts depend on applying 0024 against the deployed `products` table
 - Browser research connectors are stubs; live fetch is Node scripts only
 - Reddit / forums / blogs: unavailable (by design without official API)
 - BfArM / MHRA not queried
@@ -160,7 +164,7 @@ Not in the frontend; optional for later server-side research (names only):
 
 1. Keep shop/auth stable.
 2. Do **not** start Research Batch 03 until asked.
-3. Optional: persist research models in Supabase after review workflow.
+3. Do **not** start Persistence Phase 2 (sources/studies/claims) until asked.
 4. Optional: resolve review items (gonadorelin title-restricted literature, Zadaxin primary label, Mazdutide NMPA, Orforglipron EMA).
 
 ### Architecture decisions (in force)

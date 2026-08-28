@@ -26,7 +26,7 @@ export function searchSubstances(query: string, category: PeptideCategory | "all
   });
 }
 
-const CODE_PREFIX: Array<{ test: RegExp; slug: string }> = [
+export const PRODUCT_CODE_PREFIX_RULES: Array<{ test: RegExp; slug: string }> = [
   { test: /^RT\d+/i, slug: "retatrutide" },
   { test: /^TZ\d+/i, slug: "tirzepatide" },
   { test: /^SM\d+/i, slug: "semaglutide" },
@@ -45,7 +45,7 @@ const CODE_PREFIX: Array<{ test: RegExp; slug: string }> = [
 
 export function substanceSlugForProduct(product: { code?: string | null; name?: string | null }): string | null {
   const code = (product.code ?? "").trim();
-  for (const rule of CODE_PREFIX) {
+  for (const rule of PRODUCT_CODE_PREFIX_RULES) {
     if (rule.test.test(code)) return rule.slug;
   }
   const name = (product.name ?? "").toLowerCase();

@@ -399,6 +399,122 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["user_customer_roles"]["Row"]>;
         Relationships: never[];
       };
+      substances: {
+        Row: {
+          id: string;
+          slug: string;
+          name: string;
+          display_name: string;
+          category: string;
+          molecule_type: string | null;
+          chemical_class: string | null;
+          cas_number: string | null;
+          description: string | null;
+          identity_note: string | null;
+          status: "active" | "deprecated" | "merged" | "placeholder" | "blend";
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["substances"]["Row"]> & {
+          slug: string;
+          name: string;
+          display_name: string;
+          category: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["substances"]["Row"]>;
+        Relationships: never[];
+      };
+      substance_aliases: {
+        Row: {
+          id: string;
+          substance_id: string;
+          alias: string;
+          alias_type:
+            | "common_name"
+            | "development_name"
+            | "abbreviation"
+            | "chemical_name"
+            | "brand_name"
+            | "other";
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["substance_aliases"]["Row"]> & {
+          substance_id: string;
+          alias: string;
+          alias_type: Database["public"]["Tables"]["substance_aliases"]["Row"]["alias_type"];
+        };
+        Update: Partial<Database["public"]["Tables"]["substance_aliases"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "substance_aliases_substance_id_fkey";
+            columns: ["substance_id"];
+            isOneToOne: false;
+            referencedRelation: "substances";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      substance_components: {
+        Row: {
+          id: string;
+          blend_id: string;
+          component_id: string;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["substance_components"]["Row"]> & {
+          blend_id: string;
+          component_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["substance_components"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "substance_components_blend_id_fkey";
+            columns: ["blend_id"];
+            isOneToOne: false;
+            referencedRelation: "substances";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "substance_components_component_id_fkey";
+            columns: ["component_id"];
+            isOneToOne: false;
+            referencedRelation: "substances";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      product_substances: {
+        Row: {
+          id: string;
+          product_id: string;
+          substance_id: string;
+          mapping_method: "prefix" | "name" | "manual";
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["product_substances"]["Row"]> & {
+          product_id: string;
+          substance_id: string;
+          mapping_method: "prefix" | "name" | "manual";
+        };
+        Update: Partial<Database["public"]["Tables"]["product_substances"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "product_substances_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "product_substances_substance_id_fkey";
+            columns: ["substance_id"];
+            isOneToOne: false;
+            referencedRelation: "substances";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       cart_summaries: {
@@ -488,6 +604,7 @@ export interface Database {
         Returns: { shares: number[]; total: number; count: number };
       };
       delete_order: { Args: { _order_id: string }; Returns: undefined };
+      refresh_product_substance_prefix_mappings: { Args: Record<string, never>; Returns: number };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

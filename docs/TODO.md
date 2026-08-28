@@ -17,7 +17,8 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] Research Batch 01 quality audit (no Batch 02 at audit time)
 - [x] Research Batch 02 for remaining identity substances (12 slugs; exclusive: 9 complete, 1 partial igf-1-lr3, 2 review-required TA-1 + gonadorelin)
 - [ ] Resolve remaining Review Required: Mazdutide NMPA, Orforglipron EMA, Hudson cluster, Zadaxin primary label, gonadorelin title-restricted literature
-- [ ] Persist substance/source/study in Postgres with RLS + admin approve/reject of **new** drafts
+- [x] Persist substance **identity** + product mapping in Postgres (Phase 1: `substances`, aliases, components, `product_substances`; lexicon still file-based)
+- [ ] Persist source/study/claim/evidence/regulatory/community in Postgres with RLS + admin approve/reject of **new** drafts — later phases; see `docs/RESEARCH_PERSISTENCE_ARCHITECTURE.md`
 - [x] Populate remaining identity substances with verified sources (Batch 02; Partial: IGF-1 LR3; Review Required: gonadorelin, thymosin-alpha-1)
 - [ ] Server-side live connectors (no secrets in the client) if ongoing scans are required
 - [ ] Official Reddit API or keep connector unavailable (no scraping)

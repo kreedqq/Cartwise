@@ -6,6 +6,23 @@ Only material changes. Dates are local project days.
 
 ### Added
 
+- Research Persistence Phase 1: Postgres identity + product mapping (`supabase/migrations/0024_research_identity_and_product_mapping.sql`) — 27 substances, 46 aliases, glow-blend components; `product_substances` FK to existing `products` without altering shop columns
+- Dual-read helper `VITE_RESEARCH_DB_MODE` (`legacy` default); lexicon still reads `catalog.ts` + `published.json`
+- Report `docs/RESEARCH_PERSISTENCE_PHASE_1.md`
+
+### Changed
+
+- Client prefix rules exported as `PRODUCT_CODE_PREFIX_RULES`; mapping behavior unchanged
+- Database types include the four identity/mapping tables and `refresh_product_substance_prefix_mappings`
+
+### Research persistence
+
+- Identity status is lifecycle (`active` / `blend` / …), not evidence A–F
+- TB-500, Thymosin Beta-4, Melanotan II, IGF-1 LR3 remain separate identities
+- Sources, studies, claims, evidence, regulatory, community **not** migrated
+
+### Added (Batch 02, earlier this day)
+
 - Research Batch 02: 12 remaining identity substances compiled into `published.json` (sermorelin, thymosin-beta-4, semax, selank, thymosin-alpha-1, kpv, igf-1-lr3, somatropin, hcg, gonadorelin, melanotan-ii, glow-blend)
 - Report `docs/RESEARCH_BATCH_02_REPORT.md` and snapshot `docs/snapshots/2026-08-28-research-batch-02.md`
 - Title/sponsor filters for noisy Batch 02 CT.gov/PubMed queries; glow-blend mapping-only profile
@@ -48,7 +65,7 @@ Only material changes. Dates are local project days.
 
 ### Architecture
 
-- Product vs substance split; research file-backed, not Postgres
+- Architecture analysis (no implementation): `docs/RESEARCH_PERSISTENCE_ARCHITECTURE.md` — research remains file-based; Postgres target schema and migration order documented
 - Browser connectors stay unavailable; Node scripts perform allowed API reads
 - Review items live on compiled profiles, not a new Postgres queue
 

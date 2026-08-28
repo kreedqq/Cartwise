@@ -8,6 +8,7 @@ Browser (Peptix SPA)
   ├─ RPCs / tables (shop, carts, orders) ── RLS
   ├─ Edge: get-exchange-rate, set-user-role
   └─ Peptide platform (client modules + published.json)
+       ├─ Identity also seeded to Postgres (Phase 1; lexicon still reads files)
        └─ Node scripts (official APIs) → cache → compile (not called from the browser)
 ```
 
@@ -29,17 +30,18 @@ Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PA
 
 ## Shop vs peptide
 
-| Shop (Postgres) | Lexicon (client) |
+| Shop (Postgres) | Lexicon (client, Phase 1) |
 |---|---|
-| `products` SKU, `price_usd`, bulk, availability | `PeptideSubstance` + `SubstanceProfile` |
+| `products` SKU, `price_usd`, bulk, availability | `PeptideSubstance` + `SubstanceProfile` from `catalog.ts` + `published.json` |
 | Cart / checkout / orders | Sources, studies, evidence, community disclaimer |
-| `list_shop_products` | `published.json` + identity catalog |
+| `list_shop_products` | File overlay; Postgres identity is **not** the lexicon read path yet |
+| `product_substances` (SKU → substance, no prices) | Client `substanceSlugForProduct` prefix/name mapping still live |
 
-Mapping is one-way: product code/name → substance slug. Lexicon UI must not render prices or cart actions.
+Mapping is dual: client prefix/name **and** `product_substances`. Lexicon UI must not render prices or cart actions.
 
 ## Database (Postgres)
 
-Defined in `supabase/migrations/` (0001–0023). Hand-mirrored in `src/types/database.ts`.
+Defined in `supabase/migrations/` (0001–0024). Hand-mirrored in `src/types/database.ts`.
 
 **Auth-adjacent:** `profiles`, `user_roles` (`user` \| `admin`).
 
@@ -53,7 +55,9 @@ Defined in `supabase/migrations/` (0001–0023). Hand-mirrored in `src/types/dat
 
 **Other:** `product_favorites`, `order_templates`, `order_template_items`, `exchange_rates`, `pdf_imports`, `pdf_import_rows`, `audit_logs`.
 
-There are **no** SQL tables for substance/source/study/community/research_update. Those exist as TypeScript models.
+**Research identity (Phase 1, 0024):** `substances`, `substance_aliases`, `substance_components`, `product_substances`. RLS: authenticated SELECT; admin write via `has_role`. Shop `products` columns were not altered.
+
+There are **no** SQL tables for source/study/community/research_update. Those remain TypeScript + `published.json`. Dual-read flag: `VITE_RESEARCH_DB_MODE` (`legacy` default). See `docs/RESEARCH_PERSISTENCE_PHASE_1.md`.
 
 ## Peptide / research data models
 
@@ -98,9 +102,10 @@ Type + `createResearchDraft` / `canPublish` in `src/research/engine.ts`. Admin q
 ### Relationships (logical)
 
 ```
-Product.code ──mapping──► Substance.slug
-Substance ──1:n──► Source
-Substance ──1:n──► Study (NCT)
+Product.code ──client prefix/name──► Substance.slug (catalog.ts)
+Product.id   ──product_substances──► substances.id (Postgres, Phase 1)
+Substance ──1:n──► Source          (still published.json)
+Substance ──1:n──► Study (NCT)     (still published.json)
 Substance ──1:n──► CommunityReport (none published)
 Source ──n:1──► Substance
 Community ─x─► EvidenceLevel   (forbidden; communityCannotRaiseEvidence)
