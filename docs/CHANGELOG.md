@@ -2,9 +2,21 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-08-29
+
+### Fixed
+
+- Phase 10D: Radix Slot crash on lexicon detail and calculator (`Button asChild` always had a spinner sibling). `Slottable` wrap in `src/components/ui/button.tsx`. Tests `src/tests/button.test.tsx`. `docs/RESEARCH_UI_CRASH_FIX_PHASE_10D.md` — **UI_CRASH_FIXED**. Not deployed.
+
+### Added
+
+- Logged-in production admin browser QA: `docs/RESEARCH_PRODUCTION_ADMIN_BROWSER_QA.md` — **BROWSER_QA_NOT_READY**. Admin Research (Postgres), mapping, lexicon list/search, shop, and cart pass. Lexicon detail pages and `/peptide/rechner` crash on the hosted SPA (`Slot failed to slot onto its children` in `button-C9NJmCLl.js`). No mutation, no deploy, no commit.
+
 ## 2026-08-28
 
 ### Added
+
+- Phase 10C production SPA deploy: `docs/RESEARCH_PRODUCTION_DEPLOY_PHASE_10C.md` — **PRODUCTION_DEPLOY_SUCCESS_WITH_QA_LIMITATION**. `https://cartwise-zeta.vercel.app` aliased to `cartwise-kkl57nrul-pepsi7.vercel.app`. Migration still 0029. Logged-in admin QA not run.
 
 - Phase 10B production deploy preflight: `docs/RESEARCH_DEPLOYMENT_PREFLIGHT_PHASE_10B.md` — **DEPLOYMENT_PREFLIGHT_PASS**. Peptix domain `https://cartwise-zeta.vercel.app` (`pepsi7/cartwise`). No migration on Vercel build. `VITE_RESEARCH_DB_MODE` unset → legacy. No push/deploy.
 

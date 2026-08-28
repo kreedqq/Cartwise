@@ -2,7 +2,7 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-08-28** (Deployment preflight Phase 10B — DEPLOYMENT_PREFLIGHT_PASS).
+Last documentation pass: **2026-08-29** (Phase 10D UI crash fix — **UI_CRASH_FIXED**, not deployed).
 
 ## Identity
 
@@ -20,7 +20,7 @@ Last documentation pass: **2026-08-28** (Deployment preflight Phase 10B — DEPL
 |---|---|
 | Branch | `main` (tracks `origin/main`) |
 | Last backup commit | Phase 10A local release: `feat: persist research platform and admin workflow` (not pushed) |
-| Last documentation pass | Deployment preflight Phase 10B DEPLOYMENT_PREFLIGHT_PASS (2026-08-28) |
+| Last documentation pass | Phase 10D UI crash fix **UI_CRASH_FIXED** (2026-08-29), not deployed |
 | Nested copy | A nested `Cartwise/` tree may exist; do not treat it as the app source. Tests are scoped to `src/` (`vite.config.ts`). |
 
 Do not commit unless the user asks. Recommended backup commit (when requested): all intended app files **except** `.env*`, credentials, and nested gitlinks.
@@ -159,6 +159,9 @@ Not in the frontend; optional for later server-side research (names only):
 - Phase 9 production browser QA: **BROWSER_QA_PASS_WITH_LIMITATIONS** (`docs/RESEARCH_PRODUCTION_BROWSER_QA_PHASE_9.md`). No admin session in the QA browser; hosted SPA is `https://cartwise-zeta.vercel.app` (predates uncommitted Phase 8 UI).
 - Phase 9B deployment readiness: **DEPLOYMENT_READY** (`docs/RESEARCH_DEPLOYMENT_READINESS_PHASE_9B.md`). No commit/push/deploy in that audit.
 - Phase 10B production deploy preflight: **DEPLOYMENT_PREFLIGHT_PASS** (`docs/RESEARCH_DEPLOYMENT_PREFLIGHT_PHASE_10B.md`). SPA-only; do not re-apply 0024–0029. Not pushed/deployed.
+- Phase 10C production SPA deploy: **PRODUCTION_DEPLOY_SUCCESS_WITH_QA_LIMITATION** (`docs/RESEARCH_PRODUCTION_DEPLOY_PHASE_10C.md`). `https://cartwise-zeta.vercel.app` serves `baaa335`/`a21e838`. DB still 0029.
+- Logged-in production admin browser QA (2026-08-29): **BROWSER_QA_NOT_READY** (`docs/RESEARCH_PRODUCTION_ADMIN_BROWSER_QA.md`). Admin Research/Postgres counts, mapping, lexicon **list**/search, shop, and cart pass. **Lexicon detail and `/peptide/rechner` crash** on the **currently deployed** SPA (`Button asChild` + Radix Slot / `button-C9NJmCLl.js`).
+- Phase 10D local fix: **UI_CRASH_FIXED** (`docs/RESEARCH_UI_CRASH_FIX_PHASE_10D.md`). `Button` wraps children in `Slottable`. Not committed, not pushed, not deployed.
 - Browser research connectors are stubs; live fetch is Node scripts only
 - Reddit / forums / blogs: unavailable (by design without official API)
 - BfArM / MHRA not queried
@@ -174,7 +177,8 @@ Not in the frontend; optional for later server-side research (names only):
 1. Keep shop/auth stable.
 2. Do **not** start Research Batch 03 until asked.
 3. Dual-read is **DUAL_READ_READY**. Admin Research is **ADMIN_POSTGRES_READY**. Do **not** switch the public lexicon, enable `postgres` for the lexicon, start community, or Batch 03 until asked.
-4. Optional: resolve review items (gonadorelin title-restricted literature, Zadaxin primary label, Mazdutide NMPA, Orforglipron EMA).
+4. Production lexicon **detail** + calculator are fixed locally (Phase 10D). Do **not** deploy until asked. Do not treat the crash as a reason to switch the lexicon to Postgres.
+5. Optional: resolve review items (gonadorelin title-restricted literature, Zadaxin primary label, Mazdutide NMPA, Orforglipron EMA).
 
 ### Architecture decisions (in force)
 
