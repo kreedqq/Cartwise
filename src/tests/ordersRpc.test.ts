@@ -16,13 +16,17 @@ describe("createOrder RPC", () => {
     rpc.mockReset();
   });
 
-  it("sends cart id and note and trusts the server total", async () => {
+  it("sends cart id, note, and payment method and trusts the server total", async () => {
     rpc.mockResolvedValue({
       data: { orderId: "ord-9", orderNumber: "CW-2026-000009", totalUsd: 660 },
       error: null,
     });
-    const result = await createOrder("cart-1", "Bitte schnell");
-    expect(rpc).toHaveBeenCalledWith("create_order", { _cart_id: "cart-1", _note: "Bitte schnell" });
+    const result = await createOrder("cart-1", "Bitte schnell", "paypal");
+    expect(rpc).toHaveBeenCalledWith("create_order", {
+      _cart_id: "cart-1",
+      _note: "Bitte schnell",
+      _payment_method: "paypal",
+    });
     expect(result).toEqual({ orderId: "ord-9", orderNumber: "CW-2026-000009", totalUsd: 660 });
   });
 
@@ -31,9 +35,9 @@ describe("createOrder RPC", () => {
       data: { orderId: "ord-9", orderNumber: "CW-2026-000009", totalUsd: 12 },
       error: null,
     });
-    const result = await createOrder("cart-1", null);
+    const result = await createOrder("cart-1", null, "crypto");
     const payload = rpc.mock.calls[0]?.[1] as Record<string, unknown>;
-    expect(payload).toEqual({ _cart_id: "cart-1", _note: null });
+    expect(payload).toEqual({ _cart_id: "cart-1", _note: null, _payment_method: "crypto" });
     expect(payload).not.toHaveProperty("unit_price");
     expect(payload).not.toHaveProperty("total");
     expect(payload).not.toHaveProperty("markup");

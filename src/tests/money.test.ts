@@ -282,4 +282,19 @@ describe("summarizeOrderCharges", () => {
     expect(charges.grandEur).toBe(1010);
     expect(charges.leftoverEur).toBe(0);
   });
+
+  it("keeps USD product+China shipping separate from EUR product+DE shipping", () => {
+    const charges = summarizeOrderCharges({
+      productUsd: 512.5,
+      productEur: 440.18,
+      chinaAmount: 50,
+      chinaCurrency: "USD",
+      deAmount: 6.99,
+      deCurrency: "EUR",
+      usdToEurRate: null,
+    });
+    expect(charges.grandUsd).toBe(562.5);
+    expect(charges.grandEur).toBe(447.17);
+    expect(charges.grandDisplay).toContain("562,50");
+  });
 });

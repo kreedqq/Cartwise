@@ -26,6 +26,8 @@ export type ImportRowAction = "auto" | "create" | "update" | "skip";
 export type ImportRowResult = "created" | "updated" | "skipped" | "failed";
 /** Which price tier produced the unit price applied to a cart line. */
 export type PriceTier = "normal" | "bulk";
+export type PaymentMethod = "crypto" | "bank_transfer" | "paypal";
+export type KitShareStatus = "open" | "full" | "cancelled" | "ordered";
 
 export interface Database {
   public: {
@@ -144,6 +146,7 @@ export interface Database {
           price_snapshot_at: string | null;
           resolution_status: ResolutionStatus;
           note: string | null;
+          kit_share_id: string | null;
           version: number;
           created_at: string;
           updated_at: string;
@@ -253,6 +256,7 @@ export interface Database {
           cart_id: string | null;
           status: OrderStatus;
           note: string | null;
+          payment_method: PaymentMethod | null;
           total_usd: number;
           total_eur: number | null;
           exchange_rate: number | null;
@@ -268,6 +272,41 @@ export interface Database {
           user_id: string;
         };
         Update: Partial<Database["public"]["Tables"]["orders"]["Row"]>;
+        Relationships: never[];
+      };
+      kit_shares: {
+        Row: {
+          id: string;
+          product_id: string;
+          creator_user_id: string;
+          kit_size_vials: number;
+          status: KitShareStatus;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["kit_shares"]["Row"]> & {
+          product_id: string;
+          creator_user_id: string;
+          kit_size_vials: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["kit_shares"]["Row"]>;
+        Relationships: never[];
+      };
+      kit_share_participants: {
+        Row: {
+          id: string;
+          kit_share_id: string;
+          user_id: string;
+          quantity: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["kit_share_participants"]["Row"]> & {
+          kit_share_id: string;
+          user_id: string;
+          quantity: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["kit_share_participants"]["Row"]>;
         Relationships: never[];
       };
       order_items: {
@@ -1084,9 +1123,39 @@ export interface Database {
         Returns: undefined;
       };
       create_order: {
-        Args: { _cart_id: string; _note: string | null };
+        Args: { _cart_id: string; _note: string | null; _payment_method?: PaymentMethod | null };
         Returns: { orderId: string; orderNumber: string; totalUsd: number };
       };
+      list_kit_share_members: {
+        Args: Record<string, never>;
+        Returns: { id: string; display_name: string }[];
+      };
+      create_kit_share: {
+        Args: { _product_id: string; _kit_size_vials: number; _my_quantity: number };
+        Returns: Record<string, unknown>;
+      };
+      invite_kit_share_participant: {
+        Args: { _kit_share_id: string; _participant_user_id: string; _quantity: number };
+        Returns: Record<string, unknown>;
+      };
+      join_kit_share: {
+        Args: { _kit_share_id: string; _quantity: number };
+        Returns: Record<string, unknown>;
+      };
+      update_kit_share_quantity: {
+        Args: { _kit_share_id: string; _quantity: number };
+        Returns: Record<string, unknown>;
+      };
+      get_my_kit_share: {
+        Args: { _kit_share_id: string };
+        Returns: Record<string, unknown>;
+      };
+      add_kit_share_to_cart: {
+        Args: { _kit_share_id: string };
+        Returns: string;
+      };
+      leave_kit_share: { Args: { _kit_share_id: string }; Returns: undefined };
+      cancel_kit_share: { Args: { _kit_share_id: string }; Returns: undefined };
       set_order_status: {
         Args: { _order_id: string; _status: OrderStatus; _admin_note: string | null };
         Returns: Database["public"]["Tables"]["orders"]["Row"];

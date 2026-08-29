@@ -6,8 +6,8 @@ import {
   normalizeCatalogName,
 } from "@/lib/peptide/shopCoverage/names";
 import { substanceLabelForSlug } from "@/lib/peptide/shopCoverage/formClass";
-import { parseStrengthLabel } from "@/lib/peptide/search";
 import type { ShopCatalogProduct } from "@/lib/peptide/shopCoverage/types";
+import { variantStrengthLabel } from "@/lib/shop/variantCoverage";
 import type { Tables } from "@/types/database";
 
 /** Common cart quantities supported by existing validation (1–10). */
@@ -88,12 +88,10 @@ export function lexiconHrefForShopProduct(product: Pick<Tables<"products">, "cod
   return `/peptide/lexikon/${slug}`;
 }
 
-export function variantLabelForProduct(product: Pick<Tables<"products">, "name" | "dosage_vial">): string {
-  const fromVial = product.dosage_vial?.trim();
-  if (fromVial) return fromVial;
-  const fromName = parseStrengthLabel(product.name);
-  if (fromName) return fromName;
-  return "Standard";
+export function variantLabelForProduct(
+  product: Pick<Tables<"products">, "code" | "name" | "dosage_vial">,
+): string {
+  return variantStrengthLabel(product);
 }
 
 function variantSortKey(label: string): number {

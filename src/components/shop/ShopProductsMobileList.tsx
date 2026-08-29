@@ -1,5 +1,7 @@
 import { Check, Info, ShoppingCart, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { KitShareButton, KitShareDialog } from "@/components/shop/KitShareDialog";
 import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
 import { convertUsdToEur, formatEur, formatQuantity, formatUsd, hasBulkTier } from "@/lib/money";
 import {
@@ -18,6 +21,8 @@ import {
   variantLabelForProduct,
   type ShopProductGroup,
 } from "@/lib/shop/display";
+import { shopProductTitle } from "@/lib/shop/variantCoverage";
+import { listKitShareMembers } from "@/services/kitShareMembers";
 import type { Tables } from "@/types/database";
 
 interface ShopProductsMobileListProps {
@@ -28,18 +33,39 @@ interface ShopProductsMobileListProps {
 
 export function ShopProductsMobileList({ products, rate, favoriteProductIds }: ShopProductsMobileListProps) {
   const groups = groupAndSortShopProducts(products);
+  const [kitProduct, setKitProduct] = React.useState<Tables<"products"> | null>(null);
+  const membersQuery = useQuery({
+    queryKey: ["kit-share-members"],
+    queryFn: listKitShareMembers,
+    enabled: kitProduct != null,
+    staleTime: 60_000,
+  });
 
   return (
-    <div className="space-y-3">
-      {groups.map((group) => (
-        <ShopProductGroupCard
-          key={group.familySlug}
-          group={group}
-          rate={rate}
-          favoriteProductIds={favoriteProductIds}
+    <>
+      <div className="space-y-3">
+        {groups.map((group) => (
+          <ShopProductGroupCard
+            key={group.familySlug}
+            group={group}
+            rate={rate}
+            favoriteProductIds={favoriteProductIds}
+            onKitShare={(product) => setKitProduct(product)}
+          />
+        ))}
+      </div>
+      {kitProduct && (
+        <KitShareDialog
+          product={kitProduct}
+          members={membersQuery.data ?? []}
+          membersLoading={membersQuery.isLoading}
+          open={kitProduct != null}
+          onOpenChange={(open) => {
+            if (!open) setKitProduct(null);
+          }}
         />
-      ))}
-    </div>
+      )}
+    </>
   );
 }
 
@@ -47,10 +73,12 @@ function ShopProductGroupCard({
   group,
   rate,
   favoriteProductIds,
+  onKitShare,
 }: {
   group: ShopProductGroup;
   rate: number | null;
   favoriteProductIds: Set<string>;
+  onKitShare: (product: Tables<"products">) => void;
 }) {
   const row = useShopProductGroupRow(group, rate, favoriteProductIds);
   const product = row.product;
@@ -63,6 +91,7 @@ function ShopProductGroupCard({
       ? Math.max(0, (product.bulk_price_min_quantity as number) - qtyNum)
       : null;
   const isFavorite = favoriteProductIds.has(product.id);
+  const title = shopProductTitle(group.displayName, product, row.hasMultipleVariants);
 
   return (
     <Card>
@@ -91,7 +120,7 @@ function ShopProductGroupCard({
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold">{group.displayName}</p>
+            <p className="text-sm font-semibold">{title}</p>
             {row.hasMultipleVariants && (
               <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
                 <SelectTrigger className="mt-2 h-9 w-full max-w-[200px]" aria-label="Variante wählen">
@@ -106,6 +135,9 @@ function ShopProductGroupCard({
                 </SelectContent>
               </Select>
             )}
+            <div className="mt-2">
+              <KitShareButton product={product} onClick={() => onKitShare(product)} />
+            </div>
           </div>
         </div>
 

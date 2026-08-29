@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -18,6 +19,10 @@ import { useCartItems } from "@/hooks/useCartItems";
 import { useCartComputed } from "@/hooks/useCartComputed";
 import { useCreateOrder } from "@/hooks/useOrders";
 import { calculateCartTotals, formatEur, formatUsd, summarizeOrderCharges } from "@/lib/money";
+import {
+  PAYMENT_METHOD_REQUIRED_MESSAGE,
+  type PaymentMethod,
+} from "@/lib/shop/paymentMethod";
 import { toast } from "@/components/ui/toaster";
 
 export default function CheckoutPage() {
@@ -28,6 +33,8 @@ export default function CheckoutPage() {
   const createOrder = useCreateOrder();
 
   const [note, setNote] = React.useState("");
+  const [paymentMethod, setPaymentMethod] = React.useState<PaymentMethod | null>(null);
+  const [paymentError, setPaymentError] = React.useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 
   const cart = cartsQuery.data?.find((c) => c.id === cartId);
@@ -78,8 +85,17 @@ export default function CheckoutPage() {
 
   async function handleSubmit() {
     if (!cart) return;
+    if (!paymentMethod) {
+      setPaymentError(PAYMENT_METHOD_REQUIRED_MESSAGE);
+      setConfirmOpen(false);
+      return;
+    }
     try {
-      const result = await createOrder.mutateAsync({ cartId: cart.id, note: note.trim() || null });
+      const result = await createOrder.mutateAsync({
+        cartId: cart.id,
+        note: note.trim() || null,
+        paymentMethod,
+      });
       toast.success(`Bestellung ${result.orderNumber} wurde übermittelt.`);
       navigate(`/orders/${result.orderId}`);
     } catch (error) {
@@ -88,6 +104,16 @@ export default function CheckoutPage() {
       toast.error(message);
       setConfirmOpen(false);
     }
+  }
+
+  function handleOpenConfirm() {
+    if (!paymentMethod) {
+      setPaymentError(PAYMENT_METHOD_REQUIRED_MESSAGE);
+      toast.error(PAYMENT_METHOD_REQUIRED_MESSAGE);
+      return;
+    }
+    setPaymentError(null);
+    setConfirmOpen(true);
   }
 
   return (
@@ -184,7 +210,7 @@ export default function CheckoutPage() {
           </Card>
 
           <Card className="sm:ml-auto sm:max-w-sm">
-            <CardContent className="space-y-3 p-5">
+            <CardContent className="space-y-4 p-5">
               <OrderChargeSummary
                 shippingPending
                 charges={summarizeOrderCharges({
@@ -193,7 +219,15 @@ export default function CheckoutPage() {
                   usdToEurRate: eligible.find((i) => i.exchange_rate_snapshot)?.exchange_rate_snapshot ?? null,
                 })}
               />
-              <Button className="mt-3 w-full" size="lg" onClick={() => setConfirmOpen(true)}>
+              <PaymentMethodSelector
+                value={paymentMethod}
+                onChange={(method) => {
+                  setPaymentMethod(method);
+                  setPaymentError(null);
+                }}
+                error={paymentError}
+              />
+              <Button className="mt-1 w-full" size="lg" onClick={handleOpenConfirm}>
                 Bestellung absenden
               </Button>
             </CardContent>

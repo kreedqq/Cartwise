@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import type { PaymentMethod } from "@/lib/shop/paymentMethod";
 import type { OrderStatus, Tables } from "@/types/database";
 
 export interface OrderWithItems extends Tables<"orders"> {
@@ -6,7 +7,7 @@ export interface OrderWithItems extends Tables<"orders"> {
 }
 
 export const CUSTOMER_ORDER_COLUMNS =
-  "id, order_number, user_id, cart_id, status, note, total_usd, total_eur, exchange_rate, submitted_at, created_at, updated_at, china_shipping_amount, china_shipping_currency, de_shipping_amount, de_shipping_currency";
+  "id, order_number, user_id, cart_id, status, note, payment_method, total_usd, total_eur, exchange_rate, submitted_at, created_at, updated_at, china_shipping_amount, china_shipping_currency, de_shipping_amount, de_shipping_currency";
 
 /** Customer: their own orders (RLS-scoped), most recent first. */
 export async function listMyOrders(): Promise<Tables<"orders">[]> {
@@ -66,8 +67,16 @@ export interface CreateOrderResult {
  * - the returned totalUsd is exactly what the server derived from the
  * frozen cart_items snapshots.
  */
-export async function createOrder(cartId: string, note: string | null): Promise<CreateOrderResult> {
-  const { data, error } = await supabase.rpc("create_order", { _cart_id: cartId, _note: note });
+export async function createOrder(
+  cartId: string,
+  note: string | null,
+  paymentMethod: PaymentMethod,
+): Promise<CreateOrderResult> {
+  const { data, error } = await supabase.rpc("create_order", {
+    _cart_id: cartId,
+    _note: note,
+    _payment_method: paymentMethod,
+  });
   if (error) throw error;
   return data as unknown as CreateOrderResult;
 }

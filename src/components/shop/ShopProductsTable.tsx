@@ -1,5 +1,7 @@
 import { Check, Info, ShoppingCart, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -10,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { KitShareButton, KitShareDialog } from "@/components/shop/KitShareDialog";
 import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
 import { convertUsdToEur, formatEur, formatQuantity, formatUsd, hasBulkTier } from "@/lib/money";
 import { shopCategoryById, shopCategoryIdFor } from "@/lib/shopCategories";
@@ -19,6 +22,8 @@ import {
   variantLabelForProduct,
   type ShopProductGroup,
 } from "@/lib/shop/display";
+import { shopProductTitle } from "@/lib/shop/variantCoverage";
+import { listKitShareMembers } from "@/services/kitShareMembers";
 import type { Tables } from "@/types/database";
 
 interface ShopProductsTableProps {
@@ -29,30 +34,51 @@ interface ShopProductsTableProps {
 
 export function ShopProductsTable({ products, rate, favoriteProductIds }: ShopProductsTableProps) {
   const groups = groupAndSortShopProducts(products);
+  const [kitProduct, setKitProduct] = React.useState<Tables<"products"> | null>(null);
+  const membersQuery = useQuery({
+    queryKey: ["kit-share-members"],
+    queryFn: listKitShareMembers,
+    enabled: kitProduct != null,
+    staleTime: 60_000,
+  });
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-20">Info</TableHead>
-          <TableHead className="min-w-[240px]">Produkt</TableHead>
-          <TableHead className="w-40">Einzelpreis</TableHead>
-          <TableHead className="w-48">Mengenpreis</TableHead>
-          <TableHead className="w-28 text-right">Menge</TableHead>
-          <TableHead className="w-16 text-right">In den Warenkorb</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {groups.map((group) => (
-          <ShopProductGroupTableRow
-            key={group.familySlug}
-            group={group}
-            rate={rate}
-            favoriteProductIds={favoriteProductIds}
-          />
-        ))}
-      </TableBody>
-    </Table>
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-20">Info</TableHead>
+            <TableHead className="min-w-[240px]">Produkt</TableHead>
+            <TableHead className="w-40">Einzelpreis</TableHead>
+            <TableHead className="w-48">Mengenpreis</TableHead>
+            <TableHead className="w-28 text-right">Menge</TableHead>
+            <TableHead className="w-16 text-right">In den Warenkorb</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {groups.map((group) => (
+            <ShopProductGroupTableRow
+              key={group.familySlug}
+              group={group}
+              rate={rate}
+              favoriteProductIds={favoriteProductIds}
+              onKitShare={(product) => setKitProduct(product)}
+            />
+          ))}
+        </TableBody>
+      </Table>
+      {kitProduct && (
+        <KitShareDialog
+          product={kitProduct}
+          members={membersQuery.data ?? []}
+          membersLoading={membersQuery.isLoading}
+          open={kitProduct != null}
+          onOpenChange={(open) => {
+            if (!open) setKitProduct(null);
+          }}
+        />
+      )}
+    </>
   );
 }
 
@@ -60,10 +86,12 @@ function ShopProductGroupTableRow({
   group,
   rate,
   favoriteProductIds,
+  onKitShare,
 }: {
   group: ShopProductGroup;
   rate: number | null;
   favoriteProductIds: Set<string>;
+  onKitShare: (product: Tables<"products">) => void;
 }) {
   const row = useShopProductGroupRow(group, rate, favoriteProductIds);
   const product = row.product;
@@ -76,6 +104,7 @@ function ShopProductGroupTableRow({
       ? Math.max(0, (product.bulk_price_min_quantity as number) - qtyNum)
       : null;
   const isFavorite = favoriteProductIds.has(product.id);
+  const title = shopProductTitle(group.displayName, product, row.hasMultipleVariants);
 
   return (
     <TableRow>
@@ -104,7 +133,7 @@ function ShopProductGroupTableRow({
       </TableCell>
       <TableCell>
         <div className="flex flex-wrap items-center gap-2">
-          <p className="text-sm font-medium">{group.displayName}</p>
+          <p className="text-sm font-medium">{title}</p>
           {row.hasMultipleVariants && (
             <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
               <SelectTrigger className="h-9 w-[120px] shrink-0" aria-label="Variante wählen">
@@ -120,7 +149,10 @@ function ShopProductGroupTableRow({
             </Select>
           )}
         </div>
-        <p className="text-[11px] text-muted-foreground">{shopCategoryById(shopCategoryIdFor(product)).label}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-2">
+          <p className="text-[11px] text-muted-foreground">{shopCategoryById(shopCategoryIdFor(product)).label}</p>
+          <KitShareButton product={product} onClick={() => onKitShare(product)} />
+        </div>
       </TableCell>
       <TableCell className="text-sm">
         <p className="text-base font-semibold tabular-nums tracking-tight">{formatUsd(product.price_usd)}</p>

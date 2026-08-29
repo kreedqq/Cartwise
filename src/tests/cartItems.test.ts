@@ -57,6 +57,7 @@ function makeItem(overrides: Partial<Tables<"cart_items">>): Tables<"cart_items"
     price_snapshot_at: now,
     resolution_status: "resolved",
     note: null,
+    kit_share_id: null,
     version: 1,
     created_at: now,
     updated_at: now,

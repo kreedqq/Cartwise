@@ -11,6 +11,7 @@ import {
   listOrderStatusHistory,
   setOrderStatus,
 } from "@/services/orders";
+import type { PaymentMethod } from "@/lib/shop/paymentMethod";
 import type { OrderStatus } from "@/types/database";
 
 export function useMyOrders() {
@@ -45,7 +46,15 @@ export function useCreateOrder() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   return useMutation({
-    mutationFn: ({ cartId, note }: { cartId: string; note: string | null }) => createOrder(cartId, note),
+    mutationFn: ({
+      cartId,
+      note,
+      paymentMethod,
+    }: {
+      cartId: string;
+      note: string | null;
+      paymentMethod: PaymentMethod;
+    }) => createOrder(cartId, note, paymentMethod),
     onSuccess: (_result, { cartId }) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myOrders });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });
