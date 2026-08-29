@@ -25,8 +25,8 @@ export function Sidebar() {
         sidebarCollapsed ? "w-0 overflow-hidden opacity-0" : "w-[15.5rem] opacity-100",
       )}
     >
-      <div className="flex h-16 items-center px-5">
-        <BrandMark inverted />
+      <div className="flex min-h-[4.5rem] items-center px-4 py-2 lg:min-h-24 lg:px-5">
+        <BrandMark inverted variant="sidebar" />
       </div>
 
       <nav className="flex-1 space-y-0.5 px-3 py-4">

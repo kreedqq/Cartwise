@@ -1,16 +1,21 @@
 import { cn } from "@/lib/utils";
 import { useNavShell } from "@/context/NavShellProvider";
 
+/** Original PEPTIX wordmark asset (2200×715 RGBA, 3:1). */
 const LOGO_SRC = "/peptix-logo.png";
+const LOGO_ASPECT = 2200 / 715;
 
 export function BrandMark({
   className,
   inverted = false,
   onClick,
+  variant = "header",
 }: {
   className?: string;
   inverted?: boolean;
   onClick?: () => void;
+  /** Sidebar uses the same asset but may sit in a narrower column. */
+  variant?: "header" | "sidebar";
 }) {
   const navShell = useNavShell();
   const handleClick = onClick ?? navShell.toggleNavigation;
@@ -21,7 +26,7 @@ export function BrandMark({
       type="button"
       onClick={handleClick}
       className={cn(
-        "inline-flex max-w-full shrink-0 items-center border-0 bg-transparent p-0",
+        "inline-flex max-w-full shrink-0 items-center justify-start border-0 bg-transparent p-0",
         inverted ? "text-sidebar-foreground" : "text-foreground",
         className,
       )}
@@ -30,9 +35,15 @@ export function BrandMark({
       <img
         src={LOGO_SRC}
         alt="PEPTIX"
-        width={2172}
-        height={724}
-        className="h-7 w-auto max-w-[8.5rem] object-contain object-left sm:h-8 sm:max-w-[9.5rem] lg:h-9 lg:max-w-[10.5rem]"
+        width={2200}
+        height={715}
+        className={cn(
+          "w-auto object-contain object-left",
+          variant === "sidebar"
+            ? "h-14 max-w-full sm:h-16"
+            : "h-14 max-w-[calc(100vw-9rem)] sm:h-16 sm:max-w-[calc(100vw-10rem)] lg:h-20 lg:max-w-[15.5rem]",
+        )}
+        style={{ aspectRatio: LOGO_ASPECT }}
         draggable={false}
       />
     </button>

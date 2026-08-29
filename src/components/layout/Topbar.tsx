@@ -55,12 +55,12 @@ export function Topbar() {
     .join("");
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border/80 bg-background/90 px-4 backdrop-blur-md sm:px-6">
-      <div className="min-w-0 lg:hidden">
+    <header className="sticky top-0 z-30 flex min-h-[4.5rem] items-center justify-between gap-3 border-b border-border/80 bg-background/90 px-4 py-2 backdrop-blur-md sm:px-6 lg:min-h-24">
+      <div className="min-w-0 flex-1 lg:hidden">
         <BrandMark />
       </div>
 
-      <div className={sidebarCollapsed ? "hidden min-w-0 lg:block" : "hidden"}>
+      <div className={sidebarCollapsed ? "hidden min-w-0 lg:block lg:flex-1" : "hidden"}>
         <BrandMark />
       </div>
 

@@ -11,13 +11,20 @@ describe("brand mark", () => {
     expect(brandMark).toContain("toggleNavigation");
   });
 
+  it("renders the logo large enough for desktop branding", () => {
+    const brandMark = readFileSync(resolve(process.cwd(), "src/components/layout/BrandMark.tsx"), "utf8");
+    expect(brandMark).toContain("lg:h-20");
+    expect(brandMark).not.toContain("max-w-[10.5rem]");
+  });
+
   it("ships the unmodified original logo file in public/", () => {
     const logo = readFileSync(resolve(process.cwd(), "public/peptix-logo.png"));
     expect(logo.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))).toBe(true);
     const width = logo.readUInt32BE(16);
     const height = logo.readUInt32BE(20);
-    expect(width).toBe(2172);
-    expect(height).toBe(724);
+    expect(width).toBe(2200);
+    expect(height).toBe(715);
+    expect(logo[25]).toBe(6);
   });
 
   it("wires the logo as a navigation trigger in the app shell", () => {
