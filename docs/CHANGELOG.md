@@ -7,7 +7,7 @@ Only material changes. Dates are local project days.
 ### Fixed
 
 - Final production fix: kit variant UI deployed, checkout currency (`USD subtotal → EUR → DE EUR`), PEPTIX logo + nav toggle, migration 0033 retained on prod.
-- Commit `849329d` pushed to `origin/main`; production bundle includes `/peptix-logo.svg`.
+- Production bundle uses `/peptix-logo.png` (original asset, 2172×724 RGBA).
 
 ## 2026-08-29 (kit sharing bugfix)
 
