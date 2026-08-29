@@ -32,7 +32,8 @@ export type DualReadFamily =
   | "detail"
   | "hudson"
   | "community"
-  | "ordering";
+  | "ordering"
+  | "publicVisibility";
 
 export interface DualReadDifference {
   family: DualReadFamily;
@@ -80,6 +81,7 @@ export interface NormalizedSource {
   accessDate: string | null;
   legacyIds: string[];
   substanceSlugs: string[];
+  reviewStatus: string;
 }
 
 export interface NormalizedSourceAttachment {
@@ -101,6 +103,7 @@ export interface NormalizedStudy {
   hasResults: boolean;
   url: string;
   substanceSlugs: string[];
+  reviewStatus: string;
 }
 
 export interface NormalizedStudyAttachment {
@@ -194,7 +197,7 @@ export interface NormalizedResearchSnapshot {
   communityReports: never[];
 }
 
-export type DualReadFallbackKind = "timeout" | "rls" | "network" | "query" | null;
+export type DualReadFallbackKind = "timeout" | "rls" | "network" | "query" | "invalid" | "partial" | null;
 
 export interface DualReadCounts {
   MATCH: number;

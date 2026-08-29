@@ -1,0 +1,235 @@
+{
+  "slug": "tb-500",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "TB-500",
+    "TB500"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "TB-500",
+      "totalCount": 1,
+      "studies": [
+        {
+          "nctId": "NCT07487363",
+          "title": "TB-500 (Thymosin Beta 4 17-23 Fragment) for Cardiovascular Biomarkers in Stable ASCVD",
+          "status": "RECRUITING",
+          "phase": "PHASE1, PHASE2",
+          "sponsor": "Hudson Biotech",
+          "enrollment": 80,
+          "start": "2026-02-05",
+          "completion": "2028-02-17",
+          "lastUpdate": "2026-03-23",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07487363",
+          "intervention": "TB-500; Placebo",
+          "condition": "Atherosclerotic Cardiovascular Diseases; Endothelial Dysfunction"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "TB-500 AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 10,
+      "articles": [
+        {
+          "pmid": "41490200",
+          "title": "Therapeutic Peptides in Orthopaedics: Applications, Challenges, and Future Directions.",
+          "source": "J Am Acad Orthop Surg Glob Res Rev",
+          "pubdate": "2026 Jan 1",
+          "authors": [
+            "Rahman OF",
+            "Lee SJ",
+            "Seeds WA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.5435/JAAOSGlobal-D-25-00236",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41490200/"
+        },
+        {
+          "pmid": "41476424",
+          "title": "Injectable Peptide Therapy: A Primer for Orthopaedic and Sports Medicine Physicians.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Jan",
+          "authors": [
+            "Mayfield CK",
+            "Bolia IK",
+            "Feingold CL",
+            "Lin EH",
+            "Liu JN",
+            "Rick Hatch GF"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1177/03635465251357593",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41476424/"
+        },
+        {
+          "pmid": "41966639",
+          "title": "Safety and Efficacy of Approved and Unapproved Peptide Therapies for Musculoskeletal Injuries and Athletic Performance.",
+          "source": "Sports Med",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Mendias CL",
+            "Awan TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s40279-026-02437-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41966639/"
+        },
+        {
+          "pmid": "42578445",
+          "title": "Peptide Supplements and Their Therapeutic Applications in Sports Medicine.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Aug 11",
+          "authors": [
+            "Tewari K",
+            "Liu TP",
+            "Im C",
+            "Hamad C",
+            "Petrigliano F",
+            "Cheung EC"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1177/03635465261464420",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42578445/"
+        },
+        {
+          "pmid": "42021992",
+          "title": "Therapeutic peptides in gerontology: mechanisms and applications for healthy aging.",
+          "source": "Front Aging",
+          "pubdate": "2026",
+          "authors": [
+            "Mavrych V",
+            "Shypilova I",
+            "Bolgova O"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3389/fragi.2026.1790247",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42021992/"
+        },
+        {
+          "pmid": "8837245",
+          "title": "Elimination of theobromine metabolites in healthy adults.",
+          "source": "Scand J Clin Lab Invest",
+          "pubdate": "1996 Jul",
+          "authors": [
+            "Rodopoulos N",
+            "Höjvall L",
+            "Norman A"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.3109/00365519609090590",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/8837245/"
+        },
+        {
+          "pmid": "33318598",
+          "title": "Logistic regression analysis of environmental and other variables and incidences of tuberculosis in respiratory patients.",
+          "source": "Sci Rep",
+          "pubdate": "2020 Dec 14",
+          "authors": [
+            "Pathak AK",
+            "Sharma M",
+            "Katiyar SK",
+            "Katiyar S",
+            "Nagar PK"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article"
+          ],
+          "doi": "10.1038/s41598-020-79023-5",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33318598/"
+        },
+        {
+          "pmid": "27569051",
+          "title": "Comparison of various in vitro model systems of the metabolism of synthetic doping peptides: Proteolytic enzymes, human blood serum, liver and kidney microsomes and liver S9 fraction.",
+          "source": "J Proteomics",
+          "pubdate": "2016 Oct 21",
+          "authors": [
+            "Zvereva I",
+            "Semenistaya E",
+            "Krotov G",
+            "Rodchenkov G"
+          ],
+          "pubtype": [
+            "Comparative Study",
+            "Journal Article"
+          ],
+          "doi": "10.1016/j.jprot.2016.08.016",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27569051/"
+        },
+        {
+          "pmid": "42635865",
+          "title": "Peptides in Regenerative Medicine: A Comprehensive Review of Clinical Applications in Tissue Repair and Chronic Pain Management.",
+          "source": "Curr Pain Headache Rep",
+          "pubdate": "2026 Aug 24",
+          "authors": [
+            "Luansritisakul C",
+            "Chiang MC",
+            "Burns SL",
+            "Fonseca ACG"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s11916-026-01542-z",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42635865/"
+        },
+        {
+          "pmid": "25469748",
+          "title": "In vitro models for metabolic studies of small peptide hormones in sport drug testing.",
+          "source": "J Pept Sci",
+          "pubdate": "2015 Jan",
+          "authors": [
+            "Esposito S",
+            "Deventer K",
+            "Geldof L",
+            "Van Eenoo P"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1002/psc.2710",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25469748/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "TB-500",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 62707662,
+      "cas": "885340-08-9",
+      "formula": "C38H68N10O14",
+      "iupac": "(2S)-2-[[(2S,3R)-2-[[(2S)-2-[[(2S,3R)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-acetamido-4-methylpentanoyl]amino]-6-aminohexanoyl]amino]-6-aminohexanoyl]amino]-3-hydroxybutanoyl]amino]-4-carboxybutanoyl]amino]-3-hydroxybutanoyl]amino]-5-amino-5-oxopentanoic acid"
+    }
+  }
+}

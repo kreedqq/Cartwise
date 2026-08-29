@@ -33,6 +33,7 @@ export interface PostgresResearchBundle {
     pmid: string | null;
     nct_id: string | null;
     legacy_ids: string[];
+    review_status?: string | null;
   }>;
   sourceSubstances: Array<{ source_id: string; substance_id: string; legacy_source_id: string }>;
   studies: Array<{
@@ -48,6 +49,7 @@ export interface PostgresResearchBundle {
     last_updated: string | null;
     has_results: boolean;
     source_url: string;
+    review_status?: string | null;
   }>;
   studySubstances: Array<{ study_id: string; substance_id: string }>;
   claims: Array<{
@@ -135,6 +137,7 @@ export function postgresBundleFromSeeds(): PostgresResearchBundle {
     pmid: row.pmid,
     nct_id: row.nctId,
     legacy_ids: [...row.legacyIds],
+    review_status: "approved",
   }));
   const sourceSubstances = science.sourceSubstances.map((row) => ({
     source_id: row.sourceKey,
@@ -154,6 +157,7 @@ export function postgresBundleFromSeeds(): PostgresResearchBundle {
     last_updated: row.lastUpdated,
     has_results: row.hasResults,
     source_url: row.url,
+    review_status: "approved",
   }));
   const studySubstances = science.studySubstances.map((row) => ({
     study_id: row.nctId,

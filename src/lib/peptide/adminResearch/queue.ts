@@ -1,6 +1,6 @@
 import type { WorkflowStatus } from "@/lib/peptide/adminResearch/workflow";
 
-export type ReviewQueueKind = "evidence" | "regulatory" | "claim" | "substance";
+export type ReviewQueueKind = "evidence" | "regulatory" | "claim" | "substance" | "source" | "study";
 
 export interface ReviewQueueItem {
   kind: ReviewQueueKind;
@@ -30,6 +30,10 @@ export interface AdminResearchDashboard {
   reviewActions: number;
   researchUpdates: number;
   communityReports: number;
+  sourcesReviewRequired: number;
+  studiesReviewRequired: number;
+  intakeMode: "postgres" | "local-candidates";
+  migrationRequired: string | null;
 }
 
 export function emptyDashboard(source: AdminResearchDashboard["source"]): AdminResearchDashboard {
@@ -50,6 +54,10 @@ export function emptyDashboard(source: AdminResearchDashboard["source"]): AdminR
     reviewActions: 0,
     researchUpdates: 0,
     communityReports: 0,
+    sourcesReviewRequired: 0,
+    studiesReviewRequired: 0,
+    intakeMode: "postgres",
+    migrationRequired: null,
   };
 }
 

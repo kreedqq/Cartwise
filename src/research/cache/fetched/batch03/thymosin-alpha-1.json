@@ -1,0 +1,634 @@
+{
+  "slug": "thymosin-alpha-1",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "thymosin alpha-1",
+    "thymalfasin",
+    "Zadaxin"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "thymosin alpha-1",
+      "totalCount": 66,
+      "studies": [
+        {
+          "nctId": "NCT07780721",
+          "title": "Study of Adebrelimab Combined With Thymalfasin and Chemotherapy for Neoadjuvant Treatment of Esophageal Cancer",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "The Affiliated Hospital of Putian University",
+          "enrollment": 31,
+          "start": "2026-08-30",
+          "completion": "2029-02-01",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07780721",
+          "intervention": "Adebrelimab; Thymalfasin; Chemotherapy",
+          "condition": "Esophageal Cancer"
+        },
+        {
+          "nctId": "NCT06139419",
+          "title": "The Impact of Thymosin α-1 on the Efficacy of Concurrent Chemoradiotherapy Followed by Immunotherpay Consolidation for Locally Advanced NSCLC",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Sun Yat-sen University",
+          "enrollment": 114,
+          "start": "2023-07-25",
+          "completion": "2026-06-30",
+          "lastUpdate": "2026-08-03",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06139419",
+          "intervention": "definitive radiotherapy; induction chemo-immunotherapy; concurrent chemotherapy; Immunotheapy consolidation; Thymosin Alpha1",
+          "condition": "Non-small Cell Lung Cancer"
+        },
+        {
+          "nctId": "NCT06821100",
+          "title": "Thymalfasin (Thymosin Alpha 1; Ta1) as an Enhancer of Vaccine Response Among Older Adults Receiving Booster Doses of COVID-19 Vaccine",
+          "status": "RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "The Methodist Hospital Research Institute",
+          "enrollment": 75,
+          "start": "2024-12-02",
+          "completion": "2026-12-01",
+          "lastUpdate": "2026-07-16",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06821100",
+          "intervention": "Thymalfasin (Thymosin alpha 1, Ta1)",
+          "condition": "Vaccine Response; COVID-19 Vaccine; Immune Response to Covid 19 Vaccination"
+        },
+        {
+          "nctId": "NCT07675980",
+          "title": "Thymosin-α1 for Recurrent Implantation Failure",
+          "status": "RECRUITING",
+          "phase": "PHASE2, PHASE3",
+          "sponsor": "Fakih IVF Fertility Center",
+          "enrollment": 136,
+          "start": "2026-02-11",
+          "completion": "2027-06",
+          "lastUpdate": "2026-06-30",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07675980",
+          "intervention": "Thymosin Alpha1; Placebo Control",
+          "condition": "Recurrent Implantation Faliure"
+        },
+        {
+          "nctId": "NCT06024356",
+          "title": "Neoadjuvant Chemoradiotherapy Combined With PD-1 Inhibitor and Thymalfasin for Locally Advanced Mid-low Rectal Cancer",
+          "status": "COMPLETED",
+          "phase": null,
+          "sponsor": "Beijing Friendship Hospital",
+          "enrollment": 47,
+          "start": "2023-09-20",
+          "completion": "2026-05-15",
+          "lastUpdate": "2026-06-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06024356",
+          "intervention": "Thymalfasin",
+          "condition": "Colorectal Neoplasms"
+        },
+        {
+          "nctId": "NCT07644897",
+          "title": "Thymosin Alpha 1 Combined With Anti-PD-1 Monoclonal Antibody in Elderly Patients With Advanced Melanoma",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Sun Yat-sen University",
+          "enrollment": 55,
+          "start": "2023-05-30",
+          "completion": "2027-09-30",
+          "lastUpdate": "2026-06-12",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07644897",
+          "intervention": "Thymosin Alpha 1 and Anti-PD-1 monoclonal antibody",
+          "condition": "Melanoma; Immune-related Adverse Event; Immune Checkpoint Inhibitor"
+        },
+        {
+          "nctId": "NCT06401447",
+          "title": "TPF Concurrent Chemo-radiotherapy Plus Immunotherapy for Local Advanced Esophageal Squamous Cell Carcinoma",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "NA",
+          "sponsor": "Fudan University",
+          "enrollment": 50,
+          "start": "2023-12-21",
+          "completion": "2027-07-10",
+          "lastUpdate": "2026-04-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06401447",
+          "intervention": "Radiotherapy",
+          "condition": "Esophageal Squamous Cell Carcinoma"
+        },
+        {
+          "nctId": "NCT04428008",
+          "title": "Thymosin Alpha 1 to Prevent COVID-19 Infection in Renal Dialysis Patients",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "William B. Ershler, MD",
+          "enrollment": 189,
+          "start": "2021-01-12",
+          "completion": "2023-01-19",
+          "lastUpdate": "2026-04-21",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT04428008",
+          "intervention": "Thymalfasin",
+          "condition": "COVID-19"
+        },
+        {
+          "nctId": "NCT07277439",
+          "title": "Phase II Trial of Neoadjuvant Thymalfasin, PD-1 Inhibitor, and Chemoradiotherapy for cStage III GEJ Adenocarcinoma",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "The First Affiliated Hospital with Nanjing Medical University",
+          "enrollment": 48,
+          "start": "2025-12-16",
+          "completion": "2029-02-16",
+          "lastUpdate": "2026-03-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07277439",
+          "intervention": "Radiochemoimmunotherapy; Immunomodulation",
+          "condition": "Gastric Cancer"
+        },
+        {
+          "nctId": "NCT06461910",
+          "title": "Efficacy and Safety of Anti-PD-1, Thymalfasin, and SOX in Neoadjuvant Treatment of cStage III Gastric/Gastroesophageal Junction Adenocarcinoma",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Zekuan Xu",
+          "enrollment": 30,
+          "start": "2024-06-14",
+          "completion": "2027-12",
+          "lastUpdate": "2026-03-03",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06461910",
+          "intervention": "Serplulimab; thymalfasin; Oxaliplatin; Tegafur",
+          "condition": "Gastric Cancer; Esophagogastric Junction Adenocarcinoma"
+        },
+        {
+          "nctId": "NCT07382375",
+          "title": "AI-assisted Subtyping-directed Precision Treatment in Acute Aortic Dissection",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "NA",
+          "sponsor": "Nanjing Medical University",
+          "enrollment": 300,
+          "start": "2027-12-31",
+          "completion": "2027-12-31",
+          "lastUpdate": "2026-02-02",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07382375",
+          "intervention": "Ulinastatin and Thymalfasin; Ulinastatin",
+          "condition": "Aortic Aneurysm and Dissection"
+        },
+        {
+          "nctId": "NCT06552598",
+          "title": "The Safety, Tolerability, and Efficacy of KD01 in Gynecologic Malignancies",
+          "status": "RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "Tongji Hospital",
+          "enrollment": 97,
+          "start": "2024-04-01",
+          "completion": "2028-04-01",
+          "lastUpdate": "2026-01-15",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06552598",
+          "intervention": "KD01(the recombinant oncolytic adenovirus)",
+          "condition": "Cervical Cancer; Gynecologic Malignancies; Endometrial Cancer"
+        },
+        {
+          "nctId": "NCT07342322",
+          "title": "A Prospective, Multicenter, Open-label, Single-arm Phase II Clinical Study Evaluating the Efficacy and Safety of Spatially Fractionated Radiotherapy Combined With the PraG Strategy for the Treatment of Soft Tissue Sarcoma",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "First Affiliated Hospital of Guangxi Medical University",
+          "enrollment": 25,
+          "start": "2026-02-01",
+          "completion": "2029-01-31",
+          "lastUpdate": "2026-01-15",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07342322",
+          "intervention": "Spatially Fractionated Radiation Therapy Combined with Toripalimab and Human Granulocyte-Macrophage Colony-Stimulating Factor for Injection",
+          "condition": "Soft Tissue Sarcoma (STS)"
+        },
+        {
+          "nctId": "NCT07103395",
+          "title": "A Study Evaluating Neoadjuvant Chemotherapy, Concurrent Chemoradiotherapy Combined With Dual Immune Checkpoint Blockade in Patients With Locally Advanced Non-Small Cell Lung Cancer",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Sun Yat-sen University",
+          "enrollment": 56,
+          "start": "2026-01-01",
+          "completion": "2029-12-30",
+          "lastUpdate": "2026-01-14",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07103395",
+          "intervention": "Neoadjuvant therapy; Radiotherapy; Consolidative therapy",
+          "condition": "Lung Cancer (NSCLC)"
+        },
+        {
+          "nctId": "NCT06966687",
+          "title": "Protective Effect of Ulinastatin and Thymosin α1 Against Negative Immune Dysregulation and Organ Dysfunction After Acute Aortic Dissection Surgery (PANDA XI)",
+          "status": "ENROLLING_BY_INVITATION",
+          "phase": "NA",
+          "sponsor": "Nanjing Medical University",
+          "enrollment": 200,
+          "start": "2025-04-01",
+          "completion": "2026-12-31",
+          "lastUpdate": "2026-01-14",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06966687",
+          "intervention": "Ulinastatin and Thymosin α1; Ulinastatin only",
+          "condition": "Aortic Dissection; Aortic Dissection Aneurysm"
+        },
+        {
+          "nctId": "NCT07103408",
+          "title": "A Study Evaluating Concurrent Chemoradiotherapy Combined With Dual Immune Checkpoint Blockade for Limited-stage Small Cell Lung Cancer",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Sun Yat-sen University",
+          "enrollment": 56,
+          "start": "2025-10-01",
+          "completion": "2029-09-30",
+          "lastUpdate": "2025-08-05",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07103408",
+          "intervention": "Immuno-chemotherapy; Radiotherapy; Consolidative therapy",
+          "condition": "Small-Cell Lung Cancer (SCLC)"
+        },
+        {
+          "nctId": "NCT06056804",
+          "title": "Neoadjuvant Chemoradiotherapy Combined With PD-1 Inhibitor and Thymalfasin for pMMR/MSS Locally Advanced Mid-low Rectal Cancer",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Beijing Friendship Hospital",
+          "enrollment": 20,
+          "start": "2024-01-03",
+          "completion": "2027-07-01",
+          "lastUpdate": "2025-04-02",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06056804",
+          "intervention": "capecitabine; tislelizumab; thymalfasin; long-term radiotherapy",
+          "condition": "Locally Advanced Rectal Cancer"
+        },
+        {
+          "nctId": "NCT06829355",
+          "title": "\"Thymalfasin Immunotherapy Study with Triple Regimen in Advanced MSS/pMMR Colorectal Cancer\"",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Beijing Friendship Hospital",
+          "enrollment": 52,
+          "start": "2025-02-11",
+          "completion": "2027-12-31",
+          "lastUpdate": "2025-02-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06829355",
+          "intervention": "Thymalfasin (Thymosin alpha 1, Ta1); Regorafenib (BAY 73-4506); Tislelizumab (BGB-A317)",
+          "condition": "MCRC"
+        },
+        {
+          "nctId": "NCT05339529",
+          "title": "Protective Effect of Thymosin Α1 Against Negative Immune Dysregulation and Organ Dysfunction After Acute Aortic Dissection Surgery (PANDA II)",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Nanjing Medical University",
+          "enrollment": 330,
+          "start": "2022-07-01",
+          "completion": "2025-12-31",
+          "lastUpdate": "2024-12-12",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05339529",
+          "intervention": "Thymosin Alpha1, 28A-Glycine-28B-L-Arginine-28C-L-Glutamic Acid-28D-L-Alanine-28E-L-Proline-28F-L-Alanine-28G-L-Asparagine-; Blank control",
+          "condition": "Acute Aortic Syndrome; Aortic Dissection Type a"
+        },
+        {
+          "nctId": "NCT06607926",
+          "title": "Neoadjuvant With Tα1 Plus Immuno-chemotherapy for Resectable NSCLC",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "NA",
+          "sponsor": "Xuanwu Hospital, Beijing",
+          "enrollment": 40,
+          "start": "2024-10-15",
+          "completion": "2025-12-30",
+          "lastUpdate": "2024-09-23",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06607926",
+          "intervention": "Thymosin Alpha 1; Tislelizumab; Platinum-doublet chemotherapy",
+          "condition": "Resectable Non-Small-Cell Lung Cancer"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "thymosin alpha-1 AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 209,
+      "articles": [
+        {
+          "pmid": "11381492",
+          "title": "Thymosin alpha-1.",
+          "source": "Am J Health Syst Pharm",
+          "pubdate": "2001 May 15",
+          "authors": [
+            "Ancell CD",
+            "Phipps J",
+            "Young L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1093/ajhp/58.10.886",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11381492/"
+        },
+        {
+          "pmid": "39814420",
+          "title": "The efficacy and safety of thymosin α1 for sepsis (TESTS): multicentre, double blinded, randomised, placebo controlled, phase 3 trial.",
+          "source": "BMJ",
+          "pubdate": "2025 Jan 15",
+          "authors": [
+            "Wu J",
+            "Pei F",
+            "Zhou L",
+            "Li W",
+            "Sun R",
+            "Li Y"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Multicenter Study",
+            "Clinical Trial, Phase III"
+          ],
+          "doi": "10.1136/bmj-2024-082583",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39814420/"
+        },
+        {
+          "pmid": "38308608",
+          "title": "Comprehensive Review of the Safety and Efficacy of Thymosin Alpha 1 in Human Clinical Trials.",
+          "source": "Altern Ther Health Med",
+          "pubdate": "2024 Jan",
+          "authors": [
+            "Dinetz E",
+            "Lee E"
+          ],
+          "pubtype": [
+            "Systematic Review",
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38308608/"
+        },
+        {
+          "pmid": "41373628",
+          "title": "Aging and Thymosin Alpha-1.",
+          "source": "Int J Mol Sci",
+          "pubdate": "2025 Nov 27",
+          "authors": [
+            "Simonova MA",
+            "Ivanov I",
+            "Shoshina NS",
+            "Komyakova AM",
+            "Makarov DA",
+            "Baranovskii DS"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3390/ijms262311470",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41373628/"
+        },
+        {
+          "pmid": "35713670",
+          "title": "Immune enhancement in patients with predicted severe acute necrotising pancreatitis: a multicentre double-blind randomised controlled trial.",
+          "source": "Intensive Care Med",
+          "pubdate": "2022 Jul",
+          "authors": [
+            "Ke L",
+            "Zhou J",
+            "Mao W",
+            "Chen T",
+            "Zhu Y",
+            "Pan X"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1007/s00134-022-06745-7",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35713670/"
+        },
+        {
+          "pmid": "26098768",
+          "title": "Historical review of thymosin α 1 in infectious diseases.",
+          "source": "Expert Opin Biol Ther",
+          "pubdate": "2015",
+          "authors": [
+            "Camerini R",
+            "Garaci E"
+          ],
+          "pubtype": [
+            "Historical Article",
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1517/14712598.2015.1033393",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26098768/"
+        },
+        {
+          "pmid": "28106477",
+          "title": "Thymosin alpha 1 and HIV-1: recent advances and future perspectives.",
+          "source": "Future Microbiol",
+          "pubdate": "2017 Feb",
+          "authors": [
+            "Matteucci C",
+            "Grelli S",
+            "Balestrieri E",
+            "Minutolo A",
+            "Argaw-Denboba A",
+            "Macchi B"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.2217/fmb-2016-0125",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28106477/"
+        },
+        {
+          "pmid": "26096345",
+          "title": "Historical review on thymosin α1 in oncology: preclinical and clinical experiences.",
+          "source": "Expert Opin Biol Ther",
+          "pubdate": "2015",
+          "authors": [
+            "Garaci E",
+            "Pica F",
+            "Matteucci C",
+            "Gaziano R",
+            "D'Agostini C",
+            "Miele MT"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1517/14712598.2015.1017466",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26096345/"
+        },
+        {
+          "pmid": "20536460",
+          "title": "Thymosin alpha 1: past clinical experience and future promise.",
+          "source": "Ann N Y Acad Sci",
+          "pubdate": "2010 Apr",
+          "authors": [
+            "Tuthill C",
+            "Rios I",
+            "McBeath R"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1111/j.1749-6632.2010.05482.x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20536460/"
+        },
+        {
+          "pmid": "26517783",
+          "title": "Ulinastatin and/or thymosin α1 for severe sepsis: A systematic review and meta-analysis.",
+          "source": "J Trauma Acute Care Surg",
+          "pubdate": "2016 Feb",
+          "authors": [
+            "Feng Z",
+            "Shi Q",
+            "Fan Y",
+            "Wang Q",
+            "Yin W"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis",
+            "Research Support, Non-U.S. Gov't",
+            "Systematic Review"
+          ],
+          "doi": "10.1097/TA.0000000000000909",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26517783/"
+        },
+        {
+          "pmid": "36527881",
+          "title": "Thymosin alpha1 use in adult COVID-19 patients: A systematic review and meta-analysis on clinical outcomes.",
+          "source": "Int Immunopharmacol",
+          "pubdate": "2023 Jan",
+          "authors": [
+            "Shang W",
+            "Zhang B",
+            "Ren Y",
+            "Wang W",
+            "Zhou D",
+            "Li Y"
+          ],
+          "pubtype": [
+            "Meta-Analysis",
+            "Systematic Review",
+            "Journal Article"
+          ],
+          "doi": "10.1016/j.intimp.2022.109584",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36527881/"
+        },
+        {
+          "pmid": "39904914",
+          "title": "Hypofractionated radiotherapy combined with a PD-1 inhibitor, granulocyte macrophage-colony stimulating factor, and thymosin-α1 in advanced metastatic solid tumors: a multicenter Phase II clinical trial.",
+          "source": "Cancer Immunol Immunother",
+          "pubdate": "2025 Feb 4",
+          "authors": [
+            "Yu J",
+            "Yin L",
+            "Guo W",
+            "Wang Q",
+            "Liu J",
+            "Zhang L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Clinical Trial, Phase II",
+            "Multicenter Study"
+          ],
+          "doi": "10.1007/s00262-024-03934-9",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39904914/"
+        },
+        {
+          "pmid": "36871535",
+          "title": "Thymosin alpha 1 - Reimagine its broader applications in the immuno-oncology era.",
+          "source": "Int Immunopharmacol",
+          "pubdate": "2023 Apr",
+          "authors": [
+            "Mao L"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1016/j.intimp.2023.109952",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36871535/"
+        },
+        {
+          "pmid": "26522590",
+          "title": "Ulinastatin- and thymosin α1-based immunomodulatory strategy for sepsis: A meta-analysis.",
+          "source": "Int Immunopharmacol",
+          "pubdate": "2015 Dec",
+          "authors": [
+            "Han D",
+            "Shang W",
+            "Wang G",
+            "Sun L",
+            "Zhang Y",
+            "Wen H"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis",
+            "Review"
+          ],
+          "doi": "10.1016/j.intimp.2015.10.026",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26522590/"
+        },
+        {
+          "pmid": "33076834",
+          "title": "The clinical efficacy and adverse effects of Entecavir plus Thymosin alpha-1 combination therapy versus Entecavir Monotherapy in HBV-related cirrhosis: a systematic review and meta-analysis.",
+          "source": "BMC Gastroenterol",
+          "pubdate": "2020 Oct 19",
+          "authors": [
+            "Peng D",
+            "Xing HY",
+            "Li C",
+            "Wang XF",
+            "Hou M",
+            "Li B"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1186/s12876-020-01477-8",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33076834/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "thymalfasin",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 16130571,
+      "cas": "62304-98-7",
+      "formula": "C129H215N33O55",
+      "iupac": "(4S)-4-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S,3R)-2-[[(2S,3R)-2-[[(2S,3S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S,3R)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-acetamido-3-hydroxypropanoyl]amino]-3-carboxypropanoyl]amino]propanoyl]amino]propanoyl]amino]-3-methylbutanoyl]amino]-3-carboxypropanoyl]amino]-3-hydroxybutanoyl]amino]-3-hydroxypropanoyl]amino]-3-hydroxypropanoyl]amino]-4-carboxybutanoyl]amino]-3-methylpentanoyl]amino]-3-hydroxybutanoyl]amino]-3-hydroxybutanoyl]amino]-6-aminohexanoyl]amino]-3-carboxypropanoyl]amino]-4-methylpentanoyl]amino]-6-aminohexanoyl]amino]-4-carboxybutanoyl]amino]-6-aminohexanoyl]amino]-6-aminohexanoyl]amino]-4-carboxybutanoyl]amino]-3-methylbutanoyl]amino]-3-methylbutanoyl]amino]-4-carboxybutanoyl]amino]-4-carboxybutanoyl]amino]propanoyl]amino]-5-[[(1S)-3-amino-1-carboxy-3-oxopropyl]amino]-5-oxopentanoic acid"
+    }
+  }
+}

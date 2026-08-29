@@ -10,11 +10,21 @@ Browser (Peptix SPA)
   └─ Peptide platform
        ├─ Public lexicon (Phase 11): Postgres primary + exclusive file fallback
        ├─ Identity also in catalog.ts (fallback + category overlay)
-       ├─ Sources/studies/claims/regulatory live on cartwise-prod (0024–0029)
-       ├─ Dual-read (Phase 7): `VITE_RESEARCH_DB_MODE=dual|postgres` compares; public UI follows postgres unless fallback
+       ├─ Sources/studies/claims/regulatory live on cartwise-prod (0024–0030; Batch 03 review-required held)
+       ├─ Dual-read: `legacy` files only; `postgres` exclusive public; `dual` compare-only, never mixed
+       ├─ Admin Dual Read copy: Postgres primary + exclusive fallback
        ├─ Admin Research (Phase 8): Postgres primary (`review_actions` append-only)
-       ├─ Production SPA until Phase 11 deploy: still files (`https://cartwise-zeta.vercel.app`, Phase 10E Slot fix)
-       └─ Node scripts (official APIs) → cache → compile (not called from the browser)
+       ├─ Production SPA: `https://cartwise-zeta.vercel.app` (`dpl_6pYjonptAdnDXzUMfxPffF2LVks5`); hardening build not deployed
+       ├─ Phase 12 post-cutover audit: PRODUCTION_POST_CUTOVER_PASS_WITH_LIMITATIONS
+       ├─ Node scripts (official APIs) → cache → compile (not called from the browser)
+       ├─ Batch 03 scan cache: `src/research/cache/fetched/batch03/` (imported as review-required on prod; not auto-approved)
+       ├─ Phase 14: BATCH_03_REVIEW_READY_WITH_LIMITATIONS
+       ├─ Phase 15: BATCH_03_REVIEW_INTAKE_READY_WITH_LIMITATIONS
+       ├─ Phase 17: PRODUCTION_0030_APPLY_SUCCESS_WITH_RLS_LIMITATION (live 0030 + 104/36 intake; SPA not redeployed)
+       ├─ Block 2 Update Engine: RESEARCH_UPDATE_ENGINE_READY_WITH_LIMITATIONS (`src/lib/peptide/research/updateEngine/`)
+       ├─ Block 3 Research Operations: RESEARCH_OPERATIONS_READY_WITH_LIMITATIONS (`src/lib/peptide/research/operations/`)
+       └─ Final hardening: FINAL_RELEASE_READY_WITH_LIMITATIONS (`docs/RESEARCH_FINAL_HARDENING.md`) — persist no longer demotes UNCHANGED approved sources; Claim Sources vs Source References
+- Production dump 2026-08-29-1130: `Documents\PEPTIX-BACKUPS\PEPTIX-PRODUCTION-FINAL-2026-08-29-1130.sql`
 ```
 
 Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PATH`.
@@ -26,7 +36,7 @@ Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PA
 - `src/components/shop|cart|orders|auth|admin|ui/`
 - `src/hooks/` — React Query wrappers
 - `src/services/` — Supabase RPC/table access for shop and admin research
-- `src/lib/peptide/` — calculator, identity catalog, mapping, published profiles, dual-read, public lexicon read, admin research workflow
+- `src/lib/peptide/` — calculator, identity catalog, mapping, published profiles, dual-read, public lexicon read, admin research workflow, update engine, research operations
 - `src/research/` — connector types, engine, queries, fetch cache
 
 ## Authentication
@@ -46,7 +56,7 @@ Mapping is dual: client prefix/name **legacy fallback** and `product_substances`
 
 ## Database (Postgres)
 
-Defined in `supabase/migrations/` (0001–0029 in Git). Hand-mirrored in `src/types/database.ts`. Live `cartwise-prod` is on 0001–0029.
+Defined in `supabase/migrations/` (0001–0031 in Git; **live `cartwise-prod` is 0001–0030 plus MCP `research_operations` / `20260829082116` = 0031 SQL**). `0030_research_source_study_review_intake.sql` is applied. Hand-mirrored in `src/types/database.ts`.
 
 **Auth-adjacent:** `profiles`, `user_roles` (`user` \| `admin`).
 
@@ -62,11 +72,11 @@ Defined in `supabase/migrations/` (0001–0029 in Git). Hand-mirrored in `src/ty
 
 **Research identity (Phase 1, 0024):** `substances`, `substance_aliases`, `substance_components`, `product_substances`. RLS: authenticated SELECT; admin write via `has_role`. Shop `products` columns were not altered.
 
-**Research science (Phase 2, 0025):** `research_runs`, `research_run_sources`, `sources`, `source_substances`, `studies`, `study_substances`, `study_sources`. Imported from `published.json` (not raw cache).
+**Research science (Phase 2, 0025):** `research_runs`, `research_run_sources`, `sources`, `source_substances`, `studies`, `study_substances`, `study_sources`. Imported from `published.json` (not raw cache). **0030 (live):** `sources.review_status` / `studies.review_status` (workflow, distinct from lifecycle / CT.gov status; new-row default `review-required`, existing backfilled `approved`), optional `connector` / `intervention` / `condition`, non-admin SELECT limited to approved rows, junction SELECT follows parent approval. Batch 03 import is a separate idempotent persist/SQL path: **104** sources + **36** studies `review-required` on production (`docs/RESEARCH_PRODUCTION_MIGRATION_0030.md`). **0031 (live as `research_operations`):** `0031_research_operations.sql` — run status `partial` / `queued` / `cancelled`, `trigger_kind`, scopes, statistics, retrieval logs, one-active-full-run index, `research_connector_health`, `community_reports` (empty, review-required default). Cron stays disabled. `docs/RESEARCH_FINAL_OPERATIONS_QA.md`.
 
 **Research claims (Phase 3, 0026):** `claims`, `claim_sources`, `evidence_assessments`. Cited blocks from `published.json` (one claim per slot/item; summary paragraphs not split). A–F lives on assessments, not on `claims`.
 
-**Research regulatory + review (Phase 4, 0027):** `regulatory_records`, `regulatory_history`, `review_actions`. Imported from published regulatory sources (41 records). Empty FDA/EMA search is never `not_approved`. Community remains unpublished as SQL. Dual-read: `VITE_RESEARCH_DB_MODE` (`postgres` default after Phase 11; `dual` compares; `legacy` emergency public rollback). Live apply **done** (0024–0029). Public lexicon (local) reads Postgres; files remain exclusive fallback. Phase 7: `docs/RESEARCH_DUAL_READ_PHASE_7.md`. Phase 11: `docs/RESEARCH_PUBLIC_LEXICON_CUTOVER_PHASE_11.md`. **0028** tightens evidence SELECT. **0029** explicit `product_substances` manuals.
+**Research regulatory + review (Phase 4, 0027):** `regulatory_records`, `regulatory_history`, `review_actions`. Imported from published regulatory sources (41 records). Empty FDA/EMA search is never `not_approved`. Community remains unpublished as SQL. Dual-read: `VITE_RESEARCH_DB_MODE` (`postgres` default after Phase 11; `dual` compares; `legacy` emergency public rollback). Live apply **done** (0024–0029). Public lexicon (local + production) reads Postgres; files remain exclusive fallback. Phase 7: `docs/RESEARCH_DUAL_READ_PHASE_7.md`. Phase 11: `docs/RESEARCH_PUBLIC_LEXICON_CUTOVER_PHASE_11.md`. Phase 11C deploy: `docs/RESEARCH_PRODUCTION_LEXICON_CUTOVER_PHASE_11C.md`. **0028** tightens evidence SELECT. **0029** explicit `product_substances` manuals.
 
 ## Peptide / research data models
 
@@ -102,7 +112,7 @@ NCT ID, title, phase, status, sponsor, enrollment, dates, `hasResults`, URL. Ded
 
 ### COMMUNITY_REPORT
 
-Type exists (`CommunityReport`). **No published community reports** in the current batch. UI shows unavailable + disclaimer. Classification enum: anecdotal / repeated-anecdotal / mixed-anecdotal / unverified.
+Type exists (`CommunityReport`). Live `community_reports` after 0031 (empty). **No community rows imported.** UI shows Scientific Research vs Community Experience; Reddit/BfArM/MHRA/NMPA unavailable. Community cannot raise evidence.
 
 ### RESEARCH_UPDATE
 
@@ -121,7 +131,7 @@ Claim ──n:n──► Source               (claim_sources)
 Claim ──1:1──► EvidenceAssessment   (A–F not on the claim row; public: approved only)
 Substance ──1:n──► RegulatoryRecord (region + product; public: current + approved)
 RegulatoryRecord ──1:n──► RegulatoryHistory
-ReviewAction ──admin──► claim | evidence | regulatory | research_update | substance
+ReviewAction ──admin──► claim | evidence | regulatory | research_update | substance | source | study
 Substance ──1:n──► CommunityReport (none published)
 Community ─x─► EvidenceLevel   (forbidden; communityCannotRaiseEvidence)
 ```
@@ -130,11 +140,15 @@ Community ─x─► EvidenceLevel   (forbidden; communityCannotRaiseEvidence)
 
 `ResearchConnector` in `src/research/connectors/types.ts`.
 
-Scientific (browser stubs): FDA, EMA, BfArM, MHRA, ClinicalTrials.gov, PubMed, literature.
+Scientific (browser stubs): FDA, EMA, BfArM, MHRA, NMPA, ClinicalTrials.gov, PubMed, literature.
 
 Community stubs: Reddit, forum, blog.
 
-Node (not bundled as live client calls): `scripts/fetch-research-sources.mjs` (`batch01` / `batch02` / `all`), `scripts/fetch-regulatory-labels.mjs`, `scripts/compile-research-profiles.mjs` + `scripts/research-batch-02-curated.mjs`.
+Update Engine (`src/lib/peptide/research/updateEngine/`): injectable scientific adapters for PubMed, CT.gov, FDA, EMA. BfArM / MHRA / NMPA and community kinds stay `unavailable`. Connectors never auto-approve. Empty FDA search is not `not_approved`. EMA 404 is not evidence. Hudson NCTs are excluded. See `docs/RESEARCH_UPDATE_ENGINE_BLOCK_2.md`.
+
+Research Operations (`src/lib/peptide/research/operations/`): persisted runs, Admin Update All, cancel/retry, concurrency, connector health, community table architecture. Live 0031 persist. UNCHANGED/DUPLICATE preserve `review_status`; UPDATED scientific fields demote to review-required with stored diff. See `docs/RESEARCH_FINAL_HARDENING.md`.
+
+Node (not bundled as live client calls): `scripts/fetch-research-sources.mjs` (`batch01` / `batch02` / `batch03` / `all`), `scripts/fetch-regulatory-labels.mjs`, `scripts/fetch-regulatory-batch-03.mjs`, `scripts/compile-research-profiles.mjs` + `scripts/research-batch-02-curated.mjs` + `scripts/research-batch-03-analyze.mjs`.
 
 ## Caching
 

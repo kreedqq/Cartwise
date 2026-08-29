@@ -12,11 +12,13 @@ export {
   isPublicClaim,
   isPublicEvidence,
   isPublicRegulatory,
+  isPublicSource,
   isPublicStudy,
   publicClaims,
   publicEvidence,
   publicRegulatory,
   publicResponseHasAdminLeak,
+  publicSources,
   publicStudies,
 } from "@/lib/peptide/lexicon/publicVisibility";
 export { resolvePublicLexicon } from "@/lib/peptide/lexicon/resolvePublicLexicon";

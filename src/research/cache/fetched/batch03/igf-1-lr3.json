@@ -1,0 +1,131 @@
+{
+  "slug": "igf-1-lr3",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "IGF-1 LR3",
+    "\"Long R3 IGF-1\"",
+    "\"IGF-I Long R3\""
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "IGF-1 LR3",
+      "totalCount": 0,
+      "studies": []
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "IGF-1 LR3 AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 5,
+      "articles": [
+        {
+          "pmid": "17636166",
+          "title": "Effects of IGF-I bioavailability on bovine preantral follicular development in vitro.",
+          "source": "Reproduction",
+          "pubdate": "2007 Jun",
+          "authors": [
+            "Thomas FH",
+            "Campbell BK",
+            "Armstrong DG",
+            "Telfer EE"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1530/REP-06-0382",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17636166/"
+        },
+        {
+          "pmid": "42395176",
+          "title": "The emerging landscape of performance-enhancing peptides modulating GH-IGF1 axis: bridging the gap between clinical evidence and patient self-administration.",
+          "source": "Front Endocrinol (Lausanne)",
+          "pubdate": "2026",
+          "authors": [
+            "Dominikowski A",
+            "Rękoś Z",
+            "Olejarz M",
+            "Szczepanek-Parulska E",
+            "Domin R",
+            "RuchaŁa M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3389/fendo.2026.1822475",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42395176/"
+        },
+        {
+          "pmid": "22227200",
+          "title": "Na+ transport across rumen epithelium of hay-fed sheep is acutely stimulated by the peptide IGF-1 in vitro.",
+          "source": "Exp Physiol",
+          "pubdate": "2012 Apr",
+          "authors": [
+            "Shen Z",
+            "Martens H",
+            "Schweigel-Röntgen M"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1113/expphysiol.2011.061580",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22227200/"
+        },
+        {
+          "pmid": "10198302",
+          "title": "Clearance of IGFs and insulin from wounds: effect of IGF-binding protein interactions.",
+          "source": "Am J Physiol",
+          "pubdate": "1999 Apr",
+          "authors": [
+            "Robertson JG",
+            "Belford DA",
+            "Ballard FJ"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1152/ajpendo.1999.276.4.E663",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/10198302/"
+        },
+        {
+          "pmid": "11334915",
+          "title": "Differential effects of insulin-like growth factor-I and gonadotropins on the proliferative activity of two subgroups of granulosa cells: cumulus oophorus and mural granulosa cells.",
+          "source": "Fertil Steril",
+          "pubdate": "2001 May",
+          "authors": [
+            "Khamsi F",
+            "Roberge S"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1016/s0015-0282(01)01695-8",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11334915/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "IGF-1 LR3",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 404,
+      "httpStatus": 404,
+      "ok": false,
+      "cid": null,
+      "cas": null,
+      "formula": null,
+      "iupac": null
+    }
+  }
+}

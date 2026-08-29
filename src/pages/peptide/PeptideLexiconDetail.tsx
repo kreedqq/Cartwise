@@ -113,6 +113,8 @@ export default function PeptideLexiconDetailPage() {
         <p className="text-sm text-muted-foreground">CAS {substance.casNumber}</p>
       )}
 
+      <section className="space-y-6">
+        <h2 className="text-lg font-semibold">Scientific Research</h2>
       <section className="space-y-2">
         <h2 className="text-lg font-semibold">Scientific Evidence</h2>
         <p className="text-sm text-muted-foreground">{EVIDENCE_LABELS[substance.evidenceLevel]}</p>
@@ -127,6 +129,7 @@ export default function PeptideLexiconDetailPage() {
 
       {profile ? (
         <>
+          <h2 className="text-lg font-semibold">Scientific Claims</h2>
           <CitedBlock title="Overview" block={profile.summary.whatIsIt} sources={sourceById} />
           <CitedBlock title="Mechanism" block={profile.summary.mechanism} sources={sourceById} />
           <CitedBlock title="What has been studied" block={profile.summary.whatHasBeenStudied} sources={sourceById} />
@@ -275,17 +278,11 @@ export default function PeptideLexiconDetailPage() {
         </section>
       )}
 
-      <section className="space-y-2 rounded-xl border border-border/70 bg-secondary/30 p-5">
-        <h2 className="text-lg font-semibold">Community Experience</h2>
-        <p className="text-sm text-muted-foreground">{COMMUNITY_DISCLAIMER}</p>
-        <p className="text-sm text-muted-foreground">{profile?.community.message ?? redditMessage}</p>
-        <p className="text-xs text-muted-foreground">
-          Community signal only. Last community scan: {formatReviewedDate(substance.lastCommunityScanAt)}
-        </p>
-      </section>
-
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Sources</h2>
+        <h2 className="text-lg font-semibold">Claim Sources</h2>
+        <p className="text-xs text-muted-foreground">
+          Quellen, die einem wissenschaftlichen Claim zugeordnet sind. Keine automatische Evidence-Stufe.
+        </p>
         {profile && profile.sources.length > 0 ? (
           <ol className="list-decimal space-y-2 pl-5 text-sm">
             {profile.sources.map((source) => (
@@ -304,6 +301,60 @@ export default function PeptideLexiconDetailPage() {
         ) : (
           <p className="text-sm text-muted-foreground">{NO_DATA}</p>
         )}
+      </section>
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">Source References</h2>
+        <p className="text-xs text-muted-foreground">
+          Genehmigte Substanzquellen ohne Claim-Zuordnung. Keine Claim-Citation, keine Evidence A–F, keine erfundenen Claims.
+        </p>
+        {profile && (profile.sourceReferences ?? []).length > 0 ? (
+          <ol className="list-decimal space-y-2 pl-5 text-sm">
+            {(profile.sourceReferences ?? []).map((source) => (
+              <li key={`ref-${source.id}`} id={`ref-${source.id}`}>
+                <a className="text-primary hover:underline" href={source.url} target="_blank" rel="noreferrer">
+                  {source.title}
+                </a>
+                <span className="block text-xs text-muted-foreground">
+                  {[source.publisher, source.sourceType, source.pmid ? `PMID ${source.pmid}` : null, source.clinicalTrialId, `accessed ${source.accessDate}`]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="text-sm text-muted-foreground">Keine zusätzlichen Source References.</p>
+        )}
+      </section>
+      </section>
+
+      <section className="space-y-2 rounded-xl border border-border/70 bg-secondary/30 p-5">
+        <h2 className="text-lg font-semibold">Community Experience</h2>
+        <p className="text-sm text-muted-foreground">{COMMUNITY_DISCLAIMER}</p>
+        <p className="text-sm text-muted-foreground">{profile?.community.message ?? redditMessage}</p>
+        {(profile?.community.reports ?? []).length > 0 ? (
+          <ul className="space-y-2 text-sm">
+            {(profile?.community.reports ?? []).map((report) => (
+              <li key={report.id}>
+                <span className="text-xs uppercase text-muted-foreground">{report.kind}</span>{" "}
+                {report.sourceUrl ? (
+                  <a className="text-primary hover:underline" href={report.sourceUrl} target="_blank" rel="noreferrer">
+                    {report.title}
+                  </a>
+                ) : (
+                  report.title
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Keine freigegebenen Community-Berichte. Reddit, Foren und Blogs bleiben unavailable ohne offizielle API.
+          </p>
+        )}
+        <p className="text-xs text-muted-foreground">
+          Community signal only. Last community scan: {formatReviewedDate(substance.lastCommunityScanAt)}
+        </p>
       </section>
     </div>
   );

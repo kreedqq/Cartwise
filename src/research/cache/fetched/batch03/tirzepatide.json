@@ -1,0 +1,875 @@
+{
+  "slug": "tirzepatide",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "tirzepatide",
+    "LY3298176"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "tirzepatide",
+      "totalCount": 292,
+      "studies": [
+        {
+          "nctId": "NCT07191873",
+          "title": "Tirzepatide in Idiopathic Intracranial Hypertension Trial",
+          "status": "RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Duke University",
+          "enrollment": 60,
+          "start": "2026-08-25",
+          "completion": "2028-08",
+          "lastUpdate": "2026-08-28",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07191873",
+          "intervention": "Tirzepatide; Tirzepatide Placebo",
+          "condition": "Idiopathic Intracranial Hypertension (IIH)"
+        },
+        {
+          "nctId": "NCT07154719",
+          "title": "GLP-1R Actions on Muscle and the Skeleton",
+          "status": "RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Pennington Biomedical Research Center",
+          "enrollment": 50,
+          "start": "2025-10-09",
+          "completion": "2027-05-01",
+          "lastUpdate": "2026-08-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07154719",
+          "intervention": "Tirzepatide; Lifestyle toolkit",
+          "condition": "Musculoskeletal Abnormalities; Obesity; Sarcopenic Obesity; Osteoporosis; Drug Effect"
+        },
+        {
+          "nctId": "NCT07787936",
+          "title": "GLP-1/GIP Receptor Agonists in Obesity-Related HFpEF: The GLIDE-HF Registry",
+          "status": "NOT_YET_RECRUITING",
+          "phase": null,
+          "sponsor": "Miedziowe Centrum Zdrowia SA",
+          "enrollment": 150,
+          "start": "2027-01-01",
+          "completion": "2033-01-01",
+          "lastUpdate": "2026-08-26",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07787936",
+          "intervention": "GLP-1 / GIP receptor agonist",
+          "condition": "Heart Failure With Preserved Ejection Fraction; Obesity; Diastolic Heart Failure; Pulmonary Hypertension; Iron Deficiency"
+        },
+        {
+          "nctId": "NCT07349641",
+          "title": "A Study of Weight Loss Intervention With Tirzepatide and Progestin Intrauterine Device to Treat Endometrial Hyperplasia and Grade 1 Endometrial Cancer",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "National Cancer Institute (NCI)",
+          "enrollment": 55,
+          "start": "2026-11-01",
+          "completion": "2030-10-31",
+          "lastUpdate": "2026-08-26",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07349641",
+          "intervention": "Medical Device Usage and Evaluation; Tirzepatide",
+          "condition": "Endometrial Atypical Hyperplasia/Endometrioid Intraepithelial Neoplasia; FIGO Grade 1 Endometrial Endometrioid Adenocarcinoma"
+        },
+        {
+          "nctId": "NCT07554638",
+          "title": "Incretin Therapies in Obesity-related HFpEF",
+          "status": "RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Columbia University",
+          "enrollment": 50,
+          "start": "2026-08-07",
+          "completion": "2030-04",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07554638",
+          "intervention": "Tirzepatide",
+          "condition": "Heart Failure, Diastolic; Heart Failure With Preserved Ejection Fraction; Obesity"
+        },
+        {
+          "nctId": "NCT07782359",
+          "title": "Impact of Using a GLP1 on Treatment Related Side Effects of Lung Cancer Patients Receiving Lorlatinib",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "University of Chicago",
+          "enrollment": 30,
+          "start": "2026-10",
+          "completion": "2030-06",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07782359",
+          "intervention": "Tirzepatide",
+          "condition": "Lung Cancer"
+        },
+        {
+          "nctId": "NCT05822544",
+          "title": "Phase 1/1b Study of TLC-6740 in Healthy Subjects and Subjects With Obesity, With or Without Diabetes",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "OrsoBio, Inc",
+          "enrollment": 564,
+          "start": "2023-04-22",
+          "completion": "2027-01",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05822544",
+          "intervention": "TLC-6740 Oral Solution; Placebo Oral Solution; TLC-6740 Tablet; Drug Metabolizing Enzyme; Tirzepatide; Placebo Tablet",
+          "condition": "Healthy Subjects; Obesity; Type 2 Diabetes"
+        },
+        {
+          "nctId": "NCT07693608",
+          "title": "An Open-Label Tirzepatide Trial for Comorbid Obesity and Stimulant Use Disorder",
+          "status": "ENROLLING_BY_INVITATION",
+          "phase": "PHASE2",
+          "sponsor": "University of Texas Southwestern Medical Center",
+          "enrollment": 45,
+          "start": "2026-08-19",
+          "completion": "2030-03-01",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07693608",
+          "intervention": "Tirzepatide",
+          "condition": "Obesity; Methamphetamine Use Disorder; Cocaine Use Disorder; Stimulant Use Disorders"
+        },
+        {
+          "nctId": "NCT07165028",
+          "title": "A Master Protocol of Multiple Agents in Adults With Metabolic Dysfunction-Associated Steatotic Liver Disease (SYNERGY-Outcomes)",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 4500,
+          "start": "2025-10-15",
+          "completion": "2032-08",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07165028",
+          "intervention": "Tirzepatide; Retatrutide; Placebo",
+          "condition": "Metabolic Dysfunction-Associated Steatotic Liver Disease"
+        },
+        {
+          "nctId": "NCT07438444",
+          "title": "A Study of Tirzepatide (LY3298176) in Adult Participants in India With Either Type 2 Diabetes Mellitus or Obesity",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 344,
+          "start": "2026-02-27",
+          "completion": "2027-07",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07438444",
+          "intervention": "Tirzepatide",
+          "condition": "Diabetes Mellitus, Type 2; Obesity; Overweight"
+        },
+        {
+          "nctId": "NCT06937086",
+          "title": "Mirikizumab Administered at the Same Time as Tirzepatide in Adult Participants With Moderately to Severely Active Ulcerative Colitis and Obesity or Overweight: Phase 3b Study",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 350,
+          "start": "2025-06-26",
+          "completion": "2028-04",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06937086",
+          "intervention": "Mirikizumab; Mirikizumab; Tirzepatide; Placebo",
+          "condition": "Ulcerative Colitis; Obesity or Overweight"
+        },
+        {
+          "nctId": "NCT06897475",
+          "title": "A Study of LY3457263 Compared With Placebo in Participants With Type 2 Diabetes on a Stable Dose of Semaglutide or Tirzepatide",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 240,
+          "start": "2025-03-28",
+          "completion": "2027-01",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06897475",
+          "intervention": "LY3457263; Placebo",
+          "condition": "Type 2 Diabetes"
+        },
+        {
+          "nctId": "NCT06937099",
+          "title": "Mirikizumab and Tirzepatide Administered in Adult Participants With Moderately to Severely Active Crohn's Disease and Obesity or Overweight",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 290,
+          "start": "2025-06-26",
+          "completion": "2028-05",
+          "lastUpdate": "2026-08-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06937099",
+          "intervention": "Mirikizumab; Mirikizumab; Tirzepatide; Placebo",
+          "condition": "Crohn's Disease; Obesity or Overweight"
+        },
+        {
+          "nctId": "NCT07777575",
+          "title": "Resistance Training to Prevent Muscle Loss During Treatment With Tirzepatide",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Technical University of Munich",
+          "enrollment": 150,
+          "start": "2026-08-17",
+          "completion": "2027-05-31",
+          "lastUpdate": "2026-08-20",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07777575",
+          "intervention": "Dual GIP/GLP-1 Receptor Agonist Tirzepatide; Resistance Training",
+          "condition": "Obesity (BMI>30)"
+        },
+        {
+          "nctId": "NCT07213323",
+          "title": "Probiotic Intervention for Digestive Health in Obese Patients Initiating GLP-RA Treatment",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Hospices Civils de Lyon",
+          "enrollment": 50,
+          "start": "2026-08-05",
+          "completion": "2028-08-05",
+          "lastUpdate": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07213323",
+          "intervention": "Probiotics (Natural product); Placebo",
+          "condition": "Obesity &Amp; Overweight; Digestive Disorders"
+        },
+        {
+          "nctId": "NCT07218445",
+          "title": "The Effect of Tirzepatide on Menopausal Vasomotor Symptoms and Biological Aging in Post-menopausal Women With Obesity",
+          "status": "RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Mayo Clinic",
+          "enrollment": 40,
+          "start": "2026-04-08",
+          "completion": "2027-09-18",
+          "lastUpdate": "2026-08-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07218445",
+          "intervention": "Tirzepatide; Placebo",
+          "condition": "Obesity; Menopause Hot Flashes"
+        },
+        {
+          "nctId": "NCT06700538",
+          "title": "A First-In-Human Study of ARO-INHBE in Adults With Obesity With and Without Type 2 Diabetes Mellitus",
+          "status": "RECRUITING",
+          "phase": "PHASE1, PHASE2",
+          "sponsor": "Arrowhead Pharmaceuticals",
+          "enrollment": 180,
+          "start": "2024-12-04",
+          "completion": "2028-01-17",
+          "lastUpdate": "2026-08-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06700538",
+          "intervention": "ARO-INHBE; Placebo; Tirzepatide",
+          "condition": "Obesity"
+        },
+        {
+          "nctId": "NCT07202247",
+          "title": "Metabolic Interventions (Time-Restricted Eating, GLP1 Receptor Agonist, and Heart Healthy Diet) to Improve Cardiometabolic Health in Prostate Cancer Patients During Androgen Deprivation Therapy, IMPACT-ADT Trial",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "City of Hope Medical Center",
+          "enrollment": 60,
+          "start": "2025-11-05",
+          "completion": "2028-04-09",
+          "lastUpdate": "2026-08-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07202247",
+          "intervention": "Antiandrogen Therapy; Behavioral Intervention; Biospecimen Collection; Cardiac Computerized Tomographic Angiography; Computed Tomography; Electronic Health Record Review",
+          "condition": "Prostate Carcinoma; Recurrent Prostate Carcinoma"
+        },
+        {
+          "nctId": "NCT06326047",
+          "title": "A Research Study Comparing How Well Different Doses of the Medicine NN0519-0130 Lower Blood Sugar in People With Type 2 Diabetes",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 299,
+          "start": "2024-03-18",
+          "completion": "2025-10-13",
+          "lastUpdate": "2026-08-13",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06326047",
+          "intervention": "NNC0519-0130; Placebo; Trizepatide",
+          "condition": "Diabetes Mellitus, Type 2"
+        },
+        {
+          "nctId": "NCT07734870",
+          "title": "Tirzepatide for Treatment of CCCA",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Johns Hopkins University",
+          "enrollment": 20,
+          "start": "2026-09-15",
+          "completion": "2028-05-25",
+          "lastUpdate": "2026-08-12",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07734870",
+          "intervention": "Tirzepatide",
+          "condition": "Central Centrifugal Cicatricial Alopecia (CCCA)"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "tirzepatide AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 1118,
+      "articles": [
+        {
+          "pmid": "38078870",
+          "title": "Continued Treatment With Tirzepatide for Maintenance of Weight Reduction in Adults With Obesity: The SURMOUNT-4 Randomized Clinical Trial.",
+          "source": "JAMA",
+          "pubdate": "2024 Jan 2",
+          "authors": [
+            "Aronne LJ",
+            "Sattar N",
+            "Horn DB",
+            "Bays HE",
+            "Wharton S",
+            "Lin WY"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1001/jama.2023.24945",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38078870/"
+        },
+        {
+          "pmid": "35658024",
+          "title": "Tirzepatide Once Weekly for the Treatment of Obesity.",
+          "source": "N Engl J Med",
+          "pubdate": "2022 Jul 21",
+          "authors": [
+            "Jastreboff AM",
+            "Aronne LJ",
+            "Ahmad NN",
+            "Wharton S",
+            "Connery L",
+            "Alves B"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1056/NEJMoa2206038",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35658024/"
+        },
+        {
+          "pmid": "38912654",
+          "title": "Tirzepatide for the Treatment of Obstructive Sleep Apnea and Obesity.",
+          "source": "N Engl J Med",
+          "pubdate": "2024 Oct 3",
+          "authors": [
+            "Malhotra A",
+            "Grunstein RR",
+            "Fietze I",
+            "Weaver TE",
+            "Redline S",
+            "Azarbarzin A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase III",
+            "Multicenter Study"
+          ],
+          "doi": "10.1056/NEJMoa2404881",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38912654/"
+        },
+        {
+          "pmid": "34170647",
+          "title": "Tirzepatide versus Semaglutide Once Weekly in Patients with Type 2 Diabetes.",
+          "source": "N Engl J Med",
+          "pubdate": "2021 Aug 5",
+          "authors": [
+            "Frías JP",
+            "Davies MJ",
+            "Rosenstock J",
+            "Pérez Manghi FC",
+            "Fernández Landó L",
+            "Bergman BK"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Comparative Study",
+            "Equivalence Trial",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1056/NEJMoa2107519",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34170647/"
+        },
+        {
+          "pmid": "40353578",
+          "title": "Tirzepatide as Compared with Semaglutide for the Treatment of Obesity.",
+          "source": "N Engl J Med",
+          "pubdate": "2025 Jul 3",
+          "authors": [
+            "Aronne LJ",
+            "Horn DB",
+            "le Roux CW",
+            "Ho W",
+            "Falcon BL",
+            "Gomez Valderas E"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Comparative Study",
+            "Equivalence Trial",
+            "Journal Article",
+            "Multicenter Study"
+          ],
+          "doi": "10.1056/NEJMoa2416394",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40353578/"
+        },
+        {
+          "pmid": "39536238",
+          "title": "Tirzepatide for Obesity Treatment and Diabetes Prevention.",
+          "source": "N Engl J Med",
+          "pubdate": "2025 Mar 6",
+          "authors": [
+            "Jastreboff AM",
+            "le Roux CW",
+            "Stefanski A",
+            "Aronne LJ",
+            "Halpern B",
+            "Wharton S"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase III",
+            "Multicenter Study"
+          ],
+          "doi": "10.1056/NEJMoa2410819",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39536238/"
+        },
+        {
+          "pmid": "39555826",
+          "title": "Tirzepatide for Heart Failure with Preserved Ejection Fraction and Obesity.",
+          "source": "N Engl J Med",
+          "pubdate": "2025 Jan 30",
+          "authors": [
+            "Packer M",
+            "Zile MR",
+            "Kramer CM",
+            "Baum SJ",
+            "Litwin SE",
+            "Menon V"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1056/NEJMoa2410027",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39555826/"
+        },
+        {
+          "pmid": "38819983",
+          "title": "Tirzepatide for Weight Reduction in Chinese Adults With Obesity: The SURMOUNT-CN Randomized Clinical Trial.",
+          "source": "JAMA",
+          "pubdate": "2024 Aug 20",
+          "authors": [
+            "Zhao L",
+            "Cheng Z",
+            "Lu Y",
+            "Liu M",
+            "Chen H",
+            "Zhang M"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1001/jama.2024.9217",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38819983/"
+        },
+        {
+          "pmid": "37385275",
+          "title": "Tirzepatide once weekly for the treatment of obesity in people with type 2 diabetes (SURMOUNT-2): a double-blind, randomised, multicentre, placebo-controlled, phase 3 trial.",
+          "source": "Lancet",
+          "pubdate": "2023 Aug 19",
+          "authors": [
+            "Garvey WT",
+            "Frias JP",
+            "Jastreboff AM",
+            "le Roux CW",
+            "Sattar N",
+            "Aizenberg D"
+          ],
+          "pubtype": [
+            "Randomized Controlled Trial",
+            "Multicenter Study",
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/S0140-6736(23)01200-X",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37385275/"
+        },
+        {
+          "pmid": "37758044",
+          "title": "Comparison of tirzepatide and dulaglutide on major adverse cardiovascular events in participants with type 2 diabetes and atherosclerotic cardiovascular disease: SURPASS-CVOT design and baseline characteristics.",
+          "source": "Am Heart J",
+          "pubdate": "2024 Jan",
+          "authors": [
+            "Nicholls SJ",
+            "Bhatt DL",
+            "Buse JB",
+            "Prato SD",
+            "Kahn SE",
+            "Lincoff AM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't",
+            "Clinical Trial Protocol"
+          ],
+          "doi": "10.1016/j.ahj.2023.09.007",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37758044/"
+        },
+        {
+          "pmid": "40196933",
+          "title": "Real-world evidence on the utilization, clinical and comparative effectiveness, and adverse effects of newer GLP-1RA-based weight-loss therapies.",
+          "source": "Diabetes Obes Metab",
+          "pubdate": "2025 Apr",
+          "authors": [
+            "Thomsen RW",
+            "Mailhac A",
+            "Løhde JB",
+            "Pottegård A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1111/dom.16364",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40196933/"
+        },
+        {
+          "pmid": "38976257",
+          "title": "Semaglutide vs Tirzepatide for Weight Loss in Adults With Overweight or Obesity.",
+          "source": "JAMA Intern Med",
+          "pubdate": "2024 Sep 1",
+          "authors": [
+            "Rodriguez PJ",
+            "Goodwin Cartwright BM",
+            "Gratzl S",
+            "Brar R",
+            "Baker C",
+            "Gluckman TJ"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Observational Study",
+            "Comparative Study",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1001/jamainternmed.2024.2525",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38976257/"
+        },
+        {
+          "pmid": "34186022",
+          "title": "Efficacy and safety of a novel dual GIP and GLP-1 receptor agonist tirzepatide in patients with type 2 diabetes (SURPASS-1): a double-blind, randomised, phase 3 trial.",
+          "source": "Lancet",
+          "pubdate": "2021 Jul 10",
+          "authors": [
+            "Rosenstock J",
+            "Wysham C",
+            "Frías JP",
+            "Kaneko S",
+            "Lee CJ",
+            "Fernández Landó L"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1016/S0140-6736(21)01324-6",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34186022/"
+        },
+        {
+          "pmid": "39719170",
+          "title": "Effect of glucagon-like peptide-1 receptor agonists and co-agonists on body composition: Systematic review and network meta-analysis.",
+          "source": "Metabolism",
+          "pubdate": "2025 Mar",
+          "authors": [
+            "Karakasis P",
+            "Patoulias D",
+            "Fragakis N",
+            "Mantzoros CS"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Network Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1016/j.metabol.2024.156113",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39719170/"
+        },
+        {
+          "pmid": "39996356",
+          "title": "Body composition changes during weight reduction with tirzepatide in the SURMOUNT-1 study of adults with obesity or overweight.",
+          "source": "Diabetes Obes Metab",
+          "pubdate": "2025 May",
+          "authors": [
+            "Look M",
+            "Dunn JP",
+            "Kushner RF",
+            "Cao D",
+            "Harris C",
+            "Gibble TH"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1111/dom.16275",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39996356/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "tirzepatide",
+      "found": true,
+      "products": [
+        {
+          "sponsor": "ELI LILLY AND CO",
+          "application": "NDA217806",
+          "products": [
+            {
+              "brand": "ZEPBOUND",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "60MG/2.4ML (25MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "ZEPBOUND KWIKPEN",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "60MG/2.4ML (25MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "ZEPBOUND",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "40MG/2.4ML (16.7MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "ZEPBOUND",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "5MG/0.5ML (5MG/0.5ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "ZEPBOUND KWIKPEN",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "40MG/2.4ML (16.7MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "ZEPBOUND",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "20MG/2.4ML (8.33MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "ZEPBOUND (AUTOINJECTOR)",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "15MG/0.5ML (15MG/0.5ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "ZEPBOUND KWIKPEN",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "20MG/2.4ML (8.33MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            }
+          ]
+        },
+        {
+          "sponsor": "ELI LILLY AND CO",
+          "application": "NDA215866",
+          "products": [
+            {
+              "brand": "MOUNJARO",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "60MG/2.4ML (25MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "MOUNJARO KWIKPEN",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "60MG/2.4ML (25MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "MOUNJARO",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "40MG/2.4ML (16.7MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "MOUNJARO",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "5MG/0.5ML (5MG/0.5ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "MOUNJARO KWIKPEN",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "40MG/2.4ML (16.7MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "MOUNJARO",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "20MG/2.4ML (8.33MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "MOUNJARO (AUTOINJECTOR)",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "15MG/0.5ML (15MG/0.5ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            },
+            {
+              "brand": "MOUNJARO KWIKPEN",
+              "active": [
+                {
+                  "name": "TIRZEPATIDE",
+                  "strength": "20MG/2.4ML (8.33MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            }
+          ]
+        }
+      ],
+      "message": null
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 166567236,
+      "cas": "2023788-19-2",
+      "formula": "C225H348N48O68",
+      "iupac": "20-[[(1S)-4-[2-[2-[2-[2-[2-[2-[[(5S)-5-[[(2S)-5-amino-2-[[(2S)-2-[[(2S,3S)-2-[[(2S)-6-amino-2-[[(2S)-2-[[(2S)-2-[[2-[[(2S,3S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S,3R)-2-[[(2S)-2-[[(2S,3R)-2-[[2-[[(2S)-2-[[2-[[(2S)-2-amino-3-(4-hydroxyphenyl)propanoyl]amino]-2-methylpropanoyl]amino]-4-carboxybutanoyl]amino]acetyl]amino]-3-hydroxybutanoyl]amino]-3-phenylpropanoyl]amino]-3-hydroxybutanoyl]amino]-3-hydroxypropanoyl]amino]-3-carboxypropanoyl]amino]-3-(4-hydroxyphenyl)propanoyl]amino]-3-hydroxypropanoyl]amino]-3-methylpentanoyl]amino]-2-methylpropanoyl]amino]-4-methylpentanoyl]amino]-3-carboxypropanoyl]amino]hexanoyl]amino]-3-methylpentanoyl]amino]propanoyl]amino]-5-oxopentanoyl]amino]-6-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-5-amino-1-[[(2S)-1-[[(2S)-1-[[(2S,3S)-1-[[(2S)-1-[[2-[[2-[(2S)-2-[[(2S)-1-[[(2S)-1-[[2-[[(2S)-1-[(2S)-2-[(2S)-2-[(2S)-2-[[(2S)-1-amino-3-hydroxy-1-oxopropan-2-yl]carbamoyl]pyrrolidine-1-carbonyl]pyrrolidine-1-carbonyl]pyrrolidin-1-yl]-1-oxopropan-2-yl]amino]-2-oxoethyl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]carbamoyl]pyrrolidin-1-yl]-2-oxoethyl]amino]-2-oxoethyl]amino]-1-oxopropan-2-yl]amino]-3-methyl-1-oxopentan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-3-(1H-indol-3-yl)-1-oxopropan-2-yl]amino]-1,5-dioxopentan-2-yl]amino]-3-methyl-1-oxobutan-2-yl]amino]-1-oxo-3-phenylpropan-2-yl]amino]-1-oxopropan-2-yl]amino]-6-oxohexyl]amino]-2-oxoethoxy]ethoxy]ethylamino]-2-oxoethoxy]ethoxy]ethylamino]-1-carboxy-4-oxobutyl]amino]-20-oxoicosanoic acid"
+    }
+  }
+}

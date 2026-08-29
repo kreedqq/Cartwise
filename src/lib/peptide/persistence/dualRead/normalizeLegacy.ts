@@ -124,6 +124,7 @@ export function normalizeLegacyResearch(): NormalizedResearchSnapshot {
     accessDate: row.accessDate,
     legacyIds: [...row.legacyIds],
     substanceSlugs: [...row.substanceSlugs],
+    reviewStatus: "approved",
   }));
 
   const studies: NormalizedStudy[] = science.studies.map((row) => ({
@@ -139,6 +140,7 @@ export function normalizeLegacyResearch(): NormalizedResearchSnapshot {
     hasResults: row.hasResults,
     url: row.url,
     substanceSlugs: [...row.substanceSlugs],
+    reviewStatus: "approved",
   }));
 
   const claims: NormalizedClaim[] = claimsSeed.claims.map((row) => ({

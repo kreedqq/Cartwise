@@ -122,7 +122,7 @@ describe("peptide pages that use Button asChild", () => {
         "href",
         expect.stringContaining("/peptide/rechner"),
       );
-      expect(screen.getByRole("heading", { name: "Scientific Evidence" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Scientific Claims" })).toBeInTheDocument();
       expect(screen.getByRole("heading", { name: "Overview" })).toBeInTheDocument();
       expect(screen.getByRole("heading", { name: "Mechanism" })).toBeInTheDocument();
       expect(screen.getByRole("heading", { name: "Effects" })).toBeInTheDocument();
@@ -130,7 +130,8 @@ describe("peptide pages that use Button asChild", () => {
       expect(screen.getByRole("heading", { name: "Interactions" })).toBeInTheDocument();
       expect(screen.getByRole("heading", { name: "Reconstitution" })).toBeInTheDocument();
       expect(screen.getByRole("heading", { name: "Clinical Trials" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Sources" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Claim Sources" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Source References" })).toBeInTheDocument();
     },
   );
 });

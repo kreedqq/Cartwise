@@ -26,6 +26,8 @@ function classifyError(error: { message: string; code?: string; name?: string })
     return "rls";
   }
   if (message.includes("failed to fetch") || message.includes("network") || message.includes("offline")) return "network";
+  if (message.includes("invalid json") || message.includes("unexpected token") || message.includes("malformed")) return "invalid";
+  if (message.includes("incomplete") || message.includes("partial")) return "partial";
   return "query";
 }
 
@@ -67,7 +69,7 @@ export async function fetchPostgresResearch(
     const sources = await selectRows<PostgresResearchBundle["sources"][number]>(
       client,
       "sources",
-      "id, source_type, title, publisher, publication_date, access_date, url, doi, pmid, nct_id, legacy_ids",
+      "id, source_type, title, publisher, publication_date, access_date, url, doi, pmid, nct_id, legacy_ids, review_status",
     );
     const sourceSubstances = await selectRows<PostgresResearchBundle["sourceSubstances"][number]>(
       client,
@@ -77,7 +79,7 @@ export async function fetchPostgresResearch(
     const studies = await selectRows<PostgresResearchBundle["studies"][number]>(
       client,
       "studies",
-      "id, nct_id, title, sponsor, phase, status, enrollment, start_date, completion_date, last_updated, has_results, source_url",
+      "id, nct_id, title, sponsor, phase, status, enrollment, start_date, completion_date, last_updated, has_results, source_url, review_status",
     );
     const studySubstances = await selectRows<PostgresResearchBundle["studySubstances"][number]>(
       client,
@@ -159,6 +161,9 @@ export async function fetchPostgresResearch(
         }, timeoutMs);
       }),
     ]);
+    if (!Array.isArray(bundle.substances) || bundle.substances.length === 0) {
+      return { ok: false, kind: "partial", message: "postgres research response incomplete" };
+    }
     return { ok: true, bundle };
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));

@@ -2,7 +2,7 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-08-29** (Phase 11B local commit of public lexicon Postgres cutover; not pushed/deployed).
+Last documentation pass: **2026-08-29** (finalization commit `feat: finalize research platform`).
 
 ## Identity
 
@@ -19,15 +19,16 @@ Last documentation pass: **2026-08-29** (Phase 11B local commit of public lexico
 | | |
 |---|---|
 | Branch | `main` (tracks `origin/main`) |
-| Last backup commit | Phase 11B: `feat: switch public lexicon to postgres` (not pushed) |
-| Last documentation pass | Phase 11B local commit (2026-08-29); not pushed/deployed |
+| Last backup commit | `feat: finalize research platform` (this finalization; not pushed) |
+| Last documentation pass | Finalization 2026-08-29; **FINAL_RELEASE_READY_WITH_LIMITATIONS** until live JWT retest; backup `PEPTIX-FULL-BACKUP-FINAL-2026-08-29-1143` |
+| Full local backup | `PEPTIX-FULL-BACKUP-2026-08-29-1054` plus dump `PEPTIX-PRODUCTION-FINAL-2026-08-29-1130.sql` under `Documents\PEPTIX-BACKUPS\` |
 | Nested copy | A nested `Cartwise/` tree may exist; do not treat it as the app source. Tests are scoped to `src/` (`vite.config.ts`). |
 
 Do not commit unless the user asks. Recommended backup commit (when requested): all intended app files **except** `.env*`, credentials, and nested gitlinks.
 
 ## Current development status
 
-The app is a React SPA on Vite with Supabase Auth + Postgres (RLS) + RPCs. Storefront, carts, checkout/orders, Discord OAuth, and admin catalog tools are implemented in code. Peptide hub/calculator are unchanged. **Public lexicon read path:** Postgres primary with exclusive full-legacy fallback (`docs/RESEARCH_PUBLIC_LEXICON_CUTOVER_PHASE_11.md`). Default `VITE_RESEARCH_DB_MODE` is `postgres`; `legacy` is emergency rollback. **Production SPA is still the Phase 10E files-based build until an explicit deploy.** Phase 1–4 seeds exist in Git. Phase 6C: **PRODUCTION_APPLY_SUCCESS**. Phase 7: **DUAL_READ_READY**. Phase 8: **ADMIN_POSTGRES_READY**. Community and Batch 03 are **not** started.
+The app is a React SPA on Vite with Supabase Auth + Postgres (RLS) + RPCs. Storefront, carts, checkout/orders, Discord OAuth, and admin catalog tools are implemented in code. Peptide hub/calculator are unchanged. Public lexicon is Postgres-primary with exclusive file fallback. Dual mode compares only and never mixes. Persist: UNCHANGED/DUPLICATE preserve `review_status`; NEW and scientific UPDATED go to review-required. Public profile splits Claim Sources and Source References. Live DB **0031**, inventory **27 / 616 / 154 / 294 / 294 / 41 / 21 / 93**. Shop 320 / 0 orders / fp `afd9f04bbf360fb5944709f30d653973`. Auth 2 / fp `76af77941b50c8bc6ff620fc81e9ac50`. RLS **RLS_VERIFIED_WITH_JWT_LIMITATION**. Batch 04 is **not** started. Final local backup: `Documents\PEPTIX-BACKUPS\PEPTIX-FULL-BACKUP-FINAL-2026-08-29-1143`.
 
 Peptide routes sit behind `ProtectedRoute` (same login as shop).
 
@@ -89,7 +90,7 @@ Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/roles`, `/ad
 - Search (name, alias, development name, CAS, slug)
 - Category + status filters
 - Identity catalog: 27 substances in `PEPTIDE_SUBSTANCES_IDENTITY` (identity defaults remain F until overlay)
-- **Public read (local):** Postgres via `usePublicLexicon` / `resolvePublicLexicon`. Files (`catalog.ts` + `published.json`) remain exclusive fallback. See `docs/RESEARCH_PUBLIC_LEXICON_CUTOVER_PHASE_11.md`.
+- **Public read (local + production):** Postgres via `usePublicLexicon` / `resolvePublicLexicon`. Files (`catalog.ts` + `published.json`) remain exclusive fallback. See `docs/RESEARCH_PUBLIC_LEXICON_CUTOVER_PHASE_11.md` and `docs/RESEARCH_PRODUCTION_LEXICON_CUTOVER_PHASE_11C.md`.
 - Public science: approved + sourced claims; approved evidence overlays only (267 review-required hidden); current approved regulatory with region; Hudson NCTs excluded
 - TB-500 ≠ Thymosin Beta-4; fictional/Hudson CT.gov records are not published as studies
 - Glow-blend is a product blend (not a unique INN); Melanotan II ≠ afamelanotide; IGF-1 LR3 ≠ mecasermin
@@ -101,12 +102,15 @@ Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/roles`, `/ad
 ### Research system
 
 - Connector interface: `search`, `getSource`, `getUpdates`, `normalize`, `validate`, `healthCheck`
-- Browser connectors all `healthCheck` → `unavailable` (no live keys in client)
+- Browser connectors all `healthCheck` → `unavailable` (no live keys in client); NMPA stub added as unavailable
 - Official API **batch** via Node scripts: ClinicalTrials.gov v2, NCBI E-utilities, openFDA, PubChem, EMA EPAR HTTP check
 - Raw cache: `src/research/cache/fetched/`
 - Compile: `npm run research:compile` → published profiles
 - Engine: drafts do not auto-publish (`canPublish` requires review + approved)
-- Admin `/admin/research`: Postgres dashboard + review queue (`review_actions` append-only). Public lexicon does not expose `review_actions`.
+- **Update Engine (Block 2):** `src/lib/peptide/research/updateEngine/` — PubMed / CT.gov / FDA / EMA normalizers, identity matching, Hudson exclusion, change detection, scoped runs, partial status, rate-limit retry, review-required persist plan (`productionWrite: false`). Cron off. Community layer unavailable. `docs/RESEARCH_UPDATE_ENGINE_BLOCK_2.md`
+- **Research Operations (Block 3–4):** `src/lib/peptide/research/operations/` — persisted runs, review-candidate store, cancel/retry, full-run concurrency, connector health, Admin Update All. After 0031, runs persist to Postgres; session store is fallback. Cache-backed connectors (no live client HTTP). `docs/RESEARCH_OPERATIONS_BLOCK_3.md`, `docs/RESEARCH_FINAL_OPERATIONS_QA.md`
+- Live `0031_research_operations.sql` is applied on cartwise-prod as MCP `research_operations` (`20260829082116`). Cron off. No community data imported.
+- Admin `/admin/research`: Postgres dashboard + review queue + Research Operations panel. Public lexicon does not expose `review_actions`.
 
 ### Admin (shop)
 
@@ -114,11 +118,11 @@ Products, CSV/XLSX/PDF import, import history, users, audit log, customer roles 
 
 ### Database (Postgres / Supabase)
 
-Migrations `0001`–`0029` under `supabase/migrations/` (Git). Types: `src/types/database.ts`.
+Migrations `0001`–`0031` under `supabase/migrations/` (Git). Types: `src/types/database.ts`.
 
-**Live `cartwise-prod`:** applied `0001`–`0029`. Research tables from 0024–0029 are **on** the deployed database. Shop product fingerprint unchanged vs pre-apply dump.
+**Live `cartwise-prod`:** applied `0001`–`0030` plus MCP `research_operations` (`20260829082116` = 0031 SQL). Research tables from 0024–0031 are **on** the deployed database. Shop product fingerprint unchanged vs pre-0031. Block 4 did **not** deploy a new SPA.
 
-Shop tables unchanged. Research identity (0024): `substances`, `substance_aliases`, `substance_components`, `product_substances`. Research science (0025): `research_runs`, `research_run_sources`, `sources`, `source_substances`, `studies`, `study_substances`, `study_sources`. Research claims (0026): `claims`, `claim_sources`, `evidence_assessments`. Research regulatory/review (0027): `regulatory_records`, `regulatory_history`, `review_actions`. **0028** replaces evidence SELECT (admin all; non-admin approved assessments only). **0029** explicit product mappings + unmap MT1/KL80. **No** `community_reports`. Public lexicon (local tree) reads Postgres with exclusive file fallback. Fixes: `docs/RESEARCH_PRODUCTION_FIXES.md`.
+Shop tables unchanged. Research identity (0024): `substances`, `substance_aliases`, `substance_components`, `product_substances`. Research science (0025): `research_runs`, `research_run_sources`, `sources`, `source_substances`, `studies`, `study_substances`, `study_sources`. Research claims (0026): `claims`, `claim_sources`, `evidence_assessments`. Research regulatory/review (0027): `regulatory_records`, `regulatory_history`, `review_actions`. **0028** replaces evidence SELECT (admin all; non-admin approved assessments only). **0029** explicit product mappings + unmap MT1/KL80. **0030** source/study review_status + Batch 03 intake. **0031** durable run columns, `research_connector_health`, `community_reports` (empty). Public lexicon (local + production) reads Postgres with exclusive file fallback. Fixes: `docs/RESEARCH_PRODUCTION_FIXES.md`. `docs/RESEARCH_FINAL_OPERATIONS_QA.md`.
 
 Edge functions in repo: `get-exchange-rate`, `set-user-role`.
 
@@ -139,21 +143,22 @@ Not in the frontend; optional for later server-side research (names only):
 - `PUBMED_API_KEY` — optional (NCBI E-utilities works without; higher limits with key)
 - Reddit official API credentials — **not configured**; connector stays unavailable
 
-### Tests / quality (last local run 2026-08-29, Phase 11 lexicon cutover)
+### Tests / quality (last local run 2026-08-29, Block 3)
 
 | Gate | Script | Last result |
 |---|---|---|
-| Tests | `npm test` | 426 passed / 34 files |
+| Tests | `npm test` | 478 passed / 39 files |
 | Typecheck | `npm run typecheck` | pass |
 | Lint | `npm run lint` | 0 errors, 5 `react-refresh/only-export-components` warnings (existing UI/auth files) |
 | Build | `npm run build` | pass; Vite warns main chunk > 500 kB; peptide `catalog` chunk ~348 kB kept for exclusive fallback |
 
 ### Known issues / gaps
 
-- Peptide **community** not persisted; research identity/science/claims/regulatory exist as Git migrations/seeds
-- Public lexicon **local working tree** reads Postgres with exclusive legacy fallback (`docs/RESEARCH_PUBLIC_LEXICON_CUTOVER_PHASE_11.md`). **Production SPA still files** (Phase 10E) until deploy. Emergency rollback: `VITE_RESEARCH_DB_MODE=legacy`.
-- Live `cartwise-prod` has **0024–0029 applied**. Phase 6C: **PRODUCTION_APPLY_SUCCESS** (`docs/RESEARCH_PRODUCTION_APPLY_0024_0029.md`).
+- Peptide **community** architecture prepared in 0031 (`community_reports`); no rows imported; Reddit unavailable; community cannot raise evidence
+- Public lexicon reads Postgres with exclusive legacy fallback (`docs/RESEARCH_PUBLIC_LEXICON_CUTOVER_PHASE_11.md`). Production SPA (`https://cartwise-zeta.vercel.app`) is `5e38cf1` / Phase 11C. Emergency rollback: `VITE_RESEARCH_DB_MODE=legacy`. Exclusive fallback is covered by unit tests; a live production outage was **not** demonstrated (Phase 12A). Dual Read / Admin Research copy is corrected in source, not yet deployed.
+- Live `cartwise-prod` has **0024–0030 applied**. Phase 6C: **PRODUCTION_APPLY_SUCCESS** (`docs/RESEARCH_PRODUCTION_APPLY_0024_0029.md`). Phase 17: **PRODUCTION_0030_APPLY_SUCCESS_WITH_RLS_LIMITATION**.
 - 0028 evidence SELECT is live; 0029 explicit product mappings are live (`product_substances` = 93)
+- Phase 17: live **0030**; sources **516** / studies **154**; 104+36 Batch 03 review-required. `docs/RESEARCH_PRODUCTION_MIGRATION_0030.md`
 - Client product mapper remains legacy fuzzy fallback; Postgres SoT is `product_substances` (prefix + explicit). Unresolved: BT*, MT1, Klow, multi-INN blends
 - Oral Semaglutide DailyMed title vs NDA213051 and Ovitrelle-vs-urinary-hCG remain UNRESOLVED
 - Admin Research reads Postgres (`docs/RESEARCH_ADMIN_POSTGRES_PHASE_8.md`). `research_updates` table does not exist.
@@ -164,24 +169,24 @@ Not in the frontend; optional for later server-side research (names only):
 - Logged-in production admin browser QA (2026-08-29): **BROWSER_QA_NOT_READY** (`docs/RESEARCH_PRODUCTION_ADMIN_BROWSER_QA.md`). Admin Research/Postgres counts, mapping, lexicon **list**/search, shop, and cart pass. **Lexicon detail and `/peptide/rechner` crash** on the **currently deployed** SPA (`Button asChild` + Radix Slot / `button-C9NJmCLl.js`).
 - Phase 10D local fix: **UI_CRASH_FIXED** (`docs/RESEARCH_UI_CRASH_FIX_PHASE_10D.md`).
 - Phase 10E: **UI_FIX_DEPLOYED_AND_VERIFIED** (`docs/RESEARCH_UI_CRASH_FIX_DEPLOY_PHASE_10E.md`). Local commit `b079bbf` (`fix: resolve asChild button slot crash`), not pushed. Production `https://cartwise-zeta.vercel.app` serves `button-Dq-9OMxe.js`. Lexicon detail + calculator no longer crash. DB still 0029.
-- Phase 11 public lexicon cutover: **LEXICON_CUTOVER_READY** (`docs/RESEARCH_PUBLIC_LEXICON_CUTOVER_PHASE_11.md`). Phase 11A: **LEXICON_RELEASE_READY**. Phase 11B: local commit `feat: switch public lexicon to postgres`. Not pushed, not deployed. Production still Phase 10E files.
-- Browser research connectors are stubs; live fetch is Node scripts only
-- Reddit / forums / blogs: unavailable (by design without official API)
-- BfArM / MHRA not queried
+- Phase 11C: **PRODUCTION_LEXICON_CUTOVER_SUCCESS_WITH_LIMITATIONS** (`docs/RESEARCH_PRODUCTION_LEXICON_CUTOVER_PHASE_11C.md`). Phase 12: **PRODUCTION_POST_CUTOVER_PASS_WITH_LIMITATIONS** (`docs/RESEARCH_PRODUCTION_POST_CUTOVER_AUDIT.md`). Production alias `https://cartwise-zeta.vercel.app`. DB still 0029. Docs not committed.
+- Browser research connectors are stubs; live fetch is Node scripts only. Block 3 Admin Update All uses official cache adapters, not live HTTP.
+- Reddit / forums / blogs / user-report: unavailable (by design without official API); community cannot raise evidence
+- BfArM / MHRA / NMPA not queried (unavailable connectors)
 - Numeric PK values not copied from labels (no unsourced numbers)
 - Excel `GENXELL_Warenkorb_8_Kunden_FINAL(1).xlsx` is **not** in the repository
 - GLP-1 CT.gov 12-cap lists can include class-adjacent trials; claims do not treat them as approved indications
 - Open Batch 01 review items: Mazdutide NMPA primary source, Orforglipron EMA, Hudson cluster, GHK X39
 - Batch 02 leftovers: exclusive Partial = IGF-1 LR3; exclusive Review Required = thymosin-alpha-1 and gonadorelin (`reviewStatus` is a separate flag, not a second inventory count)
+- Batch 03: **RESEARCH_BATCH_03_COMPLETE_WITH_REVIEW**. Phase 17 imported **104** sources + **36** studies as review-required on production (`docs/RESEARCH_PRODUCTION_MIGRATION_0030.md`). Hudson excluded. Tesamorelin EMA Egrifta is a 2012 withdrawn MAA, not EU approval.
 - `package.json` name still `shared-cart-app`
 
 ### Current priority
 
-1. Keep shop/auth stable.
-2. Do **not** start Research Batch 03 until asked.
-3. Public lexicon cutover is **LEXICON_CUTOVER_READY** / **LEXICON_RELEASE_READY** (local commit). Do **not** push/deploy until asked. Emergency rollback after deploy: `VITE_RESEARCH_DB_MODE=legacy`.
-4. Dual-read remains **DUAL_READ_READY**. Admin Research remains **ADMIN_POSTGRES_READY**. Do not start community or Batch 03 until asked.
-5. Optional: resolve review items (gonadorelin title-restricted literature, Zadaxin primary label, Mazdutide NMPA, Orforglipron EMA).
+1. Keep shop/auth stable. **Do not push** unless asked.
+2. Finalization commit is `feat: finalize research platform`. Deploy that SPA only. Do not start Batch 04, cron, auto-approve, or production SQL.
+3. RLS remains **RLS_VERIFIED_WITH_JWT_LIMITATION**.
+4. Optional: review 204 review-required sources.
 
 ### Architecture decisions (in force)
 

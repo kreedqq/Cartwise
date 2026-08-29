@@ -78,7 +78,13 @@ export interface SubstanceProfile {
   interactions: Array<{ category: "established" | "potential" | "theoretical" | "unknown"; text: string; sourceIds: string[] }>;
   reconstitution: CitedText | null;
   studies: ProfileStudy[];
+  /** Claim-linked citations only. Never treat as automatic evidence A–F. */
   sources: ProfileSource[];
+  /**
+   * Approved substance-attached sources that are not claim_sources.
+   * Traceability only. Must not appear as claim citations or raise evidence.
+   */
+  sourceReferences?: ProfileSource[];
   conflicts: Array<{ topic: string; note: string; sourceIds: string[] }>;
   reviewItems: Array<{
     id: string;
@@ -88,7 +94,11 @@ export interface SubstanceProfile {
     sourceIds: string[];
   }>;
   regulatoryRegions: string[];
-  community: { available: false; message: string };
+  community: {
+    available: boolean;
+    message: string;
+    reports?: Array<{ id: string; kind: string; title: string; sourceUrl: string | null }>;
+  };
   researchReport: {
     identity: string;
     fda: string;

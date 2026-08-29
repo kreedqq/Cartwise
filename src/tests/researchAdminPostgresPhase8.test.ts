@@ -36,6 +36,7 @@ const MIGRATION_0028 = readFileSync(
   "utf8",
 );
 const ADMIN_PAGE = readFileSync(resolve(process.cwd(), "src/pages/admin/AdminResearch.tsx"), "utf8");
+const DUAL_DEBUG = readFileSync(resolve(process.cwd(), "src/components/admin/DualReadDebug.tsx"), "utf8");
 const LEXICON = readFileSync(resolve(process.cwd(), "src/pages/peptide/PeptideLexicon.tsx"), "utf8");
 const DETAIL = readFileSync(resolve(process.cwd(), "src/pages/peptide/PeptideLexiconDetail.tsx"), "utf8");
 const SERVICE = readFileSync(resolve(process.cwd(), "src/services/adminResearch.ts"), "utf8");
@@ -178,6 +179,10 @@ describe("phase 8 rls and public lexicon isolation", () => {
     expect(DETAIL).not.toContain("fetchAdminResearchDashboard");
     expect(ADMIN_PAGE).toContain("useAdminResearchDashboard");
     expect(ADMIN_PAGE).toContain("Postgres ist die Admin-Quelle");
+    expect(ADMIN_PAGE).toContain("Das öffentliche Lexikon liest Postgres");
+    expect(DUAL_DEBUG).toContain("Öffentliches Lexikon: Postgres Primary");
+    expect(DUAL_DEBUG).toContain("exklusiver Fallback");
+    expect(DUAL_DEBUG).not.toContain("Lexikon bleibt Legacy");
     expect(researchDbMode({})).toBe("postgres");
     expect(lexiconDisplaySource({})).toBe("postgres");
     expect(lexiconDisplaySource({ VITE_RESEARCH_DB_MODE: "legacy" })).toBe("legacy");
@@ -227,6 +232,9 @@ describe("phase 8 admin read, evidence, regulatory, studies, failure", () => {
   it("fails loudly on postgres errors and only uses labeled legacy fallback", () => {
     expect(SERVICE).toContain("if (error) throw error");
     expect(ADMIN_PAGE).toContain("Postgres Research ist nicht erreichbar");
+    expect(ADMIN_PAGE).toContain("Das öffentliche Lexikon liest Postgres");
+    expect(ADMIN_PAGE).toContain("exklusive Fallback");
+    expect(ADMIN_PAGE).not.toContain("dateibasiert");
     expect(ADMIN_PAGE).toContain("Legacy-Fallback anzeigen (published.json)");
     expect(ADMIN_PAGE).toContain("nicht Source of Truth");
     expect(ADMIN_PAGE).toContain("setUseLegacy(true)");

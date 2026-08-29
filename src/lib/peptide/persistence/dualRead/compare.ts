@@ -61,6 +61,9 @@ function markCritical(family: DualReadFamily, status: DualReadDifference["status
     return false;
   }
   if (family === "productMapping" && status !== "DIFFERENT") return false;
+  if ((family === "source" || family === "study" || family === "review" || family === "publicVisibility") && status === "EXTRA") {
+    return false;
+  }
   return (
     family === "identity" ||
     family === "claim" ||
@@ -70,7 +73,8 @@ function markCritical(family: DualReadFamily, status: DualReadDifference["status
     family === "evidence" ||
     family === "hudson" ||
     family === "community" ||
-    family === "productMapping"
+    family === "productMapping" ||
+    family === "publicVisibility"
   );
 }
 
@@ -446,6 +450,23 @@ export function compareResearchSnapshots(
       push(diffs, "evidence", "MATCH", `${slug}:evidence`, String(a.evidenceLevel), String(b.evidenceLevel), "detail evidence");
     } else {
       push(diffs, "evidence", "DIFFERENT", `${slug}:evidence`, String(a.evidenceLevel), String(b.evidenceLevel), "detail evidence");
+    }
+  }
+
+  const publicSourceKeys = (snapshot: NormalizedResearchSnapshot) =>
+    snapshot.sources.filter((row) => (row.reviewStatus || "approved") === "approved").map((row) => row.key).sort();
+  const leftPublic = publicSourceKeys(legacy);
+  const rightPublic = publicSourceKeys(postgres);
+  if (sameSet(leftPublic, rightPublic)) {
+    push(diffs, "publicVisibility", "MATCH", "public-sources", String(leftPublic.length), String(rightPublic.length), "approved public sources");
+  } else {
+    const missingPublic = leftPublic.filter((key) => !rightPublic.includes(key));
+    const extraPublic = rightPublic.filter((key) => !leftPublic.includes(key));
+    if (missingPublic.length > 0) {
+      push(diffs, "publicVisibility", "MISSING", "public-sources-missing", missingPublic.join(","), "(none)", "legacy public source missing from postgres approved set");
+    }
+    if (extraPublic.length > 0) {
+      push(diffs, "publicVisibility", "EXTRA", "public-sources-extra", "(none)", extraPublic.join(","), "postgres has additional approved sources; not mixed into legacy UI");
     }
   }
 

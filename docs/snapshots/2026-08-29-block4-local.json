@@ -1,0 +1,407 @@
+{
+  "startedAt": "2026-08-29T08:18:35.115Z",
+  "dump": {
+    "path": "C:\\Users\\PolatMehmetErkan\\Documents\\cartwise-prod-backup\\cartwise-prod-0023-2026-08-28-full.sql",
+    "exists": true,
+    "bytes": 1230487,
+    "sha256": "dae0ef581968cdd7a33eb5dc34c44064a0ff8fbfaa89a666b6e25d5897cb973a",
+    "hashMatch": true
+  },
+  "container": "peptix-b4-1787991520772",
+  "restore": {
+    "errorCount": 0,
+    "uniqueErrors": [],
+    "missingRoles": [],
+    "missingExtensions": [],
+    "missingSchemas": [],
+    "permissionDenied": [],
+    "maintainPrivilege": 0,
+    "transactionTimeout": 0,
+    "psqlExit": 0,
+    "image": "postgres:17"
+  },
+  "migrations": {
+    "0024": {
+      "ok": true,
+      "errorCount": 0,
+      "tables": [
+        "product_substances",
+        "substances"
+      ]
+    },
+    "0025": {
+      "ok": true,
+      "errorCount": 0,
+      "tables": [
+        "product_substances",
+        "sources",
+        "studies",
+        "substances"
+      ]
+    },
+    "0026": {
+      "ok": true,
+      "errorCount": 0,
+      "tables": [
+        "claims",
+        "evidence_assessments",
+        "product_substances",
+        "sources",
+        "studies",
+        "substances"
+      ]
+    },
+    "0027": {
+      "ok": true,
+      "errorCount": 0,
+      "tables": [
+        "claims",
+        "evidence_assessments",
+        "product_substances",
+        "regulatory_records",
+        "review_actions",
+        "sources",
+        "studies",
+        "substances"
+      ]
+    },
+    "0028": {
+      "ok": true,
+      "errorCount": 0,
+      "tables": [
+        "claims",
+        "evidence_assessments",
+        "product_substances",
+        "regulatory_records",
+        "review_actions",
+        "sources",
+        "studies",
+        "substances"
+      ]
+    },
+    "0029": {
+      "ok": true,
+      "errorCount": 0,
+      "tables": [
+        "claims",
+        "evidence_assessments",
+        "product_substances",
+        "regulatory_records",
+        "review_actions",
+        "sources",
+        "studies",
+        "substances"
+      ]
+    },
+    "0030": {
+      "ok": true,
+      "errorCount": 0,
+      "tables": [
+        "claims",
+        "evidence_assessments",
+        "product_substances",
+        "regulatory_records",
+        "review_actions",
+        "sources",
+        "studies",
+        "substances"
+      ]
+    },
+    "0031": {
+      "ok": true,
+      "errorCount": 0,
+      "tables": [
+        "claims",
+        "community_reports",
+        "evidence_assessments",
+        "product_substances",
+        "regulatory_records",
+        "research_connector_health",
+        "review_actions",
+        "sources",
+        "studies",
+        "substances"
+      ]
+    }
+  },
+  "counts": {
+    "after0029": {
+      "substances": 27,
+      "sources": 412,
+      "studies": 118,
+      "claims": 294,
+      "evidence": 294,
+      "regulatory": 41,
+      "review_actions": 19,
+      "mappings": 93,
+      "products": 320,
+      "orders": 0,
+      "users": 2
+    },
+    "after0030": {
+      "sources": 412,
+      "studies": 118,
+      "sourcesApproved": 412,
+      "sourcesReviewRequired": 0,
+      "studiesApproved": 118,
+      "studiesReviewRequired": 0
+    }
+  },
+  "schema": {
+    "after0030": {
+      "source_review_status": "'review-required'::text",
+      "study_review_status": "'review-required'::text",
+      "source_connector": true,
+      "study_intervention": true,
+      "study_condition": true,
+      "indexes": [
+        "sources_review_status_idx",
+        "studies_review_status_idx"
+      ],
+      "source_policies": [
+        "sources_delete_admin",
+        "sources_select_authenticated",
+        "sources_update_admin",
+        "sources_write_admin"
+      ],
+      "study_policies": [
+        "studies_delete_admin",
+        "studies_select_authenticated",
+        "studies_update_admin",
+        "studies_write_admin"
+      ],
+      "review_entity_check": "CHECK ((entity_type = ANY (ARRAY['claim'::text, 'evidence_assessment'::text, 'regulatory_record'::text, 'research_update'::text, 'substance'::text, 'source'::text, 'study'::text, 'community_report'::text])))",
+      "anon_sources_privs": "none",
+      "triggers": [
+        "sources_set_updated_at",
+        "studies_set_updated_at"
+      ],
+      "fks": 6,
+      "src_approved": 412,
+      "src_rr": 0,
+      "stu_approved": 118,
+      "stu_rr": 0,
+      "src_n": 412,
+      "stu_n": 118
+    },
+    "after0031": {
+      "community_reports": true,
+      "connector_health": true,
+      "trigger_kind": true,
+      "community_rows": 0,
+      "one_active_full": true,
+      "run_select_admin": true,
+      "community_default": "'review-required'::text",
+      "src_n": 412,
+      "stu_n": 118,
+      "claims": 294,
+      "evidence": 294,
+      "regulatory": 41,
+      "review_actions": 19,
+      "products": 320,
+      "orders": 0,
+      "users": 2
+    }
+  },
+  "intake": {
+    "sqlBytes": 128813,
+    "before": {
+      "sources": 412,
+      "studies": 118
+    },
+    "afterRun1": {
+      "sources": 516,
+      "studies": 154
+    },
+    "afterRun2": {
+      "sources": 516,
+      "studies": 154,
+      "src_rr": 104,
+      "src_ap": 412,
+      "stu_rr": 36,
+      "stu_ap": 118,
+      "hudson_src": 0,
+      "hudson_stu": 0,
+      "pmid_rows": 4,
+      "pmid_distinct": 4,
+      "claims": 294,
+      "evidence": 294,
+      "ev_rr": 267,
+      "regulatory": 41,
+      "mappings": 93,
+      "review_actions": 19
+    },
+    "newSourcesRun1": 104,
+    "newStudiesRun1": 36,
+    "newSourcesRun2": 0,
+    "newStudiesRun2": 0,
+    "rollback": {
+      "probe": 0,
+      "bad": 0,
+      "sources": 516
+    },
+    "rollbackErrorSnippet": "BEGIN\nINSERT 0 1\n\npsql:/tmp/peptix.sql:6: ERROR:  new row for relation \"sources\" violates check constraint \"sources_title_check\"\nDETAIL:  Failing row contains (09fc02c4-a4e2-4c77-8f95-2dcb7345905f, pubmed, , null, null, null, null, https://example.test/bad, null, 99999992, null, null, null, null, active, {}, 2026-08-29 08:19:01.143027+00, 2026-08-29 08:19:01.143027+00, review-required, null).\n\nCommand failed: docker exec peptix-b4-1787991520772 psql -U postgres -v ON_ERROR_STOP=1 -A -t -f /tmp/peptix.sql\npsql:/tmp/peptix.sql:6: ERROR:  new row for relation \"sources\" violates check constraint \"sources_title_check\"\nDETAIL:  Failing row contains (09fc02c4-a4e2-4c77-8f95-2dcb7345905f, pubmed, , null, null, null, null, https://example.test/bad, null, 99999992, null, null, null, null, active, {}, 2026-08-29 08:19:01.143027+00, 2026-08-29 08:19:01.143027+00, review-required, null).\n"
+  },
+  "rls": {
+    "jwtSigned": "NOT TESTED",
+    "hasRoleFunction": "PASS",
+    "gucRls": {
+      "method": "SET SESSION AUTHORIZATION authenticated + request.jwt.claim.sub GUC (PostgREST-equivalent claims; not a GoTrue-signed JWT)",
+      "asPostgres": {
+        "as_postgres_rr_sources": 104
+      },
+      "authUser": {
+        "rr_sources": 0,
+        "ap_sources": 412,
+        "rr_studies": 0,
+        "ap_studies": 118,
+        "rr_claims": 0,
+        "rr_evidence": 0,
+        "rr_regulatory": 0,
+        "review_actions": 0,
+        "community": 0,
+        "runs": 0
+      },
+      "authAdmin": {
+        "rr_sources": 104,
+        "rr_studies": 36,
+        "review_actions": 19,
+        "community": 0,
+        "runs": 2
+      },
+      "anon": {
+        "select_sources": false,
+        "select_studies": false,
+        "select_claims": false,
+        "select_evidence": false,
+        "select_review_actions": false,
+        "select_community": false,
+        "select_runs": false
+      },
+      "nonAdminInsert": "DENIED"
+    },
+    "userRoles": {
+      "admin_id": "f0dc82df-7f75-4838-86c6-1e7161c7fa7b",
+      "user_id": "57b2e127-5034-4967-bcdc-7e4f0ddd4475",
+      "roles": [
+        {
+          "role": "admin",
+          "user_id": "f0dc82df-7f75-4838-86c6-1e7161c7fa7b"
+        },
+        {
+          "role": "user",
+          "user_id": "57b2e127-5034-4967-bcdc-7e4f0ddd4475"
+        },
+        {
+          "role": "user",
+          "user_id": "f0dc82df-7f75-4838-86c6-1e7161c7fa7b"
+        }
+      ]
+    }
+  },
+  "identity": {
+    "tb500": "TB-500",
+    "tb4": "Thymosin Beta-4",
+    "ids_distinct": 2,
+    "melanotan": "Melanotan II",
+    "afamelanotide_alias": false,
+    "igf": "IGF-1 LR3",
+    "mecasermin_as_igf": false,
+    "glow_type": "blend",
+    "glow_status": "blend"
+  },
+  "publicLexicon": {
+    "slugs": {
+      "retatrutide": {
+        "public_sources": 28,
+        "hidden_sources": 11,
+        "public_studies": 12,
+        "hidden_studies": 6
+      },
+      "tirzepatide": {
+        "public_sources": 30,
+        "hidden_sources": 9,
+        "public_studies": 12,
+        "hidden_studies": 4
+      },
+      "semaglutide": {
+        "public_sources": 34,
+        "hidden_sources": 13,
+        "public_studies": 12,
+        "hidden_studies": 5
+      },
+      "orforglipron": {
+        "public_sources": 29,
+        "hidden_sources": 6,
+        "public_studies": 12,
+        "hidden_studies": 4
+      },
+      "tb-500": {
+        "public_sources": 13,
+        "hidden_sources": 1,
+        "public_studies": 0,
+        "hidden_studies": 0
+      },
+      "thymosin-beta-4": {
+        "public_sources": 22,
+        "hidden_sources": 6,
+        "public_studies": 12,
+        "hidden_studies": 5
+      }
+    },
+    "global": {
+      "approved_sources": 412,
+      "rr_sources": 104,
+      "approved_studies": 118,
+      "rr_studies": 36
+    }
+  },
+  "admin": {
+    "sources_rr": 104,
+    "studies_rr": 36,
+    "uuid_rr_sources": 104
+  },
+  "approvalPath": {
+    "actions_in_tx": 1,
+    "src_rr_in_tx": 103,
+    "afterRollback": {
+      "probe_actions": 0,
+      "src_rr": 104,
+      "review_actions": 19
+    }
+  },
+  "shop": {
+    "afterRestore": {
+      "products": 320,
+      "carts": 6,
+      "orders": 0,
+      "users": 2,
+      "price_sum": 23925,
+      "product_fp": "afd9f04bbf360fb5944709f30d653973",
+      "cart_fp": "2afb3aa49c3c2015061eb3c44441791f",
+      "user_fp": "76af77941b50c8bc6ff620fc81e9ac50"
+    },
+    "afterImport": {
+      "products": 320,
+      "carts": 6,
+      "orders": 0,
+      "users": 2,
+      "price_sum": 23925,
+      "product_fp": "afd9f04bbf360fb5944709f30d653973",
+      "cart_fp": "2afb3aa49c3c2015061eb3c44441791f",
+      "user_fp": "76af77941b50c8bc6ff620fc81e9ac50"
+    }
+  },
+  "auth": {
+    "afterRestore": {
+      "users": 2,
+      "user_fp": "76af77941b50c8bc6ff620fc81e9ac50"
+    },
+    "afterImport": {
+      "users": 2,
+      "user_fp": "76af77941b50c8bc6ff620fc81e9ac50"
+    }
+  },
+  "verdictNotes": [],
+  "finishedAt": "2026-08-29T08:19:05.228Z"
+}

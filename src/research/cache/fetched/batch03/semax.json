@@ -1,0 +1,325 @@
+{
+  "slug": "semax",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "semax"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "semax",
+      "totalCount": 0,
+      "studies": []
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "semax AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 24,
+      "articles": [
+        {
+          "pmid": "41490200",
+          "title": "Therapeutic Peptides in Orthopaedics: Applications, Challenges, and Future Directions.",
+          "source": "J Am Acad Orthop Surg Glob Res Rev",
+          "pubdate": "2026 Jan 1",
+          "authors": [
+            "Rahman OF",
+            "Lee SJ",
+            "Seeds WA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.5435/JAAOSGlobal-D-25-00236",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41490200/"
+        },
+        {
+          "pmid": "28875850",
+          "title": "Pharmacological Aspects of Neuro-Immune Interactions.",
+          "source": "Curr Pharm Des",
+          "pubdate": "2018",
+          "authors": [
+            "Tarasov VV",
+            "Kudryashov NV",
+            "Chubarev VN",
+            "Kalinina TS",
+            "Barreto GE",
+            "Ashraf GM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't",
+            "Review"
+          ],
+          "doi": "10.2174/1381612823666170829135115",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28875850/"
+        },
+        {
+          "pmid": "42021992",
+          "title": "Therapeutic peptides in gerontology: mechanisms and applications for healthy aging.",
+          "source": "Front Aging",
+          "pubdate": "2026",
+          "authors": [
+            "Mavrych V",
+            "Shypilova I",
+            "Bolgova O"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3389/fragi.2026.1790247",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42021992/"
+        },
+        {
+          "pmid": "29798983",
+          "title": "[The efficacy of semax in the tretament of patients at different stages of ischemic stroke].",
+          "source": "Zh Nevrol Psikhiatr Im S S Korsakova",
+          "pubdate": "2018",
+          "authors": [
+            "Gusev EI",
+            "Martynov MY",
+            "Kostenko EV",
+            "Petrova LV",
+            "Bobyreva SN"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article"
+          ],
+          "doi": "10.17116/jnevro20181183261-68",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29798983/"
+        },
+        {
+          "pmid": "17278839",
+          "title": "Specific binding of semax in different regions of the rat brain.",
+          "source": "Dokl Biol Sci",
+          "pubdate": "2006 Sep-Oct",
+          "authors": [
+            "V'yunova TV",
+            "Shevchenko KV",
+            "Shevchenko VP",
+            "Bobrov MY",
+            "Bezuglov VV",
+            "Myasoedov NF"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1134/s0012496606050085",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17278839/"
+        },
+        {
+          "pmid": "14556513",
+          "title": "The heptapeptide SEMAX stimulates BDNF expression in different areas of the rat brain in vivo.",
+          "source": "Dokl Biol Sci",
+          "pubdate": "2003 Jul-Aug",
+          "authors": [
+            "Dolotov OV",
+            "Seredenina TS",
+            "Levitskaya NG",
+            "Kamensky AA",
+            "Andreeva LA",
+            "Alfeeva LY"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1023/a:1025177812262",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/14556513/"
+        },
+        {
+          "pmid": "23652441",
+          "title": "Stability of Semax acetyl to proteolysis in various biological media.",
+          "source": "Dokl Biol Sci",
+          "pubdate": "2013 Mar",
+          "authors": [
+            "Shevchenko KV",
+            "Nagaev IY",
+            "Andreeva LA",
+            "Shevchenko VP",
+            "Myasoedov NF"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1134/S0012496613020166",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23652441/"
+        },
+        {
+          "pmid": "11517472",
+          "title": "[Effectiveness of semax in acute period of hemispheric ischemic stroke (a clinical and electrophysiological study)].",
+          "source": "Zh Nevrol Psikhiatr Im S S Korsakova",
+          "pubdate": "1997",
+          "authors": [
+            "Gusev EI",
+            "Skvortsova VI",
+            "Miasoedov NF",
+            "Nezavibat'ko VN",
+            "Zhuravleva EIu",
+            "Vanichkin AV"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Comparative Study",
+            "Controlled Clinical Trial",
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11517472/"
+        },
+        {
+          "pmid": "16773243",
+          "title": "Degradation of the ACTH(4-10) analog Semax in the presence of rat basal forebrain cell cultures and plasma membranes.",
+          "source": "Amino Acids",
+          "pubdate": "2006 Jun",
+          "authors": [
+            "Zolotarev YA",
+            "Dolotov OV",
+            "Inozemtseva LS",
+            "Dadayan AK",
+            "Dorokhova EM",
+            "Andreeva LA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1007/s00726-006-0328-8",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16773243/"
+        },
+        {
+          "pmid": "24877185",
+          "title": "Sigmoidal maximal effect modeling of low-density lipoprotein cholesterol concentration and annual incidence of coronary heart disease events in secondary prevention trials.",
+          "source": "Pharmacotherapy",
+          "pubdate": "2014 May",
+          "authors": [
+            "Charland SL",
+            "Stanek EJ"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1002/phar.1368",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24877185/"
+        },
+        {
+          "pmid": "23821053",
+          "title": "Study of proteolysis of Semax analogues with different N-terminal amino acids by carboxypeptidases.",
+          "source": "Dokl Biol Sci",
+          "pubdate": "2013 May",
+          "authors": [
+            "Shevchenko KV",
+            "Nagaev IY",
+            "Andreeva LA",
+            "Alfeeva LY",
+            "Myasoedov NF"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1134/S0012496613030101",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23821053/"
+        },
+        {
+          "pmid": "28505067",
+          "title": "Risk Assessment of Florists Exposed to Pesticide Residues through Handling of Flowers and Preparing Bouquets.",
+          "source": "Int J Environ Res Public Health",
+          "pubdate": "2017 May 13",
+          "authors": [
+            "Toumi K",
+            "Joly L",
+            "Vleminckx C",
+            "Schiffers B"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.3390/ijerph14050526",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28505067/"
+        },
+        {
+          "pmid": "16082427",
+          "title": "Gateways to clinical trials.",
+          "source": "Methods Find Exp Clin Pharmacol",
+          "pubdate": "2005 May",
+          "authors": [
+            "Bayes M",
+            "Rabasseda X",
+            "Prous JR"
+          ],
+          "pubtype": [
+            "Bibliography",
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16082427/"
+        },
+        {
+          "pmid": "15678666",
+          "title": "[An experimental substantiation for using the \"Semax\" neuroprotector in the treatment of optic-nerve diseases].",
+          "source": "Vestn Oftalmol",
+          "pubdate": "2004 Nov-Dec",
+          "authors": [
+            "Sheremet NL",
+            "Polunin GS",
+            "Ovchinnikov AN",
+            "Kamenskiĭ AA",
+            "Levitskaia NG",
+            "Andreeva LA"
+          ],
+          "pubtype": [
+            "English Abstract",
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15678666/"
+        },
+        {
+          "pmid": "16523722",
+          "title": "[Kinetics of Semax penetration into the brain and blood of rats after its intranasal administration].",
+          "source": "Bioorg Khim",
+          "pubdate": "2006 Jan-Feb",
+          "authors": [
+            "Shevchenko KV",
+            "Nagaev IIu",
+            "Alfeeva LIu",
+            "Andreeva LA",
+            "Kamenskiĭ AA",
+            "Levitskaia NG"
+          ],
+          "pubtype": [
+            "English Abstract",
+            "Journal Article"
+          ],
+          "doi": "10.1134/s1068162006010055",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16523722/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "semax",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 9811102,
+      "cas": "80714-61-0",
+      "formula": "C37H51N9O10S",
+      "iupac": "(2S)-1-[2-[[(2S)-1-[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-amino-4-methylsulfanylbutanoyl]amino]-4-carboxybutanoyl]amino]-3-(1H-imidazol-5-yl)propanoyl]amino]-3-phenylpropanoyl]pyrrolidine-2-carbonyl]amino]acetyl]pyrrolidine-2-carboxylic acid"
+    }
+  }
+}

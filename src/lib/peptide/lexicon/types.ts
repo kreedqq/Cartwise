@@ -39,6 +39,8 @@ export interface PublicLexiconBundle {
     pmid: string | null;
     nct_id: string | null;
     legacy_ids: string[];
+    review_status?: string | null;
+    connector?: string | null;
   }>;
   sourceSubstances: Array<{ source_id: string; substance_id: string; legacy_source_id: string }>;
   studies: Array<{
@@ -54,6 +56,9 @@ export interface PublicLexiconBundle {
     last_updated: string | null;
     has_results: boolean;
     source_url: string;
+    review_status?: string | null;
+    intervention?: string | null;
+    condition?: string | null;
   }>;
   studySubstances: Array<{ study_id: string; substance_id: string }>;
   claims: Array<{
@@ -84,6 +89,15 @@ export interface PublicLexiconBundle {
     application_id: string | null;
     is_current: boolean;
     source_id: string;
+    review_status: string;
+  }>;
+  communityReports?: Array<{
+    id: string;
+    substance_id: string;
+    kind: string;
+    title: string;
+    content_summary: string | null;
+    source_url: string | null;
     review_status: string;
   }>;
 }

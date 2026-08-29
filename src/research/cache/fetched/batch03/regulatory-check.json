@@ -1,0 +1,161 @@
+{
+  "accessDate": "2026-08-29",
+  "startedAt": "2026-08-29T00:07:55.627Z",
+  "completedAt": "2026-08-29T00:08:04.916Z",
+  "connectors": [
+    "ema-epar-http",
+    "openfda-drugsfda"
+  ],
+  "bfarm": {
+    "status": "unavailable",
+    "note": "No supported BfArM API configured; no HTML scrape."
+  },
+  "mhra": {
+    "status": "unavailable",
+    "note": "No supported MHRA product API configured; no HTML scrape."
+  },
+  "nmpa": {
+    "status": "unavailable",
+    "note": "No supported NMPA English API configured; Mazdutide stays review-required."
+  },
+  "ema": [
+    {
+      "slug": "semaglutide-ozempic",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/ozempic",
+      "status": 200,
+      "ok": true,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/ozempic"
+    },
+    {
+      "slug": "semaglutide-wegovy",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/wegovy",
+      "status": 200,
+      "ok": true,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/wegovy"
+    },
+    {
+      "slug": "tirzepatide-mounjaro",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/mounjaro",
+      "status": 200,
+      "ok": true,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/mounjaro"
+    },
+    {
+      "slug": "liraglutide-victoza",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/victoza",
+      "status": 200,
+      "ok": true,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/victoza"
+    },
+    {
+      "slug": "liraglutide-saxenda",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/saxenda",
+      "status": 200,
+      "ok": true,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/saxenda"
+    },
+    {
+      "slug": "orforglipron-foundayo",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/foundayo",
+      "status": 404,
+      "ok": false,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/foundayo"
+    },
+    {
+      "slug": "orforglipron",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/orforglipron",
+      "status": 404,
+      "ok": false,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/orforglipron"
+    },
+    {
+      "slug": "retatrutide",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/retatrutide",
+      "status": 404,
+      "ok": false,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/retatrutide"
+    },
+    {
+      "slug": "mazdutide",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/mazdutide",
+      "status": 404,
+      "ok": false,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/mazdutide"
+    },
+    {
+      "slug": "tesamorelin-egrifta",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/egrifta",
+      "status": 200,
+      "ok": true,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/egrifta",
+      "interpretation": "HTTP 200 is a withdrawn 2012 MAA page (Ferrer; tesamorelin), not an EU marketing authorisation. Do not add EU to tesamorelin regulatoryRegions.",
+      "marketingAuthorisation": false,
+      "applicationWithdrawn": "2012-06-21"
+    },
+    {
+      "slug": "somatropin-omnitrope",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/omnitrope",
+      "status": 200,
+      "ok": true,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/omnitrope"
+    },
+    {
+      "slug": "hcg-ovitrelle",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/ovitrelle",
+      "status": 200,
+      "ok": true,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/ovitrelle"
+    },
+    {
+      "slug": "gonadorelin-lutrelef",
+      "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/lutrelef",
+      "status": 404,
+      "ok": false,
+      "finalUrl": "https://www.ema.europa.eu/en/medicines/human/EPAR/lutrelef"
+    }
+  ],
+  "fda": [
+    {
+      "query": "retatrutide",
+      "httpStatus": 404,
+      "found": false,
+      "message": "No matches found!",
+      "brands": []
+    },
+    {
+      "query": "orforglipron",
+      "httpStatus": 200,
+      "found": true,
+      "message": null,
+      "brands": [
+        "FOUNDAYO",
+        "FOUNDAYO",
+        "FOUNDAYO",
+        "FOUNDAYO",
+        "FOUNDAYO",
+        "FOUNDAYO"
+      ]
+    },
+    {
+      "query": "mazdutide",
+      "httpStatus": 404,
+      "found": false,
+      "message": "No matches found!",
+      "brands": []
+    },
+    {
+      "query": "semaglutide",
+      "httpStatus": 200,
+      "found": true,
+      "message": null,
+      "brands": [
+        "OZEMPIC",
+        "OZEMPIC",
+        "RYBELSUS",
+        "OZEMPIC",
+        "RYBELSUS",
+        "RYBELSUS"
+      ]
+    }
+  ]
+}

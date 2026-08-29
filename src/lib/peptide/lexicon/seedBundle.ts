@@ -15,9 +15,14 @@ export function publicBundleFromSeeds(): PublicLexiconBundle {
     substances: full.substances.map((row) => ({ ...row, updated_at: null })),
     aliases: full.aliases,
     components: full.components,
-    sources: full.sources,
+    sources: full.sources.map((row) => ({ ...row, review_status: "approved", connector: null })),
     sourceSubstances: full.sourceSubstances,
-    studies: full.studies,
+    studies: full.studies.map((row) => ({
+      ...row,
+      review_status: "approved",
+      intervention: null,
+      condition: null,
+    })),
     studySubstances: full.studySubstances,
     claims: full.claims.map((row) => ({
       ...row,
@@ -29,6 +34,7 @@ export function publicBundleFromSeeds(): PublicLexiconBundle {
       ...row,
       review_status: reviewByKey.get(row.stable_key) ?? "review-required",
     })),
+    communityReports: [],
   };
 }
 
@@ -45,5 +51,6 @@ export function tablesFromPublicBundle(bundle: PublicLexiconBundle): Record<stri
     claim_sources: bundle.claimSources,
     evidence_assessments: bundle.evidence,
     regulatory_records: bundle.regulatory,
+    community_reports: bundle.communityReports ?? [],
   };
 }

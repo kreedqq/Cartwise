@@ -8,7 +8,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const OUT = resolve(ROOT, "src/research/cache/fetched");
+const FETCHED = resolve(ROOT, "src/research/cache/fetched");
 const UA = "PeptixResearch/1.0 (scientific catalog; official APIs only)";
 const ACCESS = new Date().toISOString().slice(0, 10);
 
@@ -45,7 +45,8 @@ const BATCH_02 = [
 ];
 
 const arg = process.argv[2] ?? "batch02";
-const BATCH = arg === "all" ? [...BATCH_01, ...BATCH_02] : arg === "batch01" ? BATCH_01 : BATCH_02;
+const BATCH = arg === "all" || arg === "batch03" ? [...BATCH_01, ...BATCH_02] : arg === "batch01" ? BATCH_01 : BATCH_02;
+const OUT = arg === "batch03" ? resolve(FETCHED, "batch03") : FETCHED;
 
 async function getJson(url) {
   const res = await fetch(url, { headers: { Accept: "application/json", "User-Agent": UA } });
@@ -77,6 +78,8 @@ async function fetchTrials(term) {
     "EnrollmentCount",
     "HasResults",
     "LastUpdatePostDateStruct",
+    "InterventionName",
+    "Condition",
   ].join("%2C");
   const url = `https://clinicaltrials.gov/api/v2/studies?query.term=${encodeURIComponent(term)}&pageSize=20&countTotal=true&sort=LastUpdatePostDate%3Adesc&fields=${fields}`;
   return getJson(url);
@@ -92,6 +95,8 @@ function compactTrials(body) {
       const status = p.statusModule ?? {};
       const sponsor = p.sponsorCollaboratorsModule ?? {};
       const design = p.designModule ?? {};
+      const interventions = p.armsInterventionsModule?.interventions ?? [];
+      const conditions = p.conditionsModule?.conditions ?? [];
       return {
         nctId: id.nctId ?? null,
         title: id.briefTitle ?? id.officialTitle ?? null,
@@ -104,6 +109,12 @@ function compactTrials(body) {
         lastUpdate: status.lastUpdatePostDateStruct?.date ?? null,
         hasResults: study.hasResults ?? false,
         url: id.nctId ? `https://clinicaltrials.gov/study/${id.nctId}` : null,
+        intervention: interventions
+          .map((row) => row.name ?? row.interventionName)
+          .filter(Boolean)
+          .slice(0, 6)
+          .join("; ") || null,
+        condition: (Array.isArray(conditions) ? conditions : []).slice(0, 6).join("; ") || null,
       };
     }),
   };

@@ -13,6 +13,16 @@ import {
   type ReviewQueueKind,
 } from "@/lib/peptide/adminResearch";
 import { communityCannotAppearAsScientificEvidence } from "@/lib/peptide/adminResearch/workflow";
+import {
+  BATCH_03_MIGRATION_REQUIRED,
+  BATCH03_PRODUCTION_IMPORT_PENDING,
+  intakeQueueItems,
+  intakeSourceById,
+  intakeStudyById,
+  isIntakePlaceholderId,
+} from "@/lib/peptide/research/batch03Intake";
+import { batch03LocalIntakePlan } from "@/lib/peptide/research/batch03IntakeLoader";
+import { isPersistedUuid } from "@/lib/peptide/research/operations/ids";
 
 export interface ReviewPage<T> {
   items: T[];
@@ -40,6 +50,21 @@ export interface ReviewItemDetail {
   productName: string | null;
   applicationId: string | null;
   isCurrent: boolean | null;
+  url?: string | null;
+  sourceType?: string | null;
+  identifier?: string | null;
+  publicationDate?: string | null;
+  connector?: string | null;
+  publisher?: string | null;
+  pmid?: string | null;
+  doi?: string | null;
+  nctId?: string | null;
+  intervention?: string | null;
+  condition?: string | null;
+  phase?: string | null;
+  studyStatus?: string | null;
+  sponsor?: string | null;
+  persisted?: boolean;
   sources: Array<{
     id: string;
     title: string;
@@ -119,12 +144,55 @@ export async function fetchAdminResearchDashboard(): Promise<AdminResearchDashbo
   dash.reviewActions = reviewActions;
   dash.researchUpdates = RESEARCH_UPDATES_TABLE_EXISTS ? 0 : 0;
   dash.communityReports = 0;
+
+  try {
+    dash.sourcesReviewRequired = await countExact("sources", "review_status", "review-required");
+    dash.studiesReviewRequired = await countExact("studies", "review_status", "review-required");
+    dash.intakeMode = "postgres";
+    dash.migrationRequired = null;
+  } catch (error) {
+    if (!isMissingColumnError(error)) throw error;
+    const plan = await batch03LocalIntakePlan();
+    dash.sourcesReviewRequired = plan.sources.import.length;
+    dash.studiesReviewRequired = plan.studies.import.length;
+    dash.intakeMode = "local-candidates";
+    dash.migrationRequired = BATCH_03_MIGRATION_REQUIRED;
+  }
+  if (BATCH03_PRODUCTION_IMPORT_PENDING && dash.intakeMode === "postgres" && dash.sourcesReviewRequired === 0 && dash.studiesReviewRequired === 0) {
+    const plan = await batch03LocalIntakePlan();
+    dash.sourcesReviewRequired = plan.sources.import.length;
+    dash.studiesReviewRequired = plan.studies.import.length;
+    dash.intakeMode = "local-candidates";
+    dash.migrationRequired = dash.migrationRequired ?? BATCH_03_MIGRATION_REQUIRED;
+  }
   return dash;
 }
 
 function pageRange(page: number, pageSize: number): { from: number; to: number } {
   const from = Math.max(0, page) * pageSize;
   return { from, to: from + pageSize - 1 };
+}
+
+function isMissingColumnError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  const code =
+    typeof error === "object" && error && "code" in error ? String((error as { code?: string }).code ?? "") : "";
+  return (
+    code === "42703" ||
+    code === "PGRST204" ||
+    /review_status|column .* does not exist|schema cache/i.test(message)
+  );
+}
+
+async function localIntakeQueue(
+  kind: "source" | "study",
+  page: number,
+  pageSize: number,
+): Promise<ReviewPage<ReviewQueueItem>> {
+  const plan = await batch03LocalIntakePlan();
+  const all = intakeQueueItems(plan).filter((item) => item.kind === kind);
+  const { from, to } = pageRange(page, pageSize);
+  return { items: all.slice(from, to + 1), total: all.length, page, pageSize };
 }
 
 export async function fetchReviewQueue(
@@ -211,6 +279,73 @@ export async function fetchReviewQueue(
       };
     });
     return { items, total: count ?? items.length, page, pageSize };
+  }
+
+  if (kind === "source" || kind === "study") {
+    try {
+      if (kind === "source") {
+        const { data, error, count } = await supabase
+          .from("sources")
+          .select(
+            "id, title, url, source_type, pmid, doi, nct_id, publication_date, connector, review_status, source_substances(substances(slug, name))",
+            { count: "exact" },
+          )
+          .eq("review_status", "review-required")
+          .order("title", { ascending: true })
+          .range(from, to);
+        if (error) throw error;
+        if ((count ?? 0) > 0 || !BATCH03_PRODUCTION_IMPORT_PENDING) {
+          const items: ReviewQueueItem[] = (data ?? []).map((row) => {
+            const link = unwrap(row.source_substances);
+            const substance = unwrap(link?.substances);
+            return {
+              kind: "source",
+              id: row.id,
+              stableKey: row.pmid ? `pmid:${row.pmid}` : row.nct_id ? `nct:${row.nct_id}` : row.id,
+              substanceSlug: substance?.slug ?? "",
+              title: row.title,
+              status: row.review_status,
+              note: [row.source_type, row.pmid ? `PMID ${row.pmid}` : null, row.nct_id, row.connector]
+                .filter(Boolean)
+                .join(" · "),
+              sourceCount: 1,
+            };
+          });
+          return { items, total: count ?? items.length, page, pageSize };
+        }
+      } else {
+        const { data, error, count } = await supabase
+          .from("studies")
+          .select(
+            "id, nct_id, title, sponsor, phase, status, intervention, condition, review_status, study_substances(substances(slug, name))",
+            { count: "exact" },
+          )
+          .eq("review_status", "review-required")
+          .order("title", { ascending: true })
+          .range(from, to);
+        if (error) throw error;
+        if ((count ?? 0) > 0 || !BATCH03_PRODUCTION_IMPORT_PENDING) {
+          const items: ReviewQueueItem[] = (data ?? []).map((row) => {
+            const link = unwrap(row.study_substances);
+            const substance = unwrap(link?.substances);
+            return {
+              kind: "study",
+              id: row.id,
+              stableKey: row.nct_id,
+              substanceSlug: substance?.slug ?? "",
+              title: row.title,
+              status: row.review_status,
+              note: [row.nct_id, row.phase, row.status, row.sponsor].filter(Boolean).join(" · "),
+              sourceCount: 1,
+            };
+          });
+          return { items, total: count ?? items.length, page, pageSize };
+        }
+      }
+    } catch (error) {
+      if (!isMissingColumnError(error) && !BATCH03_PRODUCTION_IMPORT_PENDING) throw error;
+    }
+    return localIntakeQueue(kind, page, pageSize);
   }
 
   const { data, error } = await supabase
@@ -350,6 +485,240 @@ export async function fetchReviewItemDetail(kind: ReviewQueueKind, id: string): 
     };
   }
 
+  if (kind === "source") {
+    if (isIntakePlaceholderId(id)) {
+      const plan = await batch03LocalIntakePlan();
+      const row = intakeSourceById(plan, id);
+      if (!row) throw new Error("Intake-Source nicht gefunden.");
+      return {
+        kind,
+        id,
+        stableKey: row.candidateId,
+        substanceSlug: row.slug,
+        substanceName: row.slug,
+        statement: row.title,
+        claimType: row.sourceType,
+        status: row.reviewStatus,
+        evidenceLevel: null,
+        evidenceType: null,
+        confidence: null,
+        rationale: row.reason,
+        authority: null,
+        region: null,
+        regulatoryStatus: null,
+        productName: null,
+        applicationId: null,
+        isCurrent: null,
+        url: row.url,
+        sourceType: row.sourceType,
+        identifier: row.identifier,
+        publicationDate: row.publicationDate,
+        connector: row.connector,
+        publisher: row.publisher,
+        pmid: row.pmid,
+        doi: row.doi,
+        nctId: row.nctId,
+        persisted: false,
+        sources: [
+          {
+            id: row.candidateId,
+            title: row.title,
+            url: row.url,
+            sourceType: row.sourceType,
+            pmid: row.pmid,
+            doi: row.doi,
+            nctId: row.nctId,
+          },
+        ],
+        studies: row.nctId ? [{ nctId: row.nctId, title: row.title, sponsor: null, phase: null, status: null }] : [],
+      };
+    }
+    const { data, error } = await supabase
+      .from("sources")
+      .select(
+        "id, title, url, source_type, pmid, doi, nct_id, publication_date, publisher, connector, review_status, source_substances(substances(slug, name))",
+      )
+      .eq("id", id)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error("Source nicht gefunden.");
+    const link = unwrap(data.source_substances);
+    const substance = unwrap(link?.substances);
+    return {
+      kind,
+      id: data.id,
+      stableKey: data.pmid ? `pmid:${data.pmid}` : data.nct_id ? `nct:${data.nct_id}` : data.id,
+      substanceSlug: substance?.slug ?? "",
+      substanceName: substance?.name ?? "",
+      statement: data.title,
+      claimType: data.source_type,
+      status: data.review_status,
+      evidenceLevel: null,
+      evidenceType: null,
+      confidence: null,
+      rationale: null,
+      authority: null,
+      region: null,
+      regulatoryStatus: null,
+      productName: null,
+      applicationId: null,
+      isCurrent: null,
+      url: data.url,
+      sourceType: data.source_type,
+      identifier: data.pmid ? `PMID ${data.pmid}` : data.nct_id,
+      publicationDate: data.publication_date,
+      connector: data.connector,
+      publisher: data.publisher,
+      pmid: data.pmid,
+      doi: data.doi,
+      nctId: data.nct_id,
+      persisted: true,
+      sources: [
+        {
+          id: data.id,
+          title: data.title,
+          url: data.url,
+          sourceType: data.source_type,
+          pmid: data.pmid,
+          doi: data.doi,
+          nctId: data.nct_id,
+        },
+      ],
+      studies: data.nct_id ? [{ nctId: data.nct_id, title: data.title, sponsor: null, phase: null, status: null }] : [],
+    };
+  }
+
+  if (kind === "study") {
+    if (isIntakePlaceholderId(id)) {
+      const plan = await batch03LocalIntakePlan();
+      const row = intakeStudyById(plan, id);
+      if (!row) throw new Error("Intake-Study nicht gefunden.");
+      return {
+        kind,
+        id,
+        stableKey: row.nctId,
+        substanceSlug: row.slug,
+        substanceName: row.slug,
+        statement: row.title,
+        claimType: null,
+        status: row.reviewStatus,
+        evidenceLevel: null,
+        evidenceType: null,
+        confidence: null,
+        rationale: null,
+        authority: null,
+        region: null,
+        regulatoryStatus: null,
+        productName: null,
+        applicationId: null,
+        isCurrent: null,
+        url: row.url,
+        identifier: row.nctId,
+        nctId: row.nctId,
+        intervention: row.intervention,
+        condition: row.condition,
+        phase: row.phase,
+        studyStatus: row.status,
+        sponsor: row.sponsor,
+        persisted: false,
+        sources: [
+          {
+            id: row.candidateId,
+            title: row.title,
+            url: row.url,
+            sourceType: "clinical_trial",
+            pmid: null,
+            doi: null,
+            nctId: row.nctId,
+          },
+        ],
+        studies: [
+          {
+            nctId: row.nctId,
+            title: row.title,
+            sponsor: row.sponsor,
+            phase: row.phase,
+            status: row.status,
+          },
+        ],
+      };
+    }
+    const { data, error } = await supabase
+      .from("studies")
+      .select(
+        "id, nct_id, title, sponsor, phase, status, intervention, condition, source_url, review_status, study_substances(substances(slug, name)), study_sources(sources(id, title, url, source_type, pmid, doi, nct_id))",
+      )
+      .eq("id", id)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error("Study nicht gefunden.");
+    const link = unwrap(data.study_substances);
+    const substance = unwrap(link?.substances);
+    const linkedSources = Array.isArray(data.study_sources) ? data.study_sources : data.study_sources ? [data.study_sources] : [];
+    return {
+      kind,
+      id: data.id,
+      stableKey: data.nct_id,
+      substanceSlug: substance?.slug ?? "",
+      substanceName: substance?.name ?? "",
+      statement: data.title,
+      claimType: null,
+      status: data.review_status,
+      evidenceLevel: null,
+      evidenceType: null,
+      confidence: null,
+      rationale: null,
+      authority: null,
+      region: null,
+      regulatoryStatus: null,
+      productName: null,
+      applicationId: null,
+      isCurrent: null,
+      url: data.source_url,
+      identifier: data.nct_id,
+      nctId: data.nct_id,
+      intervention: data.intervention,
+      condition: data.condition,
+      phase: data.phase,
+      studyStatus: data.status,
+      sponsor: data.sponsor,
+      persisted: true,
+      sources: linkedSources.flatMap((item) => {
+        const source = unwrap((item as { sources?: unknown }).sources);
+        if (!source || typeof source !== "object") return [];
+        const row = source as {
+          id: string;
+          title: string;
+          url: string;
+          source_type: string;
+          pmid: string | null;
+          doi: string | null;
+          nct_id: string | null;
+        };
+        return [
+          {
+            id: row.id,
+            title: row.title,
+            url: row.url,
+            sourceType: row.source_type,
+            pmid: row.pmid,
+            doi: row.doi,
+            nctId: row.nct_id,
+          },
+        ];
+      }),
+      studies: [
+        {
+          nctId: data.nct_id,
+          title: data.title,
+          sponsor: data.sponsor,
+          phase: data.phase,
+          status: data.status,
+        },
+      ],
+    };
+  }
+
   const { data, error } = await supabase
     .from("review_actions")
     .select("id, entity_stable_key, reason, action")
@@ -457,8 +826,26 @@ export async function submitAdminReview(input: {
   reason: string;
 }): Promise<void> {
   assertAdminCanWriteReview(input.isAdmin);
+  if (isIntakePlaceholderId(input.id)) {
+    throw new Error(
+      `MIGRATION_REQUIRED: ${BATCH_03_MIGRATION_REQUIRED}. Kandidat ist nicht persistiert. Approve/Reject erst nach Import.`,
+    );
+  }
+  if ((input.kind === "source" || input.kind === "study") && !isPersistedUuid(input.id)) {
+    throw new Error("Approve/Reject nur für persistierte UUID-Datensätze.");
+  }
   const entityType: ResearchEntityType =
-    input.kind === "evidence" ? "evidence_assessment" : input.kind === "claim" ? "claim" : input.kind === "regulatory" ? "regulatory_record" : "substance";
+    input.kind === "evidence"
+      ? "evidence_assessment"
+      : input.kind === "claim"
+        ? "claim"
+        : input.kind === "regulatory"
+          ? "regulatory_record"
+          : input.kind === "source"
+            ? "source"
+            : input.kind === "study"
+              ? "study"
+              : "substance";
   const draft = buildReviewActionDraft({
     entityType,
     entityId: input.kind === "substance" ? null : input.id,
@@ -499,6 +886,16 @@ export async function submitAdminReview(input: {
       .from("regulatory_records")
       .update({ review_status: draft.newStatus })
       .eq("id", input.id);
+    if (error) throw error;
+    return;
+  }
+  if (input.kind === "source") {
+    const { error } = await supabase.from("sources").update({ review_status: draft.newStatus }).eq("id", input.id);
+    if (error) throw error;
+    return;
+  }
+  if (input.kind === "study") {
+    const { error } = await supabase.from("studies").update({ review_status: draft.newStatus }).eq("id", input.id);
     if (error) throw error;
   }
 }

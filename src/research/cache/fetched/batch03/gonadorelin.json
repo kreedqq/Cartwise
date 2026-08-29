@@ -1,0 +1,639 @@
+{
+  "slug": "gonadorelin",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "gonadorelin"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "gonadorelin",
+      "totalCount": 1332,
+      "studies": [
+        {
+          "nctId": "NCT02858336",
+          "title": "CaREFREE Study (Calorie Restriction, Environment and Fitness: Reproductive Effects Evaluation Study)",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "National Institute of Environmental Health Sciences (NIEHS)",
+          "enrollment": 38,
+          "start": "2017-01-12",
+          "completion": "2019-06-29",
+          "lastUpdate": "2026-08-28",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT02858336",
+          "intervention": "NEA; DEA",
+          "condition": "Hormones"
+        },
+        {
+          "nctId": "NCT02531516",
+          "title": "An Efficacy and Safety Study of JNJ-56021927 (Apalutamide) in High-risk Prostate Cancer Subjects Receiving Primary Radiation Therapy: ATLAS",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Aragon Pharmaceuticals, Inc.",
+          "enrollment": 1503,
+          "start": "2015-11-19",
+          "completion": "2028-12-29",
+          "lastUpdate": "2026-08-28",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT02531516",
+          "intervention": "Apalutamide; Bicalutamide; Bicalutamide Placebo; Apalutamide Placebo; GnRH (agonist); 74-80 Grays (units of radiation)",
+          "condition": "Prostatic Neoplasms"
+        },
+        {
+          "nctId": "NCT03767244",
+          "title": "A Study of Apalutamide in Participants With High-Risk, Localized or Locally Advanced Prostate Cancer Who Are Candidates for Radical Prostatectomy",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Janssen Research & Development, LLC",
+          "enrollment": 2517,
+          "start": "2019-06-11",
+          "completion": "2028-10-13",
+          "lastUpdate": "2026-08-28",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT03767244",
+          "intervention": "Apalutamide; Androgen Deprivation Therapy (ADT); Placebo",
+          "condition": "Prostatic Neoplasms"
+        },
+        {
+          "nctId": "NCT03388619",
+          "title": "Highly Conformal, Hypofractionated, Focally Dose Escalated Post-Prostatectomy Radiotherapy",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "National Cancer Institute (NCI)",
+          "enrollment": 30,
+          "start": "2018-01-17",
+          "completion": "2025-12-04",
+          "lastUpdate": "2026-08-28",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT03388619",
+          "intervention": "Prostate bed with integrated boost; Prostate bed irradiation only; Whole Body Bone Scan; 18F-NaF PET Imaging; CT; mpMRI",
+          "condition": "Cancer Of Prostate; Prostate Neoplasms; Prostate Cancer; Neoplasms of Prostate; Prostatic Cancer"
+        },
+        {
+          "nctId": "NCT04557059",
+          "title": "A Study of Adding Apalutamide to Radiotherapy and LHRH Agonist in High-Risk Patients With Hormone-Sensitive Prostate Cancer",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Janssen Pharmaceutica N.V., Belgium",
+          "enrollment": 691,
+          "start": "2020-11-12",
+          "completion": "2031-09-15",
+          "lastUpdate": "2026-08-28",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04557059",
+          "intervention": "Radiotherapy; LHRHa; Apalutamide",
+          "condition": "Prostatic Neoplasms"
+        },
+        {
+          "nctId": "NCT07793162",
+          "title": "A Phase Ia Trial Comparing the Pharmacokinetics/Pharmacodynamics, Safety, and Preliminary Efficacy of HHK001 and Enantone in Patients With Endometriosis",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "The Third Xiangya Hospital of Central South University",
+          "enrollment": 20,
+          "start": "2026-08-31",
+          "completion": "2027-12-31",
+          "lastUpdate": "2026-08-28",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07793162",
+          "intervention": "HHK001 (Leuprorelin Acetate Microspheres for Injection); Enantone (Leuprorelin Acetate Microspheres for Injection)",
+          "condition": "Endometriosis"
+        },
+        {
+          "nctId": "NCT04325828",
+          "title": "A Study of Apalutamide Combined With GnRH Agonist in Participants With Androgen Receptor Positive Salivary Gland Carcinoma",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Janssen Pharmaceutical K.K.",
+          "enrollment": 31,
+          "start": "2020-04-07",
+          "completion": "2027-12-31",
+          "lastUpdate": "2026-08-28",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT04325828",
+          "intervention": "Apalutamide; GnRH Agonist",
+          "condition": "Salivary Gland Neoplasms"
+        },
+        {
+          "nctId": "NCT01511588",
+          "title": "Hormonal Regulation of Puberty and Fertility",
+          "status": "COMPLETED",
+          "phase": null,
+          "sponsor": "National Institute of Environmental Health Sciences (NIEHS)",
+          "enrollment": 111,
+          "start": "2012-04-25",
+          "completion": null,
+          "lastUpdate": "2026-08-28",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01511588",
+          "intervention": null,
+          "condition": "Endocrine Disease; Infertility; Hypogonadism; Amenorrhea; Adolescents"
+        },
+        {
+          "nctId": "NCT07771283",
+          "title": "Purpose to Evaluate the Effectiveness of the Superovulation Stimulation Protocol Using Human Chorionic Gonadotropin (hCG) by Demonstrating Its Equivalence to Standard Controlled Ovarian Stimulation Protocols in Terms of Oocytes Retrieved, Blastulation While Maintaining an Economic Advantage",
+          "status": "ENROLLING_BY_INVITATION",
+          "phase": "NA",
+          "sponsor": "LTD \"EKODNIPRO\", Medical centre Medical Plaza Dnipro",
+          "enrollment": 360,
+          "start": "2026-08-17",
+          "completion": "2028-05-01",
+          "lastUpdate": "2026-08-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07771283",
+          "intervention": "Human Chorionic Gonadotropin (hCG); GnRH antagonist; Dual trigger (human chorionic gonadotropin plus GnRH-agonist); Gonadotropins (FSH or FSH/LH); Gonadotropins (FSH or FSH/LH)",
+          "condition": "Infertility (IVF Patients); Infertility Assisted Reproductive Technology; Infertile Patients; Infertility Drugs; Infertile Women Undergoing IVF or ICSI; Infertility"
+        },
+        {
+          "nctId": "NCT05827081",
+          "title": "Phase IIIb Study of Ribociclib + ET in Early Breast Cancer",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novartis Pharmaceuticals",
+          "enrollment": 1400,
+          "start": "2024-02-28",
+          "completion": "2030-09-20",
+          "lastUpdate": "2026-08-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05827081",
+          "intervention": "Ribociclib; Letrozole; Ansastrozole; Goserelin; Leuprolide; Exemestane",
+          "condition": "Early Breast Cancer"
+        },
+        {
+          "nctId": "NCT04648969",
+          "title": "Prolonged Pulsatile Kisspeptin Administration in Hypogonadotropic Hypogonadism",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Stephanie B. Seminara, MD",
+          "enrollment": 18,
+          "start": "2019-05-03",
+          "completion": "2025-08-31",
+          "lastUpdate": "2026-08-26",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT04648969",
+          "intervention": "kisspeptin 112-121; GnRH",
+          "condition": "Hypogonadotropic Hypogonadism"
+        },
+        {
+          "nctId": "NCT07310420",
+          "title": "A Trial to Evaluate Ovarian Suppression Following Subcutaneous ZOLADEX 10.8 mg in Premenopausal Women With Early-stage and Advanced HR+ Breast Cancer",
+          "status": "RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "TerSera Therapeutics LLC",
+          "enrollment": 176,
+          "start": "2026-08-30",
+          "completion": "2027-07-31",
+          "lastUpdate": "2026-08-26",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07310420",
+          "intervention": "ZOLADEX",
+          "condition": "Advanced Breast Cancer; Early Breast Cancer"
+        },
+        {
+          "nctId": "NCT07782840",
+          "title": "QL1706 Plus Neoadjuvant Endocrine Therapy in HR-Positive/HER2-Negative Breast Cancer With a Poor Response to Neoadjuvant Chemotherapy",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Hebei Medical University Fourth Hospital",
+          "enrollment": 40,
+          "start": "2026-10-01",
+          "completion": "2028-12-01",
+          "lastUpdate": "2026-08-26",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07782840",
+          "intervention": "Iparomlimab and Tuvonralimab (QL1706); Aromatase Inhibitor (AI); CDK4/6 inhibitor; Ovarian function suppression",
+          "condition": "Breast Cancer"
+        },
+        {
+          "nctId": "NCT00066690",
+          "title": "Suppression of Ovarian Function With Either Tamoxifen or Exemestane Compared With Tamoxifen Alone in Treating Premenopausal Women With Hormone-Responsive Breast Cancer",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "ETOP IBCSG Partners Foundation",
+          "enrollment": 3066,
+          "start": "2003-12-17",
+          "completion": "2024-11-06",
+          "lastUpdate": "2026-08-26",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00066690",
+          "intervention": "Exemestane; Laboratory Biomarker Analysis; Oophorectomy; Quality-of-Life Assessment; Radiation Therapy; Tamoxifen",
+          "condition": "Estrogen Receptor Positive Breast Cancer; Progesterone Receptor Positive Tumor; Recurrent Breast Carcinoma; Stage IA Breast Cancer; Stage IB Breast Cancer; Stage IIA Breast Cancer"
+        },
+        {
+          "nctId": "NCT06513962",
+          "title": "Triptorelin for the Prevention of Ovarian Damage in Adolescents and Young Adults With Cancer",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Children's Oncology Group",
+          "enrollment": 60,
+          "start": "2025-02-27",
+          "completion": "2029-10-30",
+          "lastUpdate": "2026-08-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06513962",
+          "intervention": "Best Practice; Biospecimen Collection; Electronic Health Record Review; Survey Administration; Triptorelin Pamoate",
+          "condition": "Hematopoietic and Lymphatic System Neoplasm; Malignant Solid Neoplasm"
+        },
+        {
+          "nctId": "NCT05894239",
+          "title": "A Study to Evaluate the Efficacy and Safety of Inavolisib in Combination With Phesgo Versus Placebo in Combination With Phesgo in Participants With PIK3CA-Mutated HER2-Positive Locally Advanced or Metastatic Breast Cancer",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Hoffmann-La Roche",
+          "enrollment": 230,
+          "start": "2023-09-08",
+          "completion": "2032-12-28",
+          "lastUpdate": "2026-08-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05894239",
+          "intervention": "Inavolisib; Phesgo; Placebo; Taxane-based Chemotherapy; Optional Endocrine Therapy of Investigator's Choice",
+          "condition": "Metastatic Breast Cancer"
+        },
+        {
+          "nctId": "NCT07783282",
+          "title": "A Study to Learn How Enzalutamide, Apalutamide and Bicalutamide Affect the Way Fezolinetant is Processed in Men With Prostate Cancer",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "Astellas Pharma Global Development, Inc.",
+          "enrollment": 56,
+          "start": "2026-08-31",
+          "completion": "2027-04-30",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07783282",
+          "intervention": "fezolinetant; enzalutamide; apalutamide; bicalutamide; GnRH agonist/antagonist",
+          "condition": "Prostate Cancer"
+        },
+        {
+          "nctId": "NCT06395753",
+          "title": "A Dose Finding Study of Debio 4228 in Participants With Advanced Prostate Cancer",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Debiopharm International SA",
+          "enrollment": 55,
+          "start": "2024-05-23",
+          "completion": "2026-07-22",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06395753",
+          "intervention": "Debio 4228",
+          "condition": "Prostate Cancer"
+        },
+        {
+          "nctId": "NCT06382948",
+          "title": "Elacestrant + Everolimus in Patients ER+/HER2-, ESR1mut, Advanced Breast Cancer Progressing to ET and CDK4/6i.",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "MedSIR",
+          "enrollment": 300,
+          "start": "2024-12-05",
+          "completion": "2028-04",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06382948",
+          "intervention": "Everolimus; Elacestrant; Placebo; Auxiliary Medicinal Product - Dexamethasone; Auxiliary Medicinal Product - Luteinizing hormone-releasing hormone (LHRH) analogues",
+          "condition": "Advanced Breast Cancer; ER-positive Breast Cancer; HER2-negative Breast Cancer; ESR1 Gene Mutation"
+        },
+        {
+          "nctId": "NCT07596212",
+          "title": "BRE-06: Study to Increase Tolerance to Aromatase Inhibitors for Patients With Early-Stage Hormone Receptor Positive Breast Cancer Who Developed Hypoactive Sexual Desire Disorder",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE1, PHASE2",
+          "sponsor": "University of Illinois at Chicago",
+          "enrollment": 100,
+          "start": "2026-09",
+          "completion": "2031-09",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07596212",
+          "intervention": "Aromatase Inhibitors; Bupropion; GnRH agonist",
+          "condition": "Early-stage Breast Cancer; Hypoactive Sexual Desire Disorder; Hormone Receptor Positive Breast Carcinoma; Breast Cancer"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "gonadorelin AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 7772,
+      "articles": [
+        {
+          "pmid": "36594696",
+          "title": "What is the optimal GnRH antagonist protocol for ovarian stimulation during ART treatment? A systematic review and network meta-analysis.",
+          "source": "Hum Reprod Update",
+          "pubdate": "2023 May 2",
+          "authors": [
+            "Venetis CA",
+            "Storr A",
+            "Chua SJ",
+            "Mol BW",
+            "Longobardi S",
+            "Yin X"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1093/humupd/dmac040",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36594696/"
+        },
+        {
+          "pmid": "12536358",
+          "title": "GnRH agonists, antagonists, and assisted conception.",
+          "source": "Semin Reprod Med",
+          "pubdate": "2002 Nov",
+          "authors": [
+            "van Loenen AC",
+            "Huirne JA",
+            "Schats R",
+            "Hompes PG",
+            "Lambalk CB"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1055/s-2002-36713",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/12536358/"
+        },
+        {
+          "pmid": "19228147",
+          "title": "A review of the pharmacokinetic and pharmacological properties of a once-yearly administered histrelin acetate implant in the treatment of prostate cancer.",
+          "source": "BJU Int",
+          "pubdate": "2009 Mar",
+          "authors": [
+            "Schlegel P"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't",
+            "Review"
+          ],
+          "doi": "10.1111/j.1464-410X.2009.08383.x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19228147/"
+        },
+        {
+          "pmid": "37480081",
+          "title": "Interventions to prevent or reduce the incidence and severity of ovarian hyperstimulation syndrome: a systematic umbrella review of the best clinical evidence.",
+          "source": "Reprod Biol Endocrinol",
+          "pubdate": "2023 Jul 21",
+          "authors": [
+            "Palomba S",
+            "Costanzi F",
+            "Nelson SM",
+            "Caserta D",
+            "Humaidan P"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.1186/s12958-023-01113-6",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37480081/"
+        },
+        {
+          "pmid": "24731070",
+          "title": "Timing of human chorionic gonadotropin (hCG) hormone administration in IVF/ICSI protocols using GnRH agonist or antagonists: a systematic review and meta-analysis.",
+          "source": "Gynecol Endocrinol",
+          "pubdate": "2014 Jun",
+          "authors": [
+            "Chen Y",
+            "Zhang Y",
+            "Hu M",
+            "Liu X",
+            "Qi H"
+          ],
+          "pubtype": [
+            "Comparative Study",
+            "Journal Article",
+            "Meta-Analysis",
+            "Research Support, Non-U.S. Gov't",
+            "Systematic Review"
+          ],
+          "doi": "10.3109/09513590.2014.895984",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24731070/"
+        },
+        {
+          "pmid": "23633329",
+          "title": "Herbal preparations for uterine fibroids.",
+          "source": "Cochrane Database Syst Rev",
+          "pubdate": "2013 Apr 30",
+          "authors": [
+            "Liu JP",
+            "Yang H",
+            "Xia Y",
+            "Cardini F"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis",
+            "Research Support, Non-U.S. Gov't",
+            "Systematic Review"
+          ],
+          "doi": "10.1002/14651858.CD005292.pub3",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23633329/"
+        },
+        {
+          "pmid": "36368594",
+          "title": "Efficacy and Safety of Oral GnRh Antagonists in Patients With Uterine Fibroids: A Systematic Review.",
+          "source": "J Obstet Gynaecol Can",
+          "pubdate": "2022 Dec",
+          "authors": [
+            "Niaz R",
+            "Saeed M",
+            "Khan H",
+            "Ali MA",
+            "Irshad A",
+            "Faiz M"
+          ],
+          "pubtype": [
+            "Systematic Review",
+            "Journal Article"
+          ],
+          "doi": "10.1016/j.jogc.2022.10.012",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36368594/"
+        },
+        {
+          "pmid": "26898822",
+          "title": "A systematic review and meta-analysis of comparative studies assessing the efficacy of luteinizing hormone-releasing hormone therapy for children with cryptorchidism.",
+          "source": "Int Urol Nephrol",
+          "pubdate": "2016 May",
+          "authors": [
+            "Li T",
+            "Gao L",
+            "Chen P",
+            "Bu S",
+            "Cao D",
+            "Yang L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis",
+            "Research Support, Non-U.S. Gov't",
+            "Systematic Review"
+          ],
+          "doi": "10.1007/s11255-016-1235-x",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26898822/"
+        },
+        {
+          "pmid": "32401547",
+          "title": "The potential role of elagolix for treating uterine bleeding associated to uterine myomas.",
+          "source": "Expert Opin Pharmacother",
+          "pubdate": "2020 Aug",
+          "authors": [
+            "Barra F",
+            "Vitale SG",
+            "Seca M",
+            "Scala C",
+            "Leone Roberti Maggiore U",
+            "Cianci A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1080/14656566.2020.1755254",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32401547/"
+        },
+        {
+          "pmid": "10744594",
+          "title": "Single-therapy androgen suppression in men with advanced prostate cancer: a systematic review and meta-analysis.",
+          "source": "Ann Intern Med",
+          "pubdate": "2000 Apr 4",
+          "authors": [
+            "Seidenfeld J",
+            "Samson DJ",
+            "Hasselblad V",
+            "Aronson N",
+            "Albertsen PC",
+            "Bennett CL"
+          ],
+          "pubtype": [
+            "Comparative Study",
+            "Journal Article",
+            "Meta-Analysis",
+            "Research Support, Non-U.S. Gov't",
+            "Systematic Review"
+          ],
+          "doi": "10.7326/0003-4819-132-7-200004040-00009",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/10744594/"
+        },
+        {
+          "pmid": "29055060",
+          "title": "Gonadotropin-releasing hormone agonists for ovarian protection during cancer chemotherapy: systematic review and meta-analysis.",
+          "source": "Ultrasound Obstet Gynecol",
+          "pubdate": "2018 Jan",
+          "authors": [
+            "Senra JC",
+            "Roque M",
+            "Talim MCT",
+            "Reis FM",
+            "Tavares RLC"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis",
+            "Research Support, Non-U.S. Gov't",
+            "Systematic Review"
+          ],
+          "doi": "10.1002/uog.18934",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29055060/"
+        },
+        {
+          "pmid": "27225286",
+          "title": "Effects and safety of combination therapy with gonadotropin-releasing hormone analogue and growth hormone in girls with idiopathic central precocious puberty: a meta-analysis.",
+          "source": "J Endocrinol Invest",
+          "pubdate": "2016 Oct",
+          "authors": [
+            "Liu S",
+            "Liu Q",
+            "Cheng X",
+            "Luo Y",
+            "Wen Y"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis"
+          ],
+          "doi": "10.1007/s40618-016-0486-9",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27225286/"
+        },
+        {
+          "pmid": "15927827",
+          "title": "Systematic review of LHRH agonists for the adjuvant treatment of early breast cancer.",
+          "source": "Breast",
+          "pubdate": "2005 Jun",
+          "authors": [
+            "Sharma R",
+            "Beith J",
+            "Hamilton A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't",
+            "Systematic Review"
+          ],
+          "doi": "10.1016/j.breast.2005.02.001",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15927827/"
+        },
+        {
+          "pmid": "7937548",
+          "title": "Pharmacokinetics of detirelix following intratracheal instillation and aerosol inhalation in the unanesthetized awake sheep.",
+          "source": "Pharm Res",
+          "pubdate": "1994 Jul",
+          "authors": [
+            "Schreier H",
+            "McNicol KJ",
+            "Bennett DB",
+            "Teitelbaum Z",
+            "Derendorf H"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1023/a:1018951824315",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/7937548/"
+        },
+        {
+          "pmid": "40517509",
+          "title": "GnRH analogues and dienogest for second line treatment of endometriosis-associated pain: a systematic review, meta-analysis, and network meta-analysis.",
+          "source": "Eur J Obstet Gynecol Reprod Biol",
+          "pubdate": "2025 Aug",
+          "authors": [
+            "Dick A",
+            "Matok I",
+            "Gutman-Ido E",
+            "Lessans N",
+            "Dior UP"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Network Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1016/j.ejogrb.2025.114093",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40517509/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "gonadorelin",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 638793,
+      "cas": "33515-09-2",
+      "formula": "C55H75N17O13",
+      "iupac": "(2S)-N-[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[2-[[(2S)-1-[[(2S)-1-[(2S)-2-[(2-amino-2-oxoethyl)carbamoyl]pyrrolidin-1-yl]-5-(diaminomethylideneamino)-1-oxopentan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-2-oxoethyl]amino]-3-(4-hydroxyphenyl)-1-oxopropan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-3-(1H-indol-3-yl)-1-oxopropan-2-yl]amino]-3-(1H-imidazol-5-yl)-1-oxopropan-2-yl]-5-oxopyrrolidine-2-carboxamide"
+    }
+  }
+}

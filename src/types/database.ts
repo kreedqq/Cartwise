@@ -522,7 +522,7 @@ export interface Database {
           connector: string;
           query: string | null;
           batch_label: string | null;
-          status: "running" | "completed" | "failed";
+          status: "queued" | "running" | "completed" | "partial" | "failed" | "cancelled";
           started_at: string | null;
           completed_at: string | null;
           sources_found: number | null;
@@ -533,11 +533,20 @@ export interface Database {
           errors: string | null;
           operator_note: string | null;
           created_at: string;
+          trigger_kind: string | null;
+          substance_scope: string[];
+          connector_scope: string[];
+          statistics: unknown;
+          error_summary: string | null;
+          progress: unknown;
+          schedule_kind: string | null;
+          cancel_requested: boolean;
+          parent_run_id: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["research_runs"]["Row"]> & {
           run_type: "historical_import" | "migration_import" | "live";
           connector: string;
-          status: "running" | "completed" | "failed";
+          status: Database["public"]["Tables"]["research_runs"]["Row"]["status"];
         };
         Update: Partial<Database["public"]["Tables"]["research_runs"]["Row"]>;
         Relationships: never[];
@@ -574,6 +583,8 @@ export interface Database {
           external_id: string | null;
           source_quality: number | null;
           status: "active" | "superseded" | "unavailable" | "rejected";
+          review_status: "draft" | "review-required" | "approved" | "rejected";
+          connector: string | null;
           legacy_ids: string[];
           created_at: string;
           updated_at: string;
@@ -631,6 +642,9 @@ export interface Database {
           last_updated: string | null;
           has_results: boolean;
           source_url: string;
+          review_status: "draft" | "review-required" | "approved" | "rejected";
+          intervention: string | null;
+          condition: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -704,15 +718,23 @@ export interface Database {
         Row: {
           id: string;
           research_run_id: string;
-          source_id: string;
+          source_id: string | null;
           discovered_at: string | null;
           accepted: boolean;
           rejection_reason: string | null;
           created_at: string;
+          connector: string | null;
+          retrieval_status: string | null;
+          result_type: string | null;
+          identifier: string | null;
+          substance_slug: string | null;
+          retrieved_at: string | null;
+          error_text: string | null;
+          previous_fields: unknown;
+          current_fields: unknown;
         };
         Insert: Partial<Database["public"]["Tables"]["research_run_sources"]["Row"]> & {
           research_run_id: string;
-          source_id: string;
         };
         Update: Partial<Database["public"]["Tables"]["research_run_sources"]["Row"]>;
         Relationships: [
@@ -947,7 +969,10 @@ export interface Database {
             | "evidence_assessment"
             | "regulatory_record"
             | "research_update"
-            | "substance";
+            | "substance"
+            | "source"
+            | "study"
+            | "community_report";
           entity_id: string | null;
           entity_stable_key: string | null;
           action: "approve" | "reject" | "request_review" | "edit" | "publish" | "unpublish";
@@ -962,6 +987,49 @@ export interface Database {
           action: Database["public"]["Tables"]["review_actions"]["Row"]["action"];
         };
         Update: Partial<Database["public"]["Tables"]["review_actions"]["Row"]>;
+        Relationships: [];
+      };
+      research_connector_health: {
+        Row: {
+          id: string;
+          connector: string;
+          kind: "scientific" | "community";
+          availability: "available" | "unavailable";
+          last_successful_run_id: string | null;
+          last_error: string | null;
+          last_checked_at: string | null;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["research_connector_health"]["Row"]> & {
+          connector: string;
+          kind: "scientific" | "community";
+          availability: "available" | "unavailable";
+        };
+        Update: Partial<Database["public"]["Tables"]["research_connector_health"]["Row"]>;
+        Relationships: [];
+      };
+      community_reports: {
+        Row: {
+          id: string;
+          substance_id: string;
+          kind: "reddit" | "forum" | "blog" | "user-report";
+          title: string;
+          content_summary: string | null;
+          source_url: string | null;
+          author_identifier: string | null;
+          published_at: string | null;
+          retrieved_at: string | null;
+          review_status: "draft" | "review-required" | "approved" | "rejected";
+          source_metadata: unknown;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["community_reports"]["Row"]> & {
+          substance_id: string;
+          kind: "reddit" | "forum" | "blog" | "user-report";
+          title: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["community_reports"]["Row"]>;
         Relationships: [];
       };
     };

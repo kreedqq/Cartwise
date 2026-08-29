@@ -1,0 +1,359 @@
+{
+  "slug": "bpc-157",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "BPC-157",
+    "BPC157",
+    "\"body protection compound 157\""
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "BPC-157",
+      "totalCount": 3,
+      "studies": [
+        {
+          "nctId": "NCT07752381",
+          "title": "A Clinical Trial to Evaluate the Effects of Peptide Gummies on Markers of Inflammation, Physical Performance, and Recovery",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "Parlay Wellness",
+          "enrollment": 40,
+          "start": "2025-09-01",
+          "completion": "2025-11-01",
+          "lastUpdate": "2026-08-07",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07752381",
+          "intervention": "Parlay Recover Peptide Gummies",
+          "condition": "Musculoskeletal Inflammation; Exercise-Induced Muscle Damage; Post-Exercise Recovery; Musculoskeletal Pain"
+        },
+        {
+          "nctId": "NCT07437547",
+          "title": "BPC 157 for Acute Hamstring Muscle Strain Repair",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Hudson Biotech",
+          "enrollment": 120,
+          "start": "2026-02-02",
+          "completion": "2028-02-17",
+          "lastUpdate": "2026-02-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07437547",
+          "intervention": "Pentadecapeptide BPC 157; Placebo",
+          "condition": "Hamstring Muscle Strain; Skeletal Muscle Injury"
+        },
+        {
+          "nctId": "NCT02637284",
+          "title": "PCO-02 - Safety and Pharmacokinetics Trial",
+          "status": "UNKNOWN",
+          "phase": "PHASE1",
+          "sponsor": "PharmaCotherapia d.o.o.",
+          "enrollment": 42,
+          "start": "2015-10",
+          "completion": "2016-03",
+          "lastUpdate": "2015-12-22",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT02637284",
+          "intervention": "Bepecin; Placebo",
+          "condition": "Healthy Volunteers"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "BPC-157 AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 40,
+      "articles": [
+        {
+          "pmid": "40005999",
+          "title": "Multifunctionality and Possible Medical Application of the BPC 157 Peptide-Literature and Patent Review.",
+          "source": "Pharmaceuticals (Basel)",
+          "pubdate": "2025 Jan 30",
+          "authors": [
+            "Józwiak M",
+            "Bauer M",
+            "Kamysz W",
+            "Kleczkowska P"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3390/ph18020185",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40005999/"
+        },
+        {
+          "pmid": "40756949",
+          "title": "Emerging Use of BPC-157 in Orthopaedic Sports Medicine: A Systematic Review.",
+          "source": "HSS J",
+          "pubdate": "2025 Nov",
+          "authors": [
+            "Vasireddi N",
+            "Hahamyan H",
+            "Salata MJ",
+            "Karns M",
+            "Calcei JG",
+            "Voos JE"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1177/15563316251355551",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40756949/"
+        },
+        {
+          "pmid": "39325560",
+          "title": "Effect of BPC-157 on Symptoms in Patients with Interstitial Cystitis: A Pilot Study.",
+          "source": "Altern Ther Health Med",
+          "pubdate": "2024 Oct",
+          "authors": [
+            "Lee E",
+            "Walker C",
+            "Ayadi B"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39325560/"
+        },
+        {
+          "pmid": "41476424",
+          "title": "Injectable Peptide Therapy: A Primer for Orthopaedic and Sports Medicine Physicians.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Jan",
+          "authors": [
+            "Mayfield CK",
+            "Bolia IK",
+            "Feingold CL",
+            "Lin EH",
+            "Liu JN",
+            "Rick Hatch GF"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1177/03635465251357593",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41476424/"
+        },
+        {
+          "pmid": "23755725",
+          "title": "Stable gastric pentadecapeptide BPC 157-NO-system relation.",
+          "source": "Curr Pharm Des",
+          "pubdate": "2014",
+          "authors": [
+            "Sikiric P",
+            "Seiwerth S",
+            "Rucman R",
+            "Turkovic B",
+            "Rokotov DS",
+            "Brcic L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.2174/13816128113190990411",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23755725/"
+        },
+        {
+          "pmid": "39265666",
+          "title": "Injectable Therapeutic Peptides-An Adjunct to Regenerative Medicine and Sports Performance?",
+          "source": "Arthroscopy",
+          "pubdate": "2025 Feb",
+          "authors": [
+            "DeFoor MT",
+            "Dekker TJ"
+          ],
+          "pubtype": [
+            "Review",
+            "Letter"
+          ],
+          "doi": "10.1016/j.arthro.2024.09.005",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39265666/"
+        },
+        {
+          "pmid": "41490200",
+          "title": "Therapeutic Peptides in Orthopaedics: Applications, Challenges, and Future Directions.",
+          "source": "J Am Acad Orthop Surg Glob Res Rev",
+          "pubdate": "2026 Jan 1",
+          "authors": [
+            "Rahman OF",
+            "Lee SJ",
+            "Seeds WA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.5435/JAAOSGlobal-D-25-00236",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41490200/"
+        },
+        {
+          "pmid": "40789979",
+          "title": "Regeneration or Risk? A Narrative Review of BPC-157 for Musculoskeletal Healing.",
+          "source": "Curr Rev Musculoskelet Med",
+          "pubdate": "2025 Dec",
+          "authors": [
+            "McGuire FP",
+            "Martinez R",
+            "Lenz A",
+            "Skinner L",
+            "Cushman DM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s12178-025-09990-7",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40789979/"
+        },
+        {
+          "pmid": "41966639",
+          "title": "Safety and Efficacy of Approved and Unapproved Peptide Therapies for Musculoskeletal Injuries and Athletic Performance.",
+          "source": "Sports Med",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Mendias CL",
+            "Awan TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s40279-026-02437-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41966639/"
+        },
+        {
+          "pmid": "41155565",
+          "title": "BPC 157 Therapy: Targeting Angiogenesis and Nitric Oxide's Cytotoxic and Damaging Actions, but Maintaining, Promoting, or Recovering Their Essential Protective Functions. Comment on Józwiak et al. Multifunctionality and Possible Medical Application of the BPC 157 Peptide-Literature and Patent Review. Pharmaceuticals 2025, 18, 185.",
+          "source": "Pharmaceuticals (Basel)",
+          "pubdate": "2025 Sep 28",
+          "authors": [
+            "Sikiric P",
+            "Seiwerth S",
+            "Skrtic A",
+            "Staresinic M",
+            "Strbe S",
+            "Vuksic A"
+          ],
+          "pubtype": [
+            "Comment",
+            "Journal Article"
+          ],
+          "doi": "10.3390/ph18101450",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41155565/"
+        },
+        {
+          "pmid": "40131143",
+          "title": "Safety of Intravenous Infusion of BPC157 in Humans: A Pilot Study.",
+          "source": "Altern Ther Health Med",
+          "pubdate": "2025 Sep",
+          "authors": [
+            "Lee E",
+            "Burgess K"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40131143/"
+        },
+        {
+          "pmid": "42578445",
+          "title": "Peptide Supplements and Their Therapeutic Applications in Sports Medicine.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Aug 11",
+          "authors": [
+            "Tewari K",
+            "Liu TP",
+            "Im C",
+            "Hamad C",
+            "Petrigliano F",
+            "Cheung EC"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1177/03635465261464420",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42578445/"
+        },
+        {
+          "pmid": "11978191",
+          "title": "Pentadecapeptide BPC 157 attenuates chronic amphetamine-induced behavior disturbances.",
+          "source": "Acta Pharmacol Sin",
+          "pubdate": "2002 May",
+          "authors": [
+            "Sikiric P",
+            "Jelovac N",
+            "Jelovac-Gjeldum A",
+            "Dodig G",
+            "Staresinic M",
+            "Anic T"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11978191/"
+        },
+        {
+          "pmid": "42123471",
+          "title": "Therapeutic Peptides in Aesthetic, Metabolic and Endocrine Conditions: Effects, Safety, Clinical Applications, and Future Perspectives.",
+          "source": "Int J Mol Sci",
+          "pubdate": "2026 Apr 27",
+          "authors": [
+            "Renke G",
+            "Chinellato L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3390/ijms27093890",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42123471/"
+        },
+        {
+          "pmid": "32445447",
+          "title": "BPC 157 Rescued NSAID-cytotoxicity Via Stabilizing Intestinal Permeability and Enhancing Cytoprotection.",
+          "source": "Curr Pharm Des",
+          "pubdate": "2020",
+          "authors": [
+            "Park JM",
+            "Lee HJ",
+            "Sikiric P",
+            "Hahm KB"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't",
+            "Review"
+          ],
+          "doi": "10.2174/1381612826666200523180301",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32445447/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "BPC-157",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 9941957,
+      "cas": "137525-51-0",
+      "formula": "C62H98N16O22",
+      "iupac": "(4S)-4-[(2-aminoacetyl)amino]-5-[(2S)-2-[(2S)-2-[(2S)-2-[[2-[[(2S)-6-amino-1-[(2S)-2-[[(2S)-1-[[(2S)-3-carboxy-1-[[(2S)-3-carboxy-1-[[(2S)-1-[[2-[[(2S)-1-[[(1S)-1-carboxy-2-methylpropyl]amino]-4-methyl-1-oxopentan-2-yl]amino]-2-oxoethyl]amino]-1-oxopropan-2-yl]amino]-1-oxopropan-2-yl]amino]-1-oxopropan-2-yl]amino]-1-oxopropan-2-yl]carbamoyl]pyrrolidin-1-yl]-1-oxohexan-2-yl]amino]-2-oxoethyl]carbamoyl]pyrrolidine-1-carbonyl]pyrrolidine-1-carbonyl]pyrrolidin-1-yl]-5-oxopentanoic acid"
+    }
+  }
+}

@@ -150,13 +150,11 @@ Gates (2026-08-29, this working tree):
 
 ## Browser / production
 
-**Not deployed.** `https://cartwise-zeta.vercel.app` still serves the Phase 10E files-based lexicon (`VITE_RESEARCH_DB_MODE` unset on that build → old default `legacy`).
-
-Logged-in production route checks for the **new** read path were not run (would require a SPA deploy). Peptide routes need a session; this environment had no local Vite + login session.
+Deployed in Phase 11C: `docs/RESEARCH_PRODUCTION_LEXICON_CUTOVER_PHASE_11C.md` — **PRODUCTION_LEXICON_CUTOVER_SUCCESS_WITH_LIMITATIONS**. `https://cartwise-zeta.vercel.app` serves `5e38cf1` with unset `VITE_RESEARCH_DB_MODE` → **postgres**. Exclusive fallback **NOT TESTED** on production.
 
 ## Rollback
 
-Set `VITE_RESEARCH_DB_MODE=legacy` on Vercel and redeploy the SPA (after this code is deployed). No database restore. Do not apply the pre-research 0023 dump.
+Set `VITE_RESEARCH_DB_MODE=legacy` on Vercel and redeploy the SPA. No database restore. Do not apply the pre-research 0023 dump.
 
 ## Out of scope (honored)
 

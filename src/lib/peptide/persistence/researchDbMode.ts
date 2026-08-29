@@ -7,8 +7,9 @@ export type LexiconDisplaySource = "legacy" | "postgres";
 /**
  * Public lexicon read mode.
  * Production default is `postgres` (Phase 11) with exclusive legacy fallback.
- * `legacy` is the emergency rollback (`VITE_RESEARCH_DB_MODE=legacy`).
- * `dual` keeps admin comparison and uses the same public Postgres read path.
+ * `legacy` is the emergency rollback (`VITE_RESEARCH_DB_MODE=legacy`) — files only.
+ * `dual` reads legacy + Postgres for admin comparison only. Public UI never mixes
+ * fields from both sources: it uses exclusive Postgres, or exclusive file fallback.
  */
 export function researchDbMode(env: ResearchEnv = import.meta.env): ResearchDbMode {
   const raw = (env.VITE_RESEARCH_DB_MODE ?? "postgres").trim().toLowerCase();
@@ -39,6 +40,11 @@ export function shouldFetchPostgresResearch(env?: ResearchEnv): boolean {
 /** Compare normalized legacy vs Postgres snapshots (admin dual-read). */
 export function shouldCompareResearchReads(env?: ResearchEnv): boolean {
   return shouldFetchPostgresResearch(env);
+}
+
+/** Public UI never merges catalog.ts/published.json fields with Postgres on one request. */
+export function publicLexiconMixesReads(): false {
+  return false;
 }
 
 /** Intended public lexicon display source. Actual request source may fall back to legacy. */

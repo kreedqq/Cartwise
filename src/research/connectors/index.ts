@@ -46,6 +46,12 @@ export const mhraConnector = staticConnector(
   "scientific",
   "Source currently unavailable.",
 );
+export const nmpaConnector = staticConnector(
+  "nmpa",
+  "NMPA",
+  "scientific",
+  "Source currently unavailable. No supported NMPA API in this client.",
+);
 export const clinicalTrialsConnector = staticConnector(
   "clinicaltrials",
   "ClinicalTrials.gov",
@@ -88,6 +94,7 @@ export const RESEARCH_CONNECTORS: readonly ResearchConnector[] = [
   emaConnector,
   bfarmConnector,
   mhraConnector,
+  nmpaConnector,
   clinicalTrialsConnector,
   pubmedConnector,
   scientificLiteratureConnector,

@@ -8,7 +8,14 @@ export const ADMIN_REVIEW_ACTIONS = [
 
 export type AdminReviewAction = (typeof ADMIN_REVIEW_ACTIONS)[number];
 
-export type ResearchEntityType = "claim" | "evidence_assessment" | "regulatory_record" | "substance";
+export type ResearchEntityType =
+  | "claim"
+  | "evidence_assessment"
+  | "regulatory_record"
+  | "substance"
+  | "source"
+  | "study"
+  | "community_report";
 
 export type WorkflowStatus = "draft" | "review-required" | "approved" | "rejected";
 
@@ -82,5 +89,5 @@ export function approvingClaimDoesNotChangeEvidence(): boolean {
 }
 
 export function communityCannotAppearAsScientificEvidence(sourceType: string): boolean {
-  return ["blog", "reddit", "forum", "community"].includes(sourceType);
+  return ["blog", "reddit", "forum", "community", "user-report"].includes(sourceType);
 }

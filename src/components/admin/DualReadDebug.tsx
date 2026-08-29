@@ -8,7 +8,11 @@ export function DualReadDebug({ report }: { report: DualReadReport }) {
       <div>
         <h2 className="text-base font-semibold">Dual Read (Admin)</h2>
         <p className="text-sm text-muted-foreground">
-          Lexikon bleibt Legacy (`catalog.ts` + `published.json`). Postgres nur Vergleich. Mode: {report.mode}.
+          {report.mode === "legacy"
+            ? "Notfall: öffentliches Lexikon liest nur Dateien (catalog.ts + published.json). Mode: legacy."
+            : report.mode === "dual"
+              ? "Dual: Legacy und Postgres werden nur verglichen. Public UI mischt nie — Postgres exklusiv, oder kompletter Datei-Fallback. Mode: dual."
+              : `Öffentliches Lexikon: Postgres Primary. Dateien (catalog.ts + published.json) nur als exklusiver Fallback, nie gemischt im selben Request. Mode: ${report.mode}.`}
         </p>
       </div>
       <p className="text-sm">

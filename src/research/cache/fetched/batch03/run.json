@@ -1,0 +1,20 @@
+{
+  "run_type": "batch_scan",
+  "connector": "clinicaltrials.gov-v2+ncbi-eutils+openfda-drugsfda+pubchem-pug+ema-epar-http",
+  "query": "batch-03 recency/coverage of 27 identity substances",
+  "batch_label": "batch-03",
+  "status": "completed",
+  "started_at": "2026-08-29T00:07:55.627Z",
+  "completed_at": "2026-08-29T00:13:43.217Z",
+  "productionWrite": false,
+  "publishedJsonMutated": false,
+  "sources_found": 723,
+  "sources_accepted": 337,
+  "sources_accepted_new_review_required": 108,
+  "sources_rejected": 334,
+  "studies_found": 5339,
+  "studies_accepted": 126,
+  "studies_accepted_new_review_required": 36,
+  "studies_rejected": 183,
+  "operator_note": "Local cache only. Not inserted into production research_runs. New validated hits remain review-required and were not merged into published.json."
+}

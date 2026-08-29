@@ -104,6 +104,33 @@ describe("phase 11 postgres read + exclusive fallback", () => {
     expect(catalog.source).toBe("legacy");
     expect(catalog.fallback).toBeNull();
   });
+
+  it("falls back to the full legacy catalog on an invalid postgres payload", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const catalog = await resolvePublicLexicon({
+      client: mockPublicSelectClient({
+        substances: [{ id: "x" }],
+        substance_aliases: [],
+        substance_components: [],
+        claims: [],
+        claim_sources: [],
+        evidence_assessments: [],
+        sources: [],
+        source_substances: [],
+        studies: [],
+        study_substances: [],
+        regulatory_records: [],
+      }),
+      mode: "postgres",
+      timeoutMs: 2000,
+    });
+    expect(catalog.source).toBe("legacy");
+    expect(catalog.fallback?.kind).toBe("invalid");
+    expect(catalog.substances).toHaveLength(27);
+    expect(catalog.profiles.get("retatrutide")?.summary.whatIsIt.text.length).toBeGreaterThan(0);
+    expect(catalog.profiles.get("semax")?.summary.whatIsIt.text.length).toBeGreaterThan(0);
+    warn.mockRestore();
+  });
 });
 
 describe("phase 11 public visibility", () => {

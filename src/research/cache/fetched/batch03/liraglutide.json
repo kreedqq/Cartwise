@@ -1,0 +1,748 @@
+{
+  "slug": "liraglutide",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "liraglutide"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "liraglutide",
+      "totalCount": 543,
+      "studies": [
+        {
+          "nctId": "NCT07787936",
+          "title": "GLP-1/GIP Receptor Agonists in Obesity-Related HFpEF: The GLIDE-HF Registry",
+          "status": "NOT_YET_RECRUITING",
+          "phase": null,
+          "sponsor": "Miedziowe Centrum Zdrowia SA",
+          "enrollment": 150,
+          "start": "2027-01-01",
+          "completion": "2033-01-01",
+          "lastUpdate": "2026-08-26",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07787936",
+          "intervention": "GLP-1 / GIP receptor agonist",
+          "condition": "Heart Failure With Preserved Ejection Fraction; Obesity; Diastolic Heart Failure; Pulmonary Hypertension; Iron Deficiency"
+        },
+        {
+          "nctId": "NCT05965908",
+          "title": "Effect of Liraglutide in Obese Women With Polycystic Ovary Syndrome",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Beni-Suef University",
+          "enrollment": 183,
+          "start": "2024-08-01",
+          "completion": "2025-12-30",
+          "lastUpdate": "2026-08-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05965908",
+          "intervention": "liraglutide; Metformin",
+          "condition": "Polycystic Ovary"
+        },
+        {
+          "nctId": "NCT07213323",
+          "title": "Probiotic Intervention for Digestive Health in Obese Patients Initiating GLP-RA Treatment",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Hospices Civils de Lyon",
+          "enrollment": 50,
+          "start": "2026-08-05",
+          "completion": "2028-08-05",
+          "lastUpdate": "2026-08-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07213323",
+          "intervention": "Probiotics (Natural product); Placebo",
+          "condition": "Obesity &Amp; Overweight; Digestive Disorders"
+        },
+        {
+          "nctId": "NCT05220917",
+          "title": "Comparative Effectiveness and Safety of Four Second Line Pharmacological Strategies in Type 2 Diabetes Study",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": null,
+          "sponsor": "Brigham and Women's Hospital",
+          "enrollment": 781430,
+          "start": "2021-08-01",
+          "completion": "2027-09-30",
+          "lastUpdate": "2026-08-13",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05220917",
+          "intervention": "SGLT2 inhibitor; DPP-4 inhibitor; GLP-1RA; 2nd generation SU",
+          "condition": "Cardiovascular Events; Type2 Diabetes; Renal Disease"
+        },
+        {
+          "nctId": "NCT03883412",
+          "title": "Effect of Exercise and/or Liraglutide on Vascular Dysfunction and Insulin Sensitivity in Type 2 Diabetes ( ZQL007)",
+          "status": "RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "University of Virginia",
+          "enrollment": 60,
+          "start": "2019-02-28",
+          "completion": "2027-12",
+          "lastUpdate": "2026-08-12",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT03883412",
+          "intervention": "Exercise; Liraglutide",
+          "condition": "Type2 Diabetes"
+        },
+        {
+          "nctId": "NCT05313529",
+          "title": "LIGHT-MCI Trial: GLP-1 Agonist, SGLT2 Inhibitor, and DPP-4 Inhibitor for MCI Remission in Type 2 Diabetes",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "The Affiliated Nanjing Drum Tower Hospital of Nanjing University Medical School",
+          "enrollment": 396,
+          "start": "2022-10-08",
+          "completion": "2026-07-01",
+          "lastUpdate": "2026-08-06",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05313529",
+          "intervention": "Liraglutide; Empagliflozin; Linagliptin",
+          "condition": "Type 2 Diabetes Mellitus; Mild Cognitive Impairment"
+        },
+        {
+          "nctId": "NCT06374875",
+          "title": "Fibrosis Lessens After Metabolic Surgery",
+          "status": "RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "The Cleveland Clinic",
+          "enrollment": 120,
+          "start": "2024-07-11",
+          "completion": "2029-12-31",
+          "lastUpdate": "2026-07-31",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06374875",
+          "intervention": "Metabolic surgery; Incretin-Based Therapy",
+          "condition": "Metabolic Dysfunction-associated Steatotic Liver Disease (MASLD); Non-Alcoholic Fatty Liver Disease; Metabolic Dysfunction-Associated Steatohepatitis (MASH); Liver Fibrosis; Obesity"
+        },
+        {
+          "nctId": "NCT07225829",
+          "title": "A Trial to Investigate the Safety and Efficacy of Intra-articular 4P004 Injection in Subjects With Knee Synovitis and Osteoarthritis",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "4Moving Biotech",
+          "enrollment": 129,
+          "start": "2025-06-17",
+          "completion": "2026-09",
+          "lastUpdate": "2026-07-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07225829",
+          "intervention": "4P004; Placebo (NaCl 0.9%)",
+          "condition": "Knee Osteoarthritis; Synovitis of Knee"
+        },
+        {
+          "nctId": "NCT07702461",
+          "title": "Determination of Resistance Training Status for Patients on Glucagon-Like Peptide-1 Receptor Agonists",
+          "status": "RECRUITING",
+          "phase": null,
+          "sponsor": "Ohio State University",
+          "enrollment": 300,
+          "start": "2026-06-12",
+          "completion": "2027-01",
+          "lastUpdate": "2026-07-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07702461",
+          "intervention": "Glucagon-Like Peptide-1 Agonist (GLP-1)",
+          "condition": "Obesity & Overweight; Diabetes (DM)"
+        },
+        {
+          "nctId": "NCT07225816",
+          "title": "Examination of How the Duration of Fasting and Temporary Stopping of GLP-1 Medications Affect the Amount of Food Left in the Stomach in People Using Liraglutide (Injected), Semaglutide (Taken by Mouth) or Semaglutide (Injected)",
+          "status": "RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 71,
+          "start": "2025-11-07",
+          "completion": "2027-01-06",
+          "lastUpdate": "2026-07-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07225816",
+          "intervention": "Liraglutide; Oral Semaglutide; Semaglutide",
+          "condition": "Obesity"
+        },
+        {
+          "nctId": "NCT04775082",
+          "title": "SCALE KIDS: Research Study to Look at How Well a New Medicine is at Lowering Weight in Children With Obesity",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 78,
+          "start": "2021-03-04",
+          "completion": "2027-02-08",
+          "lastUpdate": "2026-07-09",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04775082",
+          "intervention": "Liraglutide; Placebo",
+          "condition": "Obesity"
+        },
+        {
+          "nctId": "NCT07677865",
+          "title": "GLP-1 Receptor Agonists and Alzheimer's Disease: A Multi-National Target Trial Emulation",
+          "status": "COMPLETED",
+          "phase": null,
+          "sponsor": "West China Hospital",
+          "enrollment": 213891,
+          "start": "2007-01-01",
+          "completion": "2026-06-24",
+          "lastUpdate": "2026-07-01",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07677865",
+          "intervention": "GLP-1 Receptor Agonists; DPP-4 Inhibitors",
+          "condition": "Alzheimer Disease; Diabetes Mellitus Type 2; Obesity & Overweight"
+        },
+        {
+          "nctId": "NCT07640139",
+          "title": "Estimating the Impact of Obesity Medications on Clinical and Economic Outcomes",
+          "status": "ENROLLING_BY_INVITATION",
+          "phase": null,
+          "sponsor": "Indiana University",
+          "enrollment": 125000,
+          "start": "2026-01-01",
+          "completion": "2029-12-31",
+          "lastUpdate": "2026-06-10",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07640139",
+          "intervention": "Incretin-based therapies (GLP-1 and GLP-1/GIP)",
+          "condition": "Obesity"
+        },
+        {
+          "nctId": "NCT07107334",
+          "title": "A Study to Estimate Early Clinical Efficacy Signals of GLP-1 Agonist Administration in Conjunction With Levonorgestrel Intrauterine Device in Obese Patients With Endometrioid Intraepithelial Neoplasia",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "University of Florida",
+          "enrollment": 20,
+          "start": "2026-04-07",
+          "completion": "2029-11",
+          "lastUpdate": "2026-06-08",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07107334",
+          "intervention": "Glucagon-like peptide 1 receptor agonist",
+          "condition": "Endometrioid Endometrial Adenocarcinoma"
+        },
+        {
+          "nctId": "NCT07613437",
+          "title": "GLP-1 Receptor Agonist in Primary Intracerebral Hemorrhage: A Phase 2 Randomized Trial",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Chinese University of Hong Kong",
+          "enrollment": 200,
+          "start": "2026-06-15",
+          "completion": "2028-12-31",
+          "lastUpdate": "2026-05-29",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07613437",
+          "intervention": "Semaglutide, 0.5 mg/mL",
+          "condition": "Intracerebral Hemorrhage"
+        },
+        {
+          "nctId": "NCT07590219",
+          "title": "Use of Liraglutide in Children Aged 6 to 12 Years With Severe Obesity",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "University of Sao Paulo General Hospital",
+          "enrollment": 30,
+          "start": "2024-03-30",
+          "completion": "2028-04",
+          "lastUpdate": "2026-05-15",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07590219",
+          "intervention": "Liraglutide (Saxenda) 6Mg/Ml Inj Pen 3Ml",
+          "condition": "Severe Obesity; Cardiovascular Function; Liraglutide; Childhood Obesity; Echocardiography; Speckle Tracking"
+        },
+        {
+          "nctId": "NCT04575844",
+          "title": "Effects of Exercise and GLP-1 Agonism on Muscle Microvascular Perfusion and Insulin Action in Adults With Metabolic Syndrome",
+          "status": "RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "University of Virginia",
+          "enrollment": 80,
+          "start": "2020-11-01",
+          "completion": "2027-04-30",
+          "lastUpdate": "2026-05-06",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04575844",
+          "intervention": "Liraglutide; Exercise training; Liraglutide + Exercise training",
+          "condition": "Metabolic Syndrome"
+        },
+        {
+          "nctId": "NCT06836284",
+          "title": "The Evira Study: Additional Support During Obesity Treatment",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Karolinska Institutet",
+          "enrollment": 40,
+          "start": "2026-02-13",
+          "completion": "2027-05-01",
+          "lastUpdate": "2026-05-05",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06836284",
+          "intervention": "Digi-physical treatment tool, Evira; Obesity medication with liraglutide or semaglutide",
+          "condition": "Childhood Obesity; Treatment Adherence"
+        },
+        {
+          "nctId": "NCT06726577",
+          "title": "TP04HN106 in the Treatment of Patients With Amyotrophic Lateral Sclerosis",
+          "status": "RECRUITING",
+          "phase": "PHASE1, PHASE2",
+          "sponsor": "Talengen Institute of Life Sciences, Shenzhen, P.R. China.",
+          "enrollment": 60,
+          "start": "2026-05-10",
+          "completion": "2027-04",
+          "lastUpdate": "2026-05-05",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06726577",
+          "intervention": "TP04HN106; Saline",
+          "condition": "Amyotrophic Lateral Sclerosis"
+        },
+        {
+          "nctId": "NCT03856632",
+          "title": "Liraglutide Effect in Atrial Fibrillation",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "University of Miami",
+          "enrollment": 60,
+          "start": "2019-03-18",
+          "completion": "2026-12-31",
+          "lastUpdate": "2026-05-01",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT03856632",
+          "intervention": "Liraglutide; RFM; Anti Arrhythmics; Afib Catheter Ablation",
+          "condition": "Atrial Fibrillation"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "liraglutide AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 2682,
+      "articles": [
+        {
+          "pmid": "40196933",
+          "title": "Real-world evidence on the utilization, clinical and comparative effectiveness, and adverse effects of newer GLP-1RA-based weight-loss therapies.",
+          "source": "Diabetes Obes Metab",
+          "pubdate": "2025 Apr",
+          "authors": [
+            "Thomsen RW",
+            "Mailhac A",
+            "Løhde JB",
+            "Pottegård A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1111/dom.16364",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40196933/"
+        },
+        {
+          "pmid": "32442310",
+          "title": "Obesity, Polycystic Ovary Syndrome, and Infertility: A New Avenue for GLP-1 Receptor Agonists.",
+          "source": "J Clin Endocrinol Metab",
+          "pubdate": "2020 Aug 1",
+          "authors": [
+            "Cena H",
+            "Chiovato L",
+            "Nappi RE"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't",
+            "Review"
+          ],
+          "doi": "10.1210/clinem/dgaa285",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32442310/"
+        },
+        {
+          "pmid": "26608256",
+          "title": "Liraglutide safety and efficacy in patients with non-alcoholic steatohepatitis (LEAN): a multicentre, double-blind, randomised, placebo-controlled phase 2 study.",
+          "source": "Lancet",
+          "pubdate": "2016 Feb 13",
+          "authors": [
+            "Armstrong MJ",
+            "Gaunt P",
+            "Aithal GP",
+            "Barton D",
+            "Hull D",
+            "Parker R"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase II",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/S0140-6736(15)00803-X",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26608256/"
+        },
+        {
+          "pmid": "41039116",
+          "title": "A systematic review and meta-analysis of the efficacy and safety of pharmacological treatments for obesity in adults.",
+          "source": "Nat Med",
+          "pubdate": "2025 Oct",
+          "authors": [
+            "McGowan B",
+            "Ciudin A",
+            "Baker JL",
+            "Busetto L",
+            "Dicker D",
+            "Frühbeck G"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review",
+            "Network Meta-Analysis"
+          ],
+          "doi": "10.1038/s41591-025-03978-z",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41039116/"
+        },
+        {
+          "pmid": "39258838",
+          "title": "Liraglutide for Children 6 to <12 Years of Age with Obesity - A Randomized Trial.",
+          "source": "N Engl J Med",
+          "pubdate": "2025 Feb 6",
+          "authors": [
+            "Fox CK",
+            "Barrientos-Pérez M",
+            "Bomberg EM",
+            "Dcruz J",
+            "Gies I",
+            "Harder-Lauridsen NM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase III",
+            "Multicenter Study"
+          ],
+          "doi": "10.1056/NEJMoa2407379",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39258838/"
+        },
+        {
+          "pmid": "27005405",
+          "title": "Effect of liraglutide 3.0 mg in individuals with obesity and moderate or severe obstructive sleep apnea: the SCALE Sleep Apnea randomized clinical trial.",
+          "source": "Int J Obes (Lond)",
+          "pubdate": "2016 Aug",
+          "authors": [
+            "Blackman A",
+            "Foster GD",
+            "Zammit G",
+            "Rosenberg R",
+            "Aronne L",
+            "Wadden T"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1038/ijo.2016.52",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27005405/"
+        },
+        {
+          "pmid": "30122305",
+          "title": "Efficacy and safety of semaglutide compared with liraglutide and placebo for weight loss in patients with obesity: a randomised, double-blind, placebo and active controlled, dose-ranging, phase 2 trial.",
+          "source": "Lancet",
+          "pubdate": "2018 Aug 25",
+          "authors": [
+            "O'Neil PM",
+            "Birkenfeld AL",
+            "McGowan B",
+            "Mosenzon O",
+            "Pedersen SD",
+            "Wharton S"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase II",
+            "Comparative Study",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/S0140-6736(18)31773-2",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30122305/"
+        },
+        {
+          "pmid": "37445623",
+          "title": "Emerging Role of GLP-1 Agonists in Obesity: A Comprehensive Review of Randomised Controlled Trials.",
+          "source": "Int J Mol Sci",
+          "pubdate": "2023 Jun 21",
+          "authors": [
+            "Popoviciu MS",
+            "Păduraru L",
+            "Yahya G",
+            "Metwally K",
+            "Cavalu S"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3390/ijms241310449",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37445623/"
+        },
+        {
+          "pmid": "39178623",
+          "title": "The efficacy and safety of GLP-1 agonists in PCOS women living with obesity in promoting weight loss and hormonal regulation: A meta-analysis of randomized controlled trials.",
+          "source": "J Diabetes Complications",
+          "pubdate": "2024 Oct",
+          "authors": [
+            "Austregésilo de Athayde De Hollanda Morais B",
+            "Martins Prizão V",
+            "de Moura de Souza M",
+            "Ximenes Mendes B",
+            "Rodrigues Defante ML",
+            "Cosendey Martins O"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis",
+            "Systematic Review"
+          ],
+          "doi": "10.1016/j.jdiacomp.2024.108834",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39178623/"
+        },
+        {
+          "pmid": "37494014",
+          "title": "Safety and Efficacy of Liraglutide, 3.0 mg, Once Daily vs Placebo in Patients With Poor Weight Loss Following Metabolic Surgery: The BARI-OPTIMISE Randomized Clinical Trial.",
+          "source": "JAMA Surg",
+          "pubdate": "2023 Oct 1",
+          "authors": [
+            "Mok J",
+            "Adeleke MO",
+            "Brown A",
+            "Magee CG",
+            "Firman C",
+            "Makahamadze C"
+          ],
+          "pubtype": [
+            "Randomized Controlled Trial",
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1001/jamasurg.2023.2930",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37494014/"
+        },
+        {
+          "pmid": "39719583",
+          "title": "Evaluation and comparison of efficacy and safety of tirzepatide, liraglutide and SGLT2i in patients with type 2 diabetes mellitus: a network meta-analysis.",
+          "source": "BMC Endocr Disord",
+          "pubdate": "2024 Dec 24",
+          "authors": [
+            "Teng Y",
+            "Fan X",
+            "Yu R",
+            "Yang X"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Comparative Study",
+            "Systematic Review",
+            "Network Meta-Analysis"
+          ],
+          "doi": "10.1186/s12902-024-01805-z",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39719583/"
+        },
+        {
+          "pmid": "39761578",
+          "title": "Efficacy and Safety of Glucagon-Like Peptide-1 Receptor Agonists for Weight Loss Among Adults Without Diabetes : A Systematic Review of Randomized Controlled Trials.",
+          "source": "Ann Intern Med",
+          "pubdate": "2025 Feb",
+          "authors": [
+            "Moiz A",
+            "Filion KB",
+            "Toutounchi H",
+            "Tsoukas MA",
+            "Yu OHY",
+            "Peters TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.7326/ANNALS-24-01590",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39761578/"
+        },
+        {
+          "pmid": "35710599",
+          "title": "Liraglutide 3 mg on weight, body composition, and hormonal and metabolic parameters in women with obesity and polycystic ovary syndrome: a randomized placebo-controlled-phase 3 study.",
+          "source": "Fertil Steril",
+          "pubdate": "2022 Aug",
+          "authors": [
+            "Elkind-Hirsch KE",
+            "Chappell N",
+            "Shaler D",
+            "Storment J",
+            "Bellanger D"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/j.fertnstert.2022.04.027",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35710599/"
+        },
+        {
+          "pmid": "28237263",
+          "title": "3 years of liraglutide versus placebo for type 2 diabetes risk reduction and weight management in individuals with prediabetes: a randomised, double-blind trial.",
+          "source": "Lancet",
+          "pubdate": "2017 Apr 8",
+          "authors": [
+            "le Roux CW",
+            "Astrup A",
+            "Fujioka K",
+            "Greenway F",
+            "Lau DCW",
+            "Van Gaal L"
+          ],
+          "pubtype": [
+            "Comparative Study",
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/S0140-6736(17)30069-7",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28237263/"
+        },
+        {
+          "pmid": "31539622",
+          "title": "Efficacy and safety of once-weekly semaglutide 1.0mg vs once-daily liraglutide 1.2mg as add-on to 1-3 oral antidiabetic drugs in subjects with type 2 diabetes (SUSTAIN 10).",
+          "source": "Diabetes Metab",
+          "pubdate": "2020 Apr",
+          "authors": [
+            "Capehorn MS",
+            "Catarig AM",
+            "Furberg JK",
+            "Janez A",
+            "Price HC",
+            "Tadayon S"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase III",
+            "Comparative Study",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/j.diabet.2019.101117",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31539622/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "liraglutide",
+      "found": true,
+      "products": [
+        {
+          "sponsor": "BIOCON PHARMA",
+          "application": "ANDA215245",
+          "products": [
+            {
+              "brand": "LIRAGLUTIDE",
+              "active": [
+                {
+                  "name": "LIRAGLUTIDE",
+                  "strength": "18MG/3ML (6MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            }
+          ]
+        },
+        {
+          "sponsor": "NOVO NORDISK INC",
+          "application": "NDA022341",
+          "products": [
+            {
+              "brand": "VICTOZA",
+              "active": [
+                {
+                  "name": "LIRAGLUTIDE",
+                  "strength": "18MG/3ML (6MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            }
+          ]
+        },
+        {
+          "sponsor": "BIOCON PHARMA",
+          "application": "ANDA217063",
+          "products": [
+            {
+              "brand": "LIRAGLUTIDE",
+              "active": [
+                {
+                  "name": "LIRAGLUTIDE",
+                  "strength": "18MG/3ML (6MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            }
+          ]
+        },
+        {
+          "sponsor": "TEVA PHARMS",
+          "application": "ANDA214568",
+          "products": [
+            {
+              "brand": "LIRAGLUTIDE",
+              "active": [
+                {
+                  "name": "LIRAGLUTIDE",
+                  "strength": "18MG/3ML (6MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            }
+          ]
+        },
+        {
+          "sponsor": "LUPIN",
+          "application": "ANDA215421",
+          "products": [
+            {
+              "brand": "LIRAGLUTIDE",
+              "active": [
+                {
+                  "name": "LIRAGLUTIDE",
+                  "strength": "18MG/3ML (6MG/ML)"
+                }
+              ],
+              "marketing": "Prescription",
+              "dosageForm": "SOLUTION",
+              "route": "SUBCUTANEOUS"
+            }
+          ]
+        }
+      ],
+      "message": null
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 16134956,
+      "cas": "204656-20-2",
+      "formula": "C172H265N43O51",
+      "iupac": "(2S)-5-[[(5S)-5-[[(2S)-2-[[(2S)-2-[[(2S)-5-amino-2-[[2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S,3R)-2-[[(2S)-2-[[(2S,3R)-2-[[2-[[(2S)-2-[[(2S)-2-[[(2S)-2-amino-3-(1H-imidazol-5-yl)propanoyl]amino]propanoyl]amino]-4-carboxybutanoyl]amino]acetyl]amino]-3-hydroxybutanoyl]amino]-3-phenylpropanoyl]amino]-3-hydroxybutanoyl]amino]-3-hydroxypropanoyl]amino]-3-carboxypropanoyl]amino]-3-methylbutanoyl]amino]-3-hydroxypropanoyl]amino]-3-hydroxypropanoyl]amino]-3-(4-hydroxyphenyl)propanoyl]amino]-4-methylpentanoyl]amino]-4-carboxybutanoyl]amino]acetyl]amino]-5-oxopentanoyl]amino]propanoyl]amino]propanoyl]amino]-6-[[(2S)-1-[[(2S)-1-[[(2S,3S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-5-carbamimidamido-1-[[2-[[(2S)-5-carbamimidamido-1-(carboxymethylamino)-1-oxopentan-2-yl]amino]-2-oxoethyl]amino]-1-oxopentan-2-yl]amino]-3-methyl-1-oxobutan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-3-(1H-indol-3-yl)-1-oxopropan-2-yl]amino]-1-oxopropan-2-yl]amino]-3-methyl-1-oxopentan-2-yl]amino]-1-oxo-3-phenylpropan-2-yl]amino]-4-carboxy-1-oxobutan-2-yl]amino]-6-oxohexyl]amino]-2-(hexadecanoylamino)-5-oxopentanoic acid"
+    }
+  }
+}

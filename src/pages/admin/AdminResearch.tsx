@@ -5,6 +5,7 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { ResearchOperationsPanel } from "@/components/admin/ResearchOperationsPanel";
 import { DualReadDebug } from "@/components/admin/DualReadDebug";
 import { useDualRead } from "@/hooks/useDualRead";
 import {
@@ -26,6 +27,8 @@ import { connectorHealthReport } from "@/research/connectors";
 import { RESEARCH_PIPELINE } from "@/research/engine";
 
 const QUEUE_TABS: Array<{ id: ReviewQueueKind | "mapping"; label: string }> = [
+  { id: "source", label: "Sources" },
+  { id: "study", label: "Studies" },
   { id: "evidence", label: "Evidence Review" },
   { id: "regulatory", label: "Regulatory Review" },
   { id: "claim", label: "Claims" },
@@ -66,7 +69,7 @@ export default function AdminResearchPage() {
       <PageHeader
         eyebrow="Research"
         title="Research Queue"
-        description="Postgres ist die Admin-Quelle. Community bleibt unavailable. Das öffentliche Lexikon bleibt dateibasiert."
+        description="Postgres ist die Admin-Quelle. Das öffentliche Lexikon liest Postgres; catalog.ts + published.json sind der exklusive Fallback. Run-History liegt nach 0031 in Postgres. Community bleibt getrennt und default review-required. Kein Cron, kein Auto-Approve."
       />
 
       {postgresFailed && !useLegacy ? (
@@ -86,6 +89,8 @@ export default function AdminResearchPage() {
         </p>
       ) : null}
 
+      <ResearchOperationsPanel />
+
       {dashboard ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label="Total Sources" value={dashboard.sources} />
@@ -94,19 +99,32 @@ export default function AdminResearchPage() {
           <Stat
             label="Review Required"
             value={
-              dashboard.claimsReviewRequired + dashboard.evidenceReviewRequired + dashboard.regulatoryReviewRequired
+              dashboard.claimsReviewRequired +
+              dashboard.evidenceReviewRequired +
+              dashboard.regulatoryReviewRequired +
+              dashboard.sourcesReviewRequired +
+              dashboard.studiesReviewRequired
             }
           />
           <Stat label="Approved" value={dashboard.claimsApproved} />
           <Stat label="Rejected" value={dashboard.claimsRejected} />
           <Stat label="Evidence Review" value={dashboard.evidenceReviewRequired} />
           <Stat label="Regulatory Review" value={dashboard.regulatoryReviewRequired} />
+          <Stat label="Source Review" value={dashboard.sourcesReviewRequired} />
+          <Stat label="Study Review" value={dashboard.studiesReviewRequired} />
           <Stat label="Community Updates" value={0} />
           <Stat label="Research Updates" value={dashboard.researchUpdates} />
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">Lade Research-Zähler aus Postgres…</p>
       )}
+
+      {dashboard?.migrationRequired ? (
+        <p className="rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 text-sm">
+          MIGRATION_REQUIRED: {dashboard.migrationRequired}. Batch-03-Kandidaten sind lokal sichtbar, nicht persistiert
+          und nicht öffentlich. Keine automatische Freigabe.
+        </p>
+      ) : null}
 
       {dualRead.data ? <DualReadDebug report={dualRead.data} /> : null}
 
@@ -350,6 +368,49 @@ function ReviewDetail({
         {detail.authority ? ` · ${detail.authority} ${detail.region}` : ""}
       </p>
       {detail.statement ? <p className="text-sm text-muted-foreground">{detail.statement}</p> : null}
+      {detail.url ? (
+        <p className="text-sm">
+          <a className="text-primary hover:underline" href={detail.url} target="_blank" rel="noreferrer">
+            {detail.url}
+          </a>
+        </p>
+      ) : null}
+      {detail.identifier || detail.sourceType || detail.connector || detail.publicationDate ? (
+        <p className="text-sm text-muted-foreground">
+          {[
+            detail.identifier,
+            detail.sourceType,
+            detail.publisher,
+            detail.publicationDate,
+            detail.connector,
+            detail.pmid ? `PMID ${detail.pmid}` : null,
+            detail.doi,
+            detail.nctId,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
+      ) : null}
+      {detail.kind === "study" || detail.intervention || detail.condition ? (
+        <p className="text-sm text-muted-foreground">
+          {[
+            detail.nctId,
+            detail.sponsor,
+            detail.intervention ? `Intervention: ${detail.intervention}` : null,
+            detail.condition ? `Condition: ${detail.condition}` : null,
+            detail.phase,
+            detail.studyStatus,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
+      ) : null}
+      {detail.persisted === false ? (
+        <p className="rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 text-sm">
+          Nicht persistiert. Approve/Reject sind deaktiviert, bis Migration 0030 angewendet und der Import geschrieben
+          ist.
+        </p>
+      ) : null}
       {detail.regulatoryStatus ? (
         <p className="text-sm text-muted-foreground">
           Regulatory status: {detail.regulatoryStatus}
@@ -412,7 +473,7 @@ function ReviewDetail({
             type="button"
             size="sm"
             variant={action === "reject" ? "destructive" : "outline"}
-            disabled={submit.isPending || reason.trim().length === 0}
+            disabled={submit.isPending || reason.trim().length === 0 || detail.persisted === false}
             onClick={() => void run(action)}
           >
             {action}

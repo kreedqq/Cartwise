@@ -87,6 +87,7 @@ export function normalizePostgresResearch(bundle: PostgresResearchBundle): Norma
       accessDate: row.access_date,
       legacyIds: [...row.legacy_ids],
       substanceSlugs: attachments.map((item) => slugById.get(item.substance_id) ?? item.substance_id),
+      reviewStatus: row.review_status ?? "approved",
     };
   });
 
@@ -105,6 +106,7 @@ export function normalizePostgresResearch(bundle: PostgresResearchBundle): Norma
     substanceSlugs: bundle.studySubstances
       .filter((item) => item.study_id === row.id)
       .map((item) => slugById.get(item.substance_id) ?? item.substance_id),
+    reviewStatus: row.review_status ?? "approved",
   }));
 
   const claims = bundle.claims.map((row) => {

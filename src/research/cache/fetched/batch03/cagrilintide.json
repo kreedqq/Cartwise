@@ -1,0 +1,655 @@
+{
+  "slug": "cagrilintide",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "cagrilintide"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "cagrilintide",
+      "totalCount": 44,
+      "studies": [
+        {
+          "nctId": "NCT06719011",
+          "title": "A Study on How NNC0174-1213 Works in People With Overweight or Obesity.",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 178,
+          "start": "2024-12-03",
+          "completion": "2026-07-20",
+          "lastUpdate": "2026-08-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06719011",
+          "intervention": "NNC0174-1213 A; Cagrilintide B; Placebo A (NNC0174 1213 A)",
+          "condition": "Obesity; Overweight"
+        },
+        {
+          "nctId": "NCT07605052",
+          "title": "A Research Study to Compare Blood Levels of Two Different Versions of Cagrilintide in Adults With Excess Body Weight",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 50,
+          "start": "2026-05-20",
+          "completion": "2026-09-03",
+          "lastUpdate": "2026-08-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07605052",
+          "intervention": "Cagrilintide B; Cagrilintide D",
+          "condition": "Overweight; Obesity"
+        },
+        {
+          "nctId": "NCT07220642",
+          "title": "Weight Loss in People Living With Overweight or Obesity Following Treatment With Cagrilintide",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 300,
+          "start": "2025-11-05",
+          "completion": "2027-06-29",
+          "lastUpdate": "2026-08-06",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07220642",
+          "intervention": "Cagrilintide; Placebo",
+          "condition": "Obesity; Overweight"
+        },
+        {
+          "nctId": "NCT07745504",
+          "title": "A Research Study to Compare Two Different Versions of Injectable Cagrilintide and Placebo in People With Excess Body Weight",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 285,
+          "start": "2026-08-04",
+          "completion": "2027-07-06",
+          "lastUpdate": "2026-08-04",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07745504",
+          "intervention": "Cagrilintide; Placebo cagrilintide; Placebo semaglutide",
+          "condition": "Overweight; Obesity"
+        },
+        {
+          "nctId": "NCT07220759",
+          "title": "Weight Loss in People Living With Overweight or Obesity and Type 2 Diabetes Following Treatment With Cagrilintide",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 330,
+          "start": "2025-11-05",
+          "completion": "2027-06-30",
+          "lastUpdate": "2026-08-03",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07220759",
+          "intervention": "Cagrilintide; Placebo (matched to Cagrilintide)",
+          "condition": "Overweight; Obesity; Type 2 Diabetes"
+        },
+        {
+          "nctId": "NCT07564414",
+          "title": "A Research Study to Look at How Two Different Doses of CagriSema and One Dose of Semaglutide Help People Living With Obesity With or Without Type 2 Diabetes Lose Weight",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 2500,
+          "start": "2026-05-21",
+          "completion": "2028-04-19",
+          "lastUpdate": "2026-07-30",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07564414",
+          "intervention": "Cagrisema; Semaglutide",
+          "condition": "Obesity; Type 2 Diabetes"
+        },
+        {
+          "nctId": "NCT07011667",
+          "title": "A Research Study to Look at How Well CagriSema Helps People Living With Obesity Lose Weight and Maintain Weight Loss in the Long-term",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 609,
+          "start": "2025-06-03",
+          "completion": "2028-10-17",
+          "lastUpdate": "2026-07-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07011667",
+          "intervention": "CagriSema (Cagrilintide B and Semaglutide I); Placebo matched to CagriSema (Cagrilintide B and Semaglutide I)",
+          "condition": "Obesity"
+        },
+        {
+          "nctId": "NCT07253285",
+          "title": "A Research Study on How Well Cagrilintide and CagriSema Work in Children and Adolescents With Excess Body Weight",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 460,
+          "start": "2026-01-08",
+          "completion": "2033-09-20",
+          "lastUpdate": "2026-07-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07253285",
+          "intervention": "Cagrilintide; Semaglutide; Placebo cagrilintide; Placebo semaglutide",
+          "condition": "Overweight; Obesity"
+        },
+        {
+          "nctId": "NCT05567796",
+          "title": "A Research Study to See How Well CagriSema Helps People With Excess Body Weight Lose Weight",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 3400,
+          "start": "2022-11-01",
+          "completion": "2026-10-19",
+          "lastUpdate": "2026-07-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05567796",
+          "intervention": "Cagrilintide; Semaglutide; Placebo cagrilintide; Placebo semaglutide",
+          "condition": "Obesity"
+        },
+        {
+          "nctId": "NCT06534411",
+          "title": "A Research Study to See How Much CagriSema Lowers Blood Sugar and Body Weight Compared to Tirzepatide in People With Type 2 Diabetes Treated With Metformin, SGLT2 Inhibitor or Both",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 1023,
+          "start": "2024-11-05",
+          "completion": "2026-07-09",
+          "lastUpdate": "2026-07-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06534411",
+          "intervention": "Cagrilintide; Semaglutide; Tirzepatide",
+          "condition": "Diabetes Mellitus, Type 2"
+        },
+        {
+          "nctId": "NCT05669755",
+          "title": "REDEFINE 3: A Research Study to See the Effects of CagriSema in People Living With Diseases in the Heart and Blood Vessels",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 7101,
+          "start": "2023-03-01",
+          "completion": "2027-10-13",
+          "lastUpdate": "2026-07-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05669755",
+          "intervention": "Cagrilintide; Semaglutide; Placebo",
+          "condition": "Cardiovascular Disease"
+        },
+        {
+          "nctId": "NCT07357740",
+          "title": "A Research Study to Compare Two Different Versions of Injectable CagriSema in People With Type 2 Diabetes",
+          "status": "WITHDRAWN",
+          "phase": "PHASE2",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 0,
+          "start": "2026-08-27",
+          "completion": "2027-10-13",
+          "lastUpdate": "2026-07-09",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07357740",
+          "intervention": "CagriSema; Placebo CagriSema",
+          "condition": "Diabetes Mellitus, Type 2"
+        },
+        {
+          "nctId": "NCT07357766",
+          "title": "A Research Study to Compare Different Versions of Injectable CagriSema and Placebo in People With Excess Body Weight",
+          "status": "WITHDRAWN",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 0,
+          "start": "2026-06-22",
+          "completion": "2028-01-17",
+          "lastUpdate": "2026-07-09",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07357766",
+          "intervention": "Cagrisema; Placebo CagriSema",
+          "condition": "Overweight; Obesity"
+        },
+        {
+          "nctId": "NCT06065540",
+          "title": "A Research Study to See How Well CagriSema Compared to Semaglutide, Cagrilintide and Placebo Lowers Blood Sugar and Body Weight in People With Type 2 Diabetes Treated With Metformin With or Without an SGLT2 Inhibitor",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 2734,
+          "start": "2023-09-27",
+          "completion": "2026-01-06",
+          "lastUpdate": "2026-07-08",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06065540",
+          "intervention": "Cagrilintide; Semaglutide; Placebo cagrilintide; Placebo semaglutide",
+          "condition": "Type 2 Diabetes Mellitus"
+        },
+        {
+          "nctId": "NCT07597018",
+          "title": "A Research Study to Compare Blood Levels of Cagrilintide After Multiple Doses of Different Versions of Cagrilintide in Adults With Overweight or Obesity",
+          "status": "RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 234,
+          "start": "2026-05-18",
+          "completion": "2027-06-01",
+          "lastUpdate": "2026-06-26",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07597018",
+          "intervention": "Cagrilintide D; Cagrilintide B and placebo semaglutide I",
+          "condition": "Obesity; Overweight"
+        },
+        {
+          "nctId": "NCT07607587",
+          "title": "Evaluation of the Tolerability of Cagrilintide in Participants Not Tolerating GLP-1-RA Therapies Due to Gastrointestinal Adverse Events",
+          "status": "RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 114,
+          "start": "2026-05-29",
+          "completion": "2027-11-19",
+          "lastUpdate": "2026-06-25",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07607587",
+          "intervention": "Cagrilintide; Placebo (matched to Cagrilintide)",
+          "condition": "Obesity; Overweight"
+        },
+        {
+          "nctId": "NCT07282613",
+          "title": "A Research Study to See How Much CagriSema Lowers Blood Sugar and Body Weight Compared to Placebo in Children and Adolescents With Type 2 Diabetes",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 80,
+          "start": "2026-08-04",
+          "completion": "2030-03-30",
+          "lastUpdate": "2026-05-28",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07282613",
+          "intervention": "CagriSema (Cagrilintide B and Semaglutide I); Placebo matched to CagriSema (Cagrilintide B and Semaglutide I)",
+          "condition": "Diabetes Mellitus, Type 2"
+        },
+        {
+          "nctId": "NCT06289504",
+          "title": "A Study on How CagriSema Affects Levels of Atorvastatin and Warfarin in the Blood of Participants With Excess Body Weight",
+          "status": "COMPLETED",
+          "phase": "PHASE1",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 34,
+          "start": "2024-02-27",
+          "completion": "2024-11-15",
+          "lastUpdate": "2026-05-19",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06289504",
+          "intervention": "Cagrilintide; Semaglutide; Atorvastatin; Warfarin",
+          "condition": "Obesity"
+        },
+        {
+          "nctId": "NCT07557953",
+          "title": "A Research Study Looking Into How Cagrilintide Influences Food Intake and Appetite in People With Overweight or Obesity",
+          "status": "RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 120,
+          "start": "2026-04-30",
+          "completion": "2027-04-13",
+          "lastUpdate": "2026-05-15",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07557953",
+          "intervention": "Cagrilintide; Placebo Cagrilintide",
+          "condition": "Overweight; Obesity"
+        },
+        {
+          "nctId": "NCT07527195",
+          "title": "Understanding the Effect of CagriSema, Cagrilintide, and Semaglutide on Muscle Health (Role of Amylin Signature in Muscle Health)",
+          "status": "RECRUITING",
+          "phase": "PHASE1",
+          "sponsor": "Novo Nordisk A/S",
+          "enrollment": 100,
+          "start": "2026-04-10",
+          "completion": "2028-06-09",
+          "lastUpdate": "2026-05-07",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07527195",
+          "intervention": "Cagrilintide; Semaglutide; Placebo cagrilintide; Placebo semaglutide",
+          "condition": "Obesity"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "cagrilintide AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 49,
+      "articles": [
+        {
+          "pmid": "38286487",
+          "title": "Comparative effectiveness of GLP-1 receptor agonists on glycaemic control, body weight, and lipid profile for type 2 diabetes: systematic review and network meta-analysis.",
+          "source": "BMJ",
+          "pubdate": "2024 Jan 29",
+          "authors": [
+            "Yao H",
+            "Zhang A",
+            "Li D",
+            "Wu Y",
+            "Wang CZ",
+            "Wan JY"
+          ],
+          "pubtype": [
+            "Systematic Review",
+            "Journal Article",
+            "Network Meta-Analysis"
+          ],
+          "doi": "10.1136/bmj-2023-076410",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38286487/"
+        },
+        {
+          "pmid": "40544433",
+          "title": "Coadministered Cagrilintide and Semaglutide in Adults with Overweight or Obesity.",
+          "source": "N Engl J Med",
+          "pubdate": "2025 Aug 14",
+          "authors": [
+            "Garvey WT",
+            "Blüher M",
+            "Osorto Contreras CK",
+            "Davies MJ",
+            "Winning Lehmann E",
+            "Pietiläinen KH"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Multicenter Study",
+            "Clinical Trial, Phase III"
+          ],
+          "doi": "10.1056/NEJMoa2502081",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40544433/"
+        },
+        {
+          "pmid": "40544432",
+          "title": "Cagrilintide-Semaglutide in Adults with Overweight or Obesity and Type 2 Diabetes.",
+          "source": "N Engl J Med",
+          "pubdate": "2025 Aug 14",
+          "authors": [
+            "Davies MJ",
+            "Bajaj HS",
+            "Broholm C",
+            "Eliasen A",
+            "Garvey WT",
+            "le Roux CW"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase III",
+            "Multicenter Study"
+          ],
+          "doi": "10.1056/NEJMoa2502082",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40544432/"
+        },
+        {
+          "pmid": "33894838",
+          "title": "Safety, tolerability, pharmacokinetics, and pharmacodynamics of concomitant administration of multiple doses of cagrilintide with semaglutide 2·4 mg for weight management: a randomised, controlled, phase 1b trial.",
+          "source": "Lancet",
+          "pubdate": "2021 May 8",
+          "authors": [
+            "Enebo LB",
+            "Berthelsen KK",
+            "Kankam M",
+            "Lund MT",
+            "Rubino DM",
+            "Satylganova A"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase I",
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/S0140-6736(21)00845-X",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33894838/"
+        },
+        {
+          "pmid": "39676787",
+          "title": "Efficacy and Safety of Cagrilintide Alone and in Combination with Semaglutide (Cagrisema) as Anti-Obesity Medications: A Systematic Review and Meta-Analysis.",
+          "source": "Indian J Endocrinol Metab",
+          "pubdate": "2024 Sep-Oct",
+          "authors": [
+            "Dutta D",
+            "Nagendra L",
+            "Harish BG",
+            "Sharma M",
+            "Joshi A",
+            "Hathur B"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.4103/ijem.ijem_45_24",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39676787/"
+        },
+        {
+          "pmid": "42419792",
+          "title": "Comparative effects of drugs for adults with overweight or obesity: systematic review and network meta-analysis.",
+          "source": "BMJ",
+          "pubdate": "2026 Jul 8",
+          "authors": [
+            "Nong K",
+            "Shi Q",
+            "Xie X",
+            "Wang Y",
+            "Agarwal A",
+            "Guyatt GH"
+          ],
+          "pubtype": [
+            "Systematic Review",
+            "Network Meta-Analysis",
+            "Journal Article",
+            "Comparative Study"
+          ],
+          "doi": "10.1136/bmj-2026-372161",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42419792/"
+        },
+        {
+          "pmid": "34798060",
+          "title": "Once-weekly cagrilintide for weight management in people with overweight and obesity: a multicentre, randomised, double-blind, placebo-controlled and active-controlled, dose-finding phase 2 trial.",
+          "source": "Lancet",
+          "pubdate": "2021 Dec 11",
+          "authors": [
+            "Lau DCW",
+            "Erichsen L",
+            "Francisco AM",
+            "Satylganova A",
+            "le Roux CW",
+            "McGowan B"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase II",
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1016/S0140-6736(21)01751-7",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34798060/"
+        },
+        {
+          "pmid": "42208956",
+          "title": "Beyond weight loss: multisystem benefits of obesity medications.",
+          "source": "Lancet Diabetes Endocrinol",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Savas M",
+            "Kuckuck S",
+            "Boon MR",
+            "van Rossum EFC"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1016/S2213-8587(26)00100-2",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42208956/"
+        },
+        {
+          "pmid": "37364590",
+          "title": "Efficacy and safety of co-administered once-weekly cagrilintide 2·4 mg with once-weekly semaglutide 2·4 mg in type 2 diabetes: a multicentre, randomised, double-blind, active-controlled, phase 2 trial.",
+          "source": "Lancet",
+          "pubdate": "2023 Aug 26",
+          "authors": [
+            "Frias JP",
+            "Deenadayalan S",
+            "Erichsen L",
+            "Knop FK",
+            "Lingvay I",
+            "Macura S"
+          ],
+          "pubtype": [
+            "Randomized Controlled Trial",
+            "Multicenter Study",
+            "Clinical Trial, Phase II",
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/S0140-6736(23)01163-7",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37364590/"
+        },
+        {
+          "pmid": "40865172",
+          "title": "Weight management treatment in obesity.",
+          "source": "Med Clin (Barc)",
+          "pubdate": "2025 Nov",
+          "authors": [
+            "Rubio-Herrera MA",
+            "Mera-Carreiro S"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1016/j.medcli.2025.107152",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40865172/"
+        },
+        {
+          "pmid": "34288673",
+          "title": "Development of Cagrilintide, a Long-Acting Amylin Analogue.",
+          "source": "J Med Chem",
+          "pubdate": "2021 Aug 12",
+          "authors": [
+            "Kruse T",
+            "Hansen JL",
+            "Dahl K",
+            "Schäffer L",
+            "Sensfuss U",
+            "Poulsen C"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1021/acs.jmedchem.1c00565",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34288673/"
+        },
+        {
+          "pmid": "42009015",
+          "title": "Efficacy and safety of co-administered cagrilintide and semaglutide versus semaglutide alone in adults with overweight or obesity with or without type 2 diabetes in Japan and Taiwan (REDEFINE 5): a multicentre, randomised, active-controlled, phase 3a trial.",
+          "source": "Lancet Diabetes Endocrinol",
+          "pubdate": "2026 Jun",
+          "authors": [
+            "Yamauchi T",
+            "Becker NP",
+            "Hagemann CA",
+            "Huang KC",
+            "Kiyosue A",
+            "Lim S"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Multicenter Study",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase III"
+          ],
+          "doi": "10.1016/S2213-8587(25)00402-4",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42009015/"
+        },
+        {
+          "pmid": "41109426",
+          "title": "Eloralintide (LY3841136), a novel amylin receptor agonist for the treatment of obesity: From discovery to clinical proof of concept.",
+          "source": "Mol Metab",
+          "pubdate": "2025 Dec",
+          "authors": [
+            "Briere DA",
+            "Qu H",
+            "Lansu K",
+            "He MM",
+            "Moyers JS",
+            "Coskun T"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Clinical Trial, Phase I",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1016/j.molmet.2025.102271",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41109426/"
+        },
+        {
+          "pmid": "40206909",
+          "title": "Comparative Effectiveness of Semaglutide, Liraglutide, Orlistat, and Phentermine for Weight Loss in Obese Individuals: A Systematic Review.",
+          "source": "Cureus",
+          "pubdate": "2025 Mar",
+          "authors": [
+            "Patel JP",
+            "Hardaswani D",
+            "Patel J",
+            "Saiyed F",
+            "Goswami RJ",
+            "Saiyed TI"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.7759/cureus.80321",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40206909/"
+        },
+        {
+          "pmid": "41328546",
+          "title": "CagriSema Reduces Blood Pressure in Adults With Overweight or Obesity: REDEFINE 1.",
+          "source": "Hypertension",
+          "pubdate": "2026 Feb",
+          "authors": [
+            "Verma S",
+            "Böttcher M",
+            "Brown P",
+            "Dicker D",
+            "Rubino D",
+            "Sbraccia P"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase III",
+            "Multicenter Study"
+          ],
+          "doi": "10.1161/HYPERTENSIONAHA.125.26055",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41328546/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "cagrilintide",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 171397054,
+      "cas": "1415456-99-3",
+      "formula": "C194H312N54O59S2",
+      "iupac": "20-[[(1S)-4-[[(2S)-6-amino-1-[[(4R,7S,10S,13S,16S,19R)-4-[[(2S)-1-[[(2S,3R)-1-[[(2S)-5-amino-1-[[(2S)-1-[[(2R)-1-[[(2R)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-4-amino-1-[[(2S)-4-amino-1-[[(2S)-1-[[2-[(2S)-2-[[(2S,3S)-1-[[(2R)-1-[(2R)-2-[(2R)-2-[[(2R,3S)-1-[[(2R)-4-amino-1-[[(2R)-1-[[2-[[(2R)-1-[[(2R)-4-amino-1-[[(2R,3S)-1-[(2R)-2-carbamoylpyrrolidin-1-yl]-3-hydroxy-1-oxobutan-2-yl]amino]-1,4-dioxobutan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-2-oxoethyl]amino]-3-methyl-1-oxobutan-2-yl]amino]-1,4-dioxobutan-2-yl]amino]-3-hydroxy-1-oxobutan-2-yl]carbamoyl]pyrrolidine-1-carbonyl]pyrrolidin-1-yl]-4-methyl-1-oxopentan-2-yl]amino]-3-methyl-1-oxopentan-2-yl]carbamoyl]pyrrolidin-1-yl]-2-oxoethyl]amino]-1-oxo-3-phenylpropan-2-yl]amino]-1,4-dioxobutan-2-yl]amino]-1,4-dioxobutan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-3-hydroxy-1-oxopropan-2-yl]amino]-3-(1H-imidazol-4-yl)-1-oxopropan-2-yl]amino]-5-carbamimidamido-1-oxopentan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-1-oxo-3-phenylpropan-2-yl]amino]-4-carboxy-1-oxobutan-2-yl]amino]-1-oxopropan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-5-carbamimidamido-1-oxopentan-2-yl]amino]-1,5-dioxopentan-2-yl]amino]-3-hydroxy-1-oxobutan-2-yl]amino]-1-oxopropan-2-yl]carbamoyl]-16-(2-amino-2-oxoethyl)-7,13-bis[(1R)-1-hydroxyethyl]-10-methyl-6,9,12,15,18-pentaoxo-1,2-dithia-5,8,11,14,17-pentazacycloicos-19-yl]amino]-1-oxohexan-2-yl]amino]-1-carboxy-4-oxobutyl]amino]-20-oxoicosanoic acid"
+    }
+  }
+}

@@ -1,0 +1,474 @@
+{
+  "slug": "selank",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "selank"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "selank",
+      "totalCount": 10,
+      "studies": [
+        {
+          "nctId": "NCT07196085",
+          "title": "Neural Mechanisms and Efficacy of Imagery Rescripting for Fear of Failure",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "University of Social Sciences and Humanities, Warsaw",
+          "enrollment": 81,
+          "start": "2022-06-01",
+          "completion": "2023-05-30",
+          "lastUpdate": "2025-10-02",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07196085",
+          "intervention": "Imagery Rescripting; Sham Neutral Imagery",
+          "condition": "Fear of Failure"
+        },
+        {
+          "nctId": "NCT05076045",
+          "title": "Effects of PSAPs on Speech Processing",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "Rotman Research Institute at Baycrest",
+          "enrollment": 32,
+          "start": "2022-03-01",
+          "completion": "2022-10-01",
+          "lastUpdate": "2024-12-05",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT05076045",
+          "intervention": "Personal sound amplification products",
+          "condition": "Hearing Loss, Age-Related"
+        },
+        {
+          "nctId": "NCT05411185",
+          "title": "The Study on Effects of Acute Exposure to High Altitude Hypoxia on Cognitive Function in Lowlanders",
+          "status": "COMPLETED",
+          "phase": null,
+          "sponsor": "Xijing Hospital",
+          "enrollment": 43,
+          "start": "2022-01-01",
+          "completion": "2023-12-31",
+          "lastUpdate": "2024-10-15",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05411185",
+          "intervention": null,
+          "condition": "Cognition"
+        },
+        {
+          "nctId": "NCT06151093",
+          "title": "The Effect of Balance Exercises on Cognitive Function",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "Istanbul Medipol University Hospital",
+          "enrollment": 30,
+          "start": "2023-09-08",
+          "completion": "2024-06-05",
+          "lastUpdate": "2024-06-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06151093",
+          "intervention": "Video-based games intervention; Balance exercises",
+          "condition": "EEG Brain Oscillations; Balance Exercises"
+        },
+        {
+          "nctId": "NCT05832060",
+          "title": "Comparing the Efficacy of tDCS and tRNS to Improve Reading Skills in Children and Adolescents With Dyslexia",
+          "status": "UNKNOWN",
+          "phase": "NA",
+          "sponsor": "Bambino Gesù Hospital and Research Institute",
+          "enrollment": 24,
+          "start": "2023-05-01",
+          "completion": "2025-03-01",
+          "lastUpdate": "2023-09-15",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT05832060",
+          "intervention": "Active tDCS; Active tRNS; Sham tRNS or tDCS",
+          "condition": "Developmental Dyslexia"
+        },
+        {
+          "nctId": "NCT00464269",
+          "title": "Double-blind, Randomized Study Evaluating the Efficacy and Safety of Brivaracetam in Adults With Partial Onset Seizures",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "UCB Pharma",
+          "enrollment": 400,
+          "start": "2007-09",
+          "completion": "2009-01",
+          "lastUpdate": "2022-07-21",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00464269",
+          "intervention": "Placebo; Brivaracetam 2.5 mg; Brivaracetam 10 mg; Brivaracetam 25 mg",
+          "condition": "Epilepsy"
+        },
+        {
+          "nctId": "NCT04989088",
+          "title": "Neurofeedback Training for Dyslexia",
+          "status": "UNKNOWN",
+          "phase": "NA",
+          "sponsor": "Catholic University of the Sacred Heart",
+          "enrollment": 40,
+          "start": "2021-10",
+          "completion": "2022-06",
+          "lastUpdate": "2021-08-04",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT04989088",
+          "intervention": "ProComp5 Infiniti System w/BioGraph Infiniti Software; ProComp5 Infiniti System w/recorded videos",
+          "condition": "Dyslexia; Reading Problem"
+        },
+        {
+          "nctId": "NCT00504881",
+          "title": "Brivaracetam as add-on Treatment in Adolescents and Adults Suffering From Epilepsy",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "UCB Pharma SA",
+          "enrollment": 480,
+          "start": "2007-10",
+          "completion": "2008-12",
+          "lastUpdate": "2018-04-03",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT00504881",
+          "intervention": "Placebo; Brivaracetam",
+          "condition": "Epilepsy"
+        },
+        {
+          "nctId": "NCT01747200",
+          "title": "Effects of Transcranial Magnetic Stimulation on Object Recognition",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "National Institute of Neurological Disorders and Stroke (NINDS)",
+          "enrollment": 13,
+          "start": "2012-11-16",
+          "completion": "2017-01-26",
+          "lastUpdate": "2017-07-02",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01747200",
+          "intervention": "Sham rTMS; Bilateral rTMS at same frequency and in phase; Bilateral rTMS at different frequencies; Bilateral rTMSat same frequency and out of phase; rTMS over TP8; rTMS over TP7",
+          "condition": "Repetitive TMS (rTMS); Sham rTMS; Bilateral rTMS; Unilateral rTMS"
+        },
+        {
+          "nctId": "NCT01770990",
+          "title": "Trial of Telephone-based Psychotherapy for Depression With and Without Adjunctive Supportive Mail",
+          "status": "COMPLETED",
+          "phase": "NA",
+          "sponsor": "Universitätsklinikum Hamburg-Eppendorf",
+          "enrollment": 59,
+          "start": "2012-09",
+          "completion": "2015-04",
+          "lastUpdate": "2015-07-14",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01770990",
+          "intervention": "Tel-PT including mail; Tel-PT without mail",
+          "condition": "Depression"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "selank AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 16,
+      "articles": [
+        {
+          "pmid": "41490200",
+          "title": "Therapeutic Peptides in Orthopaedics: Applications, Challenges, and Future Directions.",
+          "source": "J Am Acad Orthop Surg Glob Res Rev",
+          "pubdate": "2026 Jan 1",
+          "authors": [
+            "Rahman OF",
+            "Lee SJ",
+            "Seeds WA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.5435/JAAOSGlobal-D-25-00236",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41490200/"
+        },
+        {
+          "pmid": "26356395",
+          "title": "[Optimization of the treatment of anxiety disorders with selank].",
+          "source": "Zh Nevrol Psikhiatr Im S S Korsakova",
+          "pubdate": "2015",
+          "authors": [
+            "Medvedev VE",
+            "Tereshchenko ON",
+            "Kost NV",
+            "Ter-Israelyan AY",
+            "Gushanskaya EV",
+            "Chobanu IK"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.17116/jnevro20151156133-40",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26356395/"
+        },
+        {
+          "pmid": "29787664",
+          "title": "[COMPARISON OF PHARMACOLOGICAL EFFECTS OF HEPTAPEPTIDE SELANK AFTER INTRANASAL AND INTRAPERITONEAL ADMINISTRATION TO BALB/c AND C57BL/6 MICE.].",
+          "source": "Eksp Klin Farmakol",
+          "pubdate": "2016",
+          "authors": [
+            "Vasil'eva EV",
+            "Kondrakhin EA",
+            "Salimov RM",
+            "Kovalev GI"
+          ],
+          "pubtype": [
+            "Comparative Study",
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29787664/"
+        },
+        {
+          "pmid": "30496524",
+          "title": "Investigation of the prevalence and severity of foot pad dermatitis at the slaughterhouse in fattening turkeys reared in organic production systems in Germany.",
+          "source": "Poult Sci",
+          "pubdate": "2019 Apr 1",
+          "authors": [
+            "Freihold D",
+            "Bartels T",
+            "Bergmann S",
+            "Berk J",
+            "Deerberg F",
+            "Dressel A"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.3382/ps/pey473",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30496524/"
+        },
+        {
+          "pmid": "25176261",
+          "title": "[A comparison of the anxiolytic effect and tolerability of selank and phenazepam in the treatment of anxiety disorders].",
+          "source": "Zh Nevrol Psikhiatr Im S S Korsakova",
+          "pubdate": "2014",
+          "authors": [
+            "Medvedev VE",
+            "Tereshchenko ON",
+            "Israelian AIu",
+            "Chobanu IK",
+            "Kost NV",
+            "Sokolov OIu"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Comparative Study",
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25176261/"
+        },
+        {
+          "pmid": "24605419",
+          "title": "[Protective effect of selank on the model of mnestic function violation induced by pharmacological blockade of protein synthesis].",
+          "source": "Eksp Klin Farmakol",
+          "pubdate": "2013",
+          "authors": [
+            "Kozlovskiĭ II",
+            "Belozertsev FIu",
+            "Andreeva LA",
+            "Kozlovskaia MM"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24605419/"
+        },
+        {
+          "pmid": "18454096",
+          "title": "[Efficacy and possible mechanisms of action of a new peptide anxiolytic selank in the therapy of generalized anxiety disorders and neurasthenia].",
+          "source": "Zh Nevrol Psikhiatr Im S S Korsakova",
+          "pubdate": "2008",
+          "authors": [
+            "Zozulia AA",
+            "Neznamov GG",
+            "Siuniakov TS",
+            "Kost NV",
+            "Gabaeva MV",
+            "Sokolov OIu"
+          ],
+          "pubtype": [
+            "Comparative Study",
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18454096/"
+        },
+        {
+          "pmid": "40497027",
+          "title": "Effect of perioperative ONS combined with intestinal microecology in patients with colorectal cancer: a randomized clinical trial.",
+          "source": "Front Nutr",
+          "pubdate": "2025",
+          "authors": [
+            "Liu X",
+            "Mao W",
+            "Zhao G",
+            "Liao J",
+            "Li Q",
+            "He G"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.3389/fnut.2025.1588399",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40497027/"
+        },
+        {
+          "pmid": "18695718",
+          "title": "[A comparative analysis of distribution of glyprolines administered by various routes].",
+          "source": "Bioorg Khim",
+          "pubdate": "2008 Jul-Aug",
+          "authors": [
+            "Ashmarin IP",
+            "Baglikova KE",
+            "Edeeva SE",
+            "Zolotarev IuA",
+            "Kozik VS",
+            "Dadaian AK"
+          ],
+          "pubtype": [
+            "Comparative Study",
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1134/s1068162008040043",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18695718/"
+        },
+        {
+          "pmid": "15892402",
+          "title": "Anaesthesia and circulating blood volume.",
+          "source": "Eur J Anaesthesiol",
+          "pubdate": "2005 Apr",
+          "authors": [
+            "Sano Y",
+            "Sakamoto A",
+            "Oi Y",
+            "Ogawa R"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article"
+          ],
+          "doi": "10.1017/s0265021505000438",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15892402/"
+        },
+        {
+          "pmid": "16637290",
+          "title": "[Evenly tritium-labeled peptides and their in vivo and in vitro biodegradation].",
+          "source": "Bioorg Khim",
+          "pubdate": "2006 Mar-Apr",
+          "authors": [
+            "Zolotarev IuA",
+            "Dadaian AK",
+            "Dolotov OV",
+            "Kozik VS",
+            "Kost NV",
+            "Sokolov OIu"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16637290/"
+        },
+        {
+          "pmid": "41975048",
+          "title": "Using nutrient limitation experiments to inform nutrient management thresholds in wadeable streams.",
+          "source": "Environ Monit Assess",
+          "pubdate": "2026 Apr 13",
+          "authors": [
+            "Shupryt M",
+            "Chenevert J"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1007/s10661-026-15289-y",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41975048/"
+        },
+        {
+          "pmid": "22796912",
+          "title": "Low dosage lithium augmentation in venlafaxine resistant depression: an open-label study.",
+          "source": "Psychiatriki",
+          "pubdate": "2012 Apr-Jun",
+          "authors": [
+            "Alevizos B",
+            "Alevizos E",
+            "Leonardou A",
+            "Zervas I"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22796912/"
+        },
+        {
+          "pmid": "29683914",
+          "title": "Different Patterns in Muscular Strength and Hypertrophy Adaptations in Untrained Individuals Undergoing Nonperiodized and Periodized Strength Regimens.",
+          "source": "J Strength Cond Res",
+          "pubdate": "2018 May",
+          "authors": [
+            "De Souza EO",
+            "Tricoli V",
+            "Rauch J",
+            "Alvarez MR",
+            "Laurentino G",
+            "Aihara AY"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1519/JSC.0000000000002482",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29683914/"
+        },
+        {
+          "pmid": "41699470",
+          "title": "Short-term nitrogen addition mediates nutrient allocation and resorption trade-offs in Populus koreana: insights for vegetation restoration on volcanic lava platform.",
+          "source": "BMC Plant Biol",
+          "pubdate": "2026 Feb 16",
+          "authors": [
+            "Yin H",
+            "Xu M",
+            "Xie L",
+            "Yang F",
+            "Zhang C",
+            "Sha G"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1186/s12870-026-08386-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41699470/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "selank",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 11765600,
+      "cas": "129954-34-3",
+      "formula": "C33H57N11O9",
+      "iupac": "(2S)-1-[2-[[(2S)-1-[(2S)-2-[[(2S)-1-[(2S)-6-amino-2-[[(2S,3R)-2-amino-3-hydroxybutanoyl]amino]hexanoyl]pyrrolidine-2-carbonyl]amino]-5-(diaminomethylideneamino)pentanoyl]pyrrolidine-2-carbonyl]amino]acetyl]pyrrolidine-2-carboxylic acid"
+    }
+  }
+}

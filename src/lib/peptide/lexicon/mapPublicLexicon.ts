@@ -2,13 +2,7 @@ import { COMMUNITY_DISCLAIMER, getIdentitySubstance, NO_DATA, PEPTIDE_SUBSTANCES
 import { RESEARCH_ACCESS_DATE } from "@/lib/peptide/profiles";
 import type { CitedText, ProfileSource, ProfileStudy, SubstanceProfile } from "@/lib/peptide/profiles/types";
 import { resolvePublicCategory } from "@/lib/peptide/lexicon/categoryOverlay";
-import {
-  isHudsonSource,
-  publicClaims,
-  publicEvidence,
-  publicRegulatory,
-  publicStudies,
-} from "@/lib/peptide/lexicon/publicVisibility";
+import { isPublicCommunityReport, isPublicSource, publicClaims, publicEvidence, publicRegulatory, publicStudies } from "@/lib/peptide/lexicon/publicVisibility";
 import type { PublicLexiconBundle } from "@/lib/peptide/lexicon/types";
 import {
   CONFIDENCE_LEVELS,
@@ -72,7 +66,7 @@ function citeIdsForClaim(
   for (const link of bundle.claimSources) {
     if (link.claim_id !== claimId) continue;
     const source = sourceById.get(link.source_id);
-    if (!source || isHudsonSource(source)) continue;
+    if (!source || !isPublicSource(source)) continue;
     const legacy = bundle.sourceSubstances.find((row) => row.source_id === source.id)?.legacy_source_id;
     ids.push(legacy ?? source.legacy_ids[0] ?? source.id);
   }
@@ -278,30 +272,31 @@ export function mapPublicLexicon(bundle: PublicLexiconBundle): {
 
     const attachments = bundle.sourceSubstances.filter((item) => item.substance_id === row.id);
     const profileSources: ProfileSource[] = [];
+    const sourceReferences: ProfileSource[] = [];
     const seenSource = new Set<string>();
-    for (const attachment of attachments) {
-      const source = sourceById.get(attachment.source_id);
-      if (!source || isHudsonSource(source)) continue;
-      const id = attachment.legacy_source_id || source.legacy_ids[0] || source.id;
+    for (const id of sourceIdsUsed) {
+      const source = bundle.sources.find((item) => item.id === id || item.legacy_ids.includes(id));
+      if (!source || !isPublicSource(source)) continue;
       if (seenSource.has(id)) continue;
-      if (!sourceIdsUsed.has(id)) continue;
       seenSource.add(id);
       profileSources.push(toProfileSource(source, id));
     }
-    for (const id of sourceIdsUsed) {
+    for (const attachment of attachments) {
+      const source = sourceById.get(attachment.source_id);
+      if (!source || !isPublicSource(source)) continue;
+      const id = attachment.legacy_source_id || source.legacy_ids[0] || source.id;
       if (seenSource.has(id)) continue;
-      const source = bundle.sources.find(
-        (item) => item.id === id || item.legacy_ids.includes(id),
-      );
-      if (!source || isHudsonSource(source)) continue;
       seenSource.add(id);
-      profileSources.push(toProfileSource(source, id));
+      sourceReferences.push(toProfileSource(source, id));
     }
 
     const regions = [
       ...new Set(regulatory.filter((item) => item.substance_id === row.id).map((item) => item.region)),
     ];
 
+    const communityReports = (bundle.communityReports ?? []).filter(
+      (item) => item.substance_id === row.id && isPublicCommunityReport(item),
+    );
     const profile: SubstanceProfile = {
       slug: row.slug,
       publicationStatus: "published",
@@ -327,10 +322,20 @@ export function mapPublicLexicon(bundle: PublicLexiconBundle): {
       reconstitution,
       studies: profileStudies,
       sources: profileSources,
+      sourceReferences,
       conflicts,
       reviewItems: [],
       regulatoryRegions: regions,
-      community: { available: false, message: COMMUNITY_DISCLAIMER },
+      community: {
+        available: communityReports.length > 0,
+        message: COMMUNITY_DISCLAIMER,
+        reports: communityReports.map((item) => ({
+          id: item.id,
+          kind: item.kind,
+          title: item.title,
+          sourceUrl: item.source_url,
+        })),
+      },
       researchReport: {
         identity: row.name,
         fda: regions.includes("US") ? "US" : NO_DATA,

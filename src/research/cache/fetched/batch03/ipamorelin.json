@@ -1,0 +1,356 @@
+{
+  "slug": "ipamorelin",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "ipamorelin"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "ipamorelin",
+      "totalCount": 3,
+      "studies": [
+        {
+          "nctId": "NCT07717866",
+          "title": "Trifecta Research Study",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": null,
+          "sponsor": "Axial Therapeutic Research",
+          "enrollment": 52,
+          "start": "2022-08-01",
+          "completion": "2026-11",
+          "lastUpdate": "2026-07-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07717866",
+          "intervention": "Magnetic e-Resonance Therapy (MeRT); Ibogaine Hydrochloride with Magnesium Sulfate; 5-methoxy-N,N-dimethyltryptamine; Physiological Supplementation",
+          "condition": "PTSD - Post Traumatic Stress Disorder; Cognitive Dysfunction; Brain Injury; Depression - Major Depressive Disorder; Suicidal Ideation"
+        },
+        {
+          "nctId": "NCT00672074",
+          "title": "Safety and Efficacy of Ipamorelin for Management of Post-Operative Ileus",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Helsinn Therapeutics (U.S.), Inc",
+          "enrollment": 117,
+          "start": "2008-04",
+          "completion": "2009-12",
+          "lastUpdate": "2017-04-14",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT00672074",
+          "intervention": "Ipamorelin; placebo",
+          "condition": "Ileus"
+        },
+        {
+          "nctId": "NCT01280344",
+          "title": "Safety and Efficacy of Ipamorelin Compared to Placebo for the Recovery of Gastrointestinal Function",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Helsinn Therapeutics (U.S.), Inc",
+          "enrollment": 320,
+          "start": "2011-04",
+          "completion": "2014-05",
+          "lastUpdate": "2017-04-13",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT01280344",
+          "intervention": "Saline Solution for Injection; Ipamorelin",
+          "condition": "Gastrointestinal Dysmotility"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "ipamorelin AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 19,
+      "articles": [
+        {
+          "pmid": "9849822",
+          "title": "Ipamorelin, the first selective growth hormone secretagogue.",
+          "source": "Eur J Endocrinol",
+          "pubdate": "1998 Nov",
+          "authors": [
+            "Raun K",
+            "Hansen BS",
+            "Johansen NL",
+            "Thøgersen H",
+            "Madsen K",
+            "Ankersen M"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1530/eje.0.1390552",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9849822/"
+        },
+        {
+          "pmid": "41490200",
+          "title": "Therapeutic Peptides in Orthopaedics: Applications, Challenges, and Future Directions.",
+          "source": "J Am Acad Orthop Surg Glob Res Rev",
+          "pubdate": "2026 Jan 1",
+          "authors": [
+            "Rahman OF",
+            "Lee SJ",
+            "Seeds WA"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.5435/JAAOSGlobal-D-25-00236",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41490200/"
+        },
+        {
+          "pmid": "41476424",
+          "title": "Injectable Peptide Therapy: A Primer for Orthopaedic and Sports Medicine Physicians.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Jan",
+          "authors": [
+            "Mayfield CK",
+            "Bolia IK",
+            "Feingold CL",
+            "Lin EH",
+            "Liu JN",
+            "Rick Hatch GF"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1177/03635465251357593",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41476424/"
+        },
+        {
+          "pmid": "41966639",
+          "title": "Safety and Efficacy of Approved and Unapproved Peptide Therapies for Musculoskeletal Injuries and Athletic Performance.",
+          "source": "Sports Med",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Mendias CL",
+            "Awan TM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1007/s40279-026-02437-0",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41966639/"
+        },
+        {
+          "pmid": "42578445",
+          "title": "Peptide Supplements and Their Therapeutic Applications in Sports Medicine.",
+          "source": "Am J Sports Med",
+          "pubdate": "2026 Aug 11",
+          "authors": [
+            "Tewari K",
+            "Liu TP",
+            "Im C",
+            "Hamad C",
+            "Petrigliano F",
+            "Cheung EC"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1177/03635465261464420",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42578445/"
+        },
+        {
+          "pmid": "41880199",
+          "title": "A new era of doping? Use of peptide and peptide-analog drugs in recreational and professional sport and bodybuilding: a critical review.",
+          "source": "J Sports Med Phys Fitness",
+          "pubdate": "2026 Jul",
+          "authors": [
+            "Coutinho LFD",
+            "DE Oliveira Neves LF",
+            "Camilo RP"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.23736/S0022-4707.26.17773-1",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41880199/"
+        },
+        {
+          "pmid": "42123471",
+          "title": "Therapeutic Peptides in Aesthetic, Metabolic and Endocrine Conditions: Effects, Safety, Clinical Applications, and Future Perspectives.",
+          "source": "Int J Mol Sci",
+          "pubdate": "2026 Apr 27",
+          "authors": [
+            "Renke G",
+            "Chinellato L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3390/ijms27093890",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42123471/"
+        },
+        {
+          "pmid": "11459660",
+          "title": "Highly potent growth hormone secretagogues: hybrids of NN703 and ipamorelin.",
+          "source": "Bioorg Med Chem Lett",
+          "pubdate": "2001 Jul 23",
+          "authors": [
+            "Hansen TK",
+            "Ankersen M",
+            "Raun K",
+            "Hansen BS"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1016/s0960-894x(01)00345-6",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11459660/"
+        },
+        {
+          "pmid": "10496658",
+          "title": "Pharmacokinetic-pharmacodynamic modeling of ipamorelin, a growth hormone releasing peptide, in human volunteers.",
+          "source": "Pharm Res",
+          "pubdate": "1999 Sep",
+          "authors": [
+            "Gobburu JV",
+            "Agersø H",
+            "Jusko WJ",
+            "Ynddal L"
+          ],
+          "pubtype": [
+            "Clinical Trial",
+            "Journal Article",
+            "Randomized Controlled Trial"
+          ],
+          "doi": "10.1023/a:1018955126402",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/10496658/"
+        },
+        {
+          "pmid": "9879640",
+          "title": "Pharmacokinetic evaluation of ipamorelin and other peptidyl growth hormone secretagogues with emphasis on nasal absorption.",
+          "source": "Xenobiotica",
+          "pubdate": "1998 Nov",
+          "authors": [
+            "Johansen PB",
+            "Hansen KT",
+            "Andersen JV",
+            "Johansen NL"
+          ],
+          "pubtype": [
+            "Comparative Study",
+            "Journal Article"
+          ],
+          "doi": "10.1080/004982598238976",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9879640/"
+        },
+        {
+          "pmid": "25331030",
+          "title": "Prospective, randomized, controlled, proof-of-concept study of the Ghrelin mimetic ipamorelin for the management of postoperative ileus in bowel resection patients.",
+          "source": "Int J Colorectal Dis",
+          "pubdate": "2014 Dec",
+          "authors": [
+            "Beck DE",
+            "Sweeney WB",
+            "McCarter MD",
+            "Ipamorelin 201 Study Group"
+          ],
+          "pubtype": [
+            "Clinical Trial, Phase II",
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1007/s00384-014-2030-8",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25331030/"
+        },
+        {
+          "pmid": "15506422",
+          "title": "[Ghrelin-related drugs: clinical perspectives].",
+          "source": "Nihon Rinsho",
+          "pubdate": "2004 Sep",
+          "authors": [
+            "Shimatsu A"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": null,
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15506422/"
+        },
+        {
+          "pmid": "42021992",
+          "title": "Therapeutic peptides in gerontology: mechanisms and applications for healthy aging.",
+          "source": "Front Aging",
+          "pubdate": "2026",
+          "authors": [
+            "Mavrych V",
+            "Shypilova I",
+            "Bolgova O"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.3389/fragi.2026.1790247",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42021992/"
+        },
+        {
+          "pmid": "12204475",
+          "title": "The influence of conformational restriction in the C-terminus of growth hormone secretagogues on their potency.",
+          "source": "Eur J Med Chem",
+          "pubdate": "2002 Jun",
+          "authors": [
+            "Peschke B",
+            "Ankersen M",
+            "Bauer M",
+            "Hansen TK",
+            "Hansen BS",
+            "Nielsen KK"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1016/s0223-5234(02)01370-3",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/12204475/"
+        },
+        {
+          "pmid": "42160466",
+          "title": "Injectable Peptides in Sports Medicine: A Structured Narrative Review of Evidence, Safety, and Antidoping Implications.",
+          "source": "JBJS Rev",
+          "pubdate": "2026 May 1",
+          "authors": [
+            "Villegas Meza AD",
+            "Nocek M",
+            "Mitchell BC",
+            "Lizarraga M",
+            "DeFoor MT",
+            "Ruzbarsky JJ"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.2106/JBJS.RVW.26.00027",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42160466/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "ipamorelin",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 9831659,
+      "cas": "170851-70-4",
+      "formula": "C38H49N9O5",
+      "iupac": "(2S)-6-amino-2-[[(2R)-2-[[(2R)-2-[[(2S)-2-[(2-amino-2-methylpropanoyl)amino]-3-(1H-imidazol-5-yl)propanoyl]amino]-3-naphthalen-2-ylpropanoyl]amino]-3-phenylpropanoyl]amino]hexanamide"
+    }
+  }
+}

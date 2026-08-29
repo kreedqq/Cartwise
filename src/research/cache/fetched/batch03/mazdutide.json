@@ -1,0 +1,648 @@
+{
+  "slug": "mazdutide",
+  "accessDate": "2026-08-29",
+  "queries": [
+    "mazdutide",
+    "IBI362",
+    "LY3305677"
+  ],
+  "connectors": {
+    "clinicaltrials": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "mazdutide",
+      "totalCount": 40,
+      "studies": [
+        {
+          "nctId": "NCT07657676",
+          "title": "Effect of Mazdutide on Coronary Plaque in Patients With Coronary Atherosclerosis and Overweight or Obesity",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "China National Center for Cardiovascular Diseases",
+          "enrollment": 116,
+          "start": "2026-09-01",
+          "completion": "2027-12-31",
+          "lastUpdate": "2026-08-28",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07657676",
+          "intervention": "Mazdutide; Placebo",
+          "condition": "Obesity & Overweight; Coronary Heart Disease"
+        },
+        {
+          "nctId": "NCT07781150",
+          "title": "Mazdutide Plus LNG-IUS for Fertility-Sparing Treatment of AEH or Early Endometrial Cancer",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Tongji Hospital",
+          "enrollment": 128,
+          "start": "2026-11-01",
+          "completion": "2031-06-30",
+          "lastUpdate": "2026-08-24",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07781150",
+          "intervention": "Mazdutide(Dual GLP-1R/GCGR Agonist); Placebo; Levonorgestrel-releasing intrauterine system",
+          "condition": "Obesity; Overweight; Atypical Endometrial Hyperplasia; Endometrial Carcinoma Stage I; Endometrioid Endometrial Cancer"
+        },
+        {
+          "nctId": "NCT07775846",
+          "title": "QUARTET-DKD: Quadruple Therapy for Type 2 Diabetic Nephropathy",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Huijie Zhang",
+          "enrollment": 820,
+          "start": "2026-09-01",
+          "completion": "2029-06-30",
+          "lastUpdate": "2026-08-20",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07775846",
+          "intervention": "empagliflozin; Finerenone; Mazdutide; Finerenone Placebo; Mazdutide Placebo; Angiotensin Receptor Blocker (ARB)",
+          "condition": "Type 2 Diabetic Kidney Disease"
+        },
+        {
+          "nctId": "NCT07767552",
+          "title": "Mazdutide for Remission of Type 2 Diabetes: Multicentre, Double Blind, Randomised, Placebo Controlled Trial",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "NA",
+          "sponsor": "Yanbing Li",
+          "enrollment": 249,
+          "start": "2026-09-30",
+          "completion": "2029-06-30",
+          "lastUpdate": "2026-08-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07767552",
+          "intervention": "Mazdutide; Placebo",
+          "condition": "Diabetes Mellitus, Type 2"
+        },
+        {
+          "nctId": "NCT06143956",
+          "title": "A Master Protocol Study (LY900038) of Multiple Intervention-Specific-Appendices (ISAs) in Adult Participants With Obesity or Overweight",
+          "status": "RECRUITING",
+          "phase": "PHASE2",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 1481,
+          "start": "2023-11-17",
+          "completion": "2028-02",
+          "lastUpdate": "2026-08-06",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06143956",
+          "intervention": "LY3305677; LY3841136; Tirzepatide; LY3549492; LY3532226; Placebo",
+          "condition": "Obesity; Overweight"
+        },
+        {
+          "nctId": "NCT07718126",
+          "title": "Pre-hepatectomy Rehabilitation in Obese MASLD-Complicated Living Liver Donors With Mazdutide (PRIME)",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE2, PHASE3",
+          "sponsor": "West China Hospital",
+          "enrollment": 60,
+          "start": "2026-09-01",
+          "completion": "2028-08-31",
+          "lastUpdate": "2026-07-21",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07718126",
+          "intervention": "Mazdutide; Placebo (Normal Saline); Lifestyle Optimization",
+          "condition": "Metabolic Dysfunction-Associated Steatohepatitis; Hepatic Steatosis; Living Liver Donors"
+        },
+        {
+          "nctId": "NCT07713992",
+          "title": "Efficacy and Safety of Mazdutide in Patients With Type 2 Diabetes Mellitus and Moderate to Severe Nonalcoholic Fatty Liver Disease Previously Treated With Semaglutide",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "NA",
+          "sponsor": "Tianjin Medical University",
+          "enrollment": 72,
+          "start": "2026-09-15",
+          "completion": "2028-02-01",
+          "lastUpdate": "2026-07-20",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07713992",
+          "intervention": "Mazdutide(Dual GLP-1R/GCGR Agonist); Semaglutide (1 Mg Dose)",
+          "condition": "Type 2 Diabetes Mellitus (T2DM); Nonalcoholic Fatty Liver Disease (NAFLD) With History of Diabetes Melitus"
+        },
+        {
+          "nctId": "NCT06817356",
+          "title": "A Study to Evaluate Mazdutide Compared With Placebo in Participants With Alcohol Use Disorder",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 308,
+          "start": "2025-02-06",
+          "completion": "2026-05-19",
+          "lastUpdate": "2026-07-16",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06817356",
+          "intervention": "Mazdutide; Placebo",
+          "condition": "Alcohol Use Disorder"
+        },
+        {
+          "nctId": "NCT07654062",
+          "title": "Mazdutide for Adults With Prediabetes: A Randomized, Double-Blind, Placebo-Controlled Trial (DREAM-PRE)",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE4",
+          "sponsor": "Shandong Provincial Hospital",
+          "enrollment": 150,
+          "start": "2026-07",
+          "completion": "2029-07",
+          "lastUpdate": "2026-06-17",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07654062",
+          "intervention": "Mazdutide; Placebo; Standardized Lifestyle Intervention",
+          "condition": "Prediabetes; Impaired Fasting Glucose; Impaired Glucose Tolerance (Prediabetes)"
+        },
+        {
+          "nctId": "NCT06184568",
+          "title": "A Study Comparing IBI362 vs Semaglutide in Chinese Adults With Early Type 2 Diabetes and Obesity",
+          "status": "COMPLETED",
+          "phase": "PHASE3",
+          "sponsor": "Innovent Biologics (Suzhou) Co. Ltd.",
+          "enrollment": 349,
+          "start": "2024-02-29",
+          "completion": "2026-02-09",
+          "lastUpdate": "2026-06-11",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06184568",
+          "intervention": "IBI362; Semaglutide",
+          "condition": "Type 2 Diabetes; Obesity"
+        },
+        {
+          "nctId": "NCT07633639",
+          "title": "GLP-1 Therapy After Bariatric Surgery in Chinese Patients With Obesity",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "China-Japan Friendship Hospital",
+          "enrollment": 200,
+          "start": "2026-05-01",
+          "completion": "2028-05-01",
+          "lastUpdate": "2026-06-08",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07633639",
+          "intervention": "LSG-Semaglutide group; LSG-Mazdutide group; LSG-Tirzepatide group; LSG group",
+          "condition": "Obesity"
+        },
+        {
+          "nctId": "NCT07469800",
+          "title": "Efficacy and Safety of IBI362 in Hypertensive Patients With Overweight/Obesity",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Innovent Biologics (Suzhou) Co. Ltd.",
+          "enrollment": 336,
+          "start": "2026-04-23",
+          "completion": "2027-04-15",
+          "lastUpdate": "2026-05-27",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07469800",
+          "intervention": "IBI362; Placebo",
+          "condition": "Overweight; Obesity; Hypertensive"
+        },
+        {
+          "nctId": "NCT06884293",
+          "title": "A Study Comparing IBI362 vs Semaglutide in Chinese Overweight or Obese Adults With Metabolic Dysfunction-associated Fatty Liver Disease （MAFLD）",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Innovent Biologics (Suzhou) Co. Ltd.",
+          "enrollment": 479,
+          "start": "2025-05-09",
+          "completion": "2027-06-30",
+          "lastUpdate": "2026-05-12",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT06884293",
+          "intervention": "IBI362; semaglutide",
+          "condition": "Overweight; Metabolic Dysfunction-associated Fatty Liver Disease (MAFLD)"
+        },
+        {
+          "nctId": "NCT06124807",
+          "title": "A Study of LY3305677 Compared With Placebo in Adult Participants With Obesity or Overweight",
+          "status": "COMPLETED",
+          "phase": "PHASE2",
+          "sponsor": "Eli Lilly and Company",
+          "enrollment": 179,
+          "start": "2023-11-17",
+          "completion": "2025-07-09",
+          "lastUpdate": "2026-04-21",
+          "hasResults": true,
+          "url": "https://clinicaltrials.gov/study/NCT06124807",
+          "intervention": "Mazdutide; Placebo",
+          "condition": "Obesity; Overweight and Obesity"
+        },
+        {
+          "nctId": "NCT07525037",
+          "title": "Chinese, Overweight or Obesity, Real-World Registry Study",
+          "status": "NOT_YET_RECRUITING",
+          "phase": null,
+          "sponsor": "Chinese PLA General Hospital",
+          "enrollment": 10000,
+          "start": "2026-05-30",
+          "completion": "2027-12",
+          "lastUpdate": "2026-04-13",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07525037",
+          "intervention": null,
+          "condition": "Obesity Type 2 Diabetes Mellitus"
+        },
+        {
+          "nctId": "NCT07517042",
+          "title": "ASCEND-1: Lifestyle Intervention Plus Mazdutide for Weight Management",
+          "status": "RECRUITING",
+          "phase": "NA",
+          "sponsor": "Shanghai Zhongshan Hospital",
+          "enrollment": 420,
+          "start": "2026-04",
+          "completion": "2028-12",
+          "lastUpdate": "2026-04-08",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07517042",
+          "intervention": "Mazdutide; Intensive Lifestyle Intervention",
+          "condition": "Obesity; Weight Control"
+        },
+        {
+          "nctId": "NCT07083154",
+          "title": "GLP-1/GCG Dual Agonist in Type 2 Diabetes With Early Dementia (LIGHT-COG Study)",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "The Affiliated Nanjing Drum Tower Hospital of Nanjing University Medical School",
+          "enrollment": 420,
+          "start": "2025-09-27",
+          "completion": "2029-08-01",
+          "lastUpdate": "2026-03-05",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07083154",
+          "intervention": "Mazdutide; Placebo",
+          "condition": "Dementia, Mild; Mild Cognitive Impairment; Type 2 Diabetes"
+        },
+        {
+          "nctId": "NCT07417306",
+          "title": "A Study of HDM1005 in Participants With T2DM Not Controlled With Metformin Alone or in Combination With a Sodium-Glucose Cotransporter 2 (SGLT2) Inhibitor",
+          "status": "NOT_YET_RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Hangzhou Zhongmei Huadong Pharmaceutical Co., Ltd.",
+          "enrollment": 912,
+          "start": "2026-03-27",
+          "completion": "2027-12-31",
+          "lastUpdate": "2026-02-18",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07417306",
+          "intervention": "HDM1005 1; HDM1005 2; Mazdutide",
+          "condition": "Type 2 Diabetes"
+        },
+        {
+          "nctId": "NCT07255209",
+          "title": "A Study of IBI362 in Chinese Adolescents With Obesity or Overweight",
+          "status": "RECRUITING",
+          "phase": "PHASE3",
+          "sponsor": "Innovent Biologics (Suzhou) Co. Ltd.",
+          "enrollment": 180,
+          "start": "2025-12-29",
+          "completion": "2028-10-31",
+          "lastUpdate": "2026-01-08",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07255209",
+          "intervention": "Placebo; IBI362",
+          "condition": "Adolescents With Obesity or Overweight With Weight-Related Comorbidities"
+        },
+        {
+          "nctId": "NCT07000955",
+          "title": "Tolerance and Pharmacokinetic/Pharmacokinetic Study of IBI362 15mg in Patients With Moderate to Severe Obesity",
+          "status": "ACTIVE_NOT_RECRUITING",
+          "phase": "PHASE1, PHASE2",
+          "sponsor": "Innovent Biologics (Suzhou) Co. Ltd.",
+          "enrollment": 98,
+          "start": "2025-06-17",
+          "completion": "2027-05-14",
+          "lastUpdate": "2025-12-15",
+          "hasResults": false,
+          "url": "https://clinicaltrials.gov/study/NCT07000955",
+          "intervention": "Tirzepatide; Placebo; IBI362",
+          "condition": "Obesity"
+        }
+      ]
+    },
+    "pubmed": {
+      "status": "checked",
+      "httpStatus": 200,
+      "query": "mazdutide AND (clinical trial OR randomized OR safety OR pharmacokinetics OR systematic review)",
+      "count": 34,
+      "articles": [
+        {
+          "pmid": "39952695",
+          "title": "Emerging pharmacotherapies for obesity: A systematic review.",
+          "source": "Pharmacol Rev",
+          "pubdate": "2025 Jan",
+          "authors": [
+            "Kokkorakis M",
+            "Chakhtoura M",
+            "Rhayem C",
+            "Al Rifai J",
+            "Ghezzawi M",
+            "Valenzuela-Vallejo L"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review"
+          ],
+          "doi": "10.1124/pharmrev.123.001045",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39952695/"
+        },
+        {
+          "pmid": "40421736",
+          "title": "Once-Weekly Mazdutide in Chinese Adults with Obesity or Overweight.",
+          "source": "N Engl J Med",
+          "pubdate": "2025 Jun 12",
+          "authors": [
+            "Ji L",
+            "Jiang H",
+            "Bi Y",
+            "Li H",
+            "Tian J",
+            "Liu D"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase III",
+            "Multicenter Study"
+          ],
+          "doi": "10.1056/NEJMoa2411528",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40421736/"
+        },
+        {
+          "pmid": "39305981",
+          "title": "Seven glucagon-like peptide-1 receptor agonists and polyagonists for weight loss in patients with obesity or overweight: an updated systematic review and network meta-analysis of randomized controlled trials.",
+          "source": "Metabolism",
+          "pubdate": "2024 Dec",
+          "authors": [
+            "Xie Z",
+            "Zheng G",
+            "Liang Z",
+            "Li M",
+            "Deng W",
+            "Cao W"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Systematic Review",
+            "Network Meta-Analysis",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1016/j.metabol.2024.156038",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39305981/"
+        },
+        {
+          "pmid": "37943529",
+          "title": "Efficacy and Safety of Mazdutide in Chinese Patients With Type 2 Diabetes: A Randomized, Double-Blind, Placebo-Controlled Phase 2 Trial.",
+          "source": "Diabetes Care",
+          "pubdate": "2024 Jan 1",
+          "authors": [
+            "Zhang B",
+            "Cheng Z",
+            "Chen J",
+            "Zhang X",
+            "Liu D",
+            "Jiang H"
+          ],
+          "pubtype": [
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase II",
+            "Journal Article",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.2337/dc23-1287",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37943529/"
+        },
+        {
+          "pmid": "42419792",
+          "title": "Comparative effects of drugs for adults with overweight or obesity: systematic review and network meta-analysis.",
+          "source": "BMJ",
+          "pubdate": "2026 Jul 8",
+          "authors": [
+            "Nong K",
+            "Shi Q",
+            "Xie X",
+            "Wang Y",
+            "Agarwal A",
+            "Guyatt GH"
+          ],
+          "pubtype": [
+            "Systematic Review",
+            "Network Meta-Analysis",
+            "Journal Article",
+            "Comparative Study"
+          ],
+          "doi": "10.1136/bmj-2026-372161",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42419792/"
+        },
+        {
+          "pmid": "42208956",
+          "title": "Beyond weight loss: multisystem benefits of obesity medications.",
+          "source": "Lancet Diabetes Endocrinol",
+          "pubdate": "2026 Aug",
+          "authors": [
+            "Savas M",
+            "Kuckuck S",
+            "Boon MR",
+            "van Rossum EFC"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1016/S2213-8587(26)00100-2",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42208956/"
+        },
+        {
+          "pmid": "36247927",
+          "title": "Safety and efficacy of a GLP-1 and glucagon receptor dual agonist mazdutide (IBI362) 9 mg and 10 mg in Chinese adults with overweight or obesity: A randomised, placebo-controlled, multiple-ascending-dose phase 1b trial.",
+          "source": "EClinicalMedicine",
+          "pubdate": "2022 Dec",
+          "authors": [
+            "Ji L",
+            "Gao L",
+            "Jiang H",
+            "Yang J",
+            "Yu L",
+            "Wen J"
+          ],
+          "pubtype": [
+            "Journal Article"
+          ],
+          "doi": "10.1016/j.eclinm.2022.101691",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36247927/"
+        },
+        {
+          "pmid": "41407860",
+          "title": "Mazdutide versus dulaglutide in Chinese adults with type 2 diabetes.",
+          "source": "Nature",
+          "pubdate": "2026 Apr",
+          "authors": [
+            "Guo L",
+            "Zhang B",
+            "Xue X",
+            "Zhang X",
+            "Cai H",
+            "Jiang H"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase III",
+            "Comparative Study",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1038/s41586-025-10031-z",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41407860/"
+        },
+        {
+          "pmid": "38092790",
+          "title": "A phase 2 randomised controlled trial of mazdutide in Chinese overweight adults or adults with obesity.",
+          "source": "Nat Commun",
+          "pubdate": "2023 Dec 14",
+          "authors": [
+            "Ji L",
+            "Jiang H",
+            "Cheng Z",
+            "Qiu W",
+            "Liao L",
+            "Zhang Y"
+          ],
+          "pubtype": [
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase II",
+            "Journal Article"
+          ],
+          "doi": "10.1038/s41467-023-44067-4",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38092790/"
+        },
+        {
+          "pmid": "41407859",
+          "title": "Mazdutide versus placebo in Chinese adults with type 2 diabetes.",
+          "source": "Nature",
+          "pubdate": "2026 Apr",
+          "authors": [
+            "Zhu D",
+            "Zhao J",
+            "Cai H",
+            "Chu X",
+            "Xiu S",
+            "Song C"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase III",
+            "Research Support, Non-U.S. Gov't"
+          ],
+          "doi": "10.1038/s41586-025-10026-w",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41407859/"
+        },
+        {
+          "pmid": "39292847",
+          "title": "Mazdutide Versus Dulaglutide for Weight Loss and Diabetes Management: Meta-Analysis of Randomized Clinical Trials.",
+          "source": "Am J Ther",
+          "pubdate": "2024 Sep-Oct 01",
+          "authors": [
+            "Ayesh H",
+            "Ayesh S",
+            "Niswender K"
+          ],
+          "pubtype": [
+            "Comparative Study",
+            "Letter",
+            "Meta-Analysis"
+          ],
+          "doi": "10.1097/MJT.0000000000001756",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39292847/"
+        },
+        {
+          "pmid": "38440786",
+          "title": "Efficacy and safety of Mazdutide on weight loss among diabetic and non-diabetic patients: a systematic review and meta-analysis of randomized controlled trials.",
+          "source": "Front Endocrinol (Lausanne)",
+          "pubdate": "2024",
+          "authors": [
+            "Nalisa DL",
+            "Cuboia N",
+            "Dyab E",
+            "Jackson IL",
+            "Felix HJ",
+            "Shoki P"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Meta-Analysis",
+            "Research Support, Non-U.S. Gov't",
+            "Systematic Review"
+          ],
+          "doi": "10.3389/fendo.2024.1309118",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38440786/"
+        },
+        {
+          "pmid": "41025406",
+          "title": "Shared mechanistic pathways of glucagon signalling: Unlocking its potential for treating obesity, metabolic dysfunction-associated steatotic liver disease, and other cardio-kidney-metabolic conditions.",
+          "source": "Diabetes Obes Metab",
+          "pubdate": "2025 Dec",
+          "authors": [
+            "Neff GW"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1111/dom.70148",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41025406/"
+        },
+        {
+          "pmid": "40081498",
+          "title": "Multifunctional incretin peptides in therapies for type 2 diabetes, obesity and associated co-morbidities.",
+          "source": "Peptides",
+          "pubdate": "2025 May",
+          "authors": [
+            "Bailey CJ",
+            "Flatt PR",
+            "Conlon JM"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Review"
+          ],
+          "doi": "10.1016/j.peptides.2025.171380",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40081498/"
+        },
+        {
+          "pmid": "40832785",
+          "title": "Mazdutide reduces body weight in adults with overweight or obesity: A high-dose Phase 1 trial.",
+          "source": "Diabetes Obes Metab",
+          "pubdate": "2025 Nov",
+          "authors": [
+            "Bhattachar SN",
+            "Tham LS",
+            "Li Y",
+            "Chua L",
+            "Ng SX",
+            "Tang Y"
+          ],
+          "pubtype": [
+            "Journal Article",
+            "Randomized Controlled Trial",
+            "Clinical Trial, Phase I"
+          ],
+          "doi": "10.1111/dom.70040",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40832785/"
+        }
+      ]
+    },
+    "fda": {
+      "status": "checked",
+      "httpStatus": 404,
+      "query": "mazdutide",
+      "found": false,
+      "products": [],
+      "message": "No matches found!"
+    },
+    "pubchem": {
+      "status": 200,
+      "httpStatus": 200,
+      "ok": true,
+      "cid": 167312357,
+      "cas": "2259884-03-0",
+      "formula": "C207H317N45O65",
+      "iupac": "20-[[(1S)-4-[2-[2-[2-[2-[2-[2-[[(5S)-5-[[(2S)-2-[[(2S)-6-amino-2-[[(2S)-6-amino-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-6-amino-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S)-2-[[(2S,3R)-2-[[(2S)-2-[[(2S,3R)-2-[[2-[[(2S)-5-amino-2-[[2-[[(2S)-2-amino-3-(1H-imidazol-4-yl)propanoyl]amino]-2-methylpropanoyl]amino]-5-oxopentanoyl]amino]acetyl]amino]-3-hydroxybutanoyl]amino]-3-phenylpropanoyl]amino]-3-hydroxybutanoyl]amino]-3-hydroxypropanoyl]amino]-3-carboxypropanoyl]amino]-3-(4-hydroxyphenyl)propanoyl]amino]-3-hydroxypropanoyl]amino]hexanoyl]amino]-3-(4-hydroxyphenyl)propanoyl]amino]-4-methylpentanoyl]amino]-3-carboxypropanoyl]amino]-4-carboxybutanoyl]amino]hexanoyl]amino]hexanoyl]amino]propanoyl]amino]-6-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[(2S)-1-[[2-[[2-[(2S)-2-[[(2S)-1-[(2-amino-2-oxoethyl)amino]-3-hydroxy-1-oxopropan-2-yl]carbamoyl]pyrrolidin-1-yl]-2-oxoethyl]amino]-2-oxoethyl]amino]-4-carboxy-1-oxobutan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-4-methyl-1-oxopentan-2-yl]amino]-3-(1H-indol-3-yl)-1-oxopropan-2-yl]amino]-4-carboxy-1-oxobutan-2-yl]amino]-3-methyl-1-oxobutan-2-yl]amino]-1-oxo-3-phenylpropan-2-yl]amino]-4-carboxy-1-oxobutan-2-yl]amino]-6-oxohexyl]amino]-2-oxoethoxy]ethoxy]ethylamino]-2-oxoethoxy]ethoxy]ethylamino]-1-carboxy-4-oxobutyl]amino]-20-oxoicosanoic acid"
+    }
+  }
+}
