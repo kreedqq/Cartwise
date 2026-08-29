@@ -4,6 +4,7 @@ import { BookOpen, ClipboardList, LayoutGrid, ShieldCheck, ShoppingBag, UserCirc
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthProvider";
 import { BrandMark } from "@/components/layout/BrandMark";
+import { useNavShell } from "@/context/NavShellProvider";
 
 const navItems = [
   { to: "/dashboard", label: "Übersicht", icon: LayoutGrid },
@@ -15,9 +16,15 @@ const navItems = [
 
 export function Sidebar() {
   const { isAdmin } = useAuth();
+  const { sidebarCollapsed } = useNavShell();
 
   return (
-    <aside className="hidden w-[15.5rem] shrink-0 bg-sidebar text-sidebar-foreground lg:flex lg:flex-col">
+    <aside
+      className={cn(
+        "hidden shrink-0 bg-sidebar text-sidebar-foreground transition-[width] duration-200 lg:flex lg:flex-col",
+        sidebarCollapsed ? "w-0 overflow-hidden opacity-0" : "w-[15.5rem] opacity-100",
+      )}
+    >
       <div className="flex h-16 items-center px-5">
         <BrandMark inverted />
       </div>

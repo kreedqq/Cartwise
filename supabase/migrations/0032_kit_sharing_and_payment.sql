@@ -728,8 +728,9 @@ begin
   _catalog_vial := _product.price_usd / _kit.kit_size_vials;
   _unit := public.apply_role_markup(_catalog_vial, _markup);
 
-  select exchange_rate into _rate
+  select rate into _rate
   from public.exchange_rates
+  where base_currency = 'USD' and quote_currency = 'EUR'
   order by fetched_at desc nulls last
   limit 1;
 

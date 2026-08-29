@@ -33,11 +33,14 @@ interface ShopProductsMobileListProps {
 
 export function ShopProductsMobileList({ products, rate, favoriteProductIds }: ShopProductsMobileListProps) {
   const groups = groupAndSortShopProducts(products);
-  const [kitProduct, setKitProduct] = React.useState<Tables<"products"> | null>(null);
+  const [kitShareContext, setKitShareContext] = React.useState<{
+    group: ShopProductGroup;
+    initialProductId: string;
+  } | null>(null);
   const membersQuery = useQuery({
     queryKey: ["kit-share-members"],
     queryFn: listKitShareMembers,
-    enabled: kitProduct != null,
+    enabled: kitShareContext != null,
     staleTime: 60_000,
   });
 
@@ -50,18 +53,20 @@ export function ShopProductsMobileList({ products, rate, favoriteProductIds }: S
             group={group}
             rate={rate}
             favoriteProductIds={favoriteProductIds}
-            onKitShare={(product) => setKitProduct(product)}
+            onKitShare={({ group, initialProductId }) => setKitShareContext({ group, initialProductId })}
           />
         ))}
       </div>
-      {kitProduct && (
+      {kitShareContext && (
         <KitShareDialog
-          product={kitProduct}
+          key={`${kitShareContext.group.familySlug}-${kitShareContext.initialProductId}`}
+          group={kitShareContext.group}
+          initialProductId={kitShareContext.initialProductId}
           members={membersQuery.data ?? []}
           membersLoading={membersQuery.isLoading}
-          open={kitProduct != null}
+          open={kitShareContext != null}
           onOpenChange={(open) => {
-            if (!open) setKitProduct(null);
+            if (!open) setKitShareContext(null);
           }}
         />
       )}
@@ -78,7 +83,7 @@ function ShopProductGroupCard({
   group: ShopProductGroup;
   rate: number | null;
   favoriteProductIds: Set<string>;
-  onKitShare: (product: Tables<"products">) => void;
+  onKitShare: (context: { group: ShopProductGroup; initialProductId: string }) => void;
 }) {
   const row = useShopProductGroupRow(group, rate, favoriteProductIds);
   const product = row.product;
@@ -136,7 +141,11 @@ function ShopProductGroupCard({
               </Select>
             )}
             <div className="mt-2">
-              <KitShareButton product={product} onClick={() => onKitShare(product)} />
+              <KitShareButton
+                group={group}
+                selectedProductId={row.selectedProductId}
+                onClick={() => onKitShare({ group, initialProductId: row.selectedProductId })}
+              />
             </div>
           </div>
         </div>

@@ -20,6 +20,7 @@ import { pickActiveOpenCart } from "@/services/carts";
 import { clearUserScopedQueries } from "@/lib/userSessionCache";
 import { toast } from "@/components/ui/toaster";
 import { BrandMark } from "@/components/layout/BrandMark";
+import { useNavShell } from "@/context/NavShellProvider";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function Topbar() {
@@ -28,6 +29,7 @@ export function Topbar() {
   const online = useOnlineStatus();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { sidebarCollapsed } = useNavShell();
   const cartsQuery = useCarts();
   const summariesQuery = useCartSummaries();
 
@@ -54,7 +56,11 @@ export function Topbar() {
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border/80 bg-background/90 px-4 backdrop-blur-md sm:px-6">
-      <div className="lg:hidden">
+      <div className="min-w-0 lg:hidden">
+        <BrandMark />
+      </div>
+
+      <div className={sidebarCollapsed ? "hidden min-w-0 lg:block" : "hidden"}>
         <BrandMark />
       </div>
 

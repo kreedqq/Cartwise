@@ -122,6 +122,11 @@ export function isKitShareableProduct(product: { code: string }): boolean {
   return kitSize != null && kitSize >= 2;
 }
 
+/** Products in a shop group that support kit sharing (explicit kit size in coverage data). */
+export function kitShareableVariants<T extends { code: string }>(variants: readonly T[]): T[] {
+  return variants.filter(isKitShareableProduct);
+}
+
 /** Dropdown label: vial strength only, never kit count or product codes. */
 export function variantStrengthLabel(
   product: { code: string; dosage_vial?: string | null; name: string },

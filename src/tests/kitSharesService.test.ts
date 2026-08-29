@@ -71,11 +71,37 @@ describe("kitShares service", () => {
     expect(view.myQuantity).toBe(4);
   });
 
-  it("adds kit share to cart via RPC", async () => {
+  it("adds kit share to cart via RPC with only kit share id", async () => {
     rpc.mockResolvedValue({ data: "cart-item-1", error: null });
     const cartItemId = await addKitShareToCart("kit-1");
     expect(rpc).toHaveBeenCalledWith("add_kit_share_to_cart", { _kit_share_id: "kit-1" });
     expect(cartItemId).toBe("cart-item-1");
+  });
+
+  it("surfaces add_kit_share_to_cart SQL column errors from production regression", async () => {
+    rpc.mockResolvedValue({
+      data: null,
+      error: {
+        code: "42703",
+        message: 'column "exchange_rate" does not exist',
+        details: null,
+        hint: null,
+      },
+    });
+    await expect(addKitShareToCart("kit-1")).rejects.toMatchObject({
+      code: "42703",
+      message: expect.stringContaining("exchange_rate"),
+    });
+  });
+
+  it("add to cart uses participant quantity not full kit size", async () => {
+    rpc.mockResolvedValue({ data: "cart-item-1", error: null });
+    await addKitShareToCart("kit-1");
+    const payload = rpc.mock.calls[0]?.[1] as Record<string, unknown>;
+    expect(payload).toEqual({ _kit_share_id: "kit-1" });
+    expect(payload).not.toHaveProperty("quantity");
+    expect(payload).not.toHaveProperty("product_id");
+    expect(payload).not.toHaveProperty("price");
   });
 });
 

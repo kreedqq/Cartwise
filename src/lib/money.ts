@@ -179,6 +179,13 @@ export interface OrderCharges {
   productEur: number | null;
   china: ShippingCharge | null;
   germany: ShippingCharge | null;
+  /** Product USD + China USD (when China is billed in USD). */
+  usdSubtotal: number;
+  usdToEurRate: number | null;
+  /** Full USD subtotal converted to EUR before Germany shipping. */
+  convertedEur: number | null;
+  /** convertedEur + Germany EUR shipping. */
+  finalEur: number | null;
   grandUsd: number;
   grandEur: number | null;
   leftoverEur: number;
@@ -190,54 +197,72 @@ function asChargeCurrency(value: string | null | undefined): ChargeCurrency | nu
 }
 
 /**
- * Product subtotal plus the two shipping kinds. USD and EUR are never added
- * together; conversion uses only the order's stored USD→EUR rate.
+ * Product subtotal plus shipping with strict currency separation:
+ * 1) product USD + China USD = USD subtotal
+ * 2) convert the full USD subtotal to EUR using the stored rate
+ * 3) add Germany EUR shipping to the converted EUR amount
  */
 export function summarizeOrderCharges(input: OrderChargesInput): OrderCharges {
-  let usd = roundCurrency(input.productUsd);
-  let eur =
-    input.productEur != null && isFiniteNumber(input.productEur) ? roundCurrency(input.productEur) : null;
-  let leftoverEur = 0;
   const rate = input.usdToEurRate ?? null;
+  const productUsd = roundCurrency(input.productUsd);
+  let usdSubtotal = productUsd;
+  let china: ShippingCharge | null = null;
+  let germany: ShippingCharge | null = null;
 
-  function addSlice(amount: number | null | undefined, currencyRaw: string | null | undefined): ShippingCharge | null {
-    if (!isFiniteNumber(amount) || amount < 0) return null;
-    const currency = asChargeCurrency(currencyRaw);
-    if (!currency) return null;
-    if (amount === 0) return { amount, currency };
-
+  if (isFiniteNumber(input.chinaAmount) && input.chinaAmount >= 0) {
+    const currency = asChargeCurrency(input.chinaCurrency);
     if (currency === "USD") {
-      usd = roundCurrency(usd + amount);
-      const asEur = convertUsdToEur(amount, rate);
-      if (asEur != null && eur != null) eur = roundCurrency(eur + asEur);
-    } else {
-      const asUsd = convertEurToUsd(amount, rate);
-      if (asUsd != null) usd = roundCurrency(usd + asUsd);
-      else leftoverEur = roundCurrency(leftoverEur + amount);
-      if (eur != null) eur = roundCurrency(eur + amount);
+      china = { amount: input.chinaAmount, currency: "USD" };
+      if (input.chinaAmount > 0) usdSubtotal = roundCurrency(usdSubtotal + input.chinaAmount);
+    } else if (currency === "EUR") {
+      china = { amount: input.chinaAmount, currency: "EUR" };
+      const asUsd = convertEurToUsd(input.chinaAmount, rate);
+      if (asUsd != null && input.chinaAmount > 0) usdSubtotal = roundCurrency(usdSubtotal + asUsd);
     }
-    return { amount, currency };
   }
 
-  const china = addSlice(input.chinaAmount, input.chinaCurrency);
-  const germany = addSlice(input.deAmount, input.deCurrency);
+  if (isFiniteNumber(input.deAmount) && input.deAmount >= 0) {
+    const currency = asChargeCurrency(input.deCurrency);
+    if (currency) germany = { amount: input.deAmount, currency };
+  }
+
+  const convertedEur = convertUsdToEur(usdSubtotal, rate);
+  let finalEur: number | null = null;
+  let leftoverEur = 0;
+
+  if (convertedEur != null) {
+    finalEur = convertedEur;
+    if (germany?.currency === "EUR" && germany.amount > 0) {
+      finalEur = roundCurrency(finalEur + germany.amount);
+    }
+  } else if (germany?.currency === "EUR" && germany.amount > 0) {
+    leftoverEur = roundCurrency(germany.amount);
+  }
+
+  const productEur =
+    convertUsdToEur(productUsd, rate) ??
+    (input.productEur != null && isFiniteNumber(input.productEur) ? roundCurrency(input.productEur) : null);
 
   let grandDisplay: string;
-  if (leftoverEur > 0) {
-    grandDisplay = `${formatUsd(usd)} + ${formatEur(leftoverEur)}`;
-  } else if (eur != null) {
-    grandDisplay = `${formatUsd(usd)} · ${formatEur(eur)}`;
+  if (finalEur != null) {
+    grandDisplay = formatEur(finalEur);
+  } else if (leftoverEur > 0) {
+    grandDisplay = `${formatUsd(usdSubtotal)} + ${formatEur(leftoverEur)}`;
   } else {
-    grandDisplay = formatUsd(usd);
+    grandDisplay = formatUsd(usdSubtotal);
   }
 
   return {
-    productUsd: roundCurrency(input.productUsd),
-    productEur: input.productEur != null && isFiniteNumber(input.productEur) ? roundCurrency(input.productEur) : null,
+    productUsd,
+    productEur,
     china,
     germany,
-    grandUsd: usd,
-    grandEur: eur,
+    usdSubtotal,
+    usdToEurRate: rate,
+    convertedEur,
+    finalEur,
+    grandUsd: usdSubtotal,
+    grandEur: finalEur,
     leftoverEur,
     grandDisplay,
   };

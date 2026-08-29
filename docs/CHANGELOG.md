@@ -2,6 +2,17 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-08-29 (kit sharing bugfix)
+
+### Fixed
+
+- `add_kit_share_to_cart` HTTP 400: production RPC referenced non-existent column `exchange_rates.exchange_rate` (Postgres **42703**); fixed to `exchange_rates.rate` in migration `0033_fix_add_kit_share_to_cart_exchange_rate.sql` (applied to cartwise-prod).
+- Kit-share dialog: product strength/variant selection when a shop group has multiple kit-shareable variants; variant locked after kit creation; strength shown in dialog UI.
+
+### Added
+
+- Regression tests for `add_kit_share_to_cart` RPC contract and Retatrutide variant separation (`kitShareableVariants`).
+
 ## 2026-08-29
 
 ### Added

@@ -239,15 +239,16 @@ describe("summarizeOrderCharges", () => {
   it("adds same-currency shipping onto the product subtotal", () => {
     const charges = summarizeOrderCharges({
       productUsd: 100,
-      productEur: 100,
+      productEur: null,
       chinaAmount: 20,
       chinaCurrency: "EUR",
       deAmount: 8,
       deCurrency: "EUR",
       usdToEurRate: 1,
     });
-    expect(charges.grandUsd).toBe(128);
-    expect(charges.grandEur).toBe(128);
+    expect(charges.usdSubtotal).toBe(120);
+    expect(charges.convertedEur).toBe(120);
+    expect(charges.finalEur).toBe(128);
     expect(charges.grandDisplay).toContain("128");
   });
 
@@ -261,40 +262,46 @@ describe("summarizeOrderCharges", () => {
       deCurrency: "EUR",
       usdToEurRate: null,
     });
-    expect(charges.grandUsd).toBe(1100);
+    expect(charges.usdSubtotal).toBe(1100);
+    expect(charges.convertedEur).toBeNull();
     expect(charges.leftoverEur).toBe(20);
     expect(charges.grandDisplay).toContain("1.100,00");
     expect(charges.grandDisplay).toContain("20,00");
-    expect(charges.grandUsd + 20).not.toBe(charges.grandUsd);
   });
 
-  it("uses the stored USD→EUR rate to merge mixed shipping", () => {
+  it("converts the full USD subtotal before adding Germany EUR shipping", () => {
+    const rate = 0.9;
     const charges = summarizeOrderCharges({
       productUsd: 1000,
-      productEur: 900,
+      productEur: null,
       chinaAmount: 100,
       chinaCurrency: "USD",
       deAmount: 20,
       deCurrency: "EUR",
-      usdToEurRate: 0.9,
+      usdToEurRate: rate,
     });
-    expect(charges.grandUsd).toBe(1122.22);
-    expect(charges.grandEur).toBe(1010);
+    expect(charges.usdSubtotal).toBe(1100);
+    expect(charges.convertedEur).toBe(990);
+    expect(charges.finalEur).toBe(1010);
     expect(charges.leftoverEur).toBe(0);
+    expect(charges.grandDisplay).toBe(formatEur(1010));
   });
 
-  it("keeps USD product+China shipping separate from EUR product+DE shipping", () => {
+  it("matches the China USD → EUR → Germany EUR checkout example", () => {
+    const rate = 440.18 / 562.5;
     const charges = summarizeOrderCharges({
       productUsd: 512.5,
-      productEur: 440.18,
+      productEur: null,
       chinaAmount: 50,
       chinaCurrency: "USD",
       deAmount: 6.99,
       deCurrency: "EUR",
-      usdToEurRate: null,
+      usdToEurRate: rate,
     });
-    expect(charges.grandUsd).toBe(562.5);
-    expect(charges.grandEur).toBe(447.17);
-    expect(charges.grandDisplay).toContain("562,50");
+    expect(charges.usdSubtotal).toBe(562.5);
+    expect(charges.convertedEur).toBe(440.18);
+    expect(charges.finalEur).toBe(447.17);
+    expect(charges.grandDisplay).toBe(formatEur(447.17));
+    expect(charges.grandDisplay).not.toContain("562,50");
   });
 });

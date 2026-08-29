@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import {
   isKitShareableProduct,
+  kitShareableVariants,
   kitSizeVialsForProduct,
   parseVariantColumn,
   shopProductTitle,
   vialStrengthForProduct,
   variantMetaForCode,
+  variantStrengthLabel,
 } from "@/lib/shop/variantCoverage";
 
 describe("parseVariantColumn", () => {
@@ -82,5 +84,30 @@ describe("shopProductTitle", () => {
     expect(
       shopProductTitle("Retatrutide", { code: "RT10", name: "Retatrutide", dosage_vial: "10 mg" }, true),
     ).toBe("Retatrutide");
+  });
+});
+
+describe("kitShareableVariants", () => {
+  it("returns only variants with explicit kit sizes from coverage data", () => {
+    const variants = [
+      { id: "a", code: "10AD", name: "AOD9604" },
+      { id: "b", code: "D100", name: "Mast P" },
+    ];
+    expect(kitShareableVariants(variants).map((v) => v.code)).toEqual(["10AD"]);
+  });
+
+  it("keeps Retatrutide strength variants separate by product row", () => {
+    const variants = [
+      { id: "rt10", code: "RT10", name: "Retatrutide", dosage_vial: "10 mg" },
+      { id: "rt20", code: "RT20", name: "Retatrutide", dosage_vial: "20 mg" },
+      { id: "rt30", code: "RT30", name: "Retatrutide", dosage_vial: "30 mg" },
+    ];
+    expect(kitShareableVariants(variants)).toHaveLength(3);
+    expect(variantStrengthLabel(variants[0])).toBe("10 mg");
+    expect(variantStrengthLabel(variants[1])).toBe("20 mg");
+    expect(variantStrengthLabel(variants[2])).toBe("30 mg");
+    expect(kitSizeVialsForProduct(variants[0])).toBe(10);
+    expect(kitSizeVialsForProduct(variants[1])).toBe(10);
+    expect(kitSizeVialsForProduct(variants[2])).toBe(10);
   });
 });

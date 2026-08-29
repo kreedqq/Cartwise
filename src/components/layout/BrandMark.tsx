@@ -1,33 +1,37 @@
 import { cn } from "@/lib/utils";
-import { BRAND_NAME } from "@/lib/constants";
+import { useNavShell } from "@/context/NavShellProvider";
+
+const LOGO_SRC = "/peptix-logo.svg";
 
 export function BrandMark({
   className,
   inverted = false,
-  showWordmark = true,
+  onClick,
 }: {
   className?: string;
   inverted?: boolean;
-  showWordmark?: boolean;
+  onClick?: () => void;
 }) {
+  const navShell = useNavShell();
+  const handleClick = onClick ?? navShell.toggleNavigation;
+
   return (
-    <div className={cn("flex items-center gap-2.5", className)}>
-      <span
-        className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-[12px] font-semibold tracking-[0.16em] text-primary-foreground"
-        aria-hidden="true"
-      >
-        PX
-      </span>
-      {showWordmark && (
-        <span
-          className={cn(
-            "font-display text-[15px] font-semibold uppercase tracking-[0.28em]",
-            inverted ? "text-sidebar-foreground" : "text-foreground",
-          )}
-        >
-          {BRAND_NAME}
-        </span>
+    <button
+      type="button"
+      onClick={handleClick}
+      className={cn(
+        "inline-flex max-w-full items-center border-0 bg-transparent p-0",
+        inverted ? "text-sidebar-foreground" : "text-foreground",
+        className,
       )}
-    </div>
+      aria-label="Navigation öffnen"
+    >
+      <img
+        src={LOGO_SRC}
+        alt="PEPTIX"
+        className="h-8 w-auto max-w-[9.5rem] object-contain object-left sm:h-9 sm:max-w-[10.5rem]"
+        draggable={false}
+      />
+    </button>
   );
 }

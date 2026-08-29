@@ -20,7 +20,12 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/toaster";
 import { formatUsd } from "@/lib/money";
-import { isKitShareableProduct, kitSizeVialsForProduct } from "@/lib/shop/variantCoverage";
+import { variantLabelForProduct, type ShopProductGroup } from "@/lib/shop/display";
+import {
+  kitShareableVariants,
+  kitSizeVialsForProduct,
+  variantStrengthLabel,
+} from "@/lib/shop/variantCoverage";
 import type { KitShareMember } from "@/services/kitShareMembers";
 import {
   addKitShareToCart,
@@ -33,7 +38,8 @@ import {
 import type { Tables } from "@/types/database";
 
 interface KitShareDialogProps {
-  product: Tables<"products">;
+  group: ShopProductGroup;
+  initialProductId?: string;
   members: KitShareMember[];
   membersLoading: boolean;
   open: boolean;
@@ -41,15 +47,35 @@ interface KitShareDialogProps {
   onAddedToCart?: () => void;
 }
 
+function resolveInitialVariantId(
+  shareableVariants: readonly Tables<"products">[],
+  initialProductId?: string,
+): string {
+  if (shareableVariants.length === 0) return "";
+  if (initialProductId && shareableVariants.some((variant) => variant.id === initialProductId)) {
+    return initialProductId;
+  }
+  return shareableVariants.length === 1 ? shareableVariants[0].id : "";
+}
+
 export function KitShareDialog({
-  product,
+  group,
+  initialProductId,
   members,
   membersLoading,
   open,
   onOpenChange,
   onAddedToCart,
 }: KitShareDialogProps) {
-  const kitSize = kitSizeVialsForProduct(product) ?? 0;
+  const shareableVariants = React.useMemo(() => kitShareableVariants(group.variants), [group.variants]);
+  const [selectedVariantId, setSelectedVariantId] = React.useState(() =>
+    resolveInitialVariantId(shareableVariants, initialProductId),
+  );
+  const product = shareableVariants.find((variant) => variant.id === selectedVariantId) ?? null;
+  const kitSize = product ? kitSizeVialsForProduct(product) ?? 0 : 0;
+  const hasMultipleShareableVariants = shareableVariants.length > 1;
+  const strengthLabel = product ? variantStrengthLabel(product) : null;
+
   const [myQuantity, setMyQuantity] = React.useState("1");
   const [selectedMemberId, setSelectedMemberId] = React.useState("");
   const [memberQuantity, setMemberQuantity] = React.useState("1");
@@ -64,6 +90,7 @@ export function KitShareDialog({
     setKitView(null);
     setError(null);
     setBusy(false);
+    setSelectedVariantId(resolveInitialVariantId(shareableVariants, initialProductId));
   }
 
   function handleOpenChange(nextOpen: boolean) {
@@ -71,11 +98,16 @@ export function KitShareDialog({
     onOpenChange(nextOpen);
   }
 
-  if (!isKitShareableProduct(product) || kitSize < 2) return null;
+  if (shareableVariants.length === 0) return null;
 
   const quantityOptions = Array.from({ length: kitSize }, (_, i) => i + 1);
+  const variantMissing = hasMultipleShareableVariants && !product;
 
   async function handleCreateKit() {
+    if (!product) {
+      setError("Bitte zuerst eine Produktstärke auswählen.");
+      return;
+    }
     const qty = Number(myQuantity);
     if (!Number.isInteger(qty) || qty < 1 || qty > kitSize) {
       setError("Bitte eine gültige Menge wählen.");
@@ -155,6 +187,24 @@ export function KitShareDialog({
     }
   }
 
+  function handleVariantChange(value: string) {
+    if (kitView) {
+      setError("Die Produktstärke kann nach Kit-Erstellung nicht mehr geändert werden.");
+      return;
+    }
+    setSelectedVariantId(value);
+    setError(null);
+  }
+
+  const lockedProductName = kitView?.productName ?? group.displayName;
+  const lockedStrengthLabel = kitView
+    ? variantStrengthLabel({
+        code: kitView.productCode,
+        name: kitView.productName,
+        dosage_vial: product?.dosage_vial ?? null,
+      })
+    : strengthLabel;
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
@@ -164,22 +214,51 @@ export function KitShareDialog({
             Kit teilen
           </DialogTitle>
           <DialogDescription>
-            Verteile ein {kitSize}-Vial-Kit auf mehrere Mitglieder. Bestellbar erst bei vollständiger Verteilung.
+            Verteile ein {kitSize || "…"}-Vial-Kit auf mehrere Mitglieder. Bestellbar erst bei vollständiger Verteilung.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 text-sm">
-          <div className="rounded-lg border border-border bg-secondary/30 p-3">
-            <p className="font-medium">{product.name}</p>
-            <p className="text-muted-foreground">Kitgröße: {kitSize} Vials</p>
+          <div className="rounded-lg border border-border bg-secondary/30 p-3 space-y-2">
+            <div>
+              <p className="text-xs text-muted-foreground">Produkt</p>
+              <p className="font-medium">{lockedProductName}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Stärke</p>
+              {kitView || !hasMultipleShareableVariants ? (
+                <p className="font-medium">{lockedStrengthLabel ?? "Standard"}</p>
+              ) : (
+                <Select value={selectedVariantId || undefined} onValueChange={handleVariantChange} disabled={busy}>
+                  <SelectTrigger aria-label="Produktstärke wählen">
+                    <SelectValue placeholder="Stärke wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {shareableVariants.map((variant) => (
+                      <SelectItem key={variant.id} value={variant.id}>
+                        {variantLabelForProduct(variant)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Kit</p>
+              <p className="font-medium">{kitSize} Vials</p>
+            </div>
           </div>
+
+          {variantMissing && (
+            <p className="text-sm text-muted-foreground">Bitte zuerst eine Produktstärke auswählen.</p>
+          )}
 
           <div className="space-y-2">
             <Label>Mein Anteil</Label>
             <Select
               value={myQuantity}
               onValueChange={kitView ? handleMyQuantityChange : setMyQuantity}
-              disabled={busy || (kitView != null && kitView.status !== "open" && kitView.status !== "full")}
+              disabled={busy || variantMissing || (kitView != null && kitView.status !== "open" && kitView.status !== "full")}
             >
               <SelectTrigger aria-label="Meine Kit-Menge">
                 <SelectValue />
@@ -195,7 +274,7 @@ export function KitShareDialog({
           </div>
 
           {!kitView ? (
-            <Button type="button" className="w-full" onClick={handleCreateKit} disabled={busy}>
+            <Button type="button" className="w-full" onClick={handleCreateKit} disabled={busy || variantMissing}>
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Kit erstellen"}
             </Button>
           ) : (
@@ -207,11 +286,17 @@ export function KitShareDialog({
                     <SelectValue placeholder={membersLoading ? "Mitglieder werden geladen …" : "Mitglied auswählen"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {members.map((member) => (
-                      <SelectItem key={member.id} value={member.id}>
-                        {member.displayName}
+                    {members.length === 0 && !membersLoading ? (
+                      <SelectItem value="__none__" disabled>
+                        Keine weiteren Mitglieder verfügbar
                       </SelectItem>
-                    ))}
+                    ) : (
+                      members.map((member) => (
+                        <SelectItem key={member.id} value={member.id}>
+                          {member.displayName}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
                 <div className="flex gap-2">
@@ -279,15 +364,30 @@ export function KitShareDialog({
 }
 
 export function KitShareButton({
-  product,
+  group,
+  selectedProductId,
   onClick,
 }: {
-  product: Tables<"products">;
+  group: ShopProductGroup;
+  selectedProductId: string;
   onClick: () => void;
 }) {
-  if (!isKitShareableProduct(product)) return null;
+  const shareableVariants = kitShareableVariants(group.variants);
+  if (shareableVariants.length === 0) return null;
+
+  const selectedIsShareable = shareableVariants.some((variant) => variant.id === selectedProductId);
+  const needsVariantPick = shareableVariants.length > 1 && !selectedIsShareable;
+
   return (
-    <Button type="button" variant="outline" size="sm" className="h-9 shrink-0" onClick={onClick}>
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="h-9 shrink-0"
+      onClick={onClick}
+      disabled={needsVariantPick}
+      title={needsVariantPick ? "Bitte zuerst eine Produktstärke auswählen." : undefined}
+    >
       <Users className="mr-1.5 h-4 w-4" />
       Kit teilen
     </Button>
