@@ -3,7 +3,8 @@ import { resolve } from "node:path";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { ConcurrencyError } from "@/lib/errors";
-import { isOpenCart } from "@/services/carts";
+import { isOpenCart, pickActiveOpenCart } from "@/services/carts";
+import type { Tables } from "@/types/database";
 
 function buildChain(updateResult: { data: unknown; error: unknown }) {
   const chain = {
@@ -33,6 +34,46 @@ describe("isOpenCart", () => {
     expect(isOpenCart("ready")).toBe(true);
     expect(isOpenCart("archived")).toBe(true);
     expect(isOpenCart("ordered")).toBe(false);
+  });
+});
+
+describe("pickActiveOpenCart", () => {
+  const userA = "user-a";
+  const userB = "user-b";
+
+  function cart(partial: Partial<Tables<"carts">> & Pick<Tables<"carts">, "id">): Tables<"carts"> {
+    return {
+      id: partial.id,
+      user_id: partial.user_id ?? userA,
+      name: partial.name ?? "Cart",
+      status: partial.status ?? "draft",
+      note: partial.note ?? null,
+      is_active_cart: partial.is_active_cart ?? false,
+      version: partial.version ?? 1,
+      deleted_at: partial.deleted_at ?? null,
+      created_at: partial.created_at ?? "2026-01-01T00:00:00Z",
+      updated_at: partial.updated_at ?? "2026-01-01T00:00:00Z",
+    };
+  }
+
+  it("returns the active open cart for the signed-in user", () => {
+    const carts = [
+      cart({ id: "old-ordered", is_active_cart: true, status: "ordered" }),
+      cart({ id: "active-open", is_active_cart: true, status: "draft" }),
+    ];
+    expect(pickActiveOpenCart(carts, userA)?.id).toBe("active-open");
+  });
+
+  it("ignores another user's active cart from stale cache", () => {
+    const carts = [cart({ id: "foreign", user_id: userB, is_active_cart: true, status: "draft" })];
+    expect(pickActiveOpenCart(carts, userA)).toBeNull();
+  });
+
+  it("ignores deleted carts", () => {
+    const carts = [
+      cart({ id: "deleted", is_active_cart: true, deleted_at: "2026-01-02T00:00:00Z", status: "draft" }),
+    ];
+    expect(pickActiveOpenCart(carts, userA)).toBeNull();
   });
 });
 

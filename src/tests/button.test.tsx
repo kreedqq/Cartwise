@@ -1,21 +1,11 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, Link } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
-import { legacyPublicLexiconCatalog } from "@/lib/peptide/lexicon";
 import PeptideCalculatorPage from "@/pages/peptide/PeptideCalculator";
 import PeptideLexiconDetailPage from "@/pages/peptide/PeptideLexiconDetail";
-
-vi.mock("@/hooks/usePublicLexicon", () => ({
-  usePublicLexicon: () => ({
-    data: legacyPublicLexiconCatalog(),
-    isLoading: false,
-    isError: false,
-  }),
-}));
 
 describe("Button", () => {
   it("renders a native button with its label", () => {
@@ -106,32 +96,30 @@ describe("peptide pages that use Button asChild", () => {
   it.each(["retatrutide", "tirzepatide", "semaglutide"] as const)(
     "renders lexicon detail for %s without a Slot crash",
     (slug) => {
-      const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
       expect(() =>
         render(
-          <QueryClientProvider client={client}>
-            <MemoryRouter initialEntries={[`/peptide/lexikon/${slug}`]}>
-              <Routes>
-                <Route path="/peptide/lexikon/:slug" element={<PeptideLexiconDetailPage />} />
-              </Routes>
-            </MemoryRouter>
-          </QueryClientProvider>,
+          <MemoryRouter initialEntries={[`/peptide/lexikon/${slug}`]}>
+            <Routes>
+              <Route path="/peptide/lexikon/:slug" element={<PeptideLexiconDetailPage />} />
+            </Routes>
+          </MemoryRouter>,
         ),
       ).not.toThrow();
-      expect(screen.getByRole("link", { name: "Im Rechner verwenden" })).toHaveAttribute(
-        "href",
-        expect.stringContaining("/peptide/rechner"),
-      );
-      expect(screen.getByRole("heading", { name: "Scientific Claims" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Overview" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Mechanism" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Effects" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Side Effects / Safety" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Interactions" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Reconstitution" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Clinical Trials" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Claim Sources" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Source References" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Kurz erklärt" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Wofür wird es verwendet bzw. untersucht?" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Mögliche Vorteile" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Mögliche Nachteile / Nebenwirkungen" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Anwendung / Darreichungsform" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Aktuelle Studienlage" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Community Erfahrungen" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Quellen" })).toBeInTheDocument();
+      if (slug === "retatrutide") {
+        expect(screen.getByRole("heading", { name: "Rekonstitution" })).toBeInTheDocument();
+        expect(screen.getByRole("link", { name: "Erweiterter Rechner" })).toHaveAttribute(
+          "href",
+          expect.stringContaining("/peptide/rechner"),
+        );
+      }
     },
   );
 });

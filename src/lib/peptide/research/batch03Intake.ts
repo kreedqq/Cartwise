@@ -145,6 +145,7 @@ function nctUrl(nct: string): string {
 
 export function identityIssueForCandidate(slug: string, title: string): string | null {
   if (slug === "glow-blend") return "Glow blend is a blend, not a unique INN source target";
+  if (slug === "klow-blend") return "KLOW blend is a blend, not a unique INN source target";
   if (slug === "tb-500" && /thymosin beta-?4/i.test(title) && !/fragment|17-23/i.test(title)) {
     return "TB-500 must not share Thymosin Beta-4 evidence";
   }

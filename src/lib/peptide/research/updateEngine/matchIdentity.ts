@@ -1,4 +1,5 @@
 import { getIdentitySubstance, PEPTIDE_SUBSTANCES_IDENTITY } from "@/lib/peptide/catalog";
+import { buildPublicLexiconV2Catalog } from "@/lib/peptide/lexiconV2/publicCatalog";
 import { identityMustStaySeparate, keepArticle, keepStudy } from "@/lib/peptide/research/sourceValidation";
 import type { SubstanceIdentityRow } from "@/lib/peptide/research/updateEngine/types";
 
@@ -21,6 +22,39 @@ export function identityCatalog(): SubstanceIdentityRow[] {
     moleculeType: item.moleculeType,
     blendComponentSlugs: item.blendComponentSlugs ? [...item.blendComponentSlugs] : [],
   }));
+}
+
+/** Lexikon profile identities for update runs — research substances plus shop-derived profiles. */
+export function lexiconIdentityCatalog(): SubstanceIdentityRow[] {
+  const researchBySlug = new Map(identityCatalog().map((row) => [row.slug, row]));
+  const catalog = buildPublicLexiconV2Catalog();
+  const rows: SubstanceIdentityRow[] = [];
+
+  for (const entry of catalog.entries) {
+    const research = researchBySlug.get(entry.slug);
+    if (research) {
+      rows.push(research);
+      continue;
+    }
+
+    const aliases = [...new Set(
+      entry.searchTerms.filter(
+        (term) => term.toLowerCase() !== entry.displayNameDe.toLowerCase() && term !== entry.slug,
+      ),
+    )];
+
+    rows.push({
+      slug: entry.slug,
+      name: entry.displayNameDe,
+      aliases,
+      developmentNames: [],
+      casNumber: null,
+      moleculeType: null,
+      blendComponentSlugs: entry.blendComponentSlugs.length > 0 ? [...entry.blendComponentSlugs] : [],
+    });
+  }
+
+  return rows;
 }
 
 export function forbiddenIdentityReason(slug: string, title: string): string | null {

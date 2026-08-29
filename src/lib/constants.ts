@@ -10,7 +10,8 @@ export const EXCHANGE_RATE_CACHE_MINUTES = 60;
 export const EXCHANGE_RATE_STALE_WARNING_HOURS = 26;
 
 export const QUERY_KEYS = {
-  carts: ["carts"] as const,
+  carts: (userId: string) => ["carts", userId] as const,
+  cartSummaries: (userId: string) => ["cart-summaries", userId] as const,
   cart: (id: string) => ["carts", id] as const,
   cartItems: (cartId: string) => ["cart-items", cartId] as const,
   products: ["products"] as const,

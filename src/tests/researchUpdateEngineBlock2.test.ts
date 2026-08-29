@@ -25,6 +25,7 @@ import {
   persistPlanFromRun,
   redditUpdateConnector,
   resetRateLimitState,
+  lexiconUpdateProfileCount,
   resolveScope,
   runResearchUpdate,
   scientificAdapter,
@@ -34,7 +35,7 @@ import {
   updateAllMeansSubstancesNotShop,
   withRateLimit,
 } from "@/lib/peptide/research/updateEngine";
-import { identityCatalog } from "@/lib/peptide/research/updateEngine/matchIdentity";
+import { identityCatalog, lexiconIdentityCatalog } from "@/lib/peptide/research/updateEngine/matchIdentity";
 import { nmpaConnector, redditConnector, scientificConnectors } from "@/research/connectors";
 
 const MIGRATION_0031 = readFileSync(
@@ -200,16 +201,20 @@ describe("hudson exclusion", () => {
 });
 
 describe("research runs", () => {
-  it("scopes all / single substance / single connector", () => {
+  it("scopes all / single substance / single connector across lexicon profiles", () => {
+    const profileCount = lexiconUpdateProfileCount();
     const all = resolveScope({});
     expect(all.trigger).toBe("full");
-    expect(all.substanceSlugs).toHaveLength(27);
+    expect(all.substanceSlugs).toHaveLength(profileCount);
+    expect(profileCount).toBeGreaterThanOrEqual(160);
     expect(updateAllMeansSubstancesNotShop(all)).toBe(true);
     expect(resolveScope({ substanceSlug: "retatrutide" }).connectors).toEqual(AVAILABLE_SCIENTIFIC_CONNECTORS);
-    expect(resolveScope({ connector: "pubmed" }).substanceSlugs).toHaveLength(27);
+    expect(resolveScope({ connector: "pubmed" }).substanceSlugs).toHaveLength(profileCount);
     expect(resolveScope({ substanceSlug: "retatrutide", connector: "clinicaltrials" }).connectors).toEqual([
       "clinicaltrials",
     ]);
+    expect(resolveScope({ category: "ORALS" }).substanceSlugs.length).toBeGreaterThan(0);
+    expect(lexiconIdentityCatalog().length).toBeGreaterThanOrEqual(profileCount);
   });
 
   it("creates review-required candidates and never auto-approves", async () => {

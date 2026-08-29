@@ -14,7 +14,12 @@ export const OPERATIONS_CRON_ENABLED = false;
 export const OPERATIONS_MIGRATION_REQUIRED = "0031_research_operations.sql";
 export const OPERATIONS_RUN_PAGE_SIZE = 20;
 
-export type OperationsAction = "update-all" | "update-substance" | "update-connector" | "update-combined";
+export type OperationsAction =
+  | "update-all"
+  | "update-substance"
+  | "update-connector"
+  | "update-combined"
+  | "update-category";
 
 export interface OperationsSource {
   id: string;

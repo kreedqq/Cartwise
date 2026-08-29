@@ -139,7 +139,8 @@ describe("phase 6B explicit product mapping (0029)", () => {
       expect(MIGRATION_0029).toContain(`('${row.code}', '${row.slug}')`);
     }
     expect(MIGRATION_0029).toMatch(/p\.code in \('MT1', 'KL80'\)/);
-    expect(UNMAP_PREFIX_CODES).toEqual(expect.arrayContaining(["MT1", "KL80"]));
+    expect(UNMAP_PREFIX_CODES).toEqual(expect.arrayContaining(["MT1"]));
+    expect(UNMAP_PREFIX_CODES).not.toEqual(expect.arrayContaining(["KL80"]));
     expect(UNRESOLVED_PRODUCT_MAPPINGS.some((row) => row.code === "BT5")).toBe(true);
     expect(MIGRATION_0029.toLowerCase()).not.toMatch(/alter table public\.products/);
     expect(MIGRATION_0029.toLowerCase()).not.toMatch(/update public\.products/);
@@ -147,8 +148,10 @@ describe("phase 6B explicit product mapping (0029)", () => {
     expect(MIGRATION_0029).toContain("'manual'");
   });
 
-  it("does not map unresolved blends, fragments, or TB-500/TB4 mixed labels", () => {
-    expect(postgresMappingSlug({ code: "KL80", name: "(KLOW) GHK-CU 50mg+TB500 10mg+BPC157 10mg+TB500 10mg Blend" })).toBeNull();
+  it("maps KLOW to klow-blend and keeps other unresolved blends unmapped", () => {
+    expect(postgresMappingSlug({ code: "KL80", name: "(KLOW) GHK-CU 50mg+TB500 10mg+BPC157 10mg+TB500 10mg Blend" })).toBe(
+      "klow-blend",
+    );
     expect(postgresMappingSlug({ code: "BB10", name: "BPC157 5mg+TB500 5mg Blend" })).toBeNull();
     expect(postgresMappingSlug({ code: "RC10", name: "Retatrutide 5mg+Cagrilintide 5mg Blend" })).toBeNull();
     expect(postgresMappingSlug({ code: "FR5", name: "HGH Fragment 176-191" })).toBeNull();

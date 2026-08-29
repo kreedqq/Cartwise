@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@/lib/constants";
+import { useAuth } from "@/context/AuthProvider";
 import {
   createOrder,
   deleteOrder,
@@ -42,14 +43,17 @@ export function useOrderAdminNote(orderId: string | undefined) {
 
 export function useCreateOrder() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   return useMutation({
     mutationFn: ({ cartId, note }: { cartId: string; note: string | null }) => createOrder(cartId, note),
     onSuccess: (_result, { cartId }) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myOrders });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts });
+      if (user) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts(user.id) });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.cartSummaries(user.id) });
+      }
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.cartItems(cartId) });
-      queryClient.invalidateQueries({ queryKey: ["cart-summaries"] });
     },
   });
 }

@@ -5,6 +5,7 @@ import { QUERY_KEYS } from "@/lib/constants";
 import { useAuth } from "@/context/AuthProvider";
 import { useCarts, useCartMutations } from "@/hooks/useCarts";
 import { addCartItem, addCartItemsBulk, type BulkImportLine } from "@/services/cartItems";
+import { pickActiveOpenCart } from "@/services/carts";
 import type { Tables } from "@/types/database";
 
 /**
@@ -26,7 +27,7 @@ export function useShopCart() {
   const { create, activate } = useCartMutations();
   const [ensuring, setEnsuring] = React.useState(false);
 
-  const activeCart = cartsQuery.data?.find((c) => c.is_active_cart) ?? null;
+  const activeCart = pickActiveOpenCart(cartsQuery.data, user?.id);
 
   async function ensureActiveCartId(): Promise<string> {
     if (activeCart) return activeCart.id;
@@ -48,10 +49,11 @@ export function useShopCart() {
   }
 
   async function invalidateAfterAdd(cartId: string) {
+    if (!user) return;
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.cartItems(cartId) }),
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts }),
-      queryClient.invalidateQueries({ queryKey: ["cart-summaries"] }),
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts(user.id) }),
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.cartSummaries(user.id) }),
     ]);
   }
 

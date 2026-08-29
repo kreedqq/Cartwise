@@ -41,6 +41,23 @@ export function isOpenCart(status: CartStatus): boolean {
   return status !== "ordered";
 }
 
+/** Active cart for shop/topbar: must belong to the user and stay editable under RLS. */
+export function pickActiveOpenCart(
+  carts: Tables<"carts">[] | undefined,
+  userId: string | undefined,
+): Tables<"carts"> | null {
+  if (!carts || !userId) return null;
+  return (
+    carts.find(
+      (cart) =>
+        cart.user_id === userId &&
+        cart.is_active_cart &&
+        !cart.deleted_at &&
+        isOpenCart(cart.status),
+    ) ?? null
+  );
+}
+
 export async function updateCartStatus(
   id: string,
   expectedVersion: number,

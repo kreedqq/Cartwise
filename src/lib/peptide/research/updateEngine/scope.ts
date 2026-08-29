@@ -1,4 +1,8 @@
-import { PEPTIDE_SUBSTANCES_IDENTITY } from "@/lib/peptide/catalog";
+import {
+  lexiconUpdatableSlugs,
+  lexiconUpdatableSlugsByCategory,
+  lexiconUpdateProfileCount,
+} from "@/lib/peptide/research/updateEngine/lexiconUpdateScope";
 import {
   AVAILABLE_SCIENTIFIC_CONNECTORS,
 } from "@/lib/peptide/research/updateEngine/unavailable";
@@ -7,8 +11,11 @@ import type {
   ResearchRunTrigger,
   ScientificConnectorId,
 } from "@/lib/peptide/research/updateEngine/types";
+import type { ShopCoverageCategory } from "@/lib/peptide/shopCoverage/types";
 
-const ALL_SLUGS = PEPTIDE_SUBSTANCES_IDENTITY.map((item) => item.slug);
+const ALL_LEXICON_SLUGS = lexiconUpdatableSlugs();
+
+export { lexiconUpdateProfileCount };
 
 export function resolveScope(input: {
   trigger?: ResearchRunTrigger;
@@ -16,13 +23,16 @@ export function resolveScope(input: {
   connector?: ScientificConnectorId | null;
   substanceSlugs?: string[];
   connectors?: ScientificConnectorId[];
+  category?: ShopCoverageCategory | null;
 }): ResearchRunScope {
   const substances =
     input.substanceSlug
       ? [input.substanceSlug]
-      : input.substanceSlugs && input.substanceSlugs.length > 0
-        ? input.substanceSlugs
-        : [...ALL_SLUGS];
+      : input.category
+        ? lexiconUpdatableSlugsByCategory(input.category)
+        : input.substanceSlugs && input.substanceSlugs.length > 0
+          ? input.substanceSlugs
+          : [...ALL_LEXICON_SLUGS];
   const connectors =
     input.connector
       ? [input.connector]
@@ -32,7 +42,7 @@ export function resolveScope(input: {
 
   let trigger: ResearchRunTrigger = input.trigger ?? "manual";
   if (!input.trigger) {
-    const allSubstances = substances.length === ALL_SLUGS.length;
+    const allSubstances = substances.length === ALL_LEXICON_SLUGS.length;
     const allConnectors = connectors.length === AVAILABLE_SCIENTIFIC_CONNECTORS.length;
     if (allSubstances && allConnectors) trigger = "full";
     else if (!allSubstances && allConnectors && substances.length === 1) trigger = "single-substance";
@@ -45,5 +55,5 @@ export function resolveScope(input: {
 }
 
 export function updateAllMeansSubstancesNotShop(scope: ResearchRunScope): boolean {
-  return scope.substanceSlugs.every((slug) => ALL_SLUGS.includes(slug));
+  return scope.substanceSlugs.every((slug) => ALL_LEXICON_SLUGS.includes(slug));
 }

@@ -4,27 +4,30 @@ import { Link } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CATEGORY_LABELS, REGULATORY_LABELS, SAFETY_DISCLAIMER } from "@/lib/peptide/catalog";
-import { LEXICON_STATUS_FILTERS, matchesLexiconStatus, type LexiconStatusFilter } from "@/lib/peptide/lexiconFilters";
-import { formatReviewedDate } from "@/lib/peptide/profiles";
-import { searchLexiconSubstances } from "@/lib/peptide/search";
-import type { PeptideCategory } from "@/lib/peptide/types";
-import { usePublicLexicon } from "@/hooks/usePublicLexicon";
+import { SAFETY_DISCLAIMER } from "@/lib/peptide/catalog";
+import {
+  LEXICON_V2_CATEGORY_FILTERS,
+  LEXICON_V2_CATEGORY_LABELS,
+  type LexiconV2CategoryFilter,
+} from "@/lib/peptide/lexiconV2/publicTypes";
+import { searchLexiconV2Entries } from "@/lib/peptide/lexiconV2/search";
+import { useLexiconV2Catalog } from "@/hooks/useLexiconV2Catalog";
 
-const FILTERS: Array<{ id: "all" | PeptideCategory; label: string }> = [
-  { id: "all", label: "Alle" },
-  ...Object.entries(CATEGORY_LABELS).map(([id, label]) => ({ id: id as PeptideCategory, label })),
-];
+function subtitleForEntry(searchTerms: string[], displayNameDe: string): string {
+  const aliases = searchTerms
+    .filter((term) => term.toLowerCase() !== displayNameDe.toLowerCase() && !term.includes("-"))
+    .slice(0, 3);
+  return aliases.length > 0 ? aliases.join(" · ") : "Keine weiteren Namen hinterlegt";
+}
 
 export default function PeptideLexiconPage() {
-  const lexiconQuery = usePublicLexicon();
+  const { catalog } = useLexiconV2Catalog();
   const [query, setQuery] = React.useState("");
-  const [category, setCategory] = React.useState<"all" | PeptideCategory>("all");
-  const [status, setStatus] = React.useState<LexiconStatusFilter>("all");
-  const substances = React.useMemo(() => lexiconQuery.data?.substances ?? [], [lexiconQuery.data?.substances]);
+  const [category, setCategory] = React.useState<LexiconV2CategoryFilter>("all");
+
   const items = React.useMemo(
-    () => searchLexiconSubstances(substances, query, category).filter((item) => matchesLexiconStatus(item, status)),
-    [substances, query, category, status],
+    () => searchLexiconV2Entries(catalog.entries, query, category),
+    [catalog.entries, query, category],
   );
 
   React.useEffect(() => {
@@ -36,19 +39,19 @@ export default function PeptideLexiconPage() {
       <PageHeader
         eyebrow="Lexikon"
         title="Peptid Lexikon"
-        description="Substanzen, Aliase und Forschungsstatus. Wissenschaftliche Aussagen nur mit geprüften Quellen."
+        description="Wirkstoffprofile, Forschungskontext und Community – getrennt von Shop und Preisen."
       />
       <p className="text-sm text-muted-foreground">{SAFETY_DISCLAIMER}</p>
 
       <Input
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Name, Alias, Entwicklungsname …"
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="Deutscher Name oder Wirkstoffname …"
         aria-label="Lexikon durchsuchen"
       />
 
       <div className="flex flex-wrap gap-1.5">
-        {FILTERS.map((filter) => (
+        {LEXICON_V2_CATEGORY_FILTERS.map((filter) => (
           <button
             key={filter.id}
             type="button"
@@ -64,58 +67,30 @@ export default function PeptideLexiconPage() {
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
-        {LEXICON_STATUS_FILTERS.map((filter) => (
-          <button
-            key={filter.id}
-            type="button"
-            onClick={() => setStatus(filter.id)}
-            className={
-              status === filter.id
-                ? "rounded-full border border-primary px-3 py-1 text-xs font-medium text-primary"
-                : "rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
-            }
+      <p className="text-xs text-muted-foreground">
+        {items.length} von {catalog.entries.length} Profilen · keine Shoppreise
+      </p>
+
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {items.map((entry) => (
+          <Link
+            key={entry.slug}
+            to={`/peptide/lexikon/${entry.slug}`}
+            className="rounded-xl border border-border/70 bg-card p-5 transition-colors hover:border-primary/40"
           >
-            {filter.label}
-          </button>
+            <div className="flex flex-wrap gap-1.5">
+              <Badge variant="secondary">{LEXICON_V2_CATEGORY_LABELS[entry.category]}</Badge>
+              {entry.publicationStatus === "draft" ? <Badge variant="outline">Entwurf</Badge> : null}
+            </div>
+            <h2 className="mt-3 text-base font-semibold tracking-tight">{entry.displayNameDe}</h2>
+            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+              {subtitleForEntry(entry.searchTerms, entry.displayNameDe)}
+            </p>
+            <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">{entry.shortDescriptionDe}</p>
+            <span className="mt-3 inline-block text-sm font-medium text-primary">Profil öffnen</span>
+          </Link>
         ))}
       </div>
-
-      {lexiconQuery.isLoading ? (
-        <p className="text-sm text-muted-foreground">Lexikon wird geladen…</p>
-      ) : lexiconQuery.isError && !lexiconQuery.data ? (
-        <p className="text-sm text-destructive">Lexikon konnte nicht geladen werden. Bitte später erneut versuchen.</p>
-      ) : (
-        <>
-          <p className="text-xs text-muted-foreground">
-            {items.length} von {substances.length} Profilen · keine Shoppreise
-          </p>
-
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {items.map((item) => (
-              <Link
-                key={item.slug}
-                to={`/peptide/lexikon/${item.slug}`}
-                className="rounded-xl border border-border/70 bg-card p-5 transition-colors hover:border-primary/40"
-              >
-                <div className="flex flex-wrap gap-1.5">
-                  <Badge variant="secondary">{CATEGORY_LABELS[item.category]}</Badge>
-                  <Badge variant="outline">Evidence {item.evidenceLevel}</Badge>
-                </div>
-                <h2 className="mt-3 text-base font-semibold tracking-tight">{item.displayName}</h2>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {[...item.aliases, ...item.developmentNames].slice(0, 3).join(" · ") || "Keine Aliase hinterlegt"}
-                </p>
-                <p className="mt-3 text-xs text-muted-foreground">
-                  Status: {REGULATORY_LABELS[item.regulatoryStatus]} · Evidence {item.evidenceLevel}
-                  {item.lastReviewedAt ? ` · Last reviewed: ${formatReviewedDate(item.lastReviewedAt)}` : " · Last reviewed: —"}
-                </p>
-                <span className="mt-3 inline-block text-sm font-medium text-primary">Profil öffnen</span>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
     </div>
   );
 }

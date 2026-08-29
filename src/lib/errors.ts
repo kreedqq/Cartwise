@@ -20,6 +20,14 @@ const KNOWN_POSTGRES_CODES: Record<string, string> = {
   "42501": "Du hast keine Berechtigung für diese Aktion.",
 };
 
+export function isSupabaseSessionError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const err = error as { message?: string; code?: string; status?: number };
+  if (err.status === 401 || err.code === "PGRST301") return true;
+  const msg = err.message?.toLowerCase() ?? "";
+  return msg.includes("jwt") || msg.includes("session") || msg.includes("token expired");
+}
+
 export function toAppError(error: unknown): AppError {
   if (error && typeof error === "object") {
     const err = error as { message?: string; code?: string; status?: number };
@@ -31,7 +39,7 @@ export function toAppError(error: unknown): AppError {
       };
     }
 
-    if (err.code === "PGRST301" || err.status === 401 || err.status === 403) {
+    if (isSupabaseSessionError(error) || err.status === 403) {
       return {
         message: "Deine Sitzung ist abgelaufen oder du hast keine Berechtigung. Bitte melde dich erneut an.",
         code: err.code,

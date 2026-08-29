@@ -36,6 +36,8 @@ import type { ConnectorSourceRecord, ReviewCandidate } from "@/lib/peptide/resea
 
 const POSTGRES_SRC = readFileSync(resolve(process.cwd(), "src/lib/peptide/research/operations/postgres.ts"), "utf8");
 const DETAIL_SRC = readFileSync(resolve(process.cwd(), "src/pages/peptide/PeptideLexiconDetail.tsx"), "utf8");
+const COMMUNITY_SRC = readFileSync(resolve(process.cwd(), "src/components/peptide/lexicon/LexiconCommunitySection.tsx"), "utf8");
+const SOURCES_SRC = readFileSync(resolve(process.cwd(), "src/components/peptide/lexicon/LexiconSourcesSection.tsx"), "utf8");
 const PERSIST_SRC = readFileSync(resolve(process.cwd(), "src/lib/peptide/research/operations/persist.ts"), "utf8");
 
 const RETA_PUBMED = {
@@ -274,10 +276,10 @@ describe("citation coverage", () => {
     const profile = mapped.profiles.get("liraglutide");
     expect(profile?.sources.some((row) => row.pmid === "28237263")).toBe(false);
     expect(profile?.sourceReferences?.some((row) => row.pmid === "28237263")).toBe(true);
-    expect(DETAIL_SRC).toContain("Scientific Claims");
-    expect(DETAIL_SRC).toContain("Claim Sources");
-    expect(DETAIL_SRC).toContain("Source References");
-    expect(DETAIL_SRC).toContain("Keine Claim-Citation");
+    expect(DETAIL_SRC).toContain("Kurz erklärt");
+    expect(SOURCES_SRC).toContain("Quellen");
+    expect(COMMUNITY_SRC).toContain("Community Erfahrungen");
+    expect(DETAIL_SRC).toMatch(/keine Dosierungsempfehlung/i);
   });
 });
 

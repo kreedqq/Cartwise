@@ -2,16 +2,18 @@ import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PEPTIDE_SUBSTANCES_IDENTITY } from "@/lib/peptide/catalog";
+import { buildPublicLexiconV2Catalog } from "@/lib/peptide/lexiconV2/publicCatalog";
+import { LEXICON_V2_CATEGORY_FILTERS } from "@/lib/peptide/lexiconV2/publicTypes";
 import {
   OPERATIONS_MIGRATION_REQUIRED,
   OPERATIONS_PRODUCTION_WRITE,
   REDDIT_CONNECTOR_STATUS,
   communityCannotRaiseScientificEvidence,
 } from "@/lib/peptide/research/operations";
-import { AVAILABLE_SCIENTIFIC_CONNECTORS, engineAdminCapabilities } from "@/lib/peptide/research/updateEngine";
+import { AVAILABLE_SCIENTIFIC_CONNECTORS, engineAdminCapabilities, lexiconUpdateProfileCount } from "@/lib/peptide/research/updateEngine";
 import type { OperationsAction, OperationsRunRecord } from "@/lib/peptide/research/operations/types";
 import type { ScientificConnectorId } from "@/lib/peptide/research/updateEngine/types";
+import type { ShopCoverageCategory } from "@/lib/peptide/shopCoverage/types";
 import {
   useAdminConnectorHealth,
   useAdminResearchRuns,
@@ -20,11 +22,20 @@ import {
 } from "@/hooks/useResearchOperations";
 import { startAdminResearchRun } from "@/services/researchOperations";
 
+const LEXICON_PROFILE_COUNT = lexiconUpdateProfileCount();
+
 export function ResearchOperationsPanel() {
   const caps = engineAdminCapabilities();
+  const catalog = React.useMemo(() => buildPublicLexiconV2Catalog(), []);
+  const profileOptions = React.useMemo(
+    () => [...catalog.entries].sort((left, right) => left.displayNameDe.localeCompare(right.displayNameDe, "de")),
+    [catalog.entries],
+  );
+
   const [page, setPage] = React.useState(0);
   const [substance, setSubstance] = React.useState("retatrutide");
   const [connector, setConnector] = React.useState<ScientificConnectorId>("pubmed");
+  const [category, setCategory] = React.useState<ShopCoverageCategory>("PEPTIDES");
   const [active, setActive] = React.useState<OperationsRunRecord | null>(null);
   const [message, setMessage] = React.useState<string | null>(null);
   const [pending, setPending] = React.useState(false);
@@ -39,14 +50,15 @@ export function ResearchOperationsPanel() {
     try {
       const result = await startAdminResearchRun({
         action,
-        substanceSlug: action === "update-all" || action === "update-connector" ? undefined : substance,
-        connector: action === "update-all" || action === "update-substance" ? undefined : connector,
+        substanceSlug: action === "update-all" || action === "update-connector" || action === "update-category" ? undefined : substance,
+        connector: action === "update-all" || action === "update-substance" || action === "update-category" ? undefined : connector,
+        category: action === "update-category" ? category : undefined,
         onProgress: setActive,
       });
       setActive(result.run);
       const s = result.run.statistics;
       setMessage(
-        `Sources checked: ${s.sourcesQueried} · New: ${s.sourcesNew} · Updated: ${s.sourcesUpdated} · Unchanged: ${s.sourcesUnchanged} · Duplicate: ${s.sourcesDuplicate} · Review required: ${s.reviewRequired}${result.postgres.ok ? " · Postgres saved" : ` · Session only (${result.postgres.message ?? "no schema"})`}`,
+        `Scope: ${result.run.scope.substanceSlugs.length} Profile · Sources checked: ${s.sourcesQueried} · New: ${s.sourcesNew} · Updated: ${s.sourcesUpdated} · Unchanged: ${s.sourcesUnchanged} · Duplicate: ${s.sourcesDuplicate} · Review required: ${s.reviewRequired}${result.postgres.ok ? " · Postgres saved" : ` · Session only (${result.postgres.message ?? "no schema"})`}`,
       );
       await runsQuery.refetch();
       await healthQuery.refetch();
@@ -65,7 +77,8 @@ export function ResearchOperationsPanel() {
       <div>
         <h2 className="text-base font-semibold">Research Operations</h2>
         <p className="text-sm text-muted-foreground">
-          Update All = 27 Substanzen × verfügbare Scientific Connectors. Nicht Shop-Produkte. Kein Auto-Approve.
+          Update All Lexikon = {LEXICON_PROFILE_COUNT} eindeutig identifizierte Profile × verfügbare Scientific Connectors.
+          Nicht Shop-Produkte. REVIEW_REQUIRED/UNKNOWN ausgeschlossen. Kein Auto-Approve.
           Cron {caps.cronEnabled ? "an" : "aus"}. Claims/Evidence/Regulatory-Write {OPERATIONS_PRODUCTION_WRITE ? "an" : "aus"}.
           Runs werden nach 0031 in Postgres gespeichert. MIGRATION_REQUIRED: {OPERATIONS_MIGRATION_REQUIRED}.
         </p>
@@ -73,15 +86,29 @@ export function ResearchOperationsPanel() {
 
       <div className="flex flex-wrap gap-2">
         <label className="text-sm">
-          Substanz
+          Lexikonprofil
           <select
-            className="ml-2 rounded-md border border-border bg-background px-2 py-1"
+            className="ml-2 max-w-xs rounded-md border border-border bg-background px-2 py-1"
             value={substance}
             onChange={(event) => setSubstance(event.target.value)}
           >
-            {PEPTIDE_SUBSTANCES_IDENTITY.map((row) => (
+            {profileOptions.map((row) => (
               <option key={row.slug} value={row.slug}>
-                {row.name}
+                {row.displayNameDe}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-sm">
+          Kategorie
+          <select
+            className="ml-2 rounded-md border border-border bg-background px-2 py-1"
+            value={category}
+            onChange={(event) => setCategory(event.target.value as ShopCoverageCategory)}
+          >
+            {LEXICON_V2_CATEGORY_FILTERS.filter((row) => row.id !== "all").map((row) => (
+              <option key={row.id} value={row.id}>
+                {row.label}
               </option>
             ))}
           </select>
@@ -104,16 +131,19 @@ export function ResearchOperationsPanel() {
 
       <div className="flex flex-wrap gap-2">
         <Button type="button" size="sm" disabled={pending} onClick={() => void run("update-all")}>
-          Update All
+          Update All Lexikon
         </Button>
         <Button type="button" size="sm" variant="outline" disabled={pending} onClick={() => void run("update-substance")}>
-          Update Substance
+          Update Profil
+        </Button>
+        <Button type="button" size="sm" variant="outline" disabled={pending} onClick={() => void run("update-category")}>
+          Update Kategorie
         </Button>
         <Button type="button" size="sm" variant="outline" disabled={pending} onClick={() => void run("update-connector")}>
           Update Connector
         </Button>
         <Button type="button" size="sm" variant="outline" disabled={pending} onClick={() => void run("update-combined")}>
-          Substance + Connector
+          Profil + Connector
         </Button>
         {active && running ? (
           <Button
@@ -138,9 +168,10 @@ export function ResearchOperationsPanel() {
             {active.progress.substance ? ` · ${active.progress.substance}` : ""}
           </p>
           <p className="text-muted-foreground">
-            Checked {active.statistics.sourcesQueried} · New {active.statistics.sourcesNew} · Updated{" "}
-            {active.statistics.sourcesUpdated} · Unchanged {active.statistics.sourcesUnchanged} · Duplicate{" "}
-            {active.statistics.sourcesDuplicate} · Review required {active.statistics.reviewRequired}
+            Scope {active.scope.substanceSlugs.length} Profile · Checked {active.statistics.sourcesQueried} · New{" "}
+            {active.statistics.sourcesNew} · Updated {active.statistics.sourcesUpdated} · Unchanged{" "}
+            {active.statistics.sourcesUnchanged} · Duplicate {active.statistics.sourcesDuplicate} · Review required{" "}
+            {active.statistics.reviewRequired}
           </p>
         </div>
       ) : null}
@@ -176,7 +207,7 @@ export function ResearchOperationsPanel() {
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
           Reddit: {REDDIT_CONNECTOR_STATUS}. Community cannot raise evidence:{" "}
-          {communityCannotRaiseScientificEvidence() ? "yes" : "no"}. Keine Community-Daten importiert.
+          {communityCannotRaiseScientificEvidence() ? "yes" : "no"}. Keine automatischen Community-Imports.
         </p>
       </div>
 
@@ -210,7 +241,7 @@ export function ResearchOperationsPanel() {
                     <td className="py-1">{row.startedAt.slice(0, 19)}</td>
                     <td className="py-1">{row.completedAt ? row.completedAt.slice(0, 19) : "—"}</td>
                     <td className="py-1">{row.trigger}</td>
-                    <td className="py-1">{row.scope.substanceSlugs.length} subst.</td>
+                    <td className="py-1">{row.scope.substanceSlugs.length} Profile</td>
                     <td className="py-1">{row.scope.connectors.join(", ") || "—"}</td>
                     <td className="py-1">{row.status}</td>
                     <td className="py-1">{row.statistics.sourcesQueried}</td>

@@ -26,8 +26,14 @@ export function sqlPrefixMappingSlug(code: string): string | null {
   return null;
 }
 
+export function sqlKlowNameMappingSlug(name: string): boolean {
+  const value = name.toLowerCase();
+  return value.includes("klow");
+}
+
 export function sqlGlowNameMappingSlug(name: string): boolean {
   const value = name.toLowerCase();
+  if (sqlKlowNameMappingSlug(value)) return false;
   return value.includes("ghk") && value.includes("tb") && value.includes("bpc");
 }
 
@@ -35,6 +41,7 @@ export function sqlGlowNameMappingSlug(name: string): boolean {
 export function sqlMappingSlug(product: { code?: string | null; name?: string | null }): string | null {
   const prefix = sqlPrefixMappingSlug(product.code ?? "");
   if (prefix) return prefix;
+  if (sqlKlowNameMappingSlug(product.name ?? "")) return "klow-blend";
   if (sqlGlowNameMappingSlug(product.name ?? "")) return "glow-blend";
   return null;
 }

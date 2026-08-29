@@ -18,6 +18,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { hasBulkTier } from "@/lib/money";
 import { cn } from "@/lib/utils";
+import { productMatchesShopSearch } from "@/lib/shop/display";
 import {
   countProductsByShopCategory,
   isShopCategoryId,
@@ -42,12 +43,11 @@ export default function ShopPage() {
 
   const filtered = React.useMemo(() => {
     if (!selected) return [];
-    const term = search.trim().toLowerCase();
+    const term = search.trim();
     return products.filter((p) => {
       if (!productInShopCategory(p, selected)) return false;
       if (bulkOnly && !hasBulkTier(p)) return false;
-      if (!term) return true;
-      return p.code.toLowerCase().includes(term) || p.name.toLowerCase().includes(term);
+      return productMatchesShopSearch(p, term);
     });
   }, [products, search, selected, bulkOnly]);
 
@@ -92,7 +92,7 @@ export default function ShopPage() {
       <PageHeader
         eyebrow="Shop"
         title={active.label}
-        description={`${filtered.length} Artikel · Menge setzen und in den Warenkorb legen.`}
+        description={`${filtered.length} Artikel · Variante und Menge wählen, dann in den Warenkorb legen.`}
         actions={
           <Button variant="ghost" size="sm" onClick={() => setParams({})} className="gap-1.5">
             <ArrowLeft className="h-4 w-4" />
@@ -125,7 +125,7 @@ export default function ShopPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Artikelcode oder Name suchen …"
+            placeholder="Produktname suchen …"
             className="pl-8"
           />
         </div>

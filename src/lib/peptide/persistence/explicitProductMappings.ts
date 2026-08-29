@@ -122,11 +122,6 @@ export const UNRESOLVED_PRODUCT_MAPPINGS: readonly UnresolvedProductMap[] = [
     reason: "Melanotan I is not Melanotan II; prefix ^MT[0-9] must not stand.",
   },
   {
-    code: "KL80",
-    name: "(KLOW) GHK-CU 50mg+TB500 10mg+BPC157 10mg+TB500 10mg Blend",
-    reason: "Klow is not the glow-blend identity (extra TB-500).",
-  },
-  {
     code: "BB10",
     name: "BPC157 5mg+TB500 5mg Blend",
     reason: "Two-substance blend; no blend identity slug.",
@@ -199,4 +194,4 @@ export const UNRESOLVED_PRODUCT_MAPPINGS: readonly UnresolvedProductMap[] = [
 ];
 
 /** Prefix-mapped codes that are identity-unsafe and must not remain after 0024. */
-export const UNMAP_PREFIX_CODES: readonly string[] = ["MT1", "KL80"];
+export const UNMAP_PREFIX_CODES: readonly string[] = ["MT1"];

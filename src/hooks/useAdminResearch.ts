@@ -14,34 +14,41 @@ import {
 import type { AdminReviewAction } from "@/lib/peptide/adminResearch";
 
 export function useAdminResearchDashboard() {
+  const { isAdmin, loading } = useAuth();
   return useQuery({
     queryKey: QUERY_KEYS.adminResearchDashboard,
     queryFn: fetchAdminResearchDashboard,
+    enabled: isAdmin && !loading,
     retry: 0,
   });
 }
 
 export function useAdminReviewQueue(kind: ReviewQueueKind, page: number) {
+  const { isAdmin, loading } = useAuth();
   return useQuery({
     queryKey: QUERY_KEYS.adminResearchQueue(kind, page),
     queryFn: () => fetchReviewQueue(kind, page, ADMIN_RESEARCH_PAGE_SIZE),
+    enabled: isAdmin && !loading,
     retry: 0,
   });
 }
 
 export function useAdminReviewDetail(kind: ReviewQueueKind | null, id: string | null) {
+  const { isAdmin, loading } = useAuth();
   return useQuery({
     queryKey: QUERY_KEYS.adminResearchDetail(kind ?? "evidence", id ?? ""),
-    enabled: Boolean(kind && id),
+    enabled: Boolean(kind && id) && isAdmin && !loading,
     queryFn: () => fetchReviewItemDetail(kind!, id!),
     retry: 0,
   });
 }
 
 export function useAdminProductMappings(page: number) {
+  const { isAdmin, loading } = useAuth();
   return useQuery({
     queryKey: QUERY_KEYS.adminResearchMappings(page),
     queryFn: () => fetchProductMappings(page, ADMIN_RESEARCH_PAGE_SIZE),
+    enabled: isAdmin && !loading,
     retry: 0,
   });
 }

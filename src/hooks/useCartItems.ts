@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@/lib/constants";
+import { useAuth } from "@/context/AuthProvider";
 import {
   addCartItem,
   addCartItemsBulk,
@@ -27,11 +28,14 @@ export function useCartItems(cartId: string | undefined) {
 
 export function useCartItemMutations(cartId: string) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   function invalidate() {
+    if (!user) return Promise.resolve();
     return Promise.all([
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.cartItems(cartId) }),
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts }),
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts(user.id) }),
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.cartSummaries(user.id) }),
     ]);
   }
 

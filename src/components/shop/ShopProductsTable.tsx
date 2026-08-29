@@ -1,11 +1,24 @@
-import { Check, ShoppingCart, Star } from "lucide-react";
+import { Check, Info, ShoppingCart, Star } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useShopProductRow } from "@/hooks/useShopProductRow";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
 import { convertUsdToEur, formatEur, formatQuantity, formatUsd, hasBulkTier } from "@/lib/money";
 import { shopCategoryById, shopCategoryIdFor } from "@/lib/shopCategories";
+import {
+  groupAndSortShopProducts,
+  SHOP_QUANTITY_OPTIONS,
+  variantLabelForProduct,
+  type ShopProductGroup,
+} from "@/lib/shop/display";
 import type { Tables } from "@/types/database";
 
 interface ShopProductsTableProps {
@@ -15,13 +28,14 @@ interface ShopProductsTableProps {
 }
 
 export function ShopProductsTable({ products, rate, favoriteProductIds }: ShopProductsTableProps) {
+  const groups = groupAndSortShopProducts(products);
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-10" />
-          <TableHead className="w-32">Artikelcode</TableHead>
-          <TableHead className="min-w-[200px]">Produktname</TableHead>
+          <TableHead className="w-20">Info</TableHead>
+          <TableHead className="min-w-[240px]">Produkt</TableHead>
           <TableHead className="w-40">Einzelpreis</TableHead>
           <TableHead className="w-48">Mengenpreis</TableHead>
           <TableHead className="w-28 text-right">Menge</TableHead>
@@ -29,12 +43,12 @@ export function ShopProductsTable({ products, rate, favoriteProductIds }: ShopPr
         </TableRow>
       </TableHeader>
       <TableBody>
-        {products.map((product) => (
-          <ShopProductRow
-            key={product.id}
-            product={product}
+        {groups.map((group) => (
+          <ShopProductGroupTableRow
+            key={group.familySlug}
+            group={group}
             rate={rate}
-            isFavorite={favoriteProductIds.has(product.id)}
+            favoriteProductIds={favoriteProductIds}
           />
         ))}
       </TableBody>
@@ -42,16 +56,18 @@ export function ShopProductsTable({ products, rate, favoriteProductIds }: ShopPr
   );
 }
 
-function ShopProductRow({
-  product,
+function ShopProductGroupTableRow({
+  group,
   rate,
-  isFavorite,
+  favoriteProductIds,
 }: {
-  product: Tables<"products">;
+  group: ShopProductGroup;
   rate: number | null;
-  isFavorite: boolean;
+  favoriteProductIds: Set<string>;
 }) {
-  const row = useShopProductRow(product, rate, isFavorite);
+  const row = useShopProductGroupRow(group, rate, favoriteProductIds);
+  const product = row.product;
+
   const bulk = hasBulkTier(product);
   const qtyNum = Number(row.quantity.replace(",", "."));
   const bulkActive = bulk && Number.isFinite(qtyNum) && qtyNum >= (product.bulk_price_min_quantity as number);
@@ -59,25 +75,51 @@ function ShopProductRow({
     bulk && Number.isFinite(qtyNum) && !bulkActive
       ? Math.max(0, (product.bulk_price_min_quantity as number) - qtyNum)
       : null;
+  const isFavorite = favoriteProductIds.has(product.id);
 
   return (
     <TableRow>
       <TableCell>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          disabled={row.favoritePending}
-          onClick={row.toggleFavorite}
-          aria-label={isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
-        >
-          <Star className={isFavorite ? "h-4 w-4 fill-warning text-warning" : "h-4 w-4 text-muted-foreground"} />
-        </Button>
+        <div className="flex items-center gap-0.5">
+          {group.lexiconHref ? (
+            <Button variant="ghost" size="icon" className="h-8 w-8" asChild title="Zum Lexikon">
+              <Link to={group.lexiconHref} aria-label="Zum Lexikon">
+                <Info className="h-4 w-4 text-primary" />
+              </Link>
+            </Button>
+          ) : (
+            <span className="inline-flex h-8 w-8 items-center justify-center" aria-hidden="true" />
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            disabled={row.favoritePending}
+            onClick={row.toggleFavorite}
+            aria-label={isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
+          >
+            <Star className={isFavorite ? "h-4 w-4 fill-warning text-warning" : "h-4 w-4 text-muted-foreground"} />
+          </Button>
+        </div>
       </TableCell>
-      <TableCell className="font-mono text-xs">{product.code}</TableCell>
       <TableCell>
-        <p className="text-sm font-medium">{product.name}</p>
-        {product.dosage_vial && <p className="text-xs text-muted-foreground">{product.dosage_vial}</p>}
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-sm font-medium">{group.displayName}</p>
+          {row.hasMultipleVariants && (
+            <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
+              <SelectTrigger className="h-9 w-[120px] shrink-0" aria-label="Variante wählen">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {group.variants.map((variant) => (
+                  <SelectItem key={variant.id} value={variant.id}>
+                    {variantLabelForProduct(variant)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
         <p className="text-[11px] text-muted-foreground">{shopCategoryById(shopCategoryIdFor(product)).label}</p>
       </TableCell>
       <TableCell className="text-sm">
@@ -105,12 +147,18 @@ function ShopProductRow({
         )}
       </TableCell>
       <TableCell>
-        <Input
-          value={row.quantity}
-          onChange={(e) => row.setQuantity(e.target.value)}
-          inputMode="decimal"
-          className="h-9 text-right tabular-nums"
-        />
+        <Select value={row.quantity} onValueChange={row.setQuantity}>
+          <SelectTrigger className="ml-auto h-9 w-[88px]" aria-label="Menge wählen">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SHOP_QUANTITY_OPTIONS.map((qty) => (
+              <SelectItem key={qty} value={String(qty)}>
+                {formatQuantity(qty)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </TableCell>
       <TableCell className="text-right">
         <Button
@@ -118,7 +166,7 @@ function ShopProductRow({
           variant={row.status === "success" ? "secondary" : "default"}
           loading={row.status === "loading"}
           onClick={row.handleAdd}
-          aria-label={`${product.code} zum Warenkorb hinzufügen`}
+          aria-label={`${group.displayName} zum Warenkorb hinzufügen`}
         >
           {row.status === "success" ? <Check className="text-success" /> : <ShoppingCart />}
         </Button>

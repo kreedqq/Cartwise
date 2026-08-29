@@ -204,6 +204,9 @@ describe("phase 7 product mapping / hudson / community / empty / ordering", () =
     expect(postgresMappingSlug({ code: "BBG70", name: "(GLOW) GHK-CU 50mg+TB500 10mg+BPC157 10mg Blend" })).toBe(
       "glow-blend",
     );
+    expect(postgresMappingSlug({ code: "KL80", name: "(KLOW) GHK-CU 50mg+TB500 10mg+BPC157 10mg+TB500 10mg Blend" })).toBe(
+      "klow-blend",
+    );
     for (const row of UNRESOLVED_PRODUCT_MAPPINGS) {
       expect(postgresMappingSlug(row)).toBeNull();
     }
@@ -310,8 +313,8 @@ describe("phase 7 readiness and safety", () => {
     const lexicon = readFileSync(resolve(process.cwd(), "src/pages/peptide/PeptideLexicon.tsx"), "utf8");
     const detail = readFileSync(resolve(process.cwd(), "src/pages/peptide/PeptideLexiconDetail.tsx"), "utf8");
     expect(`${lexicon}\n${detail}`).not.toMatch(/in den Warenkorb/i);
-    expect(lexicon).toMatch(/usePublicLexicon|searchLexiconSubstances/);
-    expect(detail).toMatch(/usePublicLexicon/);
+    expect(lexicon).toMatch(/useLexiconV2Catalog|searchLexiconV2Entries/);
+    expect(detail).toMatch(/useLexiconV2Catalog/);
     expect(lexicon).toMatch(/keine Shoppreise/);
   });
 });

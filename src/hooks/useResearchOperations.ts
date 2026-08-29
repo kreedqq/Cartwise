@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@/lib/constants";
+import { useAuth } from "@/context/AuthProvider";
 import { OPERATIONS_RUN_PAGE_SIZE } from "@/lib/peptide/research/operations";
 import type { OperationsAction } from "@/lib/peptide/research/operations/types";
 import type { ScientificConnectorId } from "@/lib/peptide/research/updateEngine/types";
@@ -13,16 +14,22 @@ import {
 } from "@/services/researchOperations";
 
 export function useAdminResearchRuns(page: number) {
+  const { isAdmin, loading } = useAuth();
   return useQuery({
     queryKey: QUERY_KEYS.adminResearchRuns(page),
     queryFn: () => listAdminResearchRuns(page, OPERATIONS_RUN_PAGE_SIZE),
+    enabled: isAdmin && !loading,
+    retry: 0,
   });
 }
 
 export function useAdminConnectorHealth() {
+  const { isAdmin, loading } = useAuth();
   return useQuery({
     queryKey: ["admin-research-connector-health"],
     queryFn: () => listAdminConnectorHealth(),
+    enabled: isAdmin && !loading,
+    retry: 0,
   });
 }
 

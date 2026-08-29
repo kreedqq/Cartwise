@@ -19,7 +19,7 @@ export {
   reviewStatusForDisposition,
   scientificSourceFieldsChanged,
 } from "@/lib/peptide/research/updateEngine/changeDetection";
-export { matchSubstance, cannotMergeSlugs, forbiddenIdentityReason, identityCatalog } from "@/lib/peptide/research/updateEngine/matchIdentity";
+export { matchSubstance, cannotMergeSlugs, forbiddenIdentityReason, identityCatalog, lexiconIdentityCatalog } from "@/lib/peptide/research/updateEngine/matchIdentity";
 export { normalizePubmedArticle, validatePubmedRecord } from "@/lib/peptide/research/updateEngine/pubmed";
 export { normalizeClinicalTrial, rejectClinicalTrial, validateClinicalTrialRecord } from "@/lib/peptide/research/updateEngine/clinicalTrials";
 export { normalizeFdaResult, validateFdaRecord } from "@/lib/peptide/research/updateEngine/fda";
@@ -27,7 +27,12 @@ export { normalizeEmaResult, validateEmaRecord } from "@/lib/peptide/research/up
 export { scientificAdapter } from "@/lib/peptide/research/updateEngine/adapters";
 export { runResearchUpdate, inspectFdaEmptySearch, inspectEma404 } from "@/lib/peptide/research/updateEngine/run";
 export type { ResearchRunControl, ResearchRunProgress } from "@/lib/peptide/research/updateEngine/run";
-export { resolveScope, updateAllMeansSubstancesNotShop } from "@/lib/peptide/research/updateEngine/scope";
+export { resolveScope, updateAllMeansSubstancesNotShop, lexiconUpdateProfileCount } from "@/lib/peptide/research/updateEngine/scope";
+export {
+  isLexiconUpdatableSlug,
+  lexiconUpdatableSlugs,
+  lexiconUpdatableSlugsByCategory,
+} from "@/lib/peptide/research/updateEngine/lexiconUpdateScope";
 export { persistPlanFromRun, candidateIsPublic } from "@/lib/peptide/research/updateEngine/persistPlan";
 export { withRateLimit, shouldRetry, resetRateLimitState } from "@/lib/peptide/research/updateEngine/rateLimit";
 export {

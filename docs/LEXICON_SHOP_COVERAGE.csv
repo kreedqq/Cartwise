@@ -1,0 +1,321 @@
+code,product_name,shop_category_db,coverage_category,substance,family_slug,research_slug,variant,lexicon_profile_required,mapping_unique,status,reason
+10AD,AOD9604,PEPTIDES,PEPTIDES,AOD9604,aod-9604,aod-9604,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+10AM,5-amino-1mq,PEPTIDES,ORALS,5-amino-1mq,5-amino-1mq,,10mg/vial x 10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+1T100,DHB (1-Test Cyp),INJECTABLES-OILS,OILS / INJECTABLES,DHB (1-Test Cyp),dhb-1-test-cyp,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+1TT10,DHB (1-Test Cyp),ORALS,OILS / INJECTABLES,DHB (1-Test Cyp),dhb-1-test-cyp,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+2AD,AOD9604,PEPTIDES,PEPTIDES,AOD9604,aod-9604,aod-9604,2mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+2S10,SS-31,PEPTIDES,PEPTIDES,SS-31,ss-31,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+2S50,SS-31,PEPTIDES,PEPTIDES,SS-31,ss-31,,50mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+325,T3,ORALS,ORALS,T3,t3,,25mcg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+340,T3,ORALS,ORALS,T3,t3,,40mcg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+375,LL37,PEPTIDES,PEPTIDES,LL37,ll37,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+3R225,TriTren 225mg,INJECTABLES-OILS,BLENDS,TriTren 225mg,tritren-225,,225mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+440,T4,ORALS,ORALS,T4,t4,,40mcg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+50AM,5-amino-1mq,PEPTIDES,ORALS,5-amino-1mq,5-amino-1mq,,50mg/vial x 10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+5AD,AOD9604,PEPTIDES,PEPTIDES,AOD9604,aod-9604,aod-9604,5mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+5AM,5-amino-1mq,PEPTIDES,ORALS,5-amino-1mq,5-amino-1mq,,5mg/vial x 10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+AA10,AA Water,RECONSTITUTION-WATER,HILFSSTOFFE,AA Water,aa-water,,10ml/vial x10vials,nein,ja,NON_LEXICON,"Rekonstitutionsflüssigkeit (BAC/AA Water), kein Wirkstoffprofil."
+AD5,Adamax,PEPTIDES,PEPTIDES,Adamax,adamax,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+AE1,ACE-031,PEPTIDES,PEPTIDES,ACE-031,ace-031,,1mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+AI10,AICAR,ORALS,ORALS,AICAR,aicar,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+AMQ50,5-amino-1mq,ORALS,ORALS,5-amino-1mq,5-amino-1mq,,50mg x 25tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+AP2,Adipotide,PEPTIDES,PEPTIDES,Adipotide,adipotide,,2mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+AP5,Adipotide,PEPTIDES,PEPTIDES,Adipotide,adipotide,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+AR100,Aicar,PEPTIDES,ORALS,AICAR,aicar,,100mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+AR50,Aicar,PEPTIDES,ORALS,AICAR,aicar,,50mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+AU100,AHK-CU,PEPTIDES,PEPTIDES,AHK-CU,ahk-cu,,100mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+B10F,TB-500 (FRAG),PEPTIDES,PEPTIDES,TB-500 (FRAG),tb-500-frag,,10mg/vial x 10vials,ja,nein,REVIEW_REQUIRED,Fragment label plus TB-500/TB4 mix; not mapped.
+B1201,B12,ORALS,SONSTIGE,B12,b12,,10ml x 1mg/ml,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+B1210,B12,ORALS,SONSTIGE,B12,b12,,10ml x 10mg/ml,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+B157,BPC157,ORALS,PEPTIDES,BPC157,bpc-157,bpc-157,500mcg x 100tablets,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+B300,BLEND 300mg,INJECTABLES-OILS,BLENDS,BLEND 300mg,blend-opaque,,300mg,nein,nein,UNKNOWN,Shopbezeichnung ohne identifizierbaren Wirkstoff.
+B375,BLEND 375mg,INJECTABLES-OILS,BLENDS,BLEND 300mg,blend-opaque,,375mg,nein,nein,UNKNOWN,Shopbezeichnung ohne identifizierbaren Wirkstoff.
+B500,BLEND 500mg,INJECTABLES-OILS,BLENDS,BLEND 300mg,blend-opaque,,500mg,nein,nein,UNKNOWN,Shopbezeichnung ohne identifizierbaren Wirkstoff.
+B70,COCK BOMBS,ORALS,SONSTIGE,COCK BOMBS,cock-bombs,,7mg x 100tablets,nein,nein,UNKNOWN,Shopbezeichnung ohne identifizierbaren Wirkstoff.
+BA03,BAC Water,RECONSTITUTION-WATER,HILFSSTOFFE,BAC Water,bac-water,,3ml/vial x10vials,nein,ja,NON_LEXICON,"Rekonstitutionsflüssigkeit (BAC/AA Water), kein Wirkstoffprofil."
+BA10,BAC Water,RECONSTITUTION-WATER,HILFSSTOFFE,BAC Water,bac-water,,10ml/vial x10vials,nein,ja,NON_LEXICON,"Rekonstitutionsflüssigkeit (BAC/AA Water), kein Wirkstoffprofil."
+BA100,TEST BASE (NO Ester),INJECTABLES-OILS,OILS / INJECTABLES,TEST BASE (NO Ester),test-base,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+BAM50,BAM15,ORALS,ORALS,BAM15,bam15,,50mg x 60capsule,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+BB10,BPC157 5mg+TB500 5mg Blend,PEPTIDES,BLENDS,BPC157 5mg+TB500 5mg Blend,bpc-tb500-blend,,10mg/vial x 10vials,ja,nein,REVIEW_REQUIRED,Two-substance blend; no blend identity slug.
+BB20,BPC157 10mg+TB500 10mg Blend,PEPTIDES,BLENDS,BPC157 5mg+TB500 5mg Blend,bpc-tb500-blend,,20mg/vial x 10vials,ja,nein,REVIEW_REQUIRED,Two-substance blend; no blend identity slug.
+BB500,BPC 500mcg+TB500 500mcg Blend,ORALS,BLENDS,BPC157 5mg+TB500 5mg Blend,bpc-tb500-blend,,1000mcg x 100tablets,ja,nein,REVIEW_REQUIRED,Two-substance blend; no blend identity slug.
+BBG70,(GLOW) GHK-CU 50mg+TB500 10mg+BPC157 10mg Blend,PEPTIDES,BLENDS,(GLOW) GHK-CU 50mg+TB500 10mg+BPC157 10mg Blend,glow-blend,glow-blend,70mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+BC10,BPC 157,PEPTIDES,PEPTIDES,BPC157,bpc-157,bpc-157,10mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+BC2,BPC 157,PEPTIDES,PEPTIDES,BPC157,bpc-157,bpc-157,2mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+BC20,BPC 157,PEPTIDES,PEPTIDES,BPC157,bpc-157,bpc-157,20mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+BC5,BPC 157,PEPTIDES,PEPTIDES,BPC157,bpc-157,bpc-157,5mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+BC500,BPC,ORALS,PEPTIDES,BPC157,bpc-157,bpc-157,500mcg x 60pcs,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+BM5,Metribolone,INJECTABLES-OILS,ORALS,Metribolone,metribolone,,5mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+BR20,Bronchogen,PEPTIDES,PEPTIDES,Bronchogen,bronchogen,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+BR50,Tren BASE,INJECTABLES-OILS,OILS / INJECTABLES,Tren BASE,tren-base,,50mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+BS250,BC (Boldenone Cyp),INJECTABLES-OILS,OILS / INJECTABLES,BC (Boldenone Cyp),boldenone-cypionate,,250mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+BT10,TB-500 (Thymosin B4 Acetate),PEPTIDES,PEPTIDES,TB-500 (Thymosin B4 Acetate),tb-500-tb4-mix,,10mg/vial x 10vials,ja,nein,REVIEW_REQUIRED,Shop label mixes TB-500 and Thymosin Beta-4; identities stay separate.
+BT20,TB-500 (Thymosin B4 Acetate),PEPTIDES,PEPTIDES,TB-500 (Thymosin B4 Acetate),tb-500-tb4-mix,,20mg/vial x 10vials,ja,nein,REVIEW_REQUIRED,Shop label mixes TB-500 and Thymosin Beta-4; identities stay separate.
+BT5,TB-500 (Thymosin B4 Acetate),PEPTIDES,PEPTIDES,TB-500 (Thymosin B4 Acetate),tb-500-tb4-mix,,5mg/vial x 10vials,ja,nein,REVIEW_REQUIRED,Shop label mixes TB-500 and Thymosin Beta-4; identities stay separate.
+C250,TEST CYPIONATE,INJECTABLES-OILS,OILS / INJECTABLES,TEST CYPIONATE,testosterone-cypionate,,250mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+CA20,Cardiogen,PEPTIDES,PEPTIDES,Cardiogen,cardiogen,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+CB40,CLENBUTEROL,ORALS,ORALS,CLENBUTEROL,clenbuterol,,40mcg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+CBL60,Cerebrolysin,PEPTIDES,SONSTIGE,Cerebrolysin,cerebrolysin,,60mg/vial x 6 vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+CD10,CJC-1295 With DAC,PEPTIDES,PEPTIDES,CJC-1295 With DAC,cjc-1295,cjc-1295,10mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+CD2,CJC-1295 With DAC,PEPTIDES,PEPTIDES,CJC-1295 With DAC,cjc-1295,cjc-1295,2mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+CD5,CJC-1295 With DAC,PEPTIDES,PEPTIDES,CJC-1295 With DAC,cjc-1295,cjc-1295,5mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+CD50,Clomiphene,ORALS,ORALS,Clomiphene,clomiphene,,50mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+CG25,Cabergoline,ORALS,ORALS,Cabergoline,cabergoline,,0.25mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+CGL10,Cagrilintide,PEPTIDES,PEPTIDES,Cagrilintide,cagrilintide,cagrilintide,10mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+CGL20,Cagrilintide,PEPTIDES,PEPTIDES,Cagrilintide,cagrilintide,cagrilintide,20mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+CGL5,Cagrilintide,PEPTIDES,PEPTIDES,Cagrilintide,cagrilintide,cagrilintide,5mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+CND10,CJC-1295 Without DAC,PEPTIDES,PEPTIDES,CJC-1295 With DAC,cjc-1295,cjc-1295,10mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+CND2,CJC-1295 Without DAC,PEPTIDES,PEPTIDES,CJC-1295 With DAC,cjc-1295,cjc-1295,2mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+CND5,CJC-1295 Without DAC,PEPTIDES,PEPTIDES,CJC-1295 With DAC,cjc-1295,cjc-1295,5mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+COR20,Cortagen,PEPTIDES,PEPTIDES,Cortagen,cortagen,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+CP10,CJC-1295 without DAC 5mg + IPA 5mg Blend,PEPTIDES,BLENDS,CJC-1295 without DAC 5mg + IPA 5mg Blend,cjc-ipamorelin-blend,,10mg/vial x 10vials,ja,nein,REVIEW_REQUIRED,Two-substance blend.
+CP20,CJC-1295 without DAC 10mg + IPA 10mg,PEPTIDES,BLENDS,CJC-1295 without DAC 5mg + IPA 5mg Blend,cjc-ipamorelin-blend,,20mg/vial x 10vials,ja,nein,REVIEW_REQUIRED,Two-substance blend.
+CRY20,Crystagen,PEPTIDES,PEPTIDES,Crystagen,crystagen,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+CS10,Cagrilintide 5mg+Semaglutide 5mg Blend,PEPTIDES,BLENDS,Cagrilintide 5mg+Semaglutide 5mg Blend,cagrilintide-semaglutide-blend,,10mg/vial x 10vials,ja,nein,REVIEW_REQUIRED,Two-substance blend; do not pick one INN.
+CT10,Turinabol,ORALS,ORALS,Turinabol,turinabol,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+CT25,Turinabol,ORALS,ORALS,Turinabol,turinabol,,25mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+CT50,Turinabol,ORALS,ORALS,Turinabol,turinabol,,50mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+CU100,GHK-CU,PEPTIDES,PEPTIDES,GHK-CU,ghk-cu,ghk-cu,100mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+CU50,GHK-CU,PEPTIDES,PEPTIDES,GHK-CU,ghk-cu,ghk-cu,50mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+D10,DIANABOL,ORALS,ORALS,DIANABOL,dianabol,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+D100,Mast P (DP),INJECTABLES-OILS,OILS / INJECTABLES,Mast P (DP),drostanolone-propionate,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+D20,DIANABOL,ORALS,ORALS,DIANABOL,dianabol,,20mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+D200,Mast E (DE),INJECTABLES-OILS,OILS / INJECTABLES,Mast E (DE),drostanolone-enanthate,,200mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+D50,DIANABOL,ORALS,ORALS,DIANABOL,dianabol,,50mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DAP30,dapoxetine,ORALS,ORALS,dapoxetine,dapoxetine,,30mg x 100pcs,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DEX1,ARIMIDEX,ORALS,ORALS,ARIMIDEX,anastrozole,,1mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DHA20,Dihexa,ORALS,PEPTIDES,Dihexa,dihexa,,20mg x 25pcs,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DM200,MAST Blend 200mg,INJECTABLES-OILS,BLENDS,MAST Blend 200mg,mast-blend,,200mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DO50,DIANABOL (Methandranstenolone),INJECTABLES-OILS,ORALS,DIANABOL,dianabol,,50mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DR5,Dermorphin,PEPTIDES,PEPTIDES,Dermorphin,dermorphin,,5mg/vial x 10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DS10,DSIP,PEPTIDES,PEPTIDES,DSIP,dsip,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DS15,DSIP,PEPTIDES,PEPTIDES,DSIP,dsip,,15mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DS2,DSIP,PEPTIDES,PEPTIDES,DSIP,dsip,,2mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DS5,DSIP,PEPTIDES,PEPTIDES,DSIP,dsip,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DT20,Tadalafil (Cialis),ORALS,ORALS,Tadalafil (Cialis),tadalafil,,20mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+DUT1,Dutasteride,ORALS,ORALS,Dutasteride,dutasteride,,1mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+E3K,EPO,PEPTIDES,SONSTIGE,EPO,epo,,3000UI/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+EC100,Estradiol Cypionate,INJECTABLES-OILS,OILS / INJECTABLES,Estradiol Cypionate,estradiol-cypionate,,10mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+EC25,Androxal (Enclomiphene),ORALS,ORALS,Androxal (Enclomiphene),enclomiphene,,25mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+ET10,Epithalon,PEPTIDES,PEPTIDES,Epithalon,epithalon,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+ET40,Epithalon,PEPTIDES,PEPTIDES,Epithalon,epithalon,,40mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+ET50,Epithalon,PEPTIDES,PEPTIDES,Epithalon,epithalon,,50mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+EX25,Aromasin (Exemestane),ORALS,ORALS,Aromasin (Exemestane),exemestane,,25mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+F410,FOXO4,PEPTIDES,PEPTIDES,FOXO4,foxo4,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+FM2,MGF,PEPTIDES,PEPTIDES,MGF,mgf,,2mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+FMP2,PEG MGF,PEPTIDES,PEPTIDES,PEG MGF,peg-mgf,,2mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+FNA1,Finasteride,ORALS,ORALS,Finasteride,finasteride,,1mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+FR10,HGH Fragment 176-191,PEPTIDES,PEPTIDES,HGH Fragment 176-191,hgh-fragment-176-191,,10mg/vial x 10 vials,ja,nein,REVIEW_REQUIRED,Fragment is not somatropin.
+FR2,HGH Fragment 176-191,PEPTIDES,PEPTIDES,HGH Fragment 176-191,hgh-fragment-176-191,,2mg/vial x 10 vials,ja,nein,REVIEW_REQUIRED,Fragment is not somatropin.
+FR5,HGH Fragment 176-191,PEPTIDES,PEPTIDES,HGH Fragment 176-191,hgh-fragment-176-191,,5mg/vial x 10 vials,ja,nein,REVIEW_REQUIRED,Fragment is not somatropin.
+FS5,Finasteride,ORALS,ORALS,Finasteride,finasteride,,5mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+FX10,Fluoxymesterone (Halotestin),ORALS,ORALS,Fluoxymesterone (Halotestin),fluoxymesterone,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+G10K,HCG,PEPTIDES,PEPTIDES,HCG,hcg,hcg,10000IU/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+G210,GHRP-2 Acetate,PEPTIDES,PEPTIDES,GHRP-2 Acetate,ghrp-2,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+G25,GHRP-2 Acetate,PEPTIDES,PEPTIDES,GHRP-2 Acetate,ghrp-2,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+G2K,HCG,PEPTIDES,PEPTIDES,HCG,hcg,hcg,2000IU/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+G50,GW-501516 (Cardarine),ORALS,ORALS,GW-501516 (Cardarine),cardarine,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+G5K,HCG,PEPTIDES,PEPTIDES,HCG,hcg,hcg,5000IU/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+G610,GHRP-6 Acetate,PEPTIDES,PEPTIDES,GHRP-6 Acetate,ghrp-6,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+G65,GHRP-6 Acetate,PEPTIDES,PEPTIDES,GHRP-6 Acetate,ghrp-6,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+G75,HMG,PEPTIDES,PEPTIDES,HMG,hmg,,75IU/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+GGH,GGH,ORALS,SONSTIGE,GGH,ggh,,blend,nein,nein,UNKNOWN,Shopbezeichnung ohne identifizierbaren Wirkstoff.
+GND2,Gonadorelin,PEPTIDES,PEPTIDES,Gonadorelin,gonadorelin,gonadorelin,2mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+GTT,Glutathione,PEPTIDES,SONSTIGE,Glutathione,glutathione,,1500mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+H06,HGH,PEPTIDES,PEPTIDES,HGH,somatropin,somatropin,6iu/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+H10,HGH,PEPTIDES,PEPTIDES,HGH,somatropin,somatropin,10iu/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+H100,Tren Hex,INJECTABLES-OILS,OILS / INJECTABLES,Tren Hex,trenbolone-hexahydrobenzylcarbonate,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+H12,HGH,PEPTIDES,PEPTIDES,HGH,somatropin,somatropin,12iu/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+H15,HGH,PEPTIDES,PEPTIDES,HGH,somatropin,somatropin,15iu/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+H24,HGH,PEPTIDES,PEPTIDES,HGH,somatropin,somatropin,24iu/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+H36,HGH,PEPTIDES,PEPTIDES,HGH,somatropin,somatropin,36iu/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+H50,HGH,PEPTIDES,PEPTIDES,HGH,somatropin,somatropin,50iu/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+HA5,Hyaluronic acid,PEPTIDES,SONSTIGE,Hyaluronic acid,hyaluronic-acid,,5mg/vial x1vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+HD50,DHT (Stanolone),INJECTABLES-OILS,OILS / INJECTABLES,DHT (Stanolone),dht-stanolone,,50mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+HHB,HHB,ORALS,SONSTIGE,HHB,hhb,,blend,nein,nein,UNKNOWN,Shopbezeichnung ohne identifizierbaren Wirkstoff.
+HU10,Humanin,PEPTIDES,PEPTIDES,Humanin,humanin,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+HX2,Hexarelin,PEPTIDES,PEPTIDES,Hexarelin,hexarelin,,2mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+HX5,Hexarelin,PEPTIDES,PEPTIDES,Hexarelin,hexarelin,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+HYD200,Hydroxychloroquine,ORALS,ORALS,Hydroxychloroquine,hydroxychloroquine,,200mg x 60capsule,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+IG01,IGF-1LR3,PEPTIDES,PEPTIDES,IGF-1LR3,igf-1-lr3,igf-1-lr3,0.1mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+IG1,IGF-1LR3,PEPTIDES,PEPTIDES,IGF-1LR3,igf-1-lr3,igf-1-lr3,1mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+IP10,Ipamorelin,PEPTIDES,PEPTIDES,Ipamorelin,ipamorelin,ipamorelin,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+IP2,Ipamorelin,PEPTIDES,PEPTIDES,Ipamorelin,ipamorelin,ipamorelin,2mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+IP5,Ipamorelin,PEPTIDES,PEPTIDES,Ipamorelin,ipamorelin,ipamorelin,5mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+ISO10,isotretinoin,ORALS,ORALS,isotretinoin,isotretinoin,,10mg x 100pcs,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+KL80,(KLOW) GHK-CU 50mg+TB500 10mg+BPC157 10mg+TB500 10mg Blend,PEPTIDES,BLENDS,(KLOW) GHK-CU 50mg+TB500 10mg+BPC157 10mg+TB500 10mg Blend,klow-blend,,80mg/vial x10vials,ja,nein,REVIEW_REQUIRED,Klow is not the glow-blend identity (extra TB-500).
+KP10,KPV,PEPTIDES,PEPTIDES,KPV,kpv,kpv,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+KP5,KPV,PEPTIDES,PEPTIDES,KPV,kpv,kpv,5mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+KP500,KPV,ORALS,PEPTIDES,KPV,kpv,kpv,500mcg x 100tablets,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+KS10,KissPeptin-10,PEPTIDES,PEPTIDES,KissPeptin-10,kisspeptin-10,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+KS5,KissPeptin-10,PEPTIDES,PEPTIDES,KissPeptin-10,kisspeptin-10,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+LAX20,Cartalax,PEPTIDES,PEPTIDES,Cartalax,cartalax,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+LC500,LC500,INJECTABLES-OILS,SONSTIGE,LC500,lc-opaque,,500mg,nein,nein,UNKNOWN,Shopbezeichnung ohne identifizierbaren Wirkstoff.
+LC526,LC526,INJECTABLES-OILS,SONSTIGE,LC500,lc-opaque,,various,nein,nein,UNKNOWN,Shopbezeichnung ohne identifizierbaren Wirkstoff.
+LC653,LC653,INJECTABLES-OILS,SONSTIGE,LC500,lc-opaque,,various,nein,nein,UNKNOWN,Shopbezeichnung ohne identifizierbaren Wirkstoff.
+LGD,LGD-4033 (Ligandrol),ORALS,ORALS,LGD-4033 (Ligandrol),ligandrol,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+LI20,Livagen,PEPTIDES,PEPTIDES,Livagen,livagen,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+LL10,Liraglutide,PEPTIDES,PEPTIDES,Liraglutide,liraglutide,liraglutide,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+LL30,Liraglutide,PEPTIDES,PEPTIDES,Liraglutide,liraglutide,liraglutide,30mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+LL5,Liraglutide,PEPTIDES,PEPTIDES,Liraglutide,liraglutide,liraglutide,5mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+LV5,Ivermectin,ORALS,ORALS,Ivermectin,ivermectin,,5mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+LZ25,Letrozole,ORALS,ORALS,Letrozole,letrozole,,2.5mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+M100,Primobolan E,INJECTABLES-OILS,OILS / INJECTABLES,Primobolan E,methenolone-enanthate,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+M1T10,17a-Methyl-1-testosterone,ORALS,ORALS,17a-Methyl-1-testosterone,methyl-1-testosterone,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+M200,Primobolan E,INJECTABLES-OILS,OILS / INJECTABLES,Primobolan E,methenolone-enanthate,,200mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+M25,Methenolone Acetate (Primobolan),ORALS,OILS / INJECTABLES,Methenolone Acetate (Primobolan),methenolone-acetate,,25mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+M28,Ostarine / MK-2866,ORALS,ORALS,Ostarine / MK-2866,ostarine,,25mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+M40,Methenolone Acetate (Primobolan),ORALS,OILS / INJECTABLES,Methenolone Acetate (Primobolan),methenolone-acetate,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+M50,Methenolone Acetate (Primobolan),ORALS,OILS / INJECTABLES,Methenolone Acetate (Primobolan),methenolone-acetate,,50mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+M6,MK-677 (Ibutamoren),ORALS,ORALS,MK-677 (Ibutamoren),ibutamoren,,10mg x 100pcs,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+MA10,Matrixyl,PEPTIDES,PEPTIDES,Matrixyl,matrixyl,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+MAX20,Prostamax,PEPTIDES,PEPTIDES,Prostamax,prostamax,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+MB20,Methylene Blue,ORALS,ORALS,Methylene Blue,methylene-blue,,20mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+MD5,Minoxidil,ORALS,ORALS,Minoxidil,minoxidil,,5mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+MDT10,Mazdutide,PEPTIDES,PEPTIDES,Mazdutide,mazdutide,mazdutide,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+MDT5,Mazdutide,PEPTIDES,PEPTIDES,Mazdutide,mazdutide,mazdutide,5mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+ML10,MT-2 (Melanotan 2 Acetate),PEPTIDES,PEPTIDES,MT-2 (Melanotan 2 Acetate),melanotan-ii,melanotan-ii,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+MN50,MENT (Testosterone Acetate),INJECTABLES-OILS,OILS / INJECTABLES,MENT (Testosterone Acetate),ment,,50mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+MS10,MOTS-C,PEPTIDES,PEPTIDES,MOTS-C,mots-c,mots-c,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+MS40,MOTS-C,PEPTIDES,PEPTIDES,MOTS-C,mots-c,mots-c,40mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+MSB10,Methylstenbolone,ORALS,ORALS,Methylstenbolone,methylstenbolone,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+MT1,MT-1,PEPTIDES,PEPTIDES,MT-1,melanotan-i,,10mg/vial x10vials,ja,nein,REVIEW_REQUIRED,Melanotan I is not Melanotan II; prefix ^MT[0-9] must not stand.
+N200,DECA (ND),INJECTABLES-OILS,OILS / INJECTABLES,DECA (ND),nandrolone-decanoate,,200mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+N300,DECA (ND),INJECTABLES-OILS,OILS / INJECTABLES,DECA (ND),nandrolone-decanoate,,300mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+NET10,N-Acetyl Epitalon Amidate,PEPTIDES,PEPTIDES,N-Acetyl Epitalon Amidate,n-acetyl-epitalon-amidate,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+NET5,N-Acetyl Epitalon Amidate,PEPTIDES,PEPTIDES,N-Acetyl Epitalon Amidate,n-acetyl-epitalon-amidate,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+NJ100,NAD+,INJECTABLES-OILS,PEPTIDES,NAD+,nad,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+NJ1000,NAD+,PEPTIDES,PEPTIDES,NAD+,nad,,1000mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+NJ250,NAD+,PEPTIDES,PEPTIDES,NAD+,nad,,250mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+NJ3100,NAD+,PEPTIDES,PEPTIDES,NAD+,nad,,100mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+NJ500,NAD+,PEPTIDES,PEPTIDES,NAD+,nad,,500mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+NM300,NANDROMIX 300mg,INJECTABLES-OILS,BLENDS,NANDROMIX 300mg,nandromix,,300mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+NP810,SNAP-8,PEPTIDES,PEPTIDES,SNAP-8,snap-8,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+NSK30,NA Selank amide,PEPTIDES,PEPTIDES,NA Selank amide,na-selank-amide,,30mg/vial x10vials,ja,nein,REVIEW_REQUIRED,Modified analogue; not mapped to selank without a separate identity.
+NXA30,NA Semax amide,PEPTIDES,PEPTIDES,NA Semax amide,na-semax-amide,,30mg/vial x10vials,ja,nein,REVIEW_REQUIRED,Modified analogue; not mapped to semax without a separate identity.
+ORF12,Orforglipron,ORALS,ORALS,Orforglipron,orforglipron,orforglipron,12mg x 100pcs,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+ORF6,Orforglipron,ORALS,ORALS,Orforglipron,orforglipron,orforglipron,6mg x 100pcs,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+OT10,Oxytocin Acetate,PEPTIDES,PEPTIDES,Oxytocin Acetate,oxytocin,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+OT2,Oxytocin Acetate,PEPTIDES,PEPTIDES,Oxytocin Acetate,oxytocin,,2mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+OT5,Oxytocin Acetate,PEPTIDES,PEPTIDES,Oxytocin Acetate,oxytocin,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+OV20,Ovagen,PEPTIDES,PEPTIDES,Ovagen,ovagen,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+OXO50,ANADROL (Oxymetholone),INJECTABLES-OILS,ORALS,ANADROL (Oxymetholone),oxymetholone,,50mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+OXP50,ANADROL,ORALS,ORALS,ANADROL (Oxymetholone),oxymetholone,,50mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+P10,Proviron,ORALS,ORALS,Proviron,mesterolone,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+P100,TEST P,INJECTABLES-OILS,OILS / INJECTABLES,TEST P,testosterone-propionate,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+P200,TEST P,INJECTABLES-OILS,OILS / INJECTABLES,TEST P,testosterone-propionate,,200mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+P210,P21,PEPTIDES,PEPTIDES,P21,p21,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+P25,Proviron,ORALS,ORALS,Proviron,mesterolone,,25mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+P41,PT-141,PEPTIDES,PEPTIDES,PT-141,pt-141,,10mg/vial x 10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PA20,Pancragen,INJECTABLES-OILS,PEPTIDES,Pancragen,pancragen,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PBN40,Prednisone,ORALS,ORALS,Prednisone,prednisone,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PE10,PE 22-28,PEPTIDES,PEPTIDES,PE 22-28,pe-22-28,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PIN10,Pinealon,PEPTIDES,PEPTIDES,Pinealon,pinealon,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PIN20,Pinealon,PEPTIDES,PEPTIDES,Pinealon,pinealon,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PIN5,Pinealon,PEPTIDES,PEPTIDES,Pinealon,pinealon,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PN10,PNC 27,PEPTIDES,PEPTIDES,PNC 27,pnc-27,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PN100,NPP,INJECTABLES-OILS,OILS / INJECTABLES,NPP,nandrolone-phenylpropionate,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PN200,NPP,INJECTABLES-OILS,OILS / INJECTABLES,NPP,nandrolone-phenylpropionate,,200mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PN5,PNC 27,PEPTIDES,PEPTIDES,PNC 27,pnc-27,,5mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PND,DNP,ORALS,ORALS,DNP,dnp,,250mg x 25tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+PRO20,Aprostadil,PEPTIDES,SONSTIGE,Aprostadil,alprostadil,,20mcg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+R100,Tren A,INJECTABLES-OILS,OILS / INJECTABLES,Tren A,trenbolone-acetate,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+R14,RAD140,ORALS,ORALS,RAD140,rad140,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+R200,Tren E,INJECTABLES-OILS,OILS / INJECTABLES,Tren E,trenbolone-enanthate,,200mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+RA10,ARA-290,PEPTIDES,PEPTIDES,ARA-290,ara-290,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+RC10,Retatrutide 5mg+Cagrilintide 5mg Blend,PEPTIDES,BLENDS,Retatrutide 5mg+Cagrilintide 5mg Blend,retatrutide-cagrilintide-blend,,10mg/vial x10vials,ja,nein,REVIEW_REQUIRED,Two-substance blend; do not pick one INN.
+RM200,TRENMIX 200mg,INJECTABLES-OILS,BLENDS,TRENMIX 200mg,trenmix,,200mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+RT10,Retatrutide,PEPTIDES,PEPTIDES,Retatrutide,retatrutide,retatrutide,10mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+RT100,Retatrutide,PEPTIDES,PEPTIDES,Retatrutide,retatrutide,retatrutide,100mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+RT15,Retatrutide,PEPTIDES,PEPTIDES,Retatrutide,retatrutide,retatrutide,15mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+RT20,Retatrutide,PEPTIDES,PEPTIDES,Retatrutide,retatrutide,retatrutide,20mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+RT30,Retatrutide,PEPTIDES,PEPTIDES,Retatrutide,retatrutide,retatrutide,30mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+RT40,Retatrutide,PEPTIDES,PEPTIDES,Retatrutide,retatrutide,retatrutide,40mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+RT5,Retatrutide,PEPTIDES,PEPTIDES,Retatrutide,retatrutide,retatrutide,5mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+RT50,Retatrutide,PEPTIDES,PEPTIDES,Retatrutide,retatrutide,retatrutide,50mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+RT60,Retatrutide,PEPTIDES,PEPTIDES,Retatrutide,retatrutide,retatrutide,60mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+RX225,RIPEX,INJECTABLES-OILS,SONSTIGE,RIPEX,ripex,,225mg,nein,nein,UNKNOWN,Shopbezeichnung ohne identifizierbaren Wirkstoff.
+RY100,Tren E,INJECTABLES-OILS,OILS / INJECTABLES,Tren E,trenbolone-enanthate,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+S040,Andarine S4,ORALS,ORALS,Andarine S4,andarine,,25mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+S250,Sustanon 250mg,INJECTABLES-OILS,BLENDS,Sustanon 250mg,sustanon,,250mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+S400,Sustanon 400mg,INJECTABLES-OILS,BLENDS,Sustanon 250mg,sustanon,,400mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+S450,Supertest 450mg,INJECTABLES-OILS,BLENDS,Supertest 450mg,supertest,,450mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+S9,SR9009,ORALS,ORALS,SR9009,sr9009,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SB20,SALBUTAMOL,ORALS,ORALS,SALBUTAMOL,salbutamol,,20mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SB300,slupp-332 250mcg+BAM15 50mcg,ORALS,BLENDS,slupp-332 250mcg+BAM15 50mcg,slu-pp-332-bam15-blend,,300mcg x 60pcs,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SD10,Superdrol,ORALS,ORALS,Superdrol,methasterone,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SD100,Sildenafil (Viagra),ORALS,ORALS,Sildenafil (Viagra),sildenafil,,100mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SDO50,Superdrol (Methyldrostanolone),INJECTABLES-OILS,ORALS,Superdrol,methasterone,,50mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SHB,SHB,INJECTABLES-OILS,SONSTIGE,SHB,shb,,blend,nein,nein,UNKNOWN,Shopbezeichnung ohne identifizierbaren Wirkstoff.
+SK10,Selank,PEPTIDES,PEPTIDES,Selank,selank,selank,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SK30,Selank,PEPTIDES,PEPTIDES,Selank,selank,selank,30mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SK5,Selank,PEPTIDES,PEPTIDES,Selank,selank,selank,5mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SL100,SLU-PP-332,ORALS,PEPTIDES,SLU-PP-332,slu-pp-332,,100mg x 60tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SL50,SLU-PP-332,ORALS,PEPTIDES,SLU-PP-332,slu-pp-332,,50mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SLU1000,SLU-PP-332,ORALS,PEPTIDES,SLU-PP-332,slu-pp-332,,1mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SLU20,SLU-PP-332,ORALS,PEPTIDES,SLU-PP-332,slu-pp-332,,20mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SLU250,SLU-PP-332,ORALS,PEPTIDES,SLU-PP-332,slu-pp-332,,250mcg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SLU5,SLU-PP-332,ORALS,PEPTIDES,SLU-PP-332,slu-pp-332,,5mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SLU500,SLU-PP-332,ORALS,PEPTIDES,SLU-PP-332,slu-pp-332,,500mcg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SM10,Semaglutide,PEPTIDES,PEPTIDES,Semaglutide,semaglutide,semaglutide,10mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SM15,Semaglutide,PEPTIDES,PEPTIDES,Semaglutide,semaglutide,semaglutide,15mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SM2,Semaglutide,PEPTIDES,PEPTIDES,Semaglutide,semaglutide,semaglutide,2mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SM20,Semaglutide,PEPTIDES,PEPTIDES,Semaglutide,semaglutide,semaglutide,20mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SM30,Semaglutide,PEPTIDES,PEPTIDES,Semaglutide,semaglutide,semaglutide,30mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SM5,Semaglutide,PEPTIDES,PEPTIDES,Semaglutide,semaglutide,semaglutide,5mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SM500,Semaglutide,ORALS,PEPTIDES,Semaglutide,semaglutide,semaglutide,500mcg x 25tablets,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SMM3,Semaglutide,ORALS,PEPTIDES,Semaglutide,semaglutide,semaglutide,3mg x 25pcs,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SMM7,Semaglutide,ORALS,PEPTIDES,Semaglutide,semaglutide,semaglutide,7mg x 25pcs,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SMO10,Sermorelin Acetate,PEPTIDES,PEPTIDES,Sermorelin Acetate,sermorelin,sermorelin,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SMO15,Sermorelin Acetate,PEPTIDES,PEPTIDES,Sermorelin Acetate,sermorelin,sermorelin,15mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SMO5,Sermorelin Acetate,PEPTIDES,PEPTIDES,Sermorelin Acetate,sermorelin,sermorelin,5mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+SO100,STANOZOLOL (Oil base) winstrol,INJECTABLES-OILS,OILS / INJECTABLES,STANOZOLOL (Oil base) winstrol,stanozolol-oil,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SO50,STANOZOLOL (Oil base) winstrol,INJECTABLES-OILS,OILS / INJECTABLES,STANOZOLOL (Oil base) winstrol,stanozolol-oil,,50mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SP100,TEST SUSPENSION 100mg,INJECTABLES-OILS,OILS / INJECTABLES,TEST SUSPENSION 100mg,testosterone-suspension,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SW100,STANOZOLOL (Water) winstrol,INJECTABLES-OILS,OILS / INJECTABLES,STANOZOLOL (Water) winstrol,stanozolol-water,,100mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+SW50,STANOZOLol (Water) winstrol,INJECTABLES-OILS,OILS / INJECTABLES,STANOZOLOL (Water) winstrol,stanozolol-water,,50mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+T20,Tamoxifen (Nolvadex),ORALS,ORALS,Tamoxifen (Nolvadex),tamoxifen,,20mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+T500,Tesofensine,ORALS,ORALS,Tesofensine,tesofensine,,500mcg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+T600,Testo 600mg,INJECTABLES-OILS,OILS / INJECTABLES,Testo 600mg,testosterone-600,,600mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+TA10,Thymosin Alpha-1,PEPTIDES,PEPTIDES,Thymosin Alpha-1,thymosin-alpha-1,thymosin-alpha-1,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TA5,Thymosin Alpha-1,PEPTIDES,PEPTIDES,Thymosin Alpha-1,thymosin-alpha-1,thymosin-alpha-1,5mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TE250,TEST ENANTHATE,INJECTABLES-OILS,OILS / INJECTABLES,TEST ENANTHATE,testosterone-enanthate,,250mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+TE300,TEST ENANTHATE,INJECTABLES-OILS,OILS / INJECTABLES,TEST ENANTHATE,testosterone-enanthate,,300mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+TER10,Teriparatide,PEPTIDES,PEPTIDES,Teriparatide,teriparatide,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+TG20,Testagen,PEPTIDES,PEPTIDES,Testagen,testagen,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+TI18,Tesamorelin 12mg+Ipamorelin 6mg,PEPTIDES,BLENDS,Tesamorelin 12mg+Ipamorelin 6mg,tesamorelin-ipamorelin-blend,,18mg/vial x10vials,ja,nein,REVIEW_REQUIRED,Two-substance blend.
+TM40,Telmisartan,ORALS,ORALS,Telmisartan,telmisartan,,40mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+TR10,Tirzepatide,PEPTIDES,PEPTIDES,Tirzepatide,tirzepatide,tirzepatide,10mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TR100,Tirzepatide,PEPTIDES,PEPTIDES,Tirzepatide,tirzepatide,tirzepatide,100mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TR120,Tirzepatide,PEPTIDES,PEPTIDES,Tirzepatide,tirzepatide,tirzepatide,120mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TR15,Tirzepatide,PEPTIDES,PEPTIDES,Tirzepatide,tirzepatide,tirzepatide,15mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TR20,Tirzepatide,PEPTIDES,PEPTIDES,Tirzepatide,tirzepatide,tirzepatide,20mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TR30,Tirzepatide,PEPTIDES,PEPTIDES,Tirzepatide,tirzepatide,tirzepatide,30mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TR40,Tirzepatide,PEPTIDES,PEPTIDES,Tirzepatide,tirzepatide,tirzepatide,40mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TR5,Tirzepatide,PEPTIDES,PEPTIDES,Tirzepatide,tirzepatide,tirzepatide,5mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TR50,Tirzepatide,PEPTIDES,PEPTIDES,Tirzepatide,tirzepatide,tirzepatide,50mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TR500,Tirzepatide,ORALS,PEPTIDES,Tirzepatide,tirzepatide,tirzepatide,500mcg x 25tablets,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TR60,Tirzepatide,PEPTIDES,PEPTIDES,Tirzepatide,tirzepatide,tirzepatide,60mg/vial x 10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TSM10,Tesamorelin,PEPTIDES,PEPTIDES,Tesamorelin,tesamorelin,tesamorelin,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TSM20,Tesamorelin,PEPTIDES,PEPTIDES,Tesamorelin,tesamorelin,tesamorelin,20mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TSM5,Tesamorelin,PEPTIDES,PEPTIDES,Tesamorelin,tesamorelin,tesamorelin,5mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+TY10,Thymalin,PEPTIDES,PEPTIDES,Thymalin,thymalin,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+TY300,TEST Undecanoate 300,INJECTABLES-OILS,OILS / INJECTABLES,TEST Undecanoate 300,testosterone-undecanoate,,300mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+U200,BU (EQUIPOISE),INJECTABLES-OILS,OILS / INJECTABLES,BU (EQUIPOISE),boldenone-undecylenate,,200mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+U300,BU (EQUIPOISE),INJECTABLES-OILS,OILS / INJECTABLES,BU (EQUIPOISE),boldenone-undecylenate,,300mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+U600,BU (EQUIPOISE),INJECTABLES-OILS,OILS / INJECTABLES,BU (EQUIPOISE),boldenone-undecylenate,,600mg,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+VE20,Vesugen,PEPTIDES,PEPTIDES,Vesugen,vesugen,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+VI20,Vilon,PEPTIDES,PEPTIDES,Vilon,vilon,,20mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+VP10,VIP,PEPTIDES,PEPTIDES,VIP,vip,,10mg/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+W10,Winstrol (Stanozolol),ORALS,ORALS,Winstrol (Stanozolol),stanozolol-oral,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+W20,Winstrol (Stanozolol),ORALS,ORALS,Winstrol (Stanozolol),stanozolol-oral,,20mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+W50,Winstrol (Stanozolol),ORALS,ORALS,Winstrol (Stanozolol),stanozolol-oral,,50mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+X10,ANAVAR,ORALS,ORALS,ANAVAR,oxandrolone,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+X25,ANAVAR,ORALS,ORALS,ANAVAR,oxandrolone,,25mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+X50,ANAVAR,ORALS,ORALS,ANAVAR,oxandrolone,,50mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+XA10,Semax,PEPTIDES,PEPTIDES,Semax,semax,semax,10mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+XA30,Semax,PEPTIDES,PEPTIDES,Semax,semax,semax,30mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+XA5,Semax,PEPTIDES,PEPTIDES,Semax,semax,semax,5mg/vial x10vials,ja,ja,COMPLETE,Sicher der vorhandenen Research-Identität zugeordnet.
+XS20,Semax 10mg+Selank 10mg,PEPTIDES,BLENDS,Semax 10mg+Selank 10mg,semax-selank-blend,,20mg/vial x10vials,ja,nein,REVIEW_REQUIRED,Two-substance blend.
+XT100,Botulinum toxin,PEPTIDES,SONSTIGE,Botulinum toxin,botulinum-toxin,,100iu/vial x10vials,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.
+Y1,YK11,ORALS,ORALS,YK11,yk11,,10mg x 100tablets,ja,ja,PARTIAL,Identifizierbarer Katalogeintrag ohne vollständiges wissenschaftliches Profil.

@@ -1,4 +1,4 @@
-import { identityCatalog } from "@/lib/peptide/research/updateEngine/matchIdentity";
+import { lexiconIdentityCatalog } from "@/lib/peptide/research/updateEngine/matchIdentity";
 import { persistPlanFromRun } from "@/lib/peptide/research/updateEngine/persistPlan";
 import { runResearchUpdate } from "@/lib/peptide/research/updateEngine/run";
 import { resolveScope } from "@/lib/peptide/research/updateEngine/scope";
@@ -16,6 +16,7 @@ import type {
   OperationsRunRecord,
   OperationsStore,
 } from "@/lib/peptide/research/operations/types";
+import type { ShopCoverageCategory } from "@/lib/peptide/shopCoverage/types";
 
 function sanitizeError(value: string | null): string | null {
   if (!value) return null;
@@ -31,10 +32,12 @@ function resolveActionScope(input: {
   action: OperationsAction;
   substanceSlug?: string;
   connector?: ScientificConnectorId;
+  category?: ShopCoverageCategory;
 }) {
   if (input.action === "update-all") return resolveScope({});
   if (input.action === "update-substance") return resolveScope({ substanceSlug: input.substanceSlug });
   if (input.action === "update-connector") return resolveScope({ connector: input.connector });
+  if (input.action === "update-category") return resolveScope({ category: input.category });
   return resolveScope({ substanceSlug: input.substanceSlug, connector: input.connector });
 }
 
@@ -52,6 +55,7 @@ export async function startPersistedRun(input: {
   action: OperationsAction;
   substanceSlug?: string;
   connector?: ScientificConnectorId;
+  category?: ShopCoverageCategory;
   connectors: UpdateEngineConnector[];
   parentRunId?: string | null;
   runId?: string;
@@ -103,7 +107,7 @@ export async function startPersistedRun(input: {
 
   const engine = await runResearchUpdate({
     scope,
-    catalog: identityCatalog(),
+    catalog: lexiconIdentityCatalog(),
     existingSources: input.store.sources.map((row) => ({
       id: row.id,
       pmid: row.pmid,

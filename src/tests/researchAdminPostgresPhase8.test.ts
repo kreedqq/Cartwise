@@ -171,9 +171,9 @@ describe("phase 8 rls and public lexicon isolation", () => {
     expect(ADMIN_PAGE).not.toMatch(/in den Warenkorb/i);
   });
 
-  it("keeps catalog files as exclusive fallback while the public lexicon reads via usePublicLexicon", () => {
-    expect(LEXICON).toContain("usePublicLexicon");
-    expect(DETAIL).toContain("usePublicLexicon");
+  it("keeps catalog files as exclusive fallback while the public lexicon reads via useLexiconV2Catalog", () => {
+    expect(LEXICON).toContain("useLexiconV2Catalog");
+    expect(DETAIL).toContain("useLexiconV2Catalog");
     expect(DETAIL).not.toContain("getPublishedProfile");
     expect(DETAIL).not.toContain("getSubstanceBySlug");
     expect(DETAIL).not.toContain("fetchAdminResearchDashboard");

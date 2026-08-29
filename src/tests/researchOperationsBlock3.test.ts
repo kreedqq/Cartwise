@@ -121,12 +121,12 @@ describe("run persistence", () => {
     expect(pageRuns(store, 0, 20).total).toBe(2);
   });
 
-  it("supports update-all, single connector, and combined scope", async () => {
+  it("supports update-all, single connector, combined, and category scope", async () => {
     const store = emptyOperationsStore();
     const connectors = [pubmedConnector([RETA_PUBMED])];
     const all = await startPersistedRun({ store, action: "update-all", connectors, now: "2026-08-29T11:00:00.000Z" });
     expect(all.run.trigger).toBe("full");
-    expect(all.run.scope.substanceSlugs).toHaveLength(27);
+    expect(all.run.scope.substanceSlugs.length).toBeGreaterThanOrEqual(160);
     const one = await startPersistedRun({
       store: emptyOperationsStore(),
       action: "update-connector",
@@ -145,6 +145,22 @@ describe("run persistence", () => {
     });
     expect(combined.run.scope.substanceSlugs).toEqual(["retatrutide"]);
     expect(combined.run.scope.connectors).toEqual(["pubmed"]);
+    const category = await startPersistedRun({
+      store: emptyOperationsStore(),
+      action: "update-category",
+      category: "ORALS",
+      connectors,
+      now: "2026-08-29T11:03:00.000Z",
+    });
+    expect(category.run.scope.substanceSlugs.length).toBeGreaterThan(0);
+    const finasteride = await startPersistedRun({
+      store: emptyOperationsStore(),
+      action: "update-substance",
+      substanceSlug: "finasteride",
+      connectors,
+      now: "2026-08-29T11:04:00.000Z",
+    });
+    expect(finasteride.run.scope.substanceSlugs).toEqual(["finasteride"]);
   });
 });
 

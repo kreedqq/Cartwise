@@ -16,23 +16,28 @@ import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useCarts } from "@/hooks/useCarts";
 import { useCartSummaries } from "@/hooks/useCartSummaries";
 import { signOut } from "@/services/auth";
+import { pickActiveOpenCart } from "@/services/carts";
+import { clearUserScopedQueries } from "@/lib/userSessionCache";
 import { toast } from "@/components/ui/toaster";
 import { BrandMark } from "@/components/layout/BrandMark";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function Topbar() {
   const { profile, user } = useAuth();
   const { theme, toggle } = useTheme();
   const online = useOnlineStatus();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const cartsQuery = useCarts();
   const summariesQuery = useCartSummaries();
 
-  const activeCart = cartsQuery.data?.find((c) => c.is_active_cart);
+  const activeCart = pickActiveOpenCart(cartsQuery.data, user?.id);
   const cartCount = activeCart ? (summariesQuery.data?.get(activeCart.id)?.item_count ?? 0) : 0;
 
   async function handleSignOut() {
     try {
       await signOut();
+      clearUserScopedQueries(queryClient);
       navigate("/login");
     } catch (error) {
       console.error("Abmelden fehlgeschlagen:", error);

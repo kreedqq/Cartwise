@@ -1,5 +1,5 @@
 import { scientificAdapter } from "@/lib/peptide/research/updateEngine/adapters";
-import { identityCatalog } from "@/lib/peptide/research/updateEngine/matchIdentity";
+import { lexiconIdentityCatalog } from "@/lib/peptide/research/updateEngine/matchIdentity";
 import { persistPlanFromRun } from "@/lib/peptide/research/updateEngine/persistPlan";
 import { runResearchUpdate } from "@/lib/peptide/research/updateEngine/run";
 import { resolveScope } from "@/lib/peptide/research/updateEngine/scope";
@@ -21,7 +21,13 @@ import {
   userReportUpdateConnector,
 } from "@/lib/peptide/research/updateEngine/unavailable";
 
-export const UPDATE_ENGINE_ADMIN_ACTIONS = ["update-all", "update-substance", "update-connector", "update-combined"] as const;
+export const UPDATE_ENGINE_ADMIN_ACTIONS = [
+  "update-all",
+  "update-substance",
+  "update-connector",
+  "update-combined",
+  "update-category",
+] as const;
 
 export function engineAdminCapabilities() {
   return {
@@ -52,7 +58,7 @@ export async function startEngineRun(input: {
   });
   const result = await runResearchUpdate({
     scope,
-    catalog: identityCatalog(),
+    catalog: lexiconIdentityCatalog(),
     existingSources: input.existingSources ?? [],
     existingStudies: input.existingStudies ?? [],
     connectors: input.connectors,

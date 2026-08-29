@@ -23,6 +23,7 @@ import { EXCLUDED_STUDY_NCTS } from "@/lib/peptide/persistence/identifiers";
 const MIGRATION = readFileSync(resolve(process.cwd(), "supabase/migrations/0031_research_operations.sql"), "utf8");
 const POSTGRES_SRC = readFileSync(resolve(process.cwd(), "src/lib/peptide/research/operations/postgres.ts"), "utf8");
 const DETAIL_SRC = readFileSync(resolve(process.cwd(), "src/pages/peptide/PeptideLexiconDetail.tsx"), "utf8");
+const COMMUNITY_SRC = readFileSync(resolve(process.cwd(), "src/components/peptide/lexicon/LexiconCommunitySection.tsx"), "utf8");
 const FETCH_SRC = readFileSync(resolve(process.cwd(), "src/lib/peptide/lexicon/fetchPublicLexicon.ts"), "utf8");
 const PANEL_SRC = readFileSync(resolve(process.cwd(), "src/components/admin/ResearchOperationsPanel.tsx"), "utf8");
 
@@ -60,9 +61,9 @@ describe("community public visibility", () => {
     expect(isPublicCommunityReport({ review_status: "review-required" })).toBe(false);
     expect(isPublicCommunityReport({ review_status: "rejected" })).toBe(false);
     expect(isPublicCommunityReport({ review_status: "approved" })).toBe(true);
-    expect(DETAIL_SRC).toContain("Scientific Research");
-    expect(DETAIL_SRC).toContain("Community Experience");
-    expect(DETAIL_SRC).toContain("Keine freigegebenen Community-Berichte");
+    expect(DETAIL_SRC).toContain("Aktuelle Studienlage");
+    expect(COMMUNITY_SRC).toContain("Community Erfahrungen");
+    expect(COMMUNITY_SRC).toContain("Nutzererfahrungen suchen");
   });
 });
 

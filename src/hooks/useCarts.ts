@@ -16,9 +16,12 @@ import {
 import type { CartStatus, Tables } from "@/types/database";
 
 export function useCarts() {
+  const { user } = useAuth();
+
   return useQuery({
-    queryKey: QUERY_KEYS.carts,
+    queryKey: QUERY_KEYS.carts(user?.id ?? ""),
     queryFn: listCarts,
+    enabled: Boolean(user?.id),
   });
 }
 
@@ -27,7 +30,8 @@ export function useCartMutations() {
   const { user } = useAuth();
 
   function invalidate() {
-    return queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts });
+    if (!user) return Promise.resolve();
+    return queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts(user.id) });
   }
 
   const create = useMutation({

@@ -1,10 +1,14 @@
 import * as React from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/lib/supabaseClient";
+import { isSupabaseSessionError } from "@/lib/errors";
+import { clearUserScopedQueries } from "@/lib/userSessionCache";
 import { getOwnProfile } from "@/services/profiles";
 import { getOwnRoles } from "@/services/roles";
 import { getMyCustomerRoleName } from "@/services/customerRoles";
+import { signOut } from "@/services/auth";
 import type { Role, Tables } from "@/types/database";
 
 interface AuthState {
@@ -21,48 +25,88 @@ interface AuthState {
 const AuthContext = React.createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = useQueryClient();
   const [session, setSession] = React.useState<Session | null>(null);
   const [profile, setProfile] = React.useState<Tables<"profiles"> | null>(null);
   const [roles, setRoles] = React.useState<Role[]>([]);
   const [customerRoleName, setCustomerRoleName] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const prevUserIdRef = React.useRef<string | null>(null);
 
-  const loadUserData = React.useCallback(async (userId: string) => {
-    try {
-      const [profileData, roleData, pricingRoleName] = await Promise.all([
-        getOwnProfile(userId),
-        getOwnRoles(userId),
-        getMyCustomerRoleName().catch(() => null),
-      ]);
-      setProfile(profileData);
-      setRoles(roleData);
-      setCustomerRoleName(pricingRoleName);
-    } catch (error) {
-      console.error("Profil/Rollen konnten nicht geladen werden:", error);
-    }
+  const resetUserState = React.useCallback(() => {
+    setProfile(null);
+    setRoles([]);
+    setCustomerRoleName(null);
   }, []);
+
+  const handleAuthUserChange = React.useCallback(
+    (nextUserId: string | null) => {
+      if (prevUserIdRef.current === nextUserId) return;
+      clearUserScopedQueries(queryClient);
+      prevUserIdRef.current = nextUserId;
+    },
+    [queryClient],
+  );
+
+  const loadUserData = React.useCallback(
+    async (userId: string) => {
+      try {
+        const [profileData, roleData, pricingRoleName] = await Promise.all([
+          getOwnProfile(userId),
+          getOwnRoles(userId),
+          getMyCustomerRoleName().catch(() => null),
+        ]);
+        setProfile(profileData);
+        setRoles(roleData);
+        setCustomerRoleName(pricingRoleName);
+      } catch (error) {
+        if (isSupabaseSessionError(error)) {
+          await signOut();
+          setSession(null);
+          resetUserState();
+          return;
+        }
+        console.error("Profil/Rollen konnten nicht geladen werden:", error);
+      }
+    },
+    [resetUserState],
+  );
 
   React.useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(({ data }) => {
+    async function bootstrapAuth() {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
       if (!mounted) return;
-      setSession(data.session);
-      if (data.session?.user) {
-        loadUserData(data.session.user.id).finally(() => setLoading(false));
-      } else {
+
+      if (error || !user) {
+        setSession(null);
+        resetUserState();
+        handleAuthUserChange(null);
         setLoading(false);
+        return;
       }
-    });
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      setSession(sessionData.session);
+      handleAuthUserChange(user.id);
+      await loadUserData(user.id);
+      if (mounted) setLoading(false);
+    }
+
+    void bootstrapAuth();
 
     const { data: subscription } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
+      handleAuthUserChange(newSession?.user?.id ?? null);
       if (newSession?.user) {
-        loadUserData(newSession.user.id);
+        void loadUserData(newSession.user.id);
       } else {
-        setProfile(null);
-        setRoles([]);
-        setCustomerRoleName(null);
+        resetUserState();
       }
     });
 
@@ -70,7 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       subscription.subscription.unsubscribe();
     };
-  }, [loadUserData]);
+  }, [handleAuthUserChange, loadUserData, resetUserState]);
 
   const refreshProfile = React.useCallback(async () => {
     if (session?.user) {

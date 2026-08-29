@@ -72,6 +72,7 @@ export function substanceSlugForProduct(product: { code?: string | null; name?: 
     if (rule.test.test(code)) return rule.slug;
   }
   const name = (product.name ?? "").toLowerCase();
+  if (name.includes("klow")) return "klow-blend";
   if (name.includes("ghk") && name.includes("tb") && name.includes("bpc")) return "glow-blend";
   const hit = PEPTIDE_SUBSTANCES.find((item) => {
     const keys = [item.name, ...item.aliases, ...item.developmentNames].map((v) => v.toLowerCase());

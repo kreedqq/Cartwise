@@ -1,10 +1,23 @@
-import { Check, ShoppingCart, Star } from "lucide-react";
+import { Check, Info, ShoppingCart, Star } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useShopProductRow } from "@/hooks/useShopProductRow";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
 import { convertUsdToEur, formatEur, formatQuantity, formatUsd, hasBulkTier } from "@/lib/money";
+import {
+  groupAndSortShopProducts,
+  SHOP_QUANTITY_OPTIONS,
+  variantLabelForProduct,
+  type ShopProductGroup,
+} from "@/lib/shop/display";
 import type { Tables } from "@/types/database";
 
 interface ShopProductsMobileListProps {
@@ -14,30 +27,34 @@ interface ShopProductsMobileListProps {
 }
 
 export function ShopProductsMobileList({ products, rate, favoriteProductIds }: ShopProductsMobileListProps) {
+  const groups = groupAndSortShopProducts(products);
+
   return (
     <div className="space-y-3">
-      {products.map((product) => (
-        <ShopProductCard
-          key={product.id}
-          product={product}
+      {groups.map((group) => (
+        <ShopProductGroupCard
+          key={group.familySlug}
+          group={group}
           rate={rate}
-          isFavorite={favoriteProductIds.has(product.id)}
+          favoriteProductIds={favoriteProductIds}
         />
       ))}
     </div>
   );
 }
 
-function ShopProductCard({
-  product,
+function ShopProductGroupCard({
+  group,
   rate,
-  isFavorite,
+  favoriteProductIds,
 }: {
-  product: Tables<"products">;
+  group: ShopProductGroup;
   rate: number | null;
-  isFavorite: boolean;
+  favoriteProductIds: Set<string>;
 }) {
-  const row = useShopProductRow(product, rate, isFavorite);
+  const row = useShopProductGroupRow(group, rate, favoriteProductIds);
+  const product = row.product;
+
   const bulk = hasBulkTier(product);
   const qtyNum = Number(row.quantity.replace(",", "."));
   const bulkActive = bulk && Number.isFinite(qtyNum) && qtyNum >= (product.bulk_price_min_quantity as number);
@@ -45,26 +62,51 @@ function ShopProductCard({
     bulk && Number.isFinite(qtyNum) && !bulkActive
       ? Math.max(0, (product.bulk_price_min_quantity as number) - qtyNum)
       : null;
+  const isFavorite = favoriteProductIds.has(product.id);
 
   return (
     <Card>
       <CardContent className="space-y-3 p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <p className="font-mono text-xs text-muted-foreground">{product.code}</p>
-            <p className="truncate text-sm font-semibold">{product.name}</p>
-            {product.dosage_vial && <p className="text-xs text-muted-foreground">{product.dosage_vial}</p>}
+        <div className="flex items-start gap-2">
+          <div className="flex shrink-0 items-center gap-0.5">
+            {group.lexiconHref ? (
+              <Button variant="ghost" size="icon" className="h-8 w-8" asChild title="Zum Lexikon">
+                <Link to={group.lexiconHref} aria-label="Zum Lexikon">
+                  <Info className="h-4 w-4 text-primary" />
+                </Link>
+              </Button>
+            ) : (
+              <span className="inline-flex h-8 w-8 items-center justify-center" aria-hidden="true" />
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              disabled={row.favoritePending}
+              onClick={row.toggleFavorite}
+              aria-label={isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
+            >
+              <Star className={isFavorite ? "h-4 w-4 fill-warning text-warning" : "h-4 w-4 text-muted-foreground"} />
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 shrink-0"
-            disabled={row.favoritePending}
-            onClick={row.toggleFavorite}
-            aria-label={isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
-          >
-            <Star className={isFavorite ? "h-4 w-4 fill-warning text-warning" : "h-4 w-4 text-muted-foreground"} />
-          </Button>
+
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold">{group.displayName}</p>
+            {row.hasMultipleVariants && (
+              <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
+                <SelectTrigger className="mt-2 h-9 w-full max-w-[200px]" aria-label="Variante wählen">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {group.variants.map((variant) => (
+                    <SelectItem key={variant.id} value={variant.id}>
+                      {variantLabelForProduct(variant)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2 rounded-md bg-secondary/50 p-2.5 text-sm">
@@ -95,19 +137,25 @@ function ShopProductCard({
         )}
 
         <div className="flex items-center gap-2">
-          <Input
-            value={row.quantity}
-            onChange={(e) => row.setQuantity(e.target.value)}
-            inputMode="decimal"
-            className="h-10 flex-1 text-right tabular-nums"
-          />
+          <Select value={row.quantity} onValueChange={row.setQuantity}>
+            <SelectTrigger className="h-10 w-[96px] shrink-0" aria-label="Menge wählen">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SHOP_QUANTITY_OPTIONS.map((qty) => (
+                <SelectItem key={qty} value={String(qty)}>
+                  {formatQuantity(qty)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Button
             size="icon"
             className="h-10 w-10 shrink-0"
             variant={row.status === "success" ? "secondary" : "default"}
             loading={row.status === "loading"}
             onClick={row.handleAdd}
-            aria-label={`${product.code} zum Warenkorb hinzufügen`}
+            aria-label={`${group.displayName} zum Warenkorb hinzufügen`}
           >
             {row.status === "success" ? <Check className="text-success" /> : <ShoppingCart />}
           </Button>

@@ -79,6 +79,7 @@ export async function startAdminResearchRun(input: {
   action: OperationsAction;
   substanceSlug?: string;
   connector?: ScientificConnectorId;
+  category?: import("@/lib/peptide/shopCoverage/types").ShopCoverageCategory;
   onProgress?: (run: OperationsRunRecord) => void;
 }) {
   const store = getSessionOperationsStore();
@@ -100,6 +101,7 @@ export async function startAdminResearchRun(input: {
       action: input.action,
       substanceSlug: input.substanceSlug,
       connector: input.connector,
+      category: input.category,
       connectors: cacheBackedScientificConnectors(),
       onProgress: input.onProgress,
       runId,
