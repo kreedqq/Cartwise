@@ -17,6 +17,7 @@ import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
 import { formatDateTime, formatEur, formatQuantity, formatUsd, summarizeOrderCharges } from "@/lib/money";
+import { PAYMENT_METHOD_LABELS, isPaymentMethod } from "@/lib/shop/paymentMethod";
 import { ORDER_STATUS_LABELS, orderItemsToBulkLines } from "@/services/orders";
 import { toast } from "@/components/ui/toaster";
 
@@ -177,6 +178,12 @@ export default function OrderDetailPage() {
                 <span className="text-muted-foreground">{formatDateTime(entry.changed_at)}</span>
               </div>
             ))}
+            <div className="flex justify-between gap-3 border-t border-border pt-2">
+              <span>Zahlungsmethode</span>
+              <span className="font-medium">
+                {isPaymentMethod(order.payment_method) ? PAYMENT_METHOD_LABELS[order.payment_method] : "—"}
+              </span>
+            </div>
             {order.note && (
               <p className="border-t border-border pt-2 text-muted-foreground">
                 Notiz: {order.note}

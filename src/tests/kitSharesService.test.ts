@@ -12,6 +12,7 @@ const {
   addKitShareToCart,
   assertKitSharePricePrivacy,
   createKitShare,
+  getMyKitShare,
   inviteKitShareParticipant,
   removeKitShareParticipant,
   updateKitShareDistribution,
@@ -31,9 +32,10 @@ const sampleView = {
   myPriceUsd: 90,
   canAddToCart: true,
   isCreator: true,
+  myHasOrdered: false,
   participants: [
-    { isSelf: true, displayName: "Du", quantity: 3 },
-    { isSelf: false, displayName: "Teilnehmer", quantity: 7 },
+    { isSelf: true, displayName: "Du", quantity: 3, hasOrdered: false },
+    { isSelf: false, displayName: "Teilnehmer", quantity: 7, hasOrdered: false },
   ],
 };
 
@@ -111,6 +113,32 @@ describe("kitShares service", () => {
     expect(view.status).toBe("open");
   });
 
+  it("maps per-participant hasOrdered / myHasOrdered so the UI can lock a placed order (Phase 13)", async () => {
+    rpc.mockResolvedValue({
+      data: {
+        ...sampleView,
+        status: "full",
+        myHasOrdered: true,
+        participants: [
+          { isSelf: true, displayName: "Du", quantity: 3, hasOrdered: true },
+          { isSelf: false, displayName: "Teilnehmer", quantity: 7, hasOrdered: false },
+        ],
+      },
+      error: null,
+    });
+    const view = await getMyKitShare("kit-1");
+    expect(view.myHasOrdered).toBe(true);
+    expect(view.participants[0].hasOrdered).toBe(true);
+    expect(view.participants[1].hasOrdered).toBe(false);
+  });
+
+  it("defaults hasOrdered/myHasOrdered to false when the server omits them (older payload)", async () => {
+    rpc.mockResolvedValue({ data: sampleView, error: null });
+    const view = await getMyKitShare("kit-1");
+    expect(view.myHasOrdered).toBe(false);
+    expect(view.participants.every((p) => p.hasOrdered === false)).toBe(true);
+  });
+
   it("adds kit share to cart via RPC with only kit share id", async () => {
     rpc.mockResolvedValue({ data: "cart-item-1", error: null });
     const cartItemId = await addKitShareToCart("kit-1");
@@ -153,7 +181,7 @@ describe("assertKitSharePricePrivacy", () => {
   it("rejects foreign price fields", () => {
     const badView = {
       ...sampleView,
-      participants: [{ isSelf: false, displayName: "Max", quantity: 7, priceUsd: 210 }],
+      participants: [{ isSelf: false, displayName: "Max", quantity: 7, hasOrdered: false, priceUsd: 210 }],
     } as typeof sampleView & { participants: Array<{ priceUsd?: number }> };
     expect(() => assertKitSharePricePrivacy(badView as never)).toThrow(/Preisfelder/);
   });

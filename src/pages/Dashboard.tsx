@@ -16,6 +16,7 @@ import { OrderTemplatesCard } from "@/components/shop/OrderTemplatesCard";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { useCarts } from "@/hooks/useCarts";
 import { useCartSummaries } from "@/hooks/useCartSummaries";
+import { isOpenCart } from "@/services/carts";
 import { useAuth } from "@/context/AuthProvider";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useMyOrders } from "@/hooks/useOrders";
@@ -33,6 +34,9 @@ export default function DashboardPage() {
   const greetingName = profile?.display_name || user?.email?.split("@")[0] || "dort";
   const recentOrders = (ordersQuery.data ?? []).slice(0, 4);
   const favoriteCount = favoritesQuery.data?.length ?? 0;
+  // Submitted carts have already become an order (visible under "Bestellungen")
+  // and must not linger in the active "Warenkörbe" overview.
+  const openCarts = (cartsQuery.data ?? []).filter((cart) => isOpenCart(cart.status));
 
   return (
     <div className="space-y-10">
@@ -86,7 +90,7 @@ export default function DashboardPage() {
           <ErrorState message="Warenkörbe konnten nicht geladen werden." onRetry={() => cartsQuery.refetch()} />
         )}
 
-        {cartsQuery.data && cartsQuery.data.length === 0 && (
+        {cartsQuery.data && openCarts.length === 0 && (
           <EmptyState
             icon={ShoppingBasket}
             title="Noch keine Warenkörbe"
@@ -102,9 +106,9 @@ export default function DashboardPage() {
           />
         )}
 
-        {cartsQuery.data && cartsQuery.data.length > 0 && (
+        {cartsQuery.data && openCarts.length > 0 && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {cartsQuery.data.map((cart) => (
+            {openCarts.map((cart) => (
               <CartCard key={cart.id} cart={cart} summary={summariesQuery.data?.get(cart.id)} />
             ))}
           </div>

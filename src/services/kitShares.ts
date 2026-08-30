@@ -5,6 +5,8 @@ export interface KitShareParticipantView {
   isSelf: boolean;
   displayName: string;
   quantity: number;
+  /** True once this participant has successfully submitted their own order for this kit. */
+  hasOrdered: boolean;
   /** Present only when the viewer is the kit creator (for distribution editing). */
   userId?: string;
 }
@@ -22,6 +24,8 @@ export interface KitShareView {
   myPriceUsd: number;
   canAddToCart: boolean;
   isCreator: boolean;
+  /** True once the viewer has already submitted their own order for this kit share. */
+  myHasOrdered: boolean;
   participants: KitShareParticipantView[];
 }
 
@@ -31,6 +35,7 @@ function mapKitShareView(raw: Record<string, unknown>): KitShareView {
         isSelf: Boolean(p.isSelf),
         displayName: String(p.displayName ?? "Teilnehmer"),
         quantity: Number(p.quantity ?? 0),
+        hasOrdered: Boolean(p.hasOrdered),
         userId: p.userId != null ? String(p.userId) : undefined,
       }))
     : [];
@@ -48,6 +53,7 @@ function mapKitShareView(raw: Record<string, unknown>): KitShareView {
     myPriceUsd: Number(raw.myPriceUsd),
     canAddToCart: Boolean(raw.canAddToCart),
     isCreator: Boolean(raw.isCreator),
+    myHasOrdered: Boolean(raw.myHasOrdered),
     participants,
   };
 }

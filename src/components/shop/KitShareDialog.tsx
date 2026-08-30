@@ -479,7 +479,9 @@ export function KitShareDialog({
                 <Select
                   value={String(kitView.myQuantity)}
                   onValueChange={handleMyQuantityChange}
-                  disabled={busy || kitView.status === "cancelled" || kitView.status === "ordered"}
+                  disabled={
+                    busy || kitView.status === "cancelled" || kitView.status === "ordered" || kitView.myHasOrdered
+                  }
                 >
                   <SelectTrigger className="min-w-[11rem] w-full" aria-label="Meine Kit-Menge">
                     <SelectValue />
@@ -492,6 +494,12 @@ export function KitShareDialog({
                     ))}
                   </SelectContent>
                 </Select>
+                {kitView.myHasOrdered && (
+                  <p className="text-xs text-muted-foreground">
+                    Du hast diesen Kit-Anteil bereits bestellt. Deine Menge ist ein fester Bestellwert und kann nicht
+                    mehr geändert werden.
+                  </p>
+                )}
               </div>
 
               {isCreator && kitView.status === "open" && (
@@ -552,12 +560,20 @@ export function KitShareDialog({
                     key={`${p.displayName}-${p.quantity}`}
                     className="flex items-center justify-between gap-2 text-muted-foreground"
                   >
-                    <span className="truncate">{p.displayName}</span>
+                    <span className="truncate">
+                      {p.displayName}
+                      {p.hasOrdered && (
+                        <span className="ml-1.5 rounded-full bg-success/10 px-1.5 py-0.5 text-[10px] font-medium text-success">
+                          Bestellt
+                        </span>
+                      )}
+                    </span>
                     <div className="flex items-center gap-1.5">
                       <span>{formatKitQuantity(p.quantity, unitLabel)}</span>
                       {isCreator &&
                         !p.isSelf &&
                         p.userId &&
+                        !p.hasOrdered &&
                         kitView.status !== "cancelled" &&
                         kitView.status !== "ordered" && (
                           <Button
@@ -602,7 +618,14 @@ export function KitShareDialog({
               <p className="font-medium">Verteilung bearbeiten</p>
               {kitView.participants.map((p) => (
                 <div key={p.displayName} className="flex items-center justify-between gap-3">
-                  <span className="min-w-0 truncate">{p.displayName}</span>
+                  <span className="min-w-0 truncate">
+                    {p.displayName}
+                    {p.hasOrdered && (
+                      <span className="ml-1.5 rounded-full bg-success/10 px-1.5 py-0.5 text-[10px] font-medium text-success">
+                        Bestellt
+                      </span>
+                    )}
+                  </span>
                   <Input
                     type="number"
                     min={1}
@@ -610,7 +633,8 @@ export function KitShareDialog({
                     value={editQuantities[p.displayName] ?? String(p.quantity)}
                     onChange={(e) => handleEditQuantityChange(p.displayName, e.target.value)}
                     className="h-9 w-20 text-right tabular-nums"
-                    disabled={busy}
+                    disabled={busy || p.hasOrdered}
+                    title={p.hasOrdered ? "Bereits bestellt: die Menge ist ein fester Bestellwert." : undefined}
                     aria-label={`Menge für ${p.displayName}`}
                   />
                 </div>
