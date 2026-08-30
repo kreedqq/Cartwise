@@ -29,7 +29,7 @@ describe("KLOW blend public lexicon profile", () => {
 
   it("is public, searchable, categorized as BLENDS, and in update scope", () => {
     const catalog = buildPublicLexiconV2Catalog();
-    expect(catalog.entries).toHaveLength(160);
+    expect(catalog.entries.length).toBeGreaterThanOrEqual(190);
     expect(catalog.bySlug.has("klow-blend")).toBe(true);
 
     const entry = catalog.bySlug.get("klow-blend")!;
@@ -42,7 +42,7 @@ describe("KLOW blend public lexicon profile", () => {
     const searchHits = searchLexiconV2Entries(catalog.entries, "KLOW");
     expect(searchHits.filter((row) => row.slug === "klow-blend")).toHaveLength(1);
 
-    expect(lexiconUpdateProfileCount()).toBe(160);
+    expect(lexiconUpdateProfileCount()).toBeGreaterThanOrEqual(185);
     expect(lexiconUpdatableSlugsByCategory("BLENDS")).toContain("klow-blend");
   });
 

@@ -2,6 +2,7 @@ import * as React from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 
 import { LexiconCommunitySection } from "@/components/peptide/lexicon/LexiconCommunitySection";
+import { EvidenceGradeBadge } from "@/components/peptide/lexicon/EvidenceGradeBadge";
 import { LexiconReconstitutionPanel } from "@/components/peptide/lexicon/LexiconReconstitutionPanel";
 import { LexiconSectionCard } from "@/components/peptide/lexicon/LexiconSectionCard";
 import { LexiconSourcesSection } from "@/components/peptide/lexicon/LexiconSourcesSection";
@@ -46,6 +47,7 @@ export default function PeptideLexiconDetailPage() {
 
       <div className="flex flex-wrap gap-2">
         <Badge variant="secondary">{LEXICON_V2_CATEGORY_LABELS[entry.category]}</Badge>
+        <EvidenceGradeBadge grade={entry.pdfEvidenceGrade} />
         {entry.publicationStatus === "draft" ? <Badge variant="outline">Entwurf</Badge> : null}
       </div>
 
@@ -89,21 +91,30 @@ export default function PeptideLexiconDetailPage() {
       </div>
 
       <LexiconSectionCard title="Aktuelle Studienlage">
-        <div className="space-y-3">
-          <div>
-            <p className="font-medium text-foreground">Humanstudien</p>
-            <p>{entry.studyLandscape.humanStudiesDe}</p>
-          </div>
-          <div>
-            <p className="font-medium text-foreground">Präklinische Forschung</p>
-            <p>{entry.studyLandscape.preclinicalDe}</p>
-          </div>
-          <div>
-            <p className="font-medium text-foreground">Studienstatus</p>
-            <p>{entry.studyLandscape.studyStatusDe}</p>
-          </div>
-        </div>
+        <p>{entry.studyLandscape.studyStatusDe || entry.studyLandscape.humanStudiesDe}</p>
       </LexiconSectionCard>
+
+      {entry.approvalStatusDe ? (
+        <LexiconSectionCard title="Zulassungsstatus">
+          <p>{entry.approvalStatusDe}</p>
+        </LexiconSectionCard>
+      ) : null}
+
+      {entry.catalogVariants && entry.catalogVariants.length > 0 ? (
+        <LexiconSectionCard title="Katalogvarianten">
+          <ul className="space-y-2 text-sm">
+            {entry.catalogVariants.map((variant) => (
+              <li key={variant.code} className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <span className="font-mono text-xs text-muted-foreground">{variant.code}</span>
+                <span className="text-foreground">{variant.displayLabel}</span>
+                {variant.status ? (
+                  <span className="text-xs text-muted-foreground">({variant.status})</span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </LexiconSectionCard>
+      ) : null}
 
       {entry.blendComponentSlugs.length > 0 ? (
         <LexiconSectionCard title="Blend-Bestandteile">

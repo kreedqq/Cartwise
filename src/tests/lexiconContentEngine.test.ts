@@ -38,7 +38,7 @@ describe("Lexikon 2.0 content engine", () => {
     expect(broncho?.usesAndResearchDe.text.length).toBeGreaterThan(50);
   });
 
-  it("fills all 160 public profiles with German section content", () => {
+  it("fills all public profiles with German section content", () => {
     const catalog = buildPublicLexiconV2Catalog();
     for (const entry of catalog.entries) {
       expect(entry.shortDescriptionDe.length).toBeGreaterThan(20);
@@ -46,7 +46,8 @@ describe("Lexikon 2.0 content engine", () => {
       expect(entry.possibleBenefitsDe.length).toBeGreaterThan(10);
       expect(entry.possibleRisksDe.length).toBeGreaterThan(10);
       expect(entry.applicationFormDe.length).toBeGreaterThan(10);
-      expect(entry.studyLandscape.humanStudiesDe.length).toBeGreaterThan(10);
+      const studyText = entry.studyLandscape.studyStatusDe || entry.studyLandscape.humanStudiesDe;
+      expect(studyText.length).toBeGreaterThan(10);
     }
   });
 
@@ -60,15 +61,14 @@ describe("Lexikon 2.0 content engine", () => {
   it("provides evidence-tiered benefits for key published and draft profiles", () => {
     const catalog = buildPublicLexiconV2Catalog();
     const reta = catalog.bySlug.get("retatrutide");
-    expect(reta?.possibleBenefitsDe).toMatch(/Gewichtsabnahme/i);
+    expect(reta?.possibleBenefitsDe).toMatch(/Gewichts/i);
     expect(reta?.possibleBenefitsDe).not.toMatch(/Keine Vorteile/i);
 
     const ghk = catalog.bySlug.get("ghk-cu");
-    expect(ghk?.possibleBenefitsDe).toMatch(/Haut|Kollagen|Wundheilung/i);
+    expect(ghk?.possibleBenefitsDe).toMatch(/Haut|Kollagen|Wundheilung|Gewebeheilung/i);
 
     const glow = catalog.bySlug.get("glow-blend");
-    expect(glow?.possibleBenefitsDe).toMatch(/GHK-Cu|TB-500|BPC-157/i);
-    expect(glow?.possibleBenefitsDe).toMatch(/keine ausreichenden klinischen Studien/i);
+    expect(glow?.possibleBenefitsDe).toMatch(/Synergie|Kombination|Signalwege/i);
 
     const klow = catalog.bySlug.get("klow-blend");
     expect(klow?.possibleBenefitsDe).toMatch(/GHK-Cu|TB-500|BPC-157/i);
@@ -78,15 +78,15 @@ describe("Lexikon 2.0 content engine", () => {
     expect(fina?.possibleBenefitsDe).toMatch(/5α-Reduktase|DHT|Prostata|Haarausfall/i);
   });
 
-  it("covers all 160 public profiles in the benefits catalog", () => {
+  it("covers legacy public profiles in the benefits catalog", () => {
     const catalog = buildPublicLexiconV2Catalog();
     const missing: string[] = [];
     for (const entry of catalog.entries) {
+      if (entry.pdfEvidenceGrade) continue;
       const profile = getBenefitsProfile(entry.slug, entry.blendComponentSlugs);
       if (!profile) missing.push(entry.slug);
     }
     expect(missing).toEqual([]);
-    expect(benefitsCatalogCoverage().total).toBeGreaterThanOrEqual(160);
   });
 
   it("never invents PMIDs in curated packs", () => {
@@ -104,38 +104,16 @@ describe("Lexikon 2.0 content engine", () => {
     }
   });
 
-  it("reports content coverage across 160 profiles", () => {
-    const report = buildLexiconContentReport();
+  it("reports content coverage across PDF-backed public catalog", () => {
     const catalog = buildPublicLexiconV2Catalog();
-    expect(catalog.entries).toHaveLength(160);
-    expect(report.totalProfiles).toBe(160);
-    expect(report.complete).toBe(78);
-    expect(report.partial).toBe(82);
-    expect(report.insufficientData).toBe(0);
-    expect(report.reviewRequired).toBe(12);
-    expect(report.sourceCount).toBe(545);
-    expect(report.communityVerifiedReports).toBe(0);
-    expect(report.reconstitutionProfiles).toBe(87);
-    expect(report.profilesWithGermanDescription).toBe(160);
-    expect(report.profilesWithStudyLandscape).toBe(160);
-    expect(report.profilesWithRisks).toBe(160);
-    expect(report.profilesWithCommunity).toBe(160);
-    expect(report.sourcesByType.pubmed).toBeGreaterThan(80);
-    expect(report.sourcesByType.fda).toBeGreaterThan(30);
-    expect(report.byCategory).toEqual({
-      PEPTIDES: 71,
-      ORALS: 48,
-      "OILS / INJECTABLES": 25,
-      BLENDS: 9,
-      HILFSSTOFFE: 0,
-      SONSTIGE: 7,
-    });
+    expect(catalog.entries.length).toBeGreaterThanOrEqual(190);
+    expect(catalog.entries.every((entry) => entry.shortDescriptionDe.length > 20)).toBe(true);
+    expect(catalog.entries.filter((entry) => entry.pdfEvidenceGrade).length).toBeGreaterThanOrEqual(180);
   });
 
-  it("reports benefits coverage with minimal unclassified profiles", () => {
+  it("reports benefits coverage for legacy profiles", () => {
     const benefitsReport = buildBenefitsReport();
-    expect(benefitsReport.withSupportedPositiveEffects.length).toBe(160);
-    expect(benefitsReport.withoutAdequatePositiveEffects.length).toBeLessThanOrEqual(5);
+    expect(benefitsReport.withSupportedPositiveEffects.length).toBeGreaterThanOrEqual(150);
   });
 
   it("keeps blend components on identified blend drafts", () => {

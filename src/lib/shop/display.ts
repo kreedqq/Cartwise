@@ -4,7 +4,9 @@ import {
   catalogNamesForSlug,
   familySlugForCatalogName,
   normalizeCatalogName,
+  slugifyCatalogName,
 } from "@/lib/peptide/shopCoverage/names";
+import { resolveLexiconSlugForShopFamily } from "@/lib/peptide/lexiconV2/pdfResearch/slugMap";
 import { substanceLabelForSlug } from "@/lib/peptide/shopCoverage/formClass";
 import type { ShopCatalogProduct } from "@/lib/peptide/shopCoverage/types";
 import { variantStrengthLabel } from "@/lib/shop/variantCoverage";
@@ -84,7 +86,18 @@ export function lexiconHrefForShopProduct(product: Pick<Tables<"products">, "cod
   if (status.status === "REVIEW_REQUIRED" || status.status === "UNKNOWN" || status.status === "NON_LEXICON") {
     return null;
   }
-  if (!buildPublicLexiconV2Catalog().bySlug.has(slug)) return null;
+  if (!buildPublicLexiconV2Catalog().bySlug.has(slug)) {
+    const names = catalogNamesForSlug(slug);
+    const pdfSlug = resolveLexiconSlugForShopFamily(slug, names);
+    if (buildPublicLexiconV2Catalog().bySlug.has(pdfSlug)) {
+      return `/peptide/lexikon/${pdfSlug}`;
+    }
+    const nameSlug = slugifyCatalogName(product.name);
+    if (buildPublicLexiconV2Catalog().bySlug.has(nameSlug)) {
+      return `/peptide/lexikon/${nameSlug}`;
+    }
+    return null;
+  }
   return `/peptide/lexikon/${slug}`;
 }
 

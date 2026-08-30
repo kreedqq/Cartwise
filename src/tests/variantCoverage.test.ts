@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  formatVialVariant,
   isKitShareableProduct,
   kitShareableVariants,
   kitSizeVialsForProduct,
@@ -73,11 +74,37 @@ describe("vialStrengthForProduct", () => {
   });
 });
 
+describe("formatVialVariant", () => {
+  it("formats vial kit labels as 10x [strength] Vials", () => {
+    expect(formatVialVariant({ code: "RT10", name: "Retatrutide", dosage_vial: "10 mg" })).toBe(
+      "10x 10 mg Vials",
+    );
+    expect(formatVialVariant({ code: "RT20", name: "Retatrutide", dosage_vial: "20 mg" })).toBe(
+      "10x 20 mg Vials",
+    );
+    expect(formatVialVariant({ code: "10AD", name: "AOD9604", dosage_vial: null })).toMatch(/^10x .+ Vials$/);
+  });
+
+  it("handles IU and ml units when kit size is known", () => {
+    expect(formatVialVariant({ code: "H10", name: "HGH", dosage_vial: null })).toMatch(/^10x .+ Vials$/i);
+  });
+
+  it("returns strength only when no kit size is known", () => {
+    expect(formatVialVariant({ code: "D100", name: "Mast P (DP)", dosage_vial: null })).toBe("100 mg");
+  });
+});
+
 describe("shopProductTitle", () => {
-  it("shows inline strength for single-variant products", () => {
+  it("shows inline variant label for single-variant products", () => {
     expect(
       shopProductTitle("Mast P (DP)", { code: "D100", name: "Mast P (DP)", dosage_vial: null }, false),
     ).toBe("Mast P (DP) 100 mg");
+  });
+
+  it("shows kit variant label for single-variant peptide kits", () => {
+    expect(
+      shopProductTitle("AOD9604", { code: "10AD", name: "AOD9604", dosage_vial: null }, false),
+    ).toMatch(/^AOD9604 10x .+ Vials$/);
   });
 
   it("keeps name only when multiple variants use dropdown", () => {
@@ -103,9 +130,9 @@ describe("kitShareableVariants", () => {
       { id: "rt30", code: "RT30", name: "Retatrutide", dosage_vial: "30 mg" },
     ];
     expect(kitShareableVariants(variants)).toHaveLength(3);
-    expect(variantStrengthLabel(variants[0])).toBe("10 mg");
-    expect(variantStrengthLabel(variants[1])).toBe("20 mg");
-    expect(variantStrengthLabel(variants[2])).toBe("30 mg");
+    expect(variantStrengthLabel(variants[0])).toBe("10x 10 mg Vials");
+    expect(variantStrengthLabel(variants[1])).toBe("10x 20 mg Vials");
+    expect(variantStrengthLabel(variants[2])).toBe("10x 30 mg Vials");
     expect(kitSizeVialsForProduct(variants[0])).toBe(10);
     expect(kitSizeVialsForProduct(variants[1])).toBe(10);
     expect(kitSizeVialsForProduct(variants[2])).toBe(10);

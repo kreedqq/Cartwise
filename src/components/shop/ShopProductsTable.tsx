@@ -52,8 +52,8 @@ export function ShopProductsTable({ products, rate, favoriteProductIds }: ShopPr
           <TableRow>
             <TableHead className="w-20">Info</TableHead>
             <TableHead className="min-w-[240px]">Produkt</TableHead>
-            <TableHead className="w-40">Einzelpreis</TableHead>
-            <TableHead className="w-48">Mengenpreis</TableHead>
+            <TableHead className="w-44">Preis / 10 Vials (Kit)</TableHead>
+            <TableHead className="w-48">Preis / 10 Kits</TableHead>
             <TableHead className="w-28 text-right">Menge</TableHead>
             <TableHead className="w-16 text-right">In den Warenkorb</TableHead>
           </TableRow>
@@ -141,7 +141,7 @@ function ShopProductGroupTableRow({
           <p className="text-sm font-medium">{title}</p>
           {row.hasMultipleVariants && (
             <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
-              <SelectTrigger className="h-9 w-[120px] shrink-0" aria-label="Variante wählen">
+              <SelectTrigger className="h-9 min-w-[11rem] w-auto max-w-full shrink-0" aria-label="Variante wählen">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

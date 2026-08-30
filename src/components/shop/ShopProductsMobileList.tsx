@@ -128,7 +128,7 @@ function ShopProductGroupCard({
             <p className="text-sm font-semibold">{title}</p>
             {row.hasMultipleVariants && (
               <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
-                <SelectTrigger className="mt-2 h-9 w-full max-w-[200px]" aria-label="Variante wählen">
+                <SelectTrigger className="mt-2 h-9 w-full min-w-[11rem]" aria-label="Variante wählen">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -152,14 +152,14 @@ function ShopProductGroupCard({
 
         <div className="grid grid-cols-2 gap-2 rounded-md bg-secondary/50 p-2.5 text-sm">
           <div>
-            <p className="text-[11px] text-muted-foreground">Einzelpreis</p>
+            <p className="text-[11px] text-muted-foreground">Preis / 10 Vials (Kit)</p>
             <p className="text-base font-semibold tabular-nums tracking-tight">{formatUsd(product.price_usd)}</p>
             <p className="text-[11px] tabular-nums text-muted-foreground">
               {formatEur(convertUsdToEur(product.price_usd, rate))}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[11px] text-muted-foreground">Mengenpreis</p>
+            <p className="text-[11px] text-muted-foreground">Preis / 10 Kits</p>
             {bulk ? (
               <>
                 <p className="text-base font-semibold tabular-nums tracking-tight">{formatUsd(product.bulk_price_usd)}</p>

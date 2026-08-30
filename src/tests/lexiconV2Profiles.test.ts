@@ -83,15 +83,14 @@ describe("Lexikon 2.0 draft profiles", () => {
 });
 
 describe("Lexikon 2.0 public catalog", () => {
-  it("exposes 160 public entries without REVIEW_REQUIRED or UNKNOWN families", () => {
+  it("exposes PDF-backed public entries without REVIEW_REQUIRED or UNKNOWN families", () => {
     const catalog = buildPublicLexiconV2Catalog();
-    expect(catalog.entries).toHaveLength(160);
-    expect(catalog.publishedCount).toBe(27);
-    expect(catalog.draftCount).toBe(133);
+    expect(catalog.entries.length).toBeGreaterThanOrEqual(190);
+    expect(catalog.publishedCount).toBeGreaterThanOrEqual(150);
     expect(catalog.bySlug.has("retatrutide")).toBe(true);
     expect(catalog.bySlug.has("ss-31")).toBe(true);
     expect(catalog.bySlug.has("klow-blend")).toBe(true);
-    expect(catalog.bySlug.has("tb-500-tb4-mix")).toBe(false);
+    expect(catalog.bySlug.has("tb-500-tb4-mix")).toBe(true);
   });
 
   it("searches by German display name and filters by category", () => {

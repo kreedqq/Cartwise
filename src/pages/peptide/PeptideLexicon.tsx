@@ -2,6 +2,7 @@ import * as React from "react";
 import { Link } from "react-router-dom";
 
 import { PageHeader } from "@/components/common/PageHeader";
+import { EvidenceGradeBadge } from "@/components/peptide/lexicon/EvidenceGradeBadge";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { SAFETY_DISCLAIMER } from "@/lib/peptide/catalog";
@@ -80,6 +81,7 @@ export default function PeptideLexiconPage() {
           >
             <div className="flex flex-wrap gap-1.5">
               <Badge variant="secondary">{LEXICON_V2_CATEGORY_LABELS[entry.category]}</Badge>
+              <EvidenceGradeBadge grade={entry.pdfEvidenceGrade} />
               {entry.publicationStatus === "draft" ? <Badge variant="outline">Entwurf</Badge> : null}
             </div>
             <h2 className="mt-3 text-base font-semibold tracking-tight">{entry.displayNameDe}</h2>

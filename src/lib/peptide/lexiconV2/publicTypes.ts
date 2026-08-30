@@ -19,6 +19,12 @@ export interface PublicLexiconCommunityView {
   channels: LexiconV2CommunityChannel[];
 }
 
+export interface PublicLexiconCatalogVariant {
+  code: string;
+  displayLabel: string;
+  status: string | null;
+}
+
 export interface PublicLexiconEntry {
   slug: string;
   displayNameDe: string;
@@ -37,6 +43,10 @@ export interface PublicLexiconEntry {
   community: PublicLexiconCommunityView;
   sources: ProfileSource[];
   blendComponentSlugs: string[];
+  /** PDF evidence grade (A/B/C/D/U or ranges like "C bis D"). */
+  pdfEvidenceGrade?: string | null;
+  approvalStatusDe?: string | null;
+  catalogVariants?: PublicLexiconCatalogVariant[];
 }
 
 export interface PublicLexiconV2Catalog {

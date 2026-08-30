@@ -40,7 +40,7 @@ export function parseVariantColumn(raw: string): Pick<ProductVariantMeta, "vialS
   return { vialStrength, kitSizeVials };
 }
 
-function normalizeStrengthToken(token: string): string {
+export function normalizeStrengthToken(token: string): string {
   const match = token.trim().match(/^([\d.,]+)\s*(mg|mcg|µg|ug|iu|ui|ml)$/i);
   if (!match) return token.trim();
   const unit = match[2]
@@ -48,6 +48,35 @@ function normalizeStrengthToken(token: string): string {
     .replace("µg", "mcg")
     .replace("ug", "mcg");
   return `${match[1].replace(",", ".")} ${unit}`;
+}
+
+function normalizedVialStrength(
+  product: { code: string; dosage_vial?: string | null; name: string },
+): string | null {
+  const raw = vialStrengthForProduct(product);
+  if (!raw) return null;
+  const withoutVialSuffix = raw.replace(/\s*\/\s*vial\s*/i, "").trim();
+  const parsed = parseVariantColumn(withoutVialSuffix);
+  if (parsed.vialStrength) return parsed.vialStrength;
+  return normalizeStrengthToken(withoutVialSuffix);
+}
+
+/**
+ * Customer-facing vial kit label, e.g. "10x 20mg Vials".
+ * Uses coverage kit size when available; falls back to strength-only for non-kit products.
+ */
+export function formatVialVariant(
+  product: { code: string; dosage_vial?: string | null; name: string },
+): string {
+  const strength = normalizedVialStrength(product);
+  if (!strength) return "Standard";
+
+  const kitSize = kitSizeVialsForProduct(product);
+  if (kitSize != null && kitSize > 0) {
+    return `${kitSize}x ${strength} Vials`;
+  }
+
+  return strength;
 }
 
 function parseCoverageCsv(csv: string): Map<string, ProductVariantMeta> {
@@ -127,11 +156,11 @@ export function kitShareableVariants<T extends { code: string }>(variants: reado
   return variants.filter(isKitShareableProduct);
 }
 
-/** Dropdown label: vial strength only, never kit count or product codes. */
+/** Dropdown label: readable kit variant, e.g. "10x 20mg Vials". */
 export function variantStrengthLabel(
   product: { code: string; dosage_vial?: string | null; name: string },
 ): string {
-  return vialStrengthForProduct(product) ?? "Standard";
+  return formatVialVariant(product);
 }
 
 /** Product row title: "Name 100 mg" when single variant; name only when multi-variant. */
@@ -141,6 +170,6 @@ export function shopProductTitle(
   hasMultipleVariants: boolean,
 ): string {
   if (hasMultipleVariants) return displayName;
-  const strength = vialStrengthForProduct(product);
-  return strength ? `${displayName} ${strength}` : displayName;
+  const variantLabel = formatVialVariant(product);
+  return variantLabel !== "Standard" ? `${displayName} ${variantLabel}` : displayName;
 }
