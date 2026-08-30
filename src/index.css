@@ -120,17 +120,17 @@
 /* ─── Admin area: override to professional light theme ─────────────────── */
 [data-admin] {
   --background: 40 25% 97%;
-  --foreground: 24 15% 10%;
+  --foreground: 0 0% 5%;
   --card: 0 0% 100%;
-  --card-foreground: 24 15% 10%;
+  --card-foreground: 0 0% 5%;
   --popover: 0 0% 100%;
-  --popover-foreground: 24 15% 10%;
+  --popover-foreground: 0 0% 5%;
   --primary: 38 55% 42%;
   --primary-foreground: 0 0% 100%;
   --secondary: 36 15% 93%;
-  --secondary-foreground: 24 12% 20%;
+  --secondary-foreground: 0 0% 8%;
   --muted: 36 12% 91%;
-  --muted-foreground: 25 8% 50%;
+  --muted-foreground: 0 0% 35%;
   --accent: 38 46% 52%;
   --accent-foreground: 0 0% 100%;
   --border: 35 10% 87%;
@@ -143,6 +143,9 @@
   --destructive: 0 65% 44%;
   --destructive-foreground: 0 0% 100%;
   color-scheme: light;
+  /* Force color inheritance from admin scope, not from dark-mode body */
+  color: hsl(var(--foreground));
+  background-color: hsl(var(--background));
 }
 
 @layer utilities {
