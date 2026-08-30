@@ -28,12 +28,14 @@ export function parseVariantColumn(raw: string): Pick<ProductVariantMeta, "vialS
     kitSizeVials = Number.isInteger(size) && size > 0 ? size : null;
   }
 
+  const strengthSource = trimmed.replace(KIT_VIALS_RE, "").replace(/\s*\/\s*vial\s*/gi, "").trim();
+
   let vialStrength: string | null = null;
-  const strengthMatch = VIAL_STRENGTH_RE.exec(trimmed);
+  const strengthMatch = VIAL_STRENGTH_RE.exec(strengthSource);
   if (strengthMatch) {
     vialStrength = normalizeStrengthToken(strengthMatch[1]);
-  } else if (!CAPSULE_TABLET_RE.test(trimmed)) {
-    const bare = trimmed.match(/^([\d.,]+\s*(?:mg|mcg|µg|ug|iu|ui|ml))\b/i);
+  } else if (!CAPSULE_TABLET_RE.test(strengthSource)) {
+    const bare = strengthSource.match(/^([\d.,]+\s*(?:mg|mcg|µg|ug|iu|ui|ml))\b/i);
     if (bare) vialStrength = normalizeStrengthToken(bare[1]);
   }
 
@@ -55,9 +57,9 @@ function normalizedVialStrength(
 ): string | null {
   const raw = vialStrengthForProduct(product);
   if (!raw) return null;
-  const withoutVialSuffix = raw.replace(/\s*\/\s*vial\s*/i, "").trim();
-  const parsed = parseVariantColumn(withoutVialSuffix);
+  const parsed = parseVariantColumn(raw);
   if (parsed.vialStrength) return parsed.vialStrength;
+  const withoutVialSuffix = raw.replace(/\s*\/\s*vial\s*/i, "").trim();
   return normalizeStrengthToken(withoutVialSuffix);
 }
 

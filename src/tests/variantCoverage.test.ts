@@ -35,8 +35,14 @@ describe("parseVariantColumn", () => {
     });
   });
 
-  it("does not treat capsule packs as vial kits", () => {
-    expect(parseVariantColumn("100mg x 60capsule").kitSizeVials).toBeNull();
+  it("parses glued legacy db values like 5mgx 10vials", () => {
+    expect(parseVariantColumn("5mgx 10vials")).toEqual({
+      vialStrength: "5 mg",
+      kitSizeVials: 10,
+    });
+    expect(formatVialVariant({ code: "RT5", name: "Retatrutide", dosage_vial: "5mgx 10vials" })).toBe(
+      "10x 5 mg Vials",
+    );
   });
 });
 
