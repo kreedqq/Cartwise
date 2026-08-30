@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, Pencil, Users } from "lucide-react";
+import { Loader2, Pencil, UserX, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -43,16 +43,21 @@ import type { KitShareMember } from "@/services/kitShareMembers";
 import {
   assertKitSharePricePrivacy,
   createKitShare,
+  getMyKitShare,
   inviteKitShareParticipant,
   type KitShareView,
+  removeKitShareParticipant,
   updateKitShareDistribution,
   updateKitShareQuantity,
 } from "@/services/kitShares";
 import type { Tables } from "@/types/database";
 
 interface KitShareDialogProps {
-  group: ShopProductGroup;
+  /** Omit when opening an existing kit purely for editing (e.g. from Cart/Checkout). */
+  group?: ShopProductGroup;
   initialProductId?: string;
+  /** Opens directly into "edit existing kit" mode instead of "create new kit". */
+  existingKitShareId?: string;
   members: KitShareMember[];
   membersLoading: boolean;
   open: boolean;
@@ -88,6 +93,7 @@ function kitSyncErrorMessage(err: unknown): string {
 export function KitShareDialog({
   group,
   initialProductId,
+  existingKitShareId,
   members,
   membersLoading,
   open,
@@ -96,7 +102,10 @@ export function KitShareDialog({
 }: KitShareDialogProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const shareableVariants = React.useMemo(() => kitShareableVariants(group.variants), [group.variants]);
+  const shareableVariants = React.useMemo(
+    () => (group ? kitShareableVariants(group.variants) : []),
+    [group],
+  );
   const [selectedVariantId, setSelectedVariantId] = React.useState(() =>
     resolveInitialVariantId(shareableVariants, initialProductId),
   );
@@ -115,6 +124,33 @@ export function KitShareDialog({
   const [editQuantities, setEditQuantities] = React.useState<Record<string, string>>({});
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
+  const [loadingExisting, setLoadingExisting] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!open || !existingKitShareId || kitView) return;
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) {
+        setLoadingExisting(true);
+        setError(null);
+      }
+    });
+    getMyKitShare(existingKitShareId)
+      .then((view) => {
+        if (cancelled) return;
+        assertKitSharePricePrivacy(view);
+        setKitView(view);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(kitSyncErrorMessage(err));
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingExisting(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, existingKitShareId, kitView]);
 
   const activeKitSize = kitView?.kitSizeVials ?? kitSize;
 
@@ -144,7 +180,7 @@ export function KitShareDialog({
     onOpenChange(nextOpen);
   }
 
-  if (shareableVariants.length === 0) return null;
+  if (!existingKitShareId && shareableVariants.length === 0) return null;
 
   const quantityOptions = Array.from({ length: activeKitSize }, (_, i) => i + 1);
   const variantMissing = hasMultipleShareableVariants && !product;
@@ -313,7 +349,24 @@ export function KitShareDialog({
     setError(null);
   }
 
-  const lockedProductName = kitView?.productName ?? group.displayName;
+  async function handleRemoveParticipant(participantUserId: string) {
+    if (!kitView) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const view = await removeKitShareParticipant(kitView.id, participantUserId);
+      assertKitSharePricePrivacy(view);
+      setKitView(view);
+      await invalidateCarts();
+      toast.success("Teilnehmer wurde entfernt. Warenkörbe wurden synchronisiert.");
+    } catch (err) {
+      setError(kitSyncErrorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const lockedProductName = kitView?.productName ?? group?.displayName ?? "Produkt";
   const lockedVariantLabel = kitView
     ? variantStrengthLabel({
         code: kitView.productCode,
@@ -324,7 +377,7 @@ export function KitShareDialog({
       ? variantLabelForProduct(product)
       : null;
 
-  const isCreator = Boolean(kitView && user);
+  const isCreator = Boolean(kitView && user && kitView.isCreator);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -392,7 +445,13 @@ export function KitShareDialog({
             <p className="text-sm text-muted-foreground">Bitte zuerst eine Variante auswählen.</p>
           )}
 
-          {!kitView && (
+          {loadingExisting && (
+            <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" /> Kit wird geladen …
+            </div>
+          )}
+
+          {!kitView && !existingKitShareId && (
             <div className="space-y-2">
               <Label>Mein Anteil</Label>
               <Select value={myQuantity} onValueChange={setMyQuantity} disabled={busy || variantMissing}>
@@ -489,9 +548,32 @@ export function KitShareDialog({
                   )}
                 </div>
                 {kitView.participants.map((p) => (
-                  <div key={`${p.displayName}-${p.quantity}`} className="flex justify-between text-muted-foreground">
-                    <span>{p.displayName}</span>
-                    <span>{formatKitQuantity(p.quantity, unitLabel)}</span>
+                  <div
+                    key={`${p.displayName}-${p.quantity}`}
+                    className="flex items-center justify-between gap-2 text-muted-foreground"
+                  >
+                    <span className="truncate">{p.displayName}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span>{formatKitQuantity(p.quantity, unitLabel)}</span>
+                      {isCreator &&
+                        !p.isSelf &&
+                        p.userId &&
+                        kitView.status !== "cancelled" &&
+                        kitView.status !== "ordered" && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                            title={`${p.displayName} entfernen`}
+                            aria-label={`${p.displayName} entfernen`}
+                            disabled={busy}
+                            onClick={() => handleRemoveParticipant(p.userId as string)}
+                          >
+                            <UserX className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                    </div>
                   </div>
                 ))}
                 <div className="border-t border-border pt-2">

@@ -238,6 +238,18 @@ describe("twenty-unit kits", () => {
     ).toBe(true);
   });
 
+  it("allows 6+14 for size-20 kit", () => {
+    expect(validateFullKitDistribution(20, [{ quantity: 6 }, { quantity: 14 }]).ok).toBe(true);
+  });
+
+  it("allows 10+10 for size-20 kit", () => {
+    expect(validateFullKitDistribution(20, [{ quantity: 10 }, { quantity: 10 }]).ok).toBe(true);
+  });
+
+  it("allows 7+13 for size-20 kit", () => {
+    expect(validateFullKitDistribution(20, [{ quantity: 7 }, { quantity: 13 }]).ok).toBe(true);
+  });
+
   it("blocks 21 total for size-20 kit", () => {
     expect(
       validateKitAllocation(20, [
@@ -248,5 +260,19 @@ describe("twenty-unit kits", () => {
         { quantity: 1 },
       ]).ok,
     ).toBe(false);
+  });
+});
+
+describe("thirty-unit kits", () => {
+  it("allows 15+15 for size-30 kit", () => {
+    expect(validateFullKitDistribution(30, [{ quantity: 15 }, { quantity: 15 }]).ok).toBe(true);
+  });
+
+  it("allows 20+10 for size-30 kit", () => {
+    expect(validateFullKitDistribution(30, [{ quantity: 20 }, { quantity: 10 }]).ok).toBe(true);
+  });
+
+  it("allows 10+20 for size-30 kit", () => {
+    expect(validateFullKitDistribution(30, [{ quantity: 10 }, { quantity: 20 }]).ok).toBe(true);
   });
 });

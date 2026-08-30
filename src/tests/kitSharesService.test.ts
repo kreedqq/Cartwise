@@ -13,6 +13,7 @@ const {
   assertKitSharePricePrivacy,
   createKitShare,
   inviteKitShareParticipant,
+  removeKitShareParticipant,
   updateKitShareDistribution,
   updateKitShareQuantity,
 } = await import("@/services/kitShares");
@@ -29,6 +30,7 @@ const sampleView = {
   myQuantity: 3,
   myPriceUsd: 90,
   canAddToCart: true,
+  isCreator: true,
   participants: [
     { isSelf: true, displayName: "Du", quantity: 3 },
     { isSelf: false, displayName: "Teilnehmer", quantity: 7 },
@@ -91,6 +93,22 @@ describe("kitShares service", () => {
         { userId: "user-b", quantity: 6 },
       ],
     });
+  });
+
+  it("removes a participant via RPC (creator-only) and re-syncs remaining carts", async () => {
+    rpc.mockResolvedValue({
+      data: { ...sampleView, allocatedTotal: 4, remainingVials: 6, status: "open", participants: [
+        { isSelf: true, displayName: "Du", quantity: 4, userId: "user-a" },
+      ]},
+      error: null,
+    });
+    const view = await removeKitShareParticipant("kit-1", "user-b");
+    expect(rpc).toHaveBeenCalledWith("remove_kit_share_participant", {
+      _kit_share_id: "kit-1",
+      _participant_user_id: "user-b",
+    });
+    expect(view.participants).toHaveLength(1);
+    expect(view.status).toBe("open");
   });
 
   it("adds kit share to cart via RPC with only kit share id", async () => {

@@ -36,6 +36,8 @@ export interface Database {
         Row: {
           id: string;
           display_name: string;
+          /** Unique public handle shown during kit sharing. Null until the user sets one. */
+          username: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -1152,6 +1154,18 @@ export interface Database {
           _distribution: { userId: string; quantity: number }[];
         };
         Returns: Record<string, unknown>;
+      };
+      remove_kit_share_participant: {
+        Args: { _kit_share_id: string; _participant_user_id: string };
+        Returns: Record<string, unknown>;
+      };
+      username_available: {
+        Args: { _username: string };
+        Returns: boolean;
+      };
+      set_username: {
+        Args: { _username: string };
+        Returns: string;
       };
       get_my_kit_share: {
         Args: { _kit_share_id: string };

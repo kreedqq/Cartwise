@@ -256,12 +256,15 @@ export function mapAuthError(error: unknown): string {
   return "Etwas ist schiefgelaufen. Bitte versuche es erneut.";
 }
 
-export async function signUp(email: string, password: string, displayName: string) {
+export async function signUp(email: string, password: string, displayName: string, username: string) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    // `username` is only ever consumed client-side right after signUp (or on
+    // first login) via `set_username` — the DB trigger never trusts this
+    // metadata for the authoritative, unique username.
     options: {
-      data: { display_name: displayName },
+      data: { display_name: displayName, username },
       emailRedirectTo: getRedirectUrl("/login"),
     },
   });

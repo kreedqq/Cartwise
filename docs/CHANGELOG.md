@@ -2,6 +2,26 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-08-30 (kit sharing 3.0: username, participant removal, cart/checkout edit)
+
+### Added
+
+- Migration `0038_username_and_kit_participant_removal.sql`:
+  - `profiles.username` — unique (case-insensitive), validated (`^[A-Za-z][A-Za-z0-9_.]{2,23}$`), nullable for a safe transition (additive, no existing row touched).
+  - `username_available(text)` / `set_username(text)` RPCs — self-service, server-validated, server-unique.
+  - `list_kit_share_members()` now returns `username` instead of `display_name` (real name is never shown to other users during kit sharing); only members who already claimed a username are selectable.
+  - `get_my_kit_share` participants now show `username`, and the payload now includes `isCreator` (server-authoritative, avoids client guessing).
+  - `remove_kit_share_participant(kit_share_id, participant_user_id)` — creator-only: deletes the participant, deletes their kit cart line, re-syncs remaining carts. Previously only self-`leave_kit_share` existed; the creator had no way to remove someone else (Phase 8 gap).
+- `RequireUsernameDialog` — mounted in `AppShell`; prompts any authenticated user without a username once, on any page, pre-filling a sanitized OAuth-provided suggestion (Discord `user_name`/`full_name`) as a suggestion only, never auto-saved.
+- Registration now requires a validated, unique username (`usernameSchema`, 3–24 chars) alongside email/password; claimed via `set_username` right after signup when a session is available immediately.
+- `EditKitShareButton` + `KitShareDialog` "existing kit" mode (`existingKitShareId` prop, loads via `get_my_kit_share`) — "Kit-Aufteilung bearbeiten" is now reachable directly from Cart (desktop table + mobile list) and Checkout for any kit-share cart line, not only from the Shop's "Kit teilen" flow.
+- `KitShareDialog`: creator can remove a participant inline (calls `remove_kit_share_participant`, re-syncs carts).
+
+### Notes
+
+- `create_order`'s existing kit validation (kit must be `full`, participant must exist, quantity must match the cart line exactly) already covered most of the checkout re-validation requirement; left untouched to avoid risking the working checkout path.
+- `list_kit_share_members` keeps its historical `(id, display_name)` column shape for backward compatibility; the column is now sourced from `username`, not the real name.
+
 ## 2026-08-30 (kit share proportional pricing)
 
 ### Fixed

@@ -22,6 +22,21 @@ export const displayNameSchema = z
   .min(1, "Bitte gib einen Anzeigenamen ein.")
   .max(80, "Der Anzeigename darf höchstens 80 Zeichen lang sein.");
 
+/**
+ * Public handle shown during kit sharing. Never the real name, email, or
+ * user id: 3-24 chars, must start with a letter, then letters/digits/"_"/".".
+ * Mirrors the server-side check in `profiles_username_format_check`.
+ */
+export const usernameSchema = z
+  .string()
+  .trim()
+  .min(3, "Der Benutzername muss mindestens 3 Zeichen lang sein.")
+  .max(24, "Der Benutzername darf höchstens 24 Zeichen lang sein.")
+  .regex(
+    /^[A-Za-z][A-Za-z0-9_.]{2,23}$/,
+    "Erlaubt: Buchstaben, Zahlen, \"_\" und \".\", beginnend mit einem Buchstaben.",
+  );
+
 export const productCodeSchema = z
   .string()
   .trim()
@@ -68,6 +83,7 @@ export const registerSchema = z
     password: passwordSchema,
     passwordConfirm: z.string(),
     displayName: displayNameSchema,
+    username: usernameSchema,
   })
   .refine((data) => data.password === data.passwordConfirm, {
     message: "Die Passwörter stimmen nicht überein.",

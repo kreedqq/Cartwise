@@ -14,6 +14,7 @@ import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
+import { EditKitShareButton } from "@/components/shop/EditKitShareButton";
 import { useCarts } from "@/hooks/useCarts";
 import { useCartItems } from "@/hooks/useCartItems";
 import { useCartComputed } from "@/hooks/useCartComputed";
@@ -171,7 +172,14 @@ export default function CheckoutPage() {
                   {eligible.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell className="font-mono text-xs">{item.product_code_snapshot}</TableCell>
-                      <TableCell className="text-sm">{item.product_name_snapshot}</TableCell>
+                      <TableCell className="text-sm">
+                        {item.product_name_snapshot}
+                        {item.kit_share_id && (
+                          <div>
+                            <EditKitShareButton kitShareId={item.kit_share_id} />
+                          </div>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right tabular-nums">{item.quantity}</TableCell>
                       <TableCell className="text-right tabular-nums">{formatUsd(item.unit_price_usd_snapshot)}</TableCell>
                       <TableCell>

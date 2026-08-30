@@ -21,6 +21,7 @@ export interface KitShareView {
   myQuantity: number;
   myPriceUsd: number;
   canAddToCart: boolean;
+  isCreator: boolean;
   participants: KitShareParticipantView[];
 }
 
@@ -46,6 +47,7 @@ function mapKitShareView(raw: Record<string, unknown>): KitShareView {
     myQuantity: Number(raw.myQuantity),
     myPriceUsd: Number(raw.myPriceUsd),
     canAddToCart: Boolean(raw.canAddToCart),
+    isCreator: Boolean(raw.isCreator),
     participants,
   };
 }
@@ -114,6 +116,19 @@ export async function addKitShareToCart(kitShareId: string): Promise<string> {
 export async function cancelKitShare(kitShareId: string): Promise<void> {
   const { error } = await supabase.rpc("cancel_kit_share", { _kit_share_id: kitShareId });
   if (error) throw error;
+}
+
+/** Creator-only: removes a participant, deletes their kit cart line, re-syncs the rest. */
+export async function removeKitShareParticipant(
+  kitShareId: string,
+  participantUserId: string,
+): Promise<KitShareView> {
+  const { data, error } = await supabase.rpc("remove_kit_share_participant", {
+    _kit_share_id: kitShareId,
+    _participant_user_id: participantUserId,
+  });
+  if (error) throw error;
+  return mapKitShareView(data as Record<string, unknown>);
 }
 
 /** Ensures participant payloads never expose foreign prices (defense in depth). */

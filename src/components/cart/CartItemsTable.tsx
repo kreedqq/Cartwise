@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SaveStatusIndicator } from "@/components/common/SaveStatusIndicator";
 import { ResolutionStatusBadge } from "@/components/cart/ResolutionStatusBadge";
+import { EditKitShareButton } from "@/components/shop/EditKitShareButton";
 import { useCartItemRow } from "@/hooks/useCartItemRow";
 import { formatDateTime, formatEur, formatRate, formatUsd } from "@/lib/money";
 import {
@@ -119,9 +120,12 @@ function CartItemRowDesktop({
           <p className="mt-0.5 text-xs text-muted-foreground">{cartItemVariantSubtitle(item)}</p>
         )}
         {isKitShareCartItem(item) && (
-          <span className="mt-1 inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-            Kit Anteil
-          </span>
+          <>
+            <span className="mt-1 inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+              Kit Anteil
+            </span>
+            {item.kit_share_id && <EditKitShareButton kitShareId={item.kit_share_id} />}
+          </>
         )}
       </TableCell>
       <TableCell>

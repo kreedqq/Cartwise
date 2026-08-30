@@ -56,6 +56,7 @@ describe("registerSchema", () => {
     password: "supersecret1",
     passwordConfirm: "supersecret1",
     displayName: "Test Nutzer",
+    username: "TestNutzer",
   };
 
   it("accepts a valid registration payload", () => {

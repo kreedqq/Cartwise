@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/toaster";
 import { registerSchema } from "@/lib/validation";
 import { mapAuthError, POST_LOGIN_PATH, signUp } from "@/services/auth";
+import { claimUsername, mapUsernameError } from "@/services/username";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 
@@ -17,6 +18,7 @@ export default function RegisterPage() {
     firstName: "",
     lastName: "",
     email: "",
+    username: "",
     password: "",
     passwordConfirm: "",
   });
@@ -35,6 +37,7 @@ export default function RegisterPage() {
       password: form.password,
       passwordConfirm: form.passwordConfirm,
       displayName: `${form.firstName} ${form.lastName}`.trim(),
+      username: form.username,
     });
     if (!result.success) {
       setErrors(Object.fromEntries(result.error.issues.map((i) => [i.path[0], i.message])));
@@ -43,8 +46,22 @@ export default function RegisterPage() {
     setErrors({});
     setLoading(true);
     try {
-      const { session } = await signUp(result.data.email, result.data.password, result.data.displayName);
+      const { session } = await signUp(
+        result.data.email,
+        result.data.password,
+        result.data.displayName,
+        result.data.username,
+      );
       if (session) {
+        // Best effort: claim the chosen username right away when a session
+        // is available immediately (email confirmation disabled). If this
+        // fails (e.g. a race on a rare duplicate), the user is prompted to
+        // choose a username on next login via <RequireUsernameDialog>.
+        try {
+          await claimUsername(result.data.username);
+        } catch (usernameError) {
+          toast.error(mapUsernameError(usernameError));
+        }
         navigate(POST_LOGIN_PATH, { replace: true });
       } else {
         setDone(true);
@@ -96,6 +113,24 @@ export default function RegisterPage() {
           </div>
         </div>
         {errors.displayName && <p className="text-xs text-destructive">{errors.displayName}</p>}
+        <div className="space-y-1.5">
+          <Label htmlFor="username">Benutzername</Label>
+          <Input
+            id="username"
+            autoComplete="username"
+            placeholder="MaxMustermann"
+            value={form.username}
+            invalid={!!errors.username}
+            onChange={(e) => update("username", e.target.value)}
+          />
+          {errors.username ? (
+            <p className="text-xs text-destructive">{errors.username}</p>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              3–24 Zeichen, wird beim Kit Sharing anderen Nutzern angezeigt (nie deine E-Mail).
+            </p>
+          )}
+        </div>
         <div className="space-y-1.5">
           <Label htmlFor="email">E-Mail-Adresse</Label>
           <Input
