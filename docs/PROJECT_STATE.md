@@ -4,6 +4,8 @@
 
 Last documentation pass: **2026-08-29** (finalization commit `feat: finalize research platform`).
 
+**Update 2026-08-30**: migration `0039_fix_kit_share_partial_order_completion.sql` deployed to `cartwise-prod` (local = remote through `0039`, verified via `supabase migration list`). Fixes the kit-share `create_order` bug where the whole kit flipped to `'ordered'` after the first participant ordered, blocking everyone else; adds `kit_share_participants.ordered_at`/`.order_id`; Dashboard now hides ordered carts (`isOpenCart` filter); `OrderDetail.tsx` now shows `payment_method`. See `docs/CHANGELOG.md` for the full entry.
+
 ## Identity
 
 | | |

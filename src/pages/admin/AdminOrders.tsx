@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
+import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { useAdminOrderItems, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
 import { buildOrdersListCsv, downloadOrdersListCsv } from "@/lib/orderExport";
 import { formatDateTime, formatUsd, summarizeOrderCharges } from "@/lib/money";
@@ -122,6 +123,7 @@ export default function AdminOrdersPage() {
               <TableHead>Kunde</TableHead>
               <TableHead>Datum</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Zahlung</TableHead>
               <TableHead className="text-right">Gesamt</TableHead>
             </TableRow>
           </TableHeader>
@@ -142,6 +144,9 @@ export default function AdminOrdersPage() {
                   <TableCell className="text-sm text-muted-foreground">{formatDateTime(order.submitted_at)}</TableCell>
                   <TableCell>
                     <OrderStatusBadge status={order.status} />
+                  </TableCell>
+                  <TableCell>
+                    <PaymentMethodBadge paymentMethod={order.payment_method} />
                   </TableCell>
                   <TableCell className="text-right">
                     <p className="tabular-nums text-sm font-medium">

@@ -2,6 +2,35 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-08-30 (fix: admin order views did not render payment_method)
+
+### Fixed
+
+- **Root cause**: `orders.payment_method` was already fetched correctly everywhere (`listAllOrders` uses `select("*")`; `getOrder`/`useOrder` — shared by the customer and admin order detail pages — already selects it via `CUSTOMER_ORDER_COLUMNS`). This was a pure UI omission: `AdminOrders.tsx` (list) and `AdminOrderDetail.tsx` never rendered the field anywhere, even though it was present on the fetched `order` object.
+- Extracted the checkout payment-method glyph out of `PaymentMethodSelector.tsx` into a shared `src/components/orders/PaymentMethodIcon.tsx`, and added `src/components/orders/PaymentMethodBadge.tsx` (mirrors the existing `OrderStatusBadge` convention) that renders the real `order.payment_method` or, for older orders / unexpected values, a plain **"Nicht angegeben"** — never an invented value.
+- Wired `PaymentMethodBadge` into `AdminOrderDetail.tsx` (next to the status badge in the header) and into a new "Zahlung" column in `AdminOrders.tsx`'s list table.
+- No RPC, query, or database type change was needed — no migration required for this fix.
+- New tests: `src/tests/adminPaymentMethod.test.tsx` (renders `PaymentMethodBadge` for all 3 methods + null + unknown value, plus source-level checks that both admin views actually use it).
+
+## 2026-08-30 (fix: kit order lifecycle, payment persistence, cart lifecycle) — DEPLOYED TO PRODUCTION
+
+### Fixed
+
+- **Root cause of `P0001 "Ungültiger Kit-Anteil im Warenkorb."`**: `create_order` unconditionally set the whole `kit_shares.status = 'ordered'` as soon as any one participant submitted their order, permanently blocking every remaining participant (their own `create_order` call required `status = 'full'`). Migration `0039_fix_kit_share_partial_order_completion.sql`:
+  - Adds `kit_share_participants.ordered_at` / `.order_id` (additive, nullable, no existing row touched) to track completion per participant.
+  - `create_order` now allows a participant to order while the kit is `'full'` **or already `'ordered'`** (meaning someone else finished first), stamps only that participant's `ordered_at`/`order_id`, and promotes `kit_shares.status` to `'ordered'` only once every participant has ordered. Locks (`for update`) the kit row and the participant row to make this race-safe when two participants submit near-simultaneously.
+  - `update_kit_share_quantity`, `update_kit_share_distribution`, `remove_kit_share_participant`, `leave_kit_share`, `cancel_kit_share` now reject changes to a participant who already ordered, and `cancel_kit_share` never deletes cart items belonging to an already-`'ordered'` cart.
+  - `get_my_kit_share` now returns `hasOrdered` per participant and `myHasOrdered`, so `KitShareDialog` can disable quantity/removal controls for an already-placed order instead of only failing on submit.
+- Dashboard "Warenkörbe" listed already-ordered carts forever; now filtered through the existing `isOpenCart` helper (`src/pages/Dashboard.tsx`).
+- `orders.payment_method` was saved correctly but never rendered; `OrderDetail.tsx` now shows "Zahlungsmethode" in the order history card.
+
+### Production rollout
+
+- Verified locally against a real Postgres instance (`scripts/repro_kit_order_bug.sql`, rolled back) before touching production.
+- `supabase db push --dry-run` confirmed only `0039` would apply; applied to `cartwise-prod` — purely additive (2 new nullable columns, function replacements), zero rows deleted, `orders`/`carts`/`kit_shares`/`kit_share_participants` row counts unchanged pre/post.
+- Pre-existing production kit shares that were already stuck `'ordered'` from the old bug were intentionally **not** heuristically backfilled with `ordered_at`/`order_id` (ambiguous historical cart/order linkage on this data made a safe 1:1 match impossible) — confirmed this has no functional impact since kit-level `'ordered'` status already fully blocks edits, and cart-level idempotency (not participant-level) is what prevents duplicate orders.
+- New regression suite `src/tests/kitOrderLifecycle.test.ts` guards the fix at the SQL/TSX source level; `src/tests/kitSharesService.test.ts` covers the new `hasOrdered`/`myHasOrdered` mapping.
+
 ## 2026-08-30 (kit sharing 3.0: username, participant removal, cart/checkout edit)
 
 ### Added

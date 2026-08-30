@@ -12,6 +12,7 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
+import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { useDeleteOrder, useOrder, useOrderAdminNote, useOrderStatusHistory, useSetOrderStatus } from "@/hooks/useOrders";
 import { useAdminUserDirectory } from "@/hooks/useAdminOrders";
@@ -99,7 +100,10 @@ export default function AdminOrderDetailPage() {
             {customer?.email ? ` · ${customer.email}` : ""} · {formatDateTime(order.submitted_at)}
           </p>
         </div>
-        <OrderStatusBadge status={order.status} />
+        <div className="flex flex-col items-end gap-1.5">
+          <OrderStatusBadge status={order.status} />
+          <PaymentMethodBadge paymentMethod={order.payment_method} />
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
