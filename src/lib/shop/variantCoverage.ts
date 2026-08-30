@@ -148,14 +148,13 @@ export function kitSizeVialsForProduct(product: { code: string }): number | null
   return variantMetaForCode(product.code)?.kitSizeVials ?? null;
 }
 
-export function isKitShareableProduct(product: { code: string }): boolean {
-  const kitSize = kitSizeVialsForProduct(product);
-  return kitSize != null && kitSize >= 2;
+export function isKitShareableProduct(_product: { code: string }): boolean {
+  return true;
 }
 
-/** Products in a shop group that support kit sharing (explicit kit size in coverage data). */
+/** All active variants in a shop group can be shared via kit. */
 export function kitShareableVariants<T extends { code: string }>(variants: readonly T[]): T[] {
-  return variants.filter(isKitShareableProduct);
+  return [...variants];
 }
 
 /** Dropdown label: readable kit variant, e.g. "10x 20mg Vials". */

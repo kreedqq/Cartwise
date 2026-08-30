@@ -2,6 +2,29 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-08-30 (kit share proportional pricing)
+
+### Fixed
+
+- Kit share catalog unit used the **full kit/bulk price** as the per-vial unit when allocation reached `bulk_min` (e.g. 6 vials × 100 USD = 600). Correct formula: `kit_catalog_total × participant_quantity / kit_size`, then role markup.
+- Migrations `0036_fix_kit_share_catalog_unit_pricing.sql` and `0037_fix_kit_share_participant_pricing.sql`: pack-size-aware bulk, proportional participant base, cart unit = catalog unit (never full kit price).
+- TypeScript mirror `src/lib/shop/kitSharePricing.ts` plus regression tests (6+4=100, 25% markup 75/50).
+
+## 2026-08-30 (kit sharing 2.0)
+
+### Added
+
+- Migration `0035_kit_share_distribution_and_ten_rule.sql`: 10-unit kit rule, `update_kit_share_distribution` RPC, bulk-aware kit pricing, kit size multiples of 10 (10–100).
+- `src/lib/shop/kitUnits.ts` — category-aware unit labels (Vials / Stück), kit size options.
+- Kit dialog: kit size selector, **Verteilung bearbeiten** edit mode, all products shareable.
+
+### Changed
+
+- Kit sharing available for **all** shop products (not only x10vials coverage rows).
+- Distribution changes sync all participant carts atomically via `kit_share_sync_all_participant_carts`.
+- Creator receives participant `userId` in `get_my_kit_share` for distribution editing.
+- Bulk tier applies when shared allocation reaches product bulk minimum (oils/orals).
+
 ## 2026-08-30 (kit sync / UX overhaul)
 
 ### Added

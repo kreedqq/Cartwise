@@ -5,6 +5,8 @@ export interface KitShareParticipantView {
   isSelf: boolean;
   displayName: string;
   quantity: number;
+  /** Present only when the viewer is the kit creator (for distribution editing). */
+  userId?: string;
 }
 
 export interface KitShareView {
@@ -28,6 +30,7 @@ function mapKitShareView(raw: Record<string, unknown>): KitShareView {
         isSelf: Boolean(p.isSelf),
         displayName: String(p.displayName ?? "Teilnehmer"),
         quantity: Number(p.quantity ?? 0),
+        userId: p.userId != null ? String(p.userId) : undefined,
       }))
     : [];
 
@@ -79,6 +82,18 @@ export async function updateKitShareQuantity(kitShareId: string, quantity: numbe
   const { data, error } = await supabase.rpc("update_kit_share_quantity", {
     _kit_share_id: kitShareId,
     _quantity: quantity,
+  });
+  if (error) throw error;
+  return mapKitShareView(data as Record<string, unknown>);
+}
+
+export async function updateKitShareDistribution(
+  kitShareId: string,
+  distribution: { userId: string; quantity: number }[],
+): Promise<KitShareView> {
+  const { data, error } = await supabase.rpc("update_kit_share_distribution", {
+    _kit_share_id: kitShareId,
+    _distribution: distribution,
   });
   if (error) throw error;
   return mapKitShareView(data as Record<string, unknown>);

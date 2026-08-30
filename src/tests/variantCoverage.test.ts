@@ -61,6 +61,7 @@ describe("variantMetaForCode from uploaded product file", () => {
   it("detects 10-vial kits for AOD9604 from file", () => {
     expect(kitSizeVialsForProduct({ code: "10AD" })).toBe(10);
     expect(isKitShareableProduct({ code: "10AD" })).toBe(true);
+    expect(isKitShareableProduct({ code: "D100" })).toBe(true);
   });
 });
 
@@ -121,12 +122,12 @@ describe("shopProductTitle", () => {
 });
 
 describe("kitShareableVariants", () => {
-  it("returns only variants with explicit kit sizes from coverage data", () => {
+  it("returns all variants for kit sharing", () => {
     const variants = [
       { id: "a", code: "10AD", name: "AOD9604" },
       { id: "b", code: "D100", name: "Mast P" },
     ];
-    expect(kitShareableVariants(variants).map((v) => v.code)).toEqual(["10AD"]);
+    expect(kitShareableVariants(variants).map((v) => v.code)).toEqual(["10AD", "D100"]);
   });
 
   it("keeps Retatrutide strength variants separate by product row", () => {

@@ -1146,6 +1146,13 @@ export interface Database {
         Args: { _kit_share_id: string; _quantity: number };
         Returns: Record<string, unknown>;
       };
+      update_kit_share_distribution: {
+        Args: {
+          _kit_share_id: string;
+          _distribution: { userId: string; quantity: number }[];
+        };
+        Returns: Record<string, unknown>;
+      };
       get_my_kit_share: {
         Args: { _kit_share_id: string };
         Returns: Record<string, unknown>;

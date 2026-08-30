@@ -1,5 +1,6 @@
 import { normalizeShopDisplayName } from "@/lib/shop/display";
-import { formatVialVariant, vialStrengthForProduct } from "@/lib/shop/variantCoverage";
+import { formatKitQuantity, kitQuantityUnitLabel } from "@/lib/shop/kitUnits";
+import { formatVialVariant } from "@/lib/shop/variantCoverage";
 
 export interface CartLineDisplayInput {
   product_name_snapshot: string | null;
@@ -30,15 +31,16 @@ export function cartItemVariantSubtitle(item: CartLineDisplayInput): string | nu
   if (!meta.code && !meta.name) return null;
 
   if (item.kit_share_id) {
-    const strength =
-      vialStrengthForProduct(meta) ??
-      formatVialVariant(meta).replace(/^10x\s+/i, "").replace(/\s+Vials$/i, "");
+    const meta = productMeta(item);
+    const variant = formatVialVariant(meta);
+    const unit = kitQuantityUnitLabel(meta);
     const qty = Number(item.quantity);
-    const qtyLabel = Number.isFinite(qty) ? `${qty} Vial${qty === 1 ? "" : "s"}` : String(item.quantity);
-    const kitSizeMatch = item.note?.match(/Gemeinsames\s+(\d+)-Vial-Kit/i);
+    const qtyLabel = Number.isFinite(qty) ? formatKitQuantity(qty, unit) : String(item.quantity);
+    const kitSizeMatch = item.note?.match(/Gemeinsames\s+(\d+)-(?:Vial-|Einheiten-)Kit/i);
     const kitSize = kitSizeMatch?.[1];
-    const kitPart = kitSize ? ` · Gemeinsames ${kitSize}-Vial-Kit` : "";
-    return `${strength} · ${qtyLabel} · Kit Anteil${kitPart}`;
+    const kitPart = kitSize ? ` · Gemeinsames ${kitSize}-${unit === "Stück" ? "Stück" : "Vial"}-Kit` : "";
+    const strengthPart = variant !== "Standard" && !variant.startsWith(String(qty)) ? `${variant} · ` : "";
+    return `${strengthPart}${qtyLabel} · Kit Anteil${kitPart}`;
   }
 
   const variant = formatVialVariant(meta);

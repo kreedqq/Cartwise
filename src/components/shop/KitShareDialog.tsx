@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, Users } from "lucide-react";
+import { Loader2, Pencil, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -25,17 +26,26 @@ import { useAuth } from "@/context/AuthProvider";
 import { formatUsd } from "@/lib/money";
 import { variantLabelForProduct, type ShopProductGroup } from "@/lib/shop/display";
 import {
+  KIT_INVALID_TOTAL_MESSAGE,
+  validateFullKitDistribution,
+  validateKitAllocation,
+} from "@/lib/shop/kitShare";
+import {
+  formatKitQuantity,
+  KIT_SIZE_OPTIONS,
+  kitQuantityUnitLabel,
+} from "@/lib/shop/kitUnits";
+import {
   kitShareableVariants,
-  kitSizeVialsForProduct,
   variantStrengthLabel,
 } from "@/lib/shop/variantCoverage";
 import type { KitShareMember } from "@/services/kitShareMembers";
 import {
-  addKitShareToCart,
   assertKitSharePricePrivacy,
   createKitShare,
   inviteKitShareParticipant,
   type KitShareView,
+  updateKitShareDistribution,
   updateKitShareQuantity,
 } from "@/services/kitShares";
 import type { Tables } from "@/types/database";
@@ -63,11 +73,14 @@ function resolveInitialVariantId(
 
 function kitSyncErrorMessage(err: unknown): string {
   const message = err instanceof Error ? err.message : "";
+  if (/Verteilung|Kit Verteilung|Gesamtmenge|teilbar/i.test(message)) {
+    return message;
+  }
   if (/42501|403|permission/i.test(message)) {
     return "Der Kit Anteil konnte nicht synchronisiert werden.";
   }
   if (/P0001|22023|P0002|42703/i.test(message)) {
-    return "Der Kit Anteil konnte nicht synchronisiert werden.";
+    return message || "Der Kit Anteil konnte nicht synchronisiert werden.";
   }
   return message || "Der Kit Anteil konnte nicht synchronisiert werden.";
 }
@@ -79,7 +92,7 @@ export function KitShareDialog({
   membersLoading,
   open,
   onOpenChange,
-  onCartSynced,
+  onCartSynced: _onCartSynced,
 }: KitShareDialogProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -88,16 +101,22 @@ export function KitShareDialog({
     resolveInitialVariantId(shareableVariants, initialProductId),
   );
   const product = shareableVariants.find((variant) => variant.id === selectedVariantId) ?? null;
-  const kitSize = product ? kitSizeVialsForProduct(product) ?? 0 : 0;
   const hasMultipleShareableVariants = shareableVariants.length > 1;
-  const strengthLabel = product ? variantStrengthLabel(product) : null;
+  const unitLabel = product ? kitQuantityUnitLabel(product) : "Vials";
+
+  const [selectedKitSize, setSelectedKitSize] = React.useState(String(KIT_SIZE_OPTIONS[0]));
+  const kitSize = Number(selectedKitSize) || KIT_SIZE_OPTIONS[0];
 
   const [myQuantity, setMyQuantity] = React.useState("1");
   const [selectedMemberId, setSelectedMemberId] = React.useState("");
   const [memberQuantity, setMemberQuantity] = React.useState("1");
   const [kitView, setKitView] = React.useState<KitShareView | null>(null);
+  const [editMode, setEditMode] = React.useState(false);
+  const [editQuantities, setEditQuantities] = React.useState<Record<string, string>>({});
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
+
+  const activeKitSize = kitView?.kitSizeVials ?? kitSize;
 
   async function invalidateCarts() {
     if (!user) return;
@@ -112,8 +131,11 @@ export function KitShareDialog({
     setSelectedMemberId("");
     setMemberQuantity("1");
     setKitView(null);
+    setEditMode(false);
+    setEditQuantities({});
     setError(null);
     setBusy(false);
+    setSelectedKitSize(String(KIT_SIZE_OPTIONS[0]));
     setSelectedVariantId(resolveInitialVariantId(shareableVariants, initialProductId));
   }
 
@@ -124,12 +146,25 @@ export function KitShareDialog({
 
   if (shareableVariants.length === 0) return null;
 
-  const quantityOptions = Array.from({ length: kitSize }, (_, i) => i + 1);
+  const quantityOptions = Array.from({ length: activeKitSize }, (_, i) => i + 1);
   const variantMissing = hasMultipleShareableVariants && !product;
+
+  const editParticipants = kitView?.participants ?? [];
+  const editTotal = editParticipants.reduce((sum, p) => {
+    const raw = editQuantities[p.displayName] ?? String(p.quantity);
+    const qty = Number(raw);
+    return sum + (Number.isFinite(qty) ? qty : 0);
+  }, 0);
+
+  const editValidation = kitView
+    ? validateFullKitDistribution(activeKitSize, editParticipants.map((p) => ({
+        quantity: Number(editQuantities[p.displayName] ?? p.quantity) || 0,
+      })))
+    : null;
 
   async function handleCreateKit() {
     if (!product) {
-      setError("Bitte zuerst eine Produktstärke auswählen.");
+      setError("Bitte zuerst eine Variante auswählen.");
       return;
     }
     const qty = Number(myQuantity);
@@ -157,6 +192,16 @@ export function KitShareDialog({
     if (!kitView) return;
     const qty = Number(value);
     if (!Number.isInteger(qty) || qty < 1) return;
+
+    const allocation = validateKitAllocation(kitView.kitSizeVials, [
+      { quantity: qty },
+      ...kitView.participants.filter((p) => !p.isSelf).map((p) => ({ quantity: p.quantity })),
+    ]);
+    if (!allocation.ok) {
+      setError(allocation.message);
+      return;
+    }
+
     setBusy(true);
     setError(null);
     try {
@@ -189,7 +234,7 @@ export function KitShareDialog({
       setMemberQuantity("1");
       await invalidateCarts();
       toast.success(
-        view.canAddToCart
+        view.status === "full"
           ? "Kit Anteil erfolgreich zugewiesen. Alle Anteile wurden synchronisiert."
           : "Kit Anteil erfolgreich zugewiesen. Der Anteil wurde dem Warenkorb des Teilnehmers hinzugefügt.",
       );
@@ -200,17 +245,58 @@ export function KitShareDialog({
     }
   }
 
-  async function handleFinish() {
+  function startEditMode() {
     if (!kitView) return;
+    const initial: Record<string, string> = {};
+    for (const p of kitView.participants) {
+      initial[p.displayName] = String(p.quantity);
+    }
+    setEditQuantities(initial);
+    setEditMode(true);
+    setError(null);
+  }
+
+  function handleEditQuantityChange(displayName: string, value: string) {
+    setEditQuantities((prev) => ({ ...prev, [displayName]: value }));
+  }
+
+  async function handleSaveDistribution() {
+    if (!kitView || !user) return;
+
+    const distribution = kitView.participants.map((p) => {
+      const userId = p.isSelf ? user.id : p.userId;
+      if (!userId) {
+        throw new Error("Teilnehmer-ID fehlt");
+      }
+      return {
+        userId,
+        quantity: Number(editQuantities[p.displayName] ?? p.quantity),
+      };
+    });
+
+    if (distribution.some((d) => !Number.isInteger(d.quantity) || d.quantity < 1)) {
+      setError("Bitte gültige Mengen für alle Teilnehmer eingeben.");
+      return;
+    }
+
+    const validation = validateFullKitDistribution(
+      kitView.kitSizeVials,
+      distribution.map((d) => ({ quantity: d.quantity })),
+    );
+    if (!validation.ok) {
+      setError(validation.message);
+      return;
+    }
+
     setBusy(true);
     setError(null);
     try {
-      if (kitView.canAddToCart) {
-        await addKitShareToCart(kitView.id);
-      }
+      const view = await updateKitShareDistribution(kitView.id, distribution);
+      assertKitSharePricePrivacy(view);
+      setKitView(view);
+      setEditMode(false);
       await invalidateCarts();
-      onCartSynced?.();
-      handleOpenChange(false);
+      toast.success("Verteilung gespeichert. Alle Warenkörbe wurden synchronisiert.");
     } catch (err) {
       setError(kitSyncErrorMessage(err));
     } finally {
@@ -220,7 +306,7 @@ export function KitShareDialog({
 
   function handleVariantChange(value: string) {
     if (kitView) {
-      setError("Die Produktstärke kann nach Kit-Erstellung nicht mehr geändert werden.");
+      setError("Die Variante kann nach Kit-Erstellung nicht mehr geändert werden.");
       return;
     }
     setSelectedVariantId(value);
@@ -228,13 +314,17 @@ export function KitShareDialog({
   }
 
   const lockedProductName = kitView?.productName ?? group.displayName;
-  const lockedStrengthLabel = kitView
+  const lockedVariantLabel = kitView
     ? variantStrengthLabel({
         code: kitView.productCode,
         name: kitView.productName,
         dosage_vial: product?.dosage_vial ?? null,
       })
-    : strengthLabel;
+    : product
+      ? variantLabelForProduct(product)
+      : null;
+
+  const isCreator = Boolean(kitView && user);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -245,25 +335,25 @@ export function KitShareDialog({
             Kit teilen
           </DialogTitle>
           <DialogDescription>
-            Verteile ein {kitSize || "…"}-Vial-Kit auf mehrere Mitglieder. Anteile werden automatisch in die
-            Warenkörbe synchronisiert.
+            Teile ein gemeinsames {activeKitSize}-Einheiten-Kit. Anteile werden automatisch in die Warenkörbe
+            synchronisiert.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 text-sm">
-          <div className="rounded-lg border border-border bg-secondary/30 p-3 space-y-2">
+          <div className="space-y-2 rounded-lg border border-border bg-secondary/30 p-3">
             <div>
               <p className="text-xs text-muted-foreground">Produkt</p>
               <p className="font-medium">{lockedProductName}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Stärke</p>
+              <p className="text-xs text-muted-foreground">Variante</p>
               {kitView || !hasMultipleShareableVariants ? (
-                <p className="font-medium">{lockedStrengthLabel ?? "Standard"}</p>
+                <p className="font-medium">{lockedVariantLabel ?? "Standard"}</p>
               ) : (
                 <Select value={selectedVariantId || undefined} onValueChange={handleVariantChange} disabled={busy}>
-                  <SelectTrigger className="min-w-[11rem] w-full" aria-label="Produktstärke wählen">
-                    <SelectValue placeholder="Stärke wählen" />
+                  <SelectTrigger className="min-w-[11rem] w-full" aria-label="Variante wählen">
+                    <SelectValue placeholder="Variante wählen" />
                   </SelectTrigger>
                   <SelectContent>
                     {shareableVariants.map((variant) => (
@@ -276,96 +366,144 @@ export function KitShareDialog({
               )}
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Kit</p>
-              <p className="font-medium">{kitSize} Vials</p>
+              <p className="text-xs text-muted-foreground">Kitgröße</p>
+              {kitView ? (
+                <p className="font-medium">
+                  {activeKitSize} {unitLabel}
+                </p>
+              ) : (
+                <Select value={selectedKitSize} onValueChange={setSelectedKitSize} disabled={busy || variantMissing}>
+                  <SelectTrigger className="min-w-[11rem] w-full" aria-label="Kitgröße wählen">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {KIT_SIZE_OPTIONS.map((size) => (
+                      <SelectItem key={size} value={String(size)}>
+                        {size} {unitLabel}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
 
           {variantMissing && (
-            <p className="text-sm text-muted-foreground">Bitte zuerst eine Produktstärke auswählen.</p>
+            <p className="text-sm text-muted-foreground">Bitte zuerst eine Variante auswählen.</p>
           )}
 
-          <div className="space-y-2">
-            <Label>Mein Anteil</Label>
-            <Select
-              value={myQuantity}
-              onValueChange={kitView ? handleMyQuantityChange : setMyQuantity}
-              disabled={busy || variantMissing || (kitView != null && kitView.status !== "open" && kitView.status !== "full")}
-            >
-              <SelectTrigger className="min-w-[11rem] w-full" aria-label="Meine Kit-Menge">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {quantityOptions.map((qty) => (
-                  <SelectItem key={qty} value={String(qty)}>
-                    {qty} Vial{qty === 1 ? "" : "s"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {!kitView && (
+            <div className="space-y-2">
+              <Label>Mein Anteil</Label>
+              <Select value={myQuantity} onValueChange={setMyQuantity} disabled={busy || variantMissing}>
+                <SelectTrigger className="min-w-[11rem] w-full" aria-label="Meine Kit-Menge">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {quantityOptions.map((qty) => (
+                    <SelectItem key={qty} value={String(qty)}>
+                      {formatKitQuantity(qty, unitLabel)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button type="button" className="w-full" onClick={handleCreateKit} disabled={busy || variantMissing}>
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Kit erstellen"}
+              </Button>
+            </div>
+          )}
 
-          {!kitView ? (
-            <Button type="button" className="w-full" onClick={handleCreateKit} disabled={busy || variantMissing}>
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Kit erstellen"}
-            </Button>
-          ) : (
+          {kitView && !editMode && (
             <>
-              <div className="space-y-2 rounded-lg border border-border p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Mitglied hinzufügen</p>
-                <Select value={selectedMemberId} onValueChange={setSelectedMemberId} disabled={membersLoading || busy}>
-                  <SelectTrigger className="min-w-[11rem] w-full" aria-label="Mitglied auswählen">
-                    <SelectValue placeholder={membersLoading ? "Mitglieder werden geladen …" : "Mitglied auswählen"} />
+              <div className="space-y-2">
+                <Label>Mein Anteil</Label>
+                <Select
+                  value={String(kitView.myQuantity)}
+                  onValueChange={handleMyQuantityChange}
+                  disabled={busy || kitView.status === "cancelled" || kitView.status === "ordered"}
+                >
+                  <SelectTrigger className="min-w-[11rem] w-full" aria-label="Meine Kit-Menge">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {members.length === 0 && !membersLoading ? (
-                      <SelectItem value="__none__" disabled>
-                        Keine weiteren Mitglieder verfügbar
+                    {quantityOptions.map((qty) => (
+                      <SelectItem key={qty} value={String(qty)}>
+                        {formatKitQuantity(qty, unitLabel)}
                       </SelectItem>
-                    ) : (
-                      members.map((member) => (
-                        <SelectItem key={member.id} value={member.id}>
-                          {member.displayName}
-                        </SelectItem>
-                      ))
-                    )}
+                    ))}
                   </SelectContent>
                 </Select>
-                <div className="flex gap-2">
-                  <Select value={memberQuantity} onValueChange={setMemberQuantity} disabled={busy}>
-                    <SelectTrigger className="w-[120px] min-w-[7rem]" aria-label="Menge für Mitglied">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {quantityOptions.map((qty) => (
-                        <SelectItem key={qty} value={String(qty)}>
-                          {qty}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button type="button" variant="secondary" onClick={handleAddMember} disabled={!selectedMemberId || busy}>
-                    Hinzufügen
-                  </Button>
-                </div>
               </div>
 
+              {isCreator && kitView.status === "open" && (
+                <div className="space-y-2 rounded-lg border border-border p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Mitglied hinzufügen
+                  </p>
+                  <Select value={selectedMemberId} onValueChange={setSelectedMemberId} disabled={membersLoading || busy}>
+                    <SelectTrigger className="min-w-[11rem] w-full" aria-label="Mitglied auswählen">
+                      <SelectValue placeholder={membersLoading ? "Mitglieder werden geladen …" : "Mitglied auswählen"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {members.length === 0 && !membersLoading ? (
+                        <SelectItem value="__none__" disabled>
+                          Keine weiteren Mitglieder verfügbar
+                        </SelectItem>
+                      ) : (
+                        members.map((member) => (
+                          <SelectItem key={member.id} value={member.id}>
+                            {member.displayName}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex gap-2">
+                    <Select value={memberQuantity} onValueChange={setMemberQuantity} disabled={busy}>
+                      <SelectTrigger className="w-[120px] min-w-[7rem]" aria-label="Menge für Mitglied">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {quantityOptions.map((qty) => (
+                          <SelectItem key={qty} value={String(qty)}>
+                            {qty}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button type="button" variant="secondary" onClick={handleAddMember} disabled={!selectedMemberId || busy}>
+                      Hinzufügen
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-2 rounded-lg border border-border p-3">
-                <p className="font-medium">Verteilung</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-medium">Verteilung</p>
+                  {isCreator && kitView.participants.length > 1 && (
+                    <Button type="button" variant="ghost" size="sm" className="h-8 gap-1" onClick={startEditMode} disabled={busy}>
+                      <Pencil className="h-3.5 w-3.5" />
+                      Verteilung bearbeiten
+                    </Button>
+                  )}
+                </div>
                 {kitView.participants.map((p) => (
-                  <div key={`${p.displayName}-${p.quantity}-${p.isSelf}`} className="flex justify-between text-muted-foreground">
+                  <div key={`${p.displayName}-${p.quantity}`} className="flex justify-between text-muted-foreground">
                     <span>{p.displayName}</span>
-                    <span>{p.quantity} Vials</span>
+                    <span>{formatKitQuantity(p.quantity, unitLabel)}</span>
                   </div>
                 ))}
                 <div className="border-t border-border pt-2">
                   <p>
-                    Vergeben: {kitView.allocatedTotal} / {kitView.kitSizeVials} Vials
+                    Gesamt: {kitView.allocatedTotal} / {kitView.kitSizeVials} {unitLabel}
                   </p>
-                  {kitView.remainingVials > 0 ? (
-                    <p className="text-muted-foreground">Noch {kitView.remainingVials} Vials verfügbar.</p>
+                  {kitView.status === "full" ? (
+                    <p className="font-medium text-success">Kit vollständig · Warenkörbe synchronisiert</p>
                   ) : (
-                    <p className="font-medium text-success">Kit vollständig verteilt · Warenkörbe synchronisiert</p>
+                    <p className="text-muted-foreground">
+                      Noch {kitView.remainingVials} {unitLabel} verfügbar
+                    </p>
                   )}
                 </div>
               </div>
@@ -377,14 +515,55 @@ export function KitShareDialog({
             </>
           )}
 
+          {kitView && editMode && (
+            <div className="space-y-3 rounded-lg border border-primary/30 p-3">
+              <p className="font-medium">Verteilung bearbeiten</p>
+              {kitView.participants.map((p) => (
+                <div key={p.displayName} className="flex items-center justify-between gap-3">
+                  <span className="min-w-0 truncate">{p.displayName}</span>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={activeKitSize}
+                    value={editQuantities[p.displayName] ?? String(p.quantity)}
+                    onChange={(e) => handleEditQuantityChange(p.displayName, e.target.value)}
+                    className="h-9 w-20 text-right tabular-nums"
+                    disabled={busy}
+                    aria-label={`Menge für ${p.displayName}`}
+                  />
+                </div>
+              ))}
+              <p className={editValidation?.ok === false ? "text-destructive" : "text-muted-foreground"}>
+                Gesamt: {editTotal} / {activeKitSize} {unitLabel}
+              </p>
+              {editValidation?.ok === false && (
+                <p className="text-sm text-destructive">
+                  {editTotal % 10 !== 0 && editTotal === activeKitSize
+                    ? KIT_INVALID_TOTAL_MESSAGE
+                    : editValidation.message}
+                </p>
+              )}
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  className="flex-1"
+                  disabled={busy || editValidation?.ok !== true}
+                  onClick={handleSaveDistribution}
+                >
+                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verteilung speichern"}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => setEditMode(false)} disabled={busy}>
+                  Abbrechen
+                </Button>
+              </div>
+            </div>
+          )}
+
           {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
 
-        {kitView && (
+        {kitView && !editMode && (
           <DialogFooter className="flex-col gap-2 sm:flex-col">
-            <Button type="button" className="w-full" disabled={!kitView.canAddToCart || busy} onClick={handleFinish}>
-              Fertig
-            </Button>
             <Button type="button" variant="outline" className="w-full" onClick={() => handleOpenChange(false)}>
               Schließen
             </Button>
@@ -418,7 +597,7 @@ export function KitShareButton({
       className="h-9 shrink-0"
       onClick={onClick}
       disabled={needsVariantPick}
-      title={needsVariantPick ? "Bitte zuerst eine Produktstärke auswählen." : undefined}
+      title={needsVariantPick ? "Bitte zuerst eine Variante auswählen." : undefined}
     >
       <Users className="mr-1.5 h-4 w-4" />
       Kit teilen
