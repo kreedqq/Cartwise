@@ -3,11 +3,12 @@ import { BookOpen, ClipboardList, LayoutGrid, ShieldCheck, ShoppingBag, UserCirc
 
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthProvider";
+import { PEPTIDE_NAV_LABEL } from "@/lib/navigation";
 
 const items = [
   { to: "/dashboard", label: "Übersicht", icon: LayoutGrid },
   { to: "/shop", label: "Shop", icon: ShoppingBag },
-  { to: "/peptide", label: "Lexikon", icon: BookOpen },
+  { to: "/peptide", label: PEPTIDE_NAV_LABEL, icon: BookOpen },
   { to: "/orders", label: "Bestellungen", icon: ClipboardList },
   { to: "/profile", label: "Profil", icon: UserCircle },
 ];

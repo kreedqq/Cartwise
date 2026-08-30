@@ -31,7 +31,10 @@ export function useCartMutations() {
 
   function invalidate() {
     if (!user) return Promise.resolve();
-    return queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts(user.id) });
+    return Promise.all([
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts(user.id) }),
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.cartSummaries(user.id) }),
+    ]);
   }
 
   const create = useMutation({

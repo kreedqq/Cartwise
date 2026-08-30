@@ -21,6 +21,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useMyOrders } from "@/hooks/useOrders";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { formatDateTime, summarizeOrderCharges } from "@/lib/money";
+import { PEPTIDE_NAV_LABEL } from "@/lib/navigation";
 
 export default function DashboardPage() {
   const cartsQuery = useCarts();
@@ -55,7 +56,7 @@ export default function DashboardPage() {
         <ShortcutCard
           to="/peptide"
           icon={BookOpen}
-          title="Rechner & Lexikon"
+          title={PEPTIDE_NAV_LABEL}
           description="Mathematische Rechner und wissenschaftliche Substanzprofile."
         />
         <ShortcutCard to="/orders" icon={ClipboardList} title="Bestellungen" description="Status und Gesamt Endpreis." />
@@ -67,10 +68,10 @@ export default function DashboardPage() {
         />
       </div>
 
-      <section className="space-y-4">
+      <section className="space-y-3">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">Warenkörbe</h2>
-          <p className="text-sm text-muted-foreground">Der aktive Warenkorb ist hervorgehoben.</p>
+          <p className="text-sm text-muted-foreground">Der aktive Warenkorb ist hervorgehoben. Nicht benötigte Entwürfe können gelöscht werden.</p>
         </div>
 
         {cartsQuery.isLoading && (

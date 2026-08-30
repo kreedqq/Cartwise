@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/toaster";
+import { QUERY_KEYS } from "@/lib/constants";
+import { useAuth } from "@/context/AuthProvider";
 import { formatUsd } from "@/lib/money";
 import { variantLabelForProduct, type ShopProductGroup } from "@/lib/shop/display";
 import {
@@ -44,7 +47,7 @@ interface KitShareDialogProps {
   membersLoading: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddedToCart?: () => void;
+  onCartSynced?: () => void;
 }
 
 function resolveInitialVariantId(
@@ -58,6 +61,17 @@ function resolveInitialVariantId(
   return shareableVariants.length === 1 ? shareableVariants[0].id : "";
 }
 
+function kitSyncErrorMessage(err: unknown): string {
+  const message = err instanceof Error ? err.message : "";
+  if (/42501|403|permission/i.test(message)) {
+    return "Der Kit Anteil konnte nicht synchronisiert werden.";
+  }
+  if (/P0001|22023|P0002|42703/i.test(message)) {
+    return "Der Kit Anteil konnte nicht synchronisiert werden.";
+  }
+  return message || "Der Kit Anteil konnte nicht synchronisiert werden.";
+}
+
 export function KitShareDialog({
   group,
   initialProductId,
@@ -65,8 +79,10 @@ export function KitShareDialog({
   membersLoading,
   open,
   onOpenChange,
-  onAddedToCart,
+  onCartSynced,
 }: KitShareDialogProps) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const shareableVariants = React.useMemo(() => kitShareableVariants(group.variants), [group.variants]);
   const [selectedVariantId, setSelectedVariantId] = React.useState(() =>
     resolveInitialVariantId(shareableVariants, initialProductId),
@@ -82,6 +98,14 @@ export function KitShareDialog({
   const [kitView, setKitView] = React.useState<KitShareView | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
+
+  async function invalidateCarts() {
+    if (!user) return;
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts(user.id) }),
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.cartSummaries(user.id) }),
+    ]);
+  }
 
   function resetDialogState() {
     setMyQuantity("1");
@@ -119,9 +143,10 @@ export function KitShareDialog({
       const view = await createKitShare(product.id, kitSize, qty);
       assertKitSharePricePrivacy(view);
       setKitView(view);
-      toast.success("Kit wurde erstellt.");
+      await invalidateCarts();
+      toast.success("Kit wurde erstellt. Dein Kit Anteil wurde dem Warenkorb hinzugefügt.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Kit konnte nicht erstellt werden.");
+      setError(kitSyncErrorMessage(err));
     } finally {
       setBusy(false);
     }
@@ -138,8 +163,10 @@ export function KitShareDialog({
       const view = await updateKitShareQuantity(kitView.id, qty);
       assertKitSharePricePrivacy(view);
       setKitView(view);
+      await invalidateCarts();
+      toast.success("Dein Kit Anteil wurde im Warenkorb aktualisiert.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Menge konnte nicht geändert werden.");
+      setError(kitSyncErrorMessage(err));
     } finally {
       setBusy(false);
     }
@@ -160,28 +187,32 @@ export function KitShareDialog({
       setKitView(view);
       setSelectedMemberId("");
       setMemberQuantity("1");
-      toast.success("Mitglied wurde zum Kit hinzugefügt.");
+      await invalidateCarts();
+      toast.success(
+        view.canAddToCart
+          ? "Kit Anteil erfolgreich zugewiesen. Alle Anteile wurden synchronisiert."
+          : "Kit Anteil erfolgreich zugewiesen. Der Anteil wurde dem Warenkorb des Teilnehmers hinzugefügt.",
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Mitglied konnte nicht hinzugefügt werden.");
+      setError(kitSyncErrorMessage(err));
     } finally {
       setBusy(false);
     }
   }
 
-  async function handleAddToCart() {
-    if (!kitView?.canAddToCart) {
-      setError(`Noch ${kitView?.remainingVials ?? kitSize} Vials verfügbar. Das Kit muss vollständig verteilt sein.`);
-      return;
-    }
+  async function handleFinish() {
+    if (!kitView) return;
     setBusy(true);
     setError(null);
     try {
-      await addKitShareToCart(kitView.id);
-      toast.success("Kit-Anteil wurde zum Warenkorb hinzugefügt.");
-      onAddedToCart?.();
+      if (kitView.canAddToCart) {
+        await addKitShareToCart(kitView.id);
+      }
+      await invalidateCarts();
+      onCartSynced?.();
       handleOpenChange(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Kit-Anteil konnte nicht hinzugefügt werden.");
+      setError(kitSyncErrorMessage(err));
     } finally {
       setBusy(false);
     }
@@ -214,7 +245,8 @@ export function KitShareDialog({
             Kit teilen
           </DialogTitle>
           <DialogDescription>
-            Verteile ein {kitSize || "…"}-Vial-Kit auf mehrere Mitglieder. Bestellbar erst bei vollständiger Verteilung.
+            Verteile ein {kitSize || "…"}-Vial-Kit auf mehrere Mitglieder. Anteile werden automatisch in die
+            Warenkörbe synchronisiert.
           </DialogDescription>
         </DialogHeader>
 
@@ -230,7 +262,7 @@ export function KitShareDialog({
                 <p className="font-medium">{lockedStrengthLabel ?? "Standard"}</p>
               ) : (
                 <Select value={selectedVariantId || undefined} onValueChange={handleVariantChange} disabled={busy}>
-                  <SelectTrigger aria-label="Produktstärke wählen">
+                  <SelectTrigger className="min-w-[11rem] w-full" aria-label="Produktstärke wählen">
                     <SelectValue placeholder="Stärke wählen" />
                   </SelectTrigger>
                   <SelectContent>
@@ -260,7 +292,7 @@ export function KitShareDialog({
               onValueChange={kitView ? handleMyQuantityChange : setMyQuantity}
               disabled={busy || variantMissing || (kitView != null && kitView.status !== "open" && kitView.status !== "full")}
             >
-              <SelectTrigger aria-label="Meine Kit-Menge">
+              <SelectTrigger className="min-w-[11rem] w-full" aria-label="Meine Kit-Menge">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -282,7 +314,7 @@ export function KitShareDialog({
               <div className="space-y-2 rounded-lg border border-border p-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Mitglied hinzufügen</p>
                 <Select value={selectedMemberId} onValueChange={setSelectedMemberId} disabled={membersLoading || busy}>
-                  <SelectTrigger aria-label="Mitglied auswählen">
+                  <SelectTrigger className="min-w-[11rem] w-full" aria-label="Mitglied auswählen">
                     <SelectValue placeholder={membersLoading ? "Mitglieder werden geladen …" : "Mitglied auswählen"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -301,7 +333,7 @@ export function KitShareDialog({
                 </Select>
                 <div className="flex gap-2">
                   <Select value={memberQuantity} onValueChange={setMemberQuantity} disabled={busy}>
-                    <SelectTrigger className="w-[120px]" aria-label="Menge für Mitglied">
+                    <SelectTrigger className="w-[120px] min-w-[7rem]" aria-label="Menge für Mitglied">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -333,7 +365,7 @@ export function KitShareDialog({
                   {kitView.remainingVials > 0 ? (
                     <p className="text-muted-foreground">Noch {kitView.remainingVials} Vials verfügbar.</p>
                   ) : (
-                    <p className="font-medium text-success">Kit vollständig verteilt</p>
+                    <p className="font-medium text-success">Kit vollständig verteilt · Warenkörbe synchronisiert</p>
                   )}
                 </div>
               </div>
@@ -350,8 +382,8 @@ export function KitShareDialog({
 
         {kitView && (
           <DialogFooter className="flex-col gap-2 sm:flex-col">
-            <Button type="button" className="w-full" disabled={!kitView.canAddToCart || busy} onClick={handleAddToCart}>
-              Kit-Anteil in den Warenkorb
+            <Button type="button" className="w-full" disabled={!kitView.canAddToCart || busy} onClick={handleFinish}>
+              Fertig
             </Button>
             <Button type="button" variant="outline" className="w-full" onClick={() => handleOpenChange(false)}>
               Schließen

@@ -2,7 +2,21 @@
 
 Only material changes. Dates are local project days.
 
-## 2026-08-30
+## 2026-08-30 (kit sync / UX overhaul)
+
+### Added
+
+- Migration `0034_kit_share_cart_sync.sql` (production `kit_share_cart_sync`): server-side kit cart sync for all participants via `kit_share_sync_participant_cart`; wired into create/invite/update/leave/cancel/add_kit_share_to_cart RPCs.
+- Central helpers: `src/lib/shop/priceLabels.ts`, `src/lib/shop/cartDisplay.ts`, `src/lib/navigation.ts` (`Lexikon & Rechner`).
+- Tests: `priceLabels.test.ts`, `cartDisplay.test.ts`, `kitCartSync.test.ts`.
+
+### Changed
+
+- Kit sharing: participant cart lines sync automatically on invite/update (no manual add-to-cart).
+- Shop: category-aware price column labels (peptides/water kit vs oils/orals unit).
+- Cart UI: kit share badge/subtitle; visible delete on dashboard cart cards.
+- Navigation: **Lexikon & Rechner** label and order.
+- Design: warmer anthracite/gold tokens; compact admin dashboard stat cards.
 
 ### Fixed
 

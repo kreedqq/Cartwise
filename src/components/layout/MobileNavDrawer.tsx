@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthProvider";
 import { useNavShell } from "@/context/NavShellProvider";
+import { PEPTIDE_NAV_LABEL } from "@/lib/navigation";
 
 const navItems = [
   { to: "/dashboard", label: "Übersicht", icon: LayoutGrid },
   { to: "/shop", label: "Shop", icon: ShoppingBag },
-  { to: "/peptide", label: "Rechner & Lexikon", icon: BookOpen },
+  { to: "/peptide", label: PEPTIDE_NAV_LABEL, icon: BookOpen },
   { to: "/orders", label: "Bestellungen", icon: ClipboardList },
   { to: "/profile", label: "Profil", icon: UserCircle },
 ];

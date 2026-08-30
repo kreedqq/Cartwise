@@ -28,8 +28,8 @@ export default function AdminDashboardPage() {
   const monthValue = thisMonth.reduce((sum, o) => sum + Number(o.total_usd), 0);
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatCard icon={ClipboardList} label="Bestellungen heute" value={today.length} hint={formatUsd(todayValue)} />
         <StatCard icon={ShoppingCart} label="Offene Bestellungen" value={open.length} />
         <StatCard icon={ClipboardList} label="Diesen Monat" value={thisMonth.length} hint={formatUsd(monthValue)} />
@@ -98,16 +98,16 @@ function StatCard({
   hint?: string;
 }) {
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary">
-          <Icon className="h-4 w-4 text-foreground" />
+    <Card className="border-border/70">
+      <CardContent className="flex items-center gap-3 p-3">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary/80">
+          <Icon className="h-3.5 w-3.5 text-foreground" />
         </span>
-      </CardHeader>
-      <CardContent>
-        <p className="font-display text-3xl font-semibold tabular-nums tracking-tight">{value}</p>
-        {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+        <div className="min-w-0">
+          <p className="truncate text-[11px] font-medium text-muted-foreground">{label}</p>
+          <p className="text-xl font-semibold tabular-nums tracking-tight">{value}</p>
+          {hint && <p className="truncate text-[10px] text-muted-foreground">{hint}</p>}
+        </div>
       </CardContent>
     </Card>
   );

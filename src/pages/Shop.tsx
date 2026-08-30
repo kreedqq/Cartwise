@@ -160,13 +160,19 @@ export default function ShopPage() {
       {filtered.length > 0 && (
         <>
           <div className="hidden lg:block">
-            <ShopProductsTable products={filtered} rate={rateQuery.data?.rate ?? null} favoriteProductIds={favoriteProductIds} />
+            <ShopProductsTable
+              products={filtered}
+              rate={rateQuery.data?.rate ?? null}
+              favoriteProductIds={favoriteProductIds}
+              categoryId={selected}
+            />
           </div>
           <div className="lg:hidden">
             <ShopProductsMobileList
               products={filtered}
               rate={rateQuery.data?.rate ?? null}
               favoriteProductIds={favoriteProductIds}
+              categoryId={selected}
             />
           </div>
         </>

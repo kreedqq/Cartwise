@@ -3,18 +3,19 @@ import { Link } from "react-router-dom";
 import { BookOpen, Calculator } from "lucide-react";
 
 import { PageHeader } from "@/components/common/PageHeader";
+import { PEPTIDE_NAV_LABEL } from "@/lib/navigation";
 import { SAFETY_DISCLAIMER } from "@/lib/peptide/catalog";
 
 export default function PeptideHubPage() {
   React.useEffect(() => {
-    document.title = "Peptid Rechner & Lexikon | Peptix";
+    document.title = `${PEPTIDE_NAV_LABEL} | Peptix`;
   }, []);
 
   return (
     <div className="space-y-8">
       <PageHeader
         eyebrow="Wissen"
-        title="Peptid Rechner & Lexikon"
+        title={PEPTIDE_NAV_LABEL}
         description="Wissenschaftliche Informationen, aktuelle Forschung und praktische Berechnungstools rund um Peptide und verwandte Wirkstoffe."
       />
 

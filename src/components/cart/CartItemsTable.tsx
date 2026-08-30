@@ -21,6 +21,11 @@ import { SaveStatusIndicator } from "@/components/common/SaveStatusIndicator";
 import { ResolutionStatusBadge } from "@/components/cart/ResolutionStatusBadge";
 import { useCartItemRow } from "@/hooks/useCartItemRow";
 import { formatDateTime, formatEur, formatRate, formatUsd } from "@/lib/money";
+import {
+  cartItemDisplayName,
+  cartItemVariantSubtitle,
+  isKitShareCartItem,
+} from "@/lib/shop/cartDisplay";
 import type { ComputedCartItem } from "@/hooks/useCartComputed";
 
 interface CartItemsTableProps {
@@ -109,7 +114,15 @@ function CartItemRowDesktop({
         </div>
       </TableCell>
       <TableCell className="text-sm">
-        {item.product_name_snapshot ?? <span className="text-muted-foreground">—</span>}
+        <div className="font-medium">{cartItemDisplayName(item)}</div>
+        {cartItemVariantSubtitle(item) && (
+          <p className="mt-0.5 text-xs text-muted-foreground">{cartItemVariantSubtitle(item)}</p>
+        )}
+        {isKitShareCartItem(item) && (
+          <span className="mt-1 inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+            Kit Anteil
+          </span>
+        )}
       </TableCell>
       <TableCell>
         <Input

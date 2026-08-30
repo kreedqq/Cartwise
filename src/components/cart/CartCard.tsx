@@ -109,7 +109,22 @@ export function CartCard({ cart, summary }: CartCardProps) {
             </div>
           </div>
 
-          <DropdownMenu>
+          <div className="flex items-center gap-1 shrink-0">
+            {isOpenCart(cart.status) && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                aria-label="Warenkorb löschen"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDeleteOpen(true);
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
                 <MoreVertical className="h-4 w-4" />
@@ -144,6 +159,7 @@ export function CartCard({ cart, summary }: CartCardProps) {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </CardHeader>
 
         <CardContent className="cursor-pointer" onClick={() => navigate(`/carts/${cart.id}`)}>
@@ -194,8 +210,8 @@ export function CartCard({ cart, summary }: CartCardProps) {
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         title="Warenkorb löschen?"
-        description={`„${cart.name}" wird gelöscht und verschwindet aus deiner Übersicht. Diese Aktion kann nicht über die Oberfläche rückgängig gemacht werden.`}
-        confirmLabel="Endgültig löschen"
+        description="Dieser Warenkorb und seine nicht bestellten Positionen werden entfernt."
+        confirmLabel="Löschen"
         variant="destructive"
         loading={remove.isPending}
         onConfirm={handleDelete}

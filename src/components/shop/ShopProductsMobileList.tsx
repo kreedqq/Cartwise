@@ -15,6 +15,9 @@ import {
 import { KitShareButton, KitShareDialog } from "@/components/shop/KitShareDialog";
 import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
 import { convertUsdToEur, formatEur, formatQuantity, formatUsd, hasBulkTier } from "@/lib/money";
+import { shopPriceColumnLabels } from "@/lib/shop/priceLabels";
+import type { ShopCategoryId } from "@/lib/shopCategories";
+import { shopCategoryIdFor } from "@/lib/shopCategories";
 import {
   groupAndSortShopProducts,
   SHOP_QUANTITY_OPTIONS,
@@ -29,10 +32,14 @@ interface ShopProductsMobileListProps {
   products: Tables<"products">[];
   rate: number | null;
   favoriteProductIds: Set<string>;
+  categoryId?: ShopCategoryId;
 }
 
-export function ShopProductsMobileList({ products, rate, favoriteProductIds }: ShopProductsMobileListProps) {
+export function ShopProductsMobileList({ products, rate, favoriteProductIds, categoryId }: ShopProductsMobileListProps) {
   const groups = groupAndSortShopProducts(products);
+  const priceLabels = shopPriceColumnLabels(
+    categoryId ?? shopCategoryIdFor(products[0] ?? { category: null, name: "", code: "" }),
+  );
   const [kitShareContext, setKitShareContext] = React.useState<{
     group: ShopProductGroup;
     initialProductId: string;
@@ -53,6 +60,7 @@ export function ShopProductsMobileList({ products, rate, favoriteProductIds }: S
             group={group}
             rate={rate}
             favoriteProductIds={favoriteProductIds}
+            priceLabels={priceLabels}
             onKitShare={({ group, initialProductId }) => setKitShareContext({ group, initialProductId })}
           />
         ))}
@@ -68,6 +76,7 @@ export function ShopProductsMobileList({ products, rate, favoriteProductIds }: S
           onOpenChange={(open) => {
             if (!open) setKitShareContext(null);
           }}
+          onCartSynced={() => setKitShareContext(null)}
         />
       )}
     </>
@@ -78,11 +87,13 @@ function ShopProductGroupCard({
   group,
   rate,
   favoriteProductIds,
+  priceLabels,
   onKitShare,
 }: {
   group: ShopProductGroup;
   rate: number | null;
   favoriteProductIds: Set<string>;
+  priceLabels: ReturnType<typeof shopPriceColumnLabels>;
   onKitShare: (context: { group: ShopProductGroup; initialProductId: string }) => void;
 }) {
   const row = useShopProductGroupRow(group, rate, favoriteProductIds);
@@ -152,14 +163,14 @@ function ShopProductGroupCard({
 
         <div className="grid grid-cols-2 gap-2 rounded-md bg-secondary/50 p-2.5 text-sm">
           <div>
-            <p className="text-[11px] text-muted-foreground">Preis / 10 Vials (Kit)</p>
+            <p className="text-[11px] text-muted-foreground">{priceLabels.unitPrice}</p>
             <p className="text-base font-semibold tabular-nums tracking-tight">{formatUsd(product.price_usd)}</p>
             <p className="text-[11px] tabular-nums text-muted-foreground">
               {formatEur(convertUsdToEur(product.price_usd, rate))}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[11px] text-muted-foreground">Preis / 10 Kits</p>
+            <p className="text-[11px] text-muted-foreground">{priceLabels.bulkPrice}</p>
             {bulk ? (
               <>
                 <p className="text-base font-semibold tabular-nums tracking-tight">{formatUsd(product.bulk_price_usd)}</p>
@@ -173,7 +184,7 @@ function ShopProductGroupCard({
 
         {bulk && (bulkActive || (remaining != null && remaining > 0)) && (
           <p className={bulkActive ? "text-xs font-medium text-success" : "text-xs text-muted-foreground"}>
-            {bulkActive ? "Mengenpreis aktiv" : `Noch ${formatQuantity(remaining)} bis Mengenpreis`}
+            {bulkActive ? priceLabels.bulkActive : priceLabels.bulkRemaining(formatQuantity(remaining!))}
           </p>
         )}
 

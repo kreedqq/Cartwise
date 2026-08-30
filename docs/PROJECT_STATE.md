@@ -45,9 +45,9 @@ Peptide routes sit behind `ProtectedRoute` (same login as shop).
 
 ### Navigation (logged-in `AppShell`)
 
-Sidebar: Übersicht `/dashboard`, Shop `/shop`, Rechner & Lexikon `/peptide`, Bestellungen `/orders`, Profil `/profile`, Admin `/admin` (admins).
+Sidebar: Übersicht `/dashboard`, Shop `/shop`, **Lexikon & Rechner** `/peptide`, Bestellungen `/orders`, Profil `/profile`, Admin `/admin` (admins).
 
-Mobile: same set; peptide label **Lexikon**.
+Mobile: same set; peptide label **Lexikon & Rechner**.
 
 Admin nav: Übersicht, Bestellungen, Rollen & Preisregeln, Versandkosten, Produkte, Produktimport, Import-Historie, Benutzer, Audit-Log, Research.
 

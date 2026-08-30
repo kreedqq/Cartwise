@@ -15,6 +15,8 @@ import {
 import { KitShareButton, KitShareDialog } from "@/components/shop/KitShareDialog";
 import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
 import { convertUsdToEur, formatEur, formatQuantity, formatUsd, hasBulkTier } from "@/lib/money";
+import { shopPriceColumnLabels } from "@/lib/shop/priceLabels";
+import type { ShopCategoryId } from "@/lib/shopCategories";
 import { shopCategoryById, shopCategoryIdFor } from "@/lib/shopCategories";
 import {
   groupAndSortShopProducts,
@@ -30,10 +32,14 @@ interface ShopProductsTableProps {
   products: Tables<"products">[];
   rate: number | null;
   favoriteProductIds: Set<string>;
+  categoryId?: ShopCategoryId;
 }
 
-export function ShopProductsTable({ products, rate, favoriteProductIds }: ShopProductsTableProps) {
+export function ShopProductsTable({ products, rate, favoriteProductIds, categoryId }: ShopProductsTableProps) {
   const groups = groupAndSortShopProducts(products);
+  const priceLabels = shopPriceColumnLabels(
+    categoryId ?? shopCategoryIdFor(products[0] ?? { category: null, name: "", code: "" }),
+  );
   const [kitShareContext, setKitShareContext] = React.useState<{
     group: ShopProductGroup;
     initialProductId: string;
@@ -52,8 +58,8 @@ export function ShopProductsTable({ products, rate, favoriteProductIds }: ShopPr
           <TableRow>
             <TableHead className="w-20">Info</TableHead>
             <TableHead className="min-w-[240px]">Produkt</TableHead>
-            <TableHead className="w-44">Preis / 10 Vials (Kit)</TableHead>
-            <TableHead className="w-48">Preis / 10 Kits</TableHead>
+            <TableHead className="w-44">{priceLabels.unitPrice}</TableHead>
+            <TableHead className="w-48">{priceLabels.bulkPrice}</TableHead>
             <TableHead className="w-28 text-right">Menge</TableHead>
             <TableHead className="w-16 text-right">In den Warenkorb</TableHead>
           </TableRow>
@@ -65,6 +71,7 @@ export function ShopProductsTable({ products, rate, favoriteProductIds }: ShopPr
               group={group}
               rate={rate}
               favoriteProductIds={favoriteProductIds}
+              priceLabels={priceLabels}
               onKitShare={({ group, initialProductId }) => setKitShareContext({ group, initialProductId })}
             />
           ))}
@@ -81,6 +88,9 @@ export function ShopProductsTable({ products, rate, favoriteProductIds }: ShopPr
           onOpenChange={(open) => {
             if (!open) setKitShareContext(null);
           }}
+          onCartSynced={() => {
+            setKitShareContext(null);
+          }}
         />
       )}
     </>
@@ -91,11 +101,13 @@ function ShopProductGroupTableRow({
   group,
   rate,
   favoriteProductIds,
+  priceLabels,
   onKitShare,
 }: {
   group: ShopProductGroup;
   rate: number | null;
   favoriteProductIds: Set<string>;
+  priceLabels: ReturnType<typeof shopPriceColumnLabels>;
   onKitShare: (context: { group: ShopProductGroup; initialProductId: string }) => void;
 }) {
   const row = useShopProductGroupRow(group, rate, favoriteProductIds);
@@ -178,13 +190,15 @@ function ShopProductGroupTableRow({
               {formatEur(convertUsdToEur(product.bulk_price_usd as number, rate))}
             </p>
             {bulkActive ? (
-              <p className="mt-0.5 text-[11px] font-medium text-success">Mengenpreis aktiv</p>
+              <p className="mt-0.5 text-[11px] font-medium text-success">{priceLabels.bulkActive}</p>
             ) : remaining != null && remaining > 0 ? (
-              <p className="mt-0.5 text-[11px] text-muted-foreground">Noch {formatQuantity(remaining)} bis Mengenpreis</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">
+                {priceLabels.bulkRemaining(formatQuantity(remaining))}
+              </p>
             ) : null}
           </>
         ) : (
-          <p className="text-xs text-muted-foreground">Kein Mengenpreis</p>
+          <p className="text-xs text-muted-foreground">{priceLabels.noBulk}</p>
         )}
       </TableCell>
       <TableCell>
