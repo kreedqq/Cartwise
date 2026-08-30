@@ -4,6 +4,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 
 # Critical
 
+- [x] Kit sharing 3.0: username system + creator participant removal + Cart/Checkout kit editing — **DEPLOYED_WITH_LIMITATIONS** (migration `0038`; commit `c7906e4`; see chat release report); no real second test account for live two-user E2E; Admin visual redesign (Phase 30) and full mobile/browser QA (Phase 37/38) not performed — TEST LIMITATION
 - [x] User-approved git backup of the dirty `main` working tree (`0da9c90`; do not commit unless asked)
 - [x] Phase 10A local release backup (`feat: persist research platform and admin workflow`; not pushed)
 - [x] Production deploy preflight (Phase 10B) — **DEPLOYMENT_PREFLIGHT_PASS** (`docs/RESEARCH_DEPLOYMENT_PREFLIGHT_PHASE_10B.md`); no push/deploy yet
