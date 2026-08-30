@@ -1,6 +1,8 @@
 import * as React from "react";
 import { AlertTriangle, CheckCircle2, FileWarning, Upload } from "lucide-react";
 
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -177,6 +179,10 @@ export default function AdminPdfImportPage() {
 
   return (
     <div className="space-y-4">
+      <AdminPageHeader
+        title="Produktimport"
+        description={`Unterstützte Formate: ${ACCEPTED_IMPORT_LABEL}. Vor Übernahme zur Prüfung angezeigt.`}
+      />
       {stage === "upload" && (
         <Card>
           <CardHeader>
@@ -265,7 +271,9 @@ export default function AdminPdfImportPage() {
               </p>
             )}
 
-            <ImportPreviewTable rows={rows} onEdit={handleEdit} />
+            <div className="overflow-x-auto">
+              <ImportPreviewTable rows={rows} onEdit={handleEdit} />
+            </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs text-muted-foreground">

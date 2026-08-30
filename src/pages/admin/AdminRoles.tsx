@@ -2,6 +2,8 @@ import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2 } from "lucide-react";
 
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -102,6 +104,10 @@ export default function AdminRolesPage() {
 
   return (
     <div className="space-y-6">
+      <AdminPageHeader
+        title="Rollen & Preisregeln"
+        description="Kundenrollen mit Aufschlägen definieren und Benutzern zuweisen."
+      />
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{editingId ? "Rolle bearbeiten" : "Neue Rolle"}</CardTitle>
@@ -137,6 +143,7 @@ export default function AdminRolesPage() {
         </CardContent>
       </Card>
 
+      <div className="overflow-x-auto rounded-lg border border-border">
       <Table>
         <TableHeader>
           <TableRow>
@@ -188,13 +195,14 @@ export default function AdminRolesPage() {
           ))}
         </TableBody>
       </Table>
+      </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Benutzer zuweisen</CardTitle>
           <CardDescription>Die neue Rolle gilt sofort für zukünftige Preise und den Checkout.</CardDescription>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="overflow-x-auto p-0">
           <Table>
             <TableHeader>
               <TableRow>

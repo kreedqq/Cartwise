@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { PageHeader } from "@/components/common/PageHeader";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -66,10 +66,9 @@ export default function AdminResearchPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow="Research"
+      <AdminPageHeader
         title="Research Queue"
-        description="Postgres ist die Admin-Quelle. Das öffentliche Lexikon liest Postgres; catalog.ts + published.json sind der exklusive Fallback. Run-History liegt nach 0031 in Postgres. Community bleibt getrennt und default review-required. Kein Cron, kein Auto-Approve."
+        description="Postgres ist die Admin-Quelle. Das öffentliche Lexikon liest Postgres; catalog.ts + published.json sind der exklusive Fallback."
       />
 
       {postgresFailed && !useLegacy ? (

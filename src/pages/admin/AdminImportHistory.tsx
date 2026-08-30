@@ -2,6 +2,9 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminSection } from "@/components/admin/AdminSection";
+
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -24,12 +27,16 @@ export default function AdminImportHistoryPage() {
 
   if (importsQuery.isLoading) return <Skeleton className="h-64 w-full" />;
 
-  if (!importsQuery.data || importsQuery.data.length === 0) {
-    return <EmptyState title="Noch keine Importe" description="Hier erscheinen alle bisherigen PDF- und CSV-Importe." />;
-  }
-
   return (
-    <Table>
+    <div className="space-y-4">
+      <AdminPageHeader title="Import-Verlauf" description="Alle bisherigen PDF- und CSV-Importe." />
+
+      {!importsQuery.data || importsQuery.data.length === 0 ? (
+        <EmptyState title="Noch keine Importe" description="Hier erscheinen alle bisherigen PDF- und CSV-Importe." />
+      ) : (
+      <AdminSection>
+      <div className="overflow-x-auto">
+      <Table>
       <TableHeader>
         <TableRow>
           <TableHead className="w-8" />
@@ -64,6 +71,10 @@ export default function AdminImportHistoryPage() {
         ))}
       </TableBody>
     </Table>
+    </div>
+    </AdminSection>
+      )}
+    </div>
   );
 }
 
@@ -73,7 +84,7 @@ function ImportRowsDetail({ importId }: { importId: string }) {
   return (
     <TableRow>
       <TableCell colSpan={8} className="bg-secondary/30 p-0">
-        <div className="max-h-72 overflow-y-auto p-3">
+        <div className="max-h-72 overflow-x-auto overflow-y-auto p-3">
           {rowsQuery.isLoading ? (
             <Skeleton className="h-24 w-full" />
           ) : (

@@ -109,36 +109,36 @@ export default function OrderDetailPage() {
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="overflow-x-auto p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Code</TableHead>
+                <TableHead className="hidden sm:table-cell">Code</TableHead>
                 <TableHead>Artikel</TableHead>
                 <TableHead className="text-right">Menge</TableHead>
-                <TableHead>Preisart</TableHead>
+                <TableHead className="hidden sm:table-cell">Preisart</TableHead>
                 <TableHead className="text-right">Einzelpreis</TableHead>
                 <TableHead className="text-right">Gesamt USD</TableHead>
-                <TableHead className="text-right">Gesamt EUR</TableHead>
+                <TableHead className="hidden sm:table-cell text-right">Gesamt EUR</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {order.items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-mono text-xs">{item.product_code_snapshot}</TableCell>
+                  <TableCell className="hidden sm:table-cell font-mono text-xs">{item.product_code_snapshot}</TableCell>
                   <TableCell>
-                    <p className="text-sm">{item.product_name_snapshot}</p>
+                    <p className="text-sm font-medium">{item.product_name_snapshot}</p>
                     {item.dosage_vial_snapshot && (
                       <p className="text-xs text-muted-foreground">{item.dosage_vial_snapshot}</p>
                     )}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">{formatQuantity(item.quantity)}</TableCell>
-                  <TableCell className="text-xs">
+                  <TableCell className="hidden sm:table-cell text-xs">
                     {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normalpreis"}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">{formatUsd(item.unit_price_usd_snapshot)}</TableCell>
                   <TableCell className="text-right tabular-nums font-medium">{formatUsd(item.line_total_usd)}</TableCell>
-                  <TableCell className="text-right tabular-nums text-primary">
+                  <TableCell className="hidden sm:table-cell text-right tabular-nums text-primary">
                     {item.eur_value_snapshot != null ? formatEur(item.eur_value_snapshot) : "—"}
                   </TableCell>
                 </TableRow>

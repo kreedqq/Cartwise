@@ -117,9 +117,40 @@
   }
 }
 
+/* ─── Admin area: override to professional light theme ─────────────────── */
+[data-admin] {
+  --background: 40 25% 97%;
+  --foreground: 24 15% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 24 15% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 24 15% 10%;
+  --primary: 38 55% 42%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 36 15% 93%;
+  --secondary-foreground: 24 12% 20%;
+  --muted: 36 12% 91%;
+  --muted-foreground: 25 8% 50%;
+  --accent: 38 46% 52%;
+  --accent-foreground: 0 0% 100%;
+  --border: 35 10% 87%;
+  --input: 35 10% 85%;
+  --ring: 38 55% 42%;
+  --success: 152 30% 34%;
+  --success-foreground: 152 40% 97%;
+  --warning: 36 65% 44%;
+  --warning-foreground: 36 92% 97%;
+  --destructive: 0 65% 44%;
+  --destructive-foreground: 0 0% 100%;
+  color-scheme: light;
+}
+
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
   }
   .no-scrollbar::-webkit-scrollbar {
     display: none;

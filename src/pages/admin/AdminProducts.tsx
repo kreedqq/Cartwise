@@ -2,6 +2,8 @@ import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Download, FileDown, MoreVertical, Plus, Search, Upload } from "lucide-react";
 
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminSection } from "@/components/admin/AdminSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -105,38 +107,45 @@ export default function AdminProductsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="relative w-full max-w-sm">
-          <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Suche nach Code, Name oder Dosage …"
-            className="pl-8"
-          />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setCsvOpen(true)}>
-            <Upload /> CSV-Import
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => downloadCsv("produkte-vorlage.csv", buildProductCsvTemplate())}
-          >
-            <FileDown /> CSV-Vorlage
-          </Button>
-          <Button variant="outline" onClick={handleExport} disabled={!productsQuery.data?.length}>
-            <Download /> CSV-Export
-          </Button>
-          <Button
-            onClick={() => {
-              setEditing(null);
-              setFormOpen(true);
-            }}
-          >
-            <Plus /> Neues Produkt
-          </Button>
-        </div>
+      <AdminPageHeader
+        title="Produkte"
+        description="Produktkatalog verwalten, importieren und exportieren."
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={() => setCsvOpen(true)}>
+              <Upload /> CSV-Import
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => downloadCsv("produkte-vorlage.csv", buildProductCsvTemplate())}
+            >
+              <FileDown /> Vorlage
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExport} disabled={!productsQuery.data?.length}>
+              <Download /> Export
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                setEditing(null);
+                setFormOpen(true);
+              }}
+            >
+              <Plus /> Neues Produkt
+            </Button>
+          </>
+        }
+      />
+
+      <div className="relative w-full max-w-sm">
+        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Suche nach Code, Name oder Dosage …"
+          className="pl-8 text-sm"
+        />
       </div>
 
       {productsQuery.isLoading && <Skeleton className="h-64 w-full" />}
@@ -146,6 +155,8 @@ export default function AdminProductsPage() {
       )}
 
       {productsQuery.data && productsQuery.data.length > 0 && (
+        <AdminSection>
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -213,6 +224,8 @@ export default function AdminProductsPage() {
             ))}
           </TableBody>
         </Table>
+        </div>
+        </AdminSection>
       )}
 
       <ProductFormDialog open={formOpen} onOpenChange={setFormOpen} product={editing} loading={saving} onSubmit={handleSubmit} />

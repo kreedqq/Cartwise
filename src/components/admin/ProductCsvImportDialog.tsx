@@ -155,7 +155,7 @@ export function ProductCsvImportDialog({ open, onOpenChange, onImported }: Produ
               </p>
             )}
 
-            <div className="max-h-[26rem] overflow-y-auto">
+            <div className="max-h-[26rem] overflow-x-auto overflow-y-auto">
               <ImportPreviewTable rows={rows} onEdit={handleEdit} />
             </div>
 

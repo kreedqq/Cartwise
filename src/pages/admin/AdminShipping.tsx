@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -95,6 +97,10 @@ export default function AdminShippingPage() {
 
   return (
     <div className="space-y-6">
+      <AdminPageHeader
+        title="Versandkosten"
+        description="Versandkosten aus China aufteilen und Deutschland-Versand individuell setzen."
+      />
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Versand aus China</CardTitle>
@@ -130,6 +136,7 @@ export default function AdminShippingPage() {
           </div>
 
           {preview && (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -151,8 +158,10 @@ export default function AdminShippingPage() {
                 })}
               </TableBody>
             </Table>
+            </div>
           )}
 
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -179,6 +188,7 @@ export default function AdminShippingPage() {
               ))}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 
@@ -187,7 +197,7 @@ export default function AdminShippingPage() {
           <CardTitle className="text-base">Versand aus Deutschland</CardTitle>
           <CardDescription>Individuell pro Bestellung. Wird niemals durch die Anzahl der Besteller geteilt.</CardDescription>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="overflow-x-auto p-0">
           <Table>
             <TableHeader>
               <TableRow>

@@ -2,11 +2,12 @@ import * as React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, FileDown, Printer, Trash2 } from "lucide-react";
 
+import { AdminSection } from "@/components/admin/AdminSection";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
@@ -87,99 +88,114 @@ export default function AdminOrderDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <Button variant="ghost" size="sm" className="-ml-2" onClick={() => navigate("/admin/orders")}>
-        <ArrowLeft /> Zurück zu Bestellungen
+    <div className="space-y-5">
+      {/* Back + breadcrumb */}
+      <Button variant="ghost" size="sm" className="-ml-2 text-muted-foreground" onClick={() => navigate("/admin/orders")}>
+        <ArrowLeft className="h-3.5 w-3.5" /> Bestellungen
       </Button>
 
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="font-mono text-xl font-semibold">{order.order_number}</h2>
-          <p className="text-sm text-muted-foreground">
-            {customer?.displayName ?? "—"}
-            {customer?.email ? ` · ${customer.email}` : ""} · {formatDateTime(order.submitted_at)}
-          </p>
-        </div>
-        <div className="flex flex-col items-end gap-1.5">
-          <OrderStatusBadge status={order.status} />
-          <PaymentMethodBadge paymentMethod={order.payment_method} />
-        </div>
-      </div>
+      {/* Order header card */}
+      <AdminSection padded>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-mono text-lg font-bold text-foreground">{order.order_number}</span>
+              <OrderStatusBadge status={order.status} />
+              <PaymentMethodBadge paymentMethod={order.payment_method} />
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">{customer?.displayName ?? "—"}</span>
+              {customer?.email && <span>{customer.email}</span>}
+              <span>{formatDateTime(order.submitted_at)}</span>
+            </div>
+          </div>
 
-      <div className="flex flex-wrap gap-2">
-        {next.map((status) => (
-          <Button
-            key={status}
-            size="sm"
-            variant={status === "cancelled" ? "destructive" : "outline"}
-            onClick={() => setPendingStatus(status)}
-          >
-            {ORDER_STATUS_LABELS[status]}
-          </Button>
-        ))}
-        <Button variant="outline" size="sm" onClick={() => printOrderDocument(exportDoc)}>
-          <Printer /> PDF
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => downloadOrderCsv(exportDoc)}>
-          <FileDown /> CSV
-        </Button>
-        {canPermanentlyDeleteOrder(order.status) && (
-          <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)}>
-            <Trash2 /> Endgültig löschen
-          </Button>
-        )}
-      </div>
+          {/* Actions */}
+          <div className="flex flex-wrap gap-2">
+            {next.map((st) => (
+              <Button
+                key={st}
+                size="sm"
+                variant={st === "cancelled" ? "destructive" : "outline"}
+                onClick={() => setPendingStatus(st)}
+              >
+                {ORDER_STATUS_LABELS[st]}
+              </Button>
+            ))}
+            <Button variant="outline" size="sm" onClick={() => printOrderDocument(exportDoc)}>
+              <Printer className="h-3.5 w-3.5" /> PDF
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => downloadOrderCsv(exportDoc)}>
+              <FileDown className="h-3.5 w-3.5" /> CSV
+            </Button>
+            {canPermanentlyDeleteOrder(order.status) && (
+              <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)}>
+                <Trash2 className="h-3.5 w-3.5" /> Löschen
+              </Button>
+            )}
+          </div>
+        </div>
+      </AdminSection>
 
-      <Card>
-        <CardContent className="overflow-x-auto p-0">
+      {/* Order items */}
+      <AdminSection title="Bestellpositionen">
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Code</TableHead>
+                <TableHead className="pl-4">Code</TableHead>
                 <TableHead>Artikel</TableHead>
                 <TableHead className="text-right">Menge</TableHead>
                 <TableHead className="text-right">Normalpreis</TableHead>
                 <TableHead className="text-right">Mengenpreis</TableHead>
                 <TableHead>Stufe</TableHead>
                 <TableHead className="text-right">Einzelpreis</TableHead>
-                <TableHead className="text-right">Gesamt</TableHead>
+                <TableHead className="pr-4 text-right">Gesamt</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {order.items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-mono text-xs">{item.product_code_snapshot}</TableCell>
+                  <TableCell className="pl-4 font-mono text-xs">{item.product_code_snapshot}</TableCell>
                   <TableCell>
-                    <p className="text-sm">{item.product_name_snapshot}</p>
+                    <p className="text-sm font-medium">{item.product_name_snapshot}</p>
                     {item.dosage_vial_snapshot && (
-                      <p className="text-xs text-muted-foreground">{item.dosage_vial_snapshot}</p>
+                      <p className="text-[11px] text-muted-foreground">{item.dosage_vial_snapshot}</p>
                     )}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">{formatQuantity(item.quantity)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{formatUsd(item.normal_price_usd_snapshot)}</TableCell>
-                  <TableCell className="text-right tabular-nums">
+                  <TableCell className="text-right tabular-nums text-sm">
+                    {formatQuantity(item.quantity)}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums text-sm">
+                    {formatUsd(item.normal_price_usd_snapshot)}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums text-sm">
                     {item.bulk_price_usd_snapshot != null
                       ? `${formatUsd(item.bulk_price_usd_snapshot)} ab ${formatQuantity(item.bulk_price_min_quantity_snapshot)}`
                       : "—"}
                   </TableCell>
-                  <TableCell className="text-xs">
-                    {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normalpreis"}
+                  <TableCell>
+                    <Badge variant={item.applied_price_tier === "bulk" ? "secondary" : "outline"} className="text-[10px]">
+                      {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normal"}
+                    </Badge>
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">{formatUsd(item.unit_price_usd_snapshot)}</TableCell>
-                  <TableCell className="text-right tabular-nums font-medium">{formatUsd(item.line_total_usd)}</TableCell>
+                  <TableCell className="text-right tabular-nums text-sm">
+                    {formatUsd(item.unit_price_usd_snapshot)}
+                  </TableCell>
+                  <TableCell className="pr-4 text-right tabular-nums text-sm font-semibold">
+                    {formatUsd(item.line_total_usd)}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </AdminSection>
 
+      {/* Charges + note */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Summen</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
+        <AdminSection title="Summen & Versand" padded>
+          <div className="space-y-3 text-sm">
             <OrderChargeSummary
               charges={summarizeOrderCharges({
                 productUsd: order.total_usd,
@@ -191,20 +207,21 @@ export default function AdminOrderDetailPage() {
                 usdToEurRate: order.exchange_rate,
               })}
             />
-            <div className="flex justify-between text-muted-foreground">
+            <div className="flex justify-between border-t border-border pt-2 text-muted-foreground">
               <span>Wechselkurs</span>
               <span className="tabular-nums">{formatRate(order.exchange_rate)}</span>
             </div>
             {order.note && (
-              <p className="border-t border-border pt-2 text-muted-foreground">Kundennotiz: {order.note}</p>
+              <div className="border-t border-border pt-2 text-muted-foreground">
+                <span className="font-medium text-foreground">Kundennotiz: </span>
+                {order.note}
+              </div>
             )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Interne Notiz</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
+          </div>
+        </AdminSection>
+
+        <AdminSection title="Interne Notiz" padded>
+          <div className="space-y-2">
             <Label htmlFor="admin-note" className="sr-only">
               Interne Notiz
             </Label>
@@ -218,26 +235,28 @@ export default function AdminOrderDetailPage() {
             <Button size="sm" variant="outline" onClick={saveNote} loading={setStatus.isPending}>
               Notiz speichern
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </AdminSection>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Statusverlauf</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          {(historyQuery.data ?? []).map((entry) => (
-            <div key={entry.id} className="flex justify-between gap-3">
-              <span>
-                {entry.old_status ? `${ORDER_STATUS_LABELS[entry.old_status]} → ` : ""}
-                {ORDER_STATUS_LABELS[entry.new_status]}
-              </span>
-              <span className="text-muted-foreground">{formatDateTime(entry.changed_at)}</span>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      {/* Status history */}
+      <AdminSection title="Statusverlauf" padded>
+        <div className="space-y-2 text-sm">
+          {(historyQuery.data ?? []).length === 0 ? (
+            <p className="text-muted-foreground">Noch keine Statusänderungen.</p>
+          ) : (
+            (historyQuery.data ?? []).map((entry) => (
+              <div key={entry.id} className="flex items-center justify-between gap-3">
+                <span className="text-foreground">
+                  {entry.old_status ? `${ORDER_STATUS_LABELS[entry.old_status]} → ` : ""}
+                  <span className="font-medium">{ORDER_STATUS_LABELS[entry.new_status]}</span>
+                </span>
+                <span className="whitespace-nowrap text-muted-foreground">{formatDateTime(entry.changed_at)}</span>
+              </div>
+            ))
+          )}
+        </div>
+      </AdminSection>
 
       <ConfirmDialog
         open={pendingStatus != null}

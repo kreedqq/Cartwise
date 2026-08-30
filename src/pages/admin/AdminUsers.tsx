@@ -2,6 +2,9 @@ import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ShieldCheck, ShieldOff } from "lucide-react";
 
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminSection } from "@/components/admin/AdminSection";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -39,7 +42,13 @@ export default function AdminUsersPage() {
   if (usersQuery.isLoading) return <Skeleton className="h-64 w-full" />;
 
   return (
-    <>
+    <div className="space-y-4">
+      <AdminPageHeader
+        title="Benutzer"
+        description="Admin-Rollen vergeben und entziehen."
+      />
+      <AdminSection>
+      <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
@@ -90,6 +99,8 @@ export default function AdminUsersPage() {
           })}
         </TableBody>
       </Table>
+      </div>
+      </AdminSection>
 
       <ConfirmDialog
         open={!!target}
@@ -105,6 +116,6 @@ export default function AdminUsersPage() {
         loading={loading}
         onConfirm={handleConfirm}
       />
-    </>
+    </div>
   );
 }

@@ -155,25 +155,25 @@ export default function CheckoutPage() {
       ) : (
         <>
           <Card>
-            <CardContent className="p-0">
+            <CardContent className="overflow-x-auto p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Code</TableHead>
+                    <TableHead className="hidden sm:table-cell">Code</TableHead>
                     <TableHead>Artikel</TableHead>
                     <TableHead className="text-right">Menge</TableHead>
                     <TableHead className="text-right">Einzelpreis</TableHead>
-                    <TableHead>Preisart</TableHead>
+                    <TableHead className="hidden sm:table-cell">Preisart</TableHead>
                     <TableHead className="text-right">Gesamt USD</TableHead>
-                    <TableHead className="text-right">Gesamt EUR</TableHead>
+                    <TableHead className="hidden xs:table-cell text-right">Gesamt EUR</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {eligible.map((item) => (
                     <TableRow key={item.id}>
-                      <TableCell className="font-mono text-xs">{item.product_code_snapshot}</TableCell>
+                      <TableCell className="hidden sm:table-cell font-mono text-xs">{item.product_code_snapshot}</TableCell>
                       <TableCell className="text-sm">
-                        {item.product_name_snapshot}
+                        <p>{item.product_name_snapshot}</p>
                         {item.kit_share_id && (
                           <div>
                             <EditKitShareButton kitShareId={item.kit_share_id} />
@@ -182,13 +182,13 @@ export default function CheckoutPage() {
                       </TableCell>
                       <TableCell className="text-right tabular-nums">{item.quantity}</TableCell>
                       <TableCell className="text-right tabular-nums">{formatUsd(item.unit_price_usd_snapshot)}</TableCell>
-                      <TableCell>
+                      <TableCell className="hidden sm:table-cell">
                         <Badge variant={item.applied_price_tier === "bulk" ? "default" : "secondary"}>
-                          {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normalpreis"}
+                          {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normal"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right tabular-nums font-medium">{formatUsd(item.totalUsd)}</TableCell>
-                      <TableCell className="text-right tabular-nums text-primary">
+                      <TableCell className="hidden xs:table-cell text-right tabular-nums text-primary">
                         {item.totalEur != null ? formatEur(item.totalEur) : "—"}
                       </TableCell>
                     </TableRow>
