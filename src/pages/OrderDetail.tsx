@@ -18,6 +18,7 @@ import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
 import { formatDateTime, formatEur, formatQuantity, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { PAYMENT_METHOD_LABELS, isPaymentMethod } from "@/lib/shop/paymentMethod";
+import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 import { ORDER_STATUS_LABELS, orderItemsToBulkLines } from "@/services/orders";
 import { toast } from "@/components/ui/toaster";
 
@@ -127,9 +128,9 @@ export default function OrderDetailPage() {
                 <TableRow key={item.id}>
                   <TableCell className="hidden sm:table-cell font-mono text-xs">{item.product_code_snapshot}</TableCell>
                   <TableCell>
-                    <p className="text-sm font-medium">{item.product_name_snapshot}</p>
-                    {item.dosage_vial_snapshot && (
-                      <p className="text-xs text-muted-foreground">{item.dosage_vial_snapshot}</p>
+                    <p className="text-sm font-medium">{cartItemDisplayName(item)}</p>
+                    {cartItemVariantSubtitle(item) && (
+                      <p className="text-xs text-muted-foreground">{cartItemVariantSubtitle(item)}</p>
                     )}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">{formatQuantity(item.quantity)}</TableCell>

@@ -1,6 +1,6 @@
 import { normalizeShopDisplayName } from "@/lib/shop/display";
 import { formatKitQuantity, kitQuantityUnitLabel } from "@/lib/shop/kitUnits";
-import { formatVialVariant } from "@/lib/shop/variantCoverage";
+import { formatProductVariant, isOralCustomerLabel } from "@/lib/shop/variantCoverage";
 
 export interface CartLineDisplayInput {
   product_name_snapshot: string | null;
@@ -8,13 +8,14 @@ export interface CartLineDisplayInput {
   quantity: number | string;
   kit_share_id?: string | null;
   note?: string | null;
+  dosage_vial_snapshot?: string | null;
 }
 
 function productMeta(item: CartLineDisplayInput) {
   return {
     code: item.product_code_snapshot ?? "",
     name: item.product_name_snapshot ?? "",
-    dosage_vial: null as string | null,
+    dosage_vial: item.dosage_vial_snapshot ?? null,
   };
 }
 
@@ -31,9 +32,8 @@ export function cartItemVariantSubtitle(item: CartLineDisplayInput): string | nu
   if (!meta.code && !meta.name) return null;
 
   if (item.kit_share_id) {
-    const meta = productMeta(item);
-    const variant = formatVialVariant(meta);
-    const unit = kitQuantityUnitLabel(meta);
+    const variant = formatProductVariant(meta);
+    const unit = isOralCustomerLabel(variant) ? "Stück" : kitQuantityUnitLabel(meta);
     const qty = Number(item.quantity);
     const qtyLabel = Number.isFinite(qty) ? formatKitQuantity(qty, unit) : String(item.quantity);
     const kitSizeMatch = item.note?.match(/Gemeinsames\s+(\d+)-(?:Vial-|Einheiten-)Kit/i);
@@ -43,9 +43,8 @@ export function cartItemVariantSubtitle(item: CartLineDisplayInput): string | nu
     return `${strengthPart}${qtyLabel} · Kit Anteil${kitPart}`;
   }
 
-  const variant = formatVialVariant(meta);
+  const variant = formatProductVariant(meta);
   if (variant === "Standard") return null;
-  if (/^\d/.test(variant) && variant.includes("Vials")) return variant;
   return variant;
 }
 

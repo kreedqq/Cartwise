@@ -86,7 +86,7 @@ Identity fields live in `catalog.ts` (always start at evidence F / regulatory in
 
 ### PRODUCT (shop)
 
-Postgres `products`. Lexicon only stores `PeptideProductRef` (code, name, strength label, slug, blend flag) derived at runtime from shop rows — still without prices in the UI.
+Postgres `products` (one row per SKU; no `product_variants` table). Customer-facing kit/pack labels come from `formatProductVariant()` in `src/lib/shop/variantCoverage.ts` (peptides: `10x 5 mg Vials`; orals: `5 mg × 100 Tabletten`). Shop grouping is by family slug except orals, which group by stored name so lexicon aliases do not merge distinct SKUs. Lexicon only stores `PeptideProductRef` (code, name, strength label, slug, blend flag) derived at runtime from shop rows — still without prices in the UI.
 
 ### SOURCE (`ProfileSource` / `PeptideSource`)
 

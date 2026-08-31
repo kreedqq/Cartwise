@@ -67,6 +67,38 @@ describe("groupAndSortShopProducts", () => {
     expect(groups[0]?.variants.map((variant) => variant.code)).toEqual(["RT10", "RT20"]);
   });
 
+  it("groups oral name families without merging distinct SKUs", () => {
+    const products = [
+      shopRow("CT10", "Turinabol", { category: "ORALS", dosage_vial: "10mg x 100tablets", id: "ct10" }),
+      shopRow("CT25", "Turinabol", { category: "ORALS", dosage_vial: "25mg x 100tablets", id: "ct25" }),
+      shopRow("AMQ50", "5-amino-1mq", { category: "ORALS", dosage_vial: "50mg x 25tablets", id: "amq" }),
+    ];
+    const groups = groupAndSortShopProducts(products);
+    const turinabol = groups.find((group) => group.displayName === "Turinabol");
+    const amino = groups.find((group) => group.displayName === "5-amino-1mq");
+    expect(turinabol?.variants.map((variant) => variant.id)).toEqual(["ct10", "ct25"]);
+    expect(amino?.variants).toHaveLength(1);
+  });
+
+  it("does not merge oral BPC and BPC157 because they are distinct catalog names", () => {
+    const groups = groupAndSortShopProducts([
+      shopRow("BC500", "BPC", { category: "ORALS", dosage_vial: "500mcg x 60pcs", id: "bc500" }),
+      shopRow("B157", "BPC157", { category: "ORALS", dosage_vial: "500mcg x 100tablets", id: "b157" }),
+    ]);
+    expect(groups).toHaveLength(2);
+    expect(groups.find((group) => group.displayName === "BPC")?.variants.map((variant) => variant.id)).toEqual(["bc500"]);
+    expect(groups.find((group) => group.displayName === "BPC157")?.variants.map((variant) => variant.id)).toEqual(["b157"]);
+  });
+
+  it("still groups peptide BPC 157 vial strengths by family", () => {
+    const groups = groupAndSortShopProducts([
+      shopRow("BC5", "BPC 157", { category: "PEPTIDES", dosage_vial: "5mg/vial x 10vials" }),
+      shopRow("BC10", "BPC 157", { category: "PEPTIDES", dosage_vial: "10mg/vial x 10vials" }),
+    ]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0]?.variants.map((variant) => variant.code).sort()).toEqual(["BC10", "BC5"]);
+  });
+
   it("sorts case-insensitively with stable slug tie-break", () => {
     const products = LIVE_SHOP_PRODUCTS.slice(0, 40).map((row) => shopRow(row.code, row.name));
     const groups = groupAndSortShopProducts(products);

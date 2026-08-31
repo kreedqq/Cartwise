@@ -24,7 +24,7 @@ import {
   variantLabelForProduct,
   type ShopProductGroup,
 } from "@/lib/shop/display";
-import { shopProductTitle } from "@/lib/shop/variantCoverage";
+import { shopProductTitle, showsStandaloneVariantLabel } from "@/lib/shop/variantCoverage";
 import { listKitShareMembers } from "@/services/kitShareMembers";
 import type { Tables } from "@/types/database";
 
@@ -149,9 +149,9 @@ function ShopProductGroupTableRow({
         </div>
       </TableCell>
       <TableCell>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <p className="text-sm font-medium">{title}</p>
-          {row.hasMultipleVariants && (
+          {row.hasMultipleVariants ? (
             <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
               <SelectTrigger className="h-9 min-w-[11rem] w-auto max-w-full shrink-0" aria-label="Variante wählen">
                 <SelectValue />
@@ -164,7 +164,9 @@ function ShopProductGroupTableRow({
                 ))}
               </SelectContent>
             </Select>
-          )}
+          ) : showsStandaloneVariantLabel(product, false) ? (
+            <p className="text-xs text-muted-foreground">{variantLabelForProduct(product)}</p>
+          ) : null}
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-2">
           <p className="text-[11px] text-muted-foreground">{shopCategoryById(shopCategoryIdFor(product)).label}</p>

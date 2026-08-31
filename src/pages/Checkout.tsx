@@ -25,6 +25,7 @@ import {
   type PaymentMethod,
 } from "@/lib/shop/paymentMethod";
 import { toast } from "@/components/ui/toaster";
+import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 
 export default function CheckoutPage() {
   const { cartId } = useParams<{ cartId: string }>();
@@ -173,7 +174,10 @@ export default function CheckoutPage() {
                     <TableRow key={item.id}>
                       <TableCell className="hidden sm:table-cell font-mono text-xs">{item.product_code_snapshot}</TableCell>
                       <TableCell className="text-sm">
-                        <p>{item.product_name_snapshot}</p>
+                        <p>{cartItemDisplayName(item)}</p>
+                        {cartItemVariantSubtitle(item) && (
+                          <p className="mt-0.5 text-xs text-muted-foreground">{cartItemVariantSubtitle(item)}</p>
+                        )}
                         {item.kit_share_id && (
                           <div>
                             <EditKitShareButton kitShareId={item.kit_share_id} />

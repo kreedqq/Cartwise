@@ -56,4 +56,15 @@ describe("cartDisplay", () => {
       }),
     ).toBe("Retatrutide");
   });
+
+  it("shows oral pack size for non-kit cart lines", () => {
+    expect(
+      cartItemVariantSubtitle({
+        product_name_snapshot: "5-amino-1mq",
+        product_code_snapshot: "AMQ50",
+        quantity: 1,
+        dosage_vial_snapshot: "50mg x 25tablets",
+      }),
+    ).toBe("50 mg × 25 Tabletten");
+  });
 });

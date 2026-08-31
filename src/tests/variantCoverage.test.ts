@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatVialVariant,
+  formatOralVariantLabel,
+  formatProductVariant,
   isKitShareableProduct,
   kitShareableVariants,
   kitSizeVialsForProduct,
@@ -99,6 +101,16 @@ describe("formatVialVariant", () => {
   it("returns strength only when no kit size is known", () => {
     expect(formatVialVariant({ code: "D100", name: "Mast P (DP)", dosage_vial: null })).toBe("100 mg");
   });
+
+  it("formats oral packs as dosage × pack unit", () => {
+    expect(
+      formatProductVariant({ code: "AMQ50", name: "5-amino-1mq", dosage_vial: "50mg x 25tablets" }),
+    ).toBe("50 mg × 25 Tabletten");
+    expect(formatOralVariantLabel("60capsule")).toBeNull();
+    expect(formatOralVariantLabel("50mg x 60capsule")).toBe("50 mg × 60 Kapseln");
+    expect(formatOralVariantLabel("30mg x 100pcs")).toBe("30 mg × 100 Stück");
+    expect(formatOralVariantLabel("blend")).toBe("Blend");
+  });
 });
 
 describe("shopProductTitle", () => {
@@ -118,6 +130,16 @@ describe("shopProductTitle", () => {
     expect(
       shopProductTitle("Retatrutide", { code: "RT10", name: "Retatrutide", dosage_vial: "10 mg" }, true),
     ).toBe("Retatrutide");
+  });
+
+  it("keeps oral product names free of concatenated pack labels", () => {
+    expect(
+      shopProductTitle(
+        "5-amino-1mq",
+        { code: "AMQ50", name: "5-amino-1mq", dosage_vial: "50mg x 25tablets" },
+        false,
+      ),
+    ).toBe("5-amino-1mq");
   });
 });
 

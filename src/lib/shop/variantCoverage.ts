@@ -13,6 +13,11 @@ const KIT_VIALS_RE = /x\s*(\d+)\s*vials?\b/i;
 const VIAL_STRENGTH_RE =
   /^([\d.,]+\s*(?:mg|mcg|µg|ug|iu|ui|ml))\b(?:\s*\/\s*vial)?/i;
 const CAPSULE_TABLET_RE = /\bx\s*\d+\s*(?:capsule|tablet)/i;
+const ORAL_BOTTLE_CODES = new Set(["B1201", "B1210"]);
+const ORAL_PACK_RE =
+  /^([\d.,]+\s*(?:mg|mcg|µg|ug|iu|ui|ml))\s*[x×]\s*(\d+)\s*(tablets?|capsules?|pcs?|stück|stueck|stuck)\b/i;
+const ORAL_BOTTLE_RE =
+  /^([\d.,]+)\s*ml\s*[x×]\s*([\d.,]+)\s*mg\s*\/\s*ml(?:\s*[x×]\s*(\d+)\s*(flasche|bottle)s?)?$/i;
 
 /** Parse the authoritative variant column from the shop product file. */
 export function parseVariantColumn(raw: string): Pick<ProductVariantMeta, "vialStrength" | "kitSizeVials"> {
@@ -63,13 +68,71 @@ function normalizedVialStrength(
   return normalizeStrengthToken(withoutVialSuffix);
 }
 
+function localizeOralPackUnit(raw: string): string | null {
+  const key = raw.trim().toLowerCase();
+  if (key.startsWith("tablet")) return "Tabletten";
+  if (key.startsWith("capsule")) return "Kapseln";
+  if (key === "pcs" || key === "pc" || key === "stück" || key === "stueck" || key === "stuck") return "Stück";
+  if (key.startsWith("flasche") || key.startsWith("bottle")) return "Flasche";
+  return null;
+}
+
 /**
- * Customer-facing vial kit label, e.g. "10x 20mg Vials".
- * Uses coverage kit size when available; falls back to strength-only for non-kit products.
+ * Formats stored oral pack strings such as "50mg x 25tablets" without inventing
+ * missing pack sizes. Returns null when the raw value is not an oral pack.
+ */
+export function formatOralVariantLabel(raw: string, code = ""): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed || trimmed === "—") return null;
+  if (/^blend$/i.test(trimmed)) return "Blend";
+
+  const bottle = ORAL_BOTTLE_RE.exec(trimmed);
+  if (bottle) {
+    const volume = `${bottle[1].replace(",", ".")} ml`;
+    const concentration = `${bottle[2].replace(",", ".")} mg/ml`;
+    const explicitCount = bottle[3] ? Number(bottle[3]) : null;
+    const sku = code.trim().toUpperCase();
+    const packCount =
+      explicitCount != null && Number.isInteger(explicitCount) && explicitCount > 0
+        ? explicitCount
+        : ORAL_BOTTLE_CODES.has(sku)
+          ? 1
+          : null;
+    const packUnit = bottle[4] ? localizeOralPackUnit(bottle[4]) : packCount != null ? "Flasche" : null;
+    if (packCount != null && packUnit) {
+      return `${volume} × ${concentration} × ${packCount} ${packUnit}`;
+    }
+    return `${volume} × ${concentration}`;
+  }
+
+  const pack = ORAL_PACK_RE.exec(trimmed);
+  if (!pack) return null;
+  const strength = normalizeStrengthToken(pack[1]);
+  const count = Number(pack[2]);
+  const unit = localizeOralPackUnit(pack[3]);
+  if (!unit || !Number.isInteger(count) || count <= 0) return null;
+  return `${strength} × ${count} ${unit}`;
+}
+
+export function isOralCustomerLabel(label: string): boolean {
+  if (label === "Blend") return true;
+  return /×/.test(label) && /(Tabletten|Kapseln|Stück|Flasche)/.test(label);
+}
+
+function rawVariantSource(product: { code: string; dosage_vial?: string | null }): string {
+  return product.dosage_vial?.trim() || variantMetaForCode(product.code)?.rawVariant?.trim() || "";
+}
+
+/**
+ * Customer-facing variant label.
+ * Peptides: "10x 20 mg Vials". Orals: "50 mg × 25 Tabletten". Oils: strength only.
  */
 export function formatVialVariant(
   product: { code: string; dosage_vial?: string | null; name: string },
 ): string {
+  const oral = formatOralVariantLabel(rawVariantSource(product), product.code);
+  if (oral) return oral;
+
   const strength = normalizedVialStrength(product);
   if (!strength) return "Standard";
 
@@ -79,6 +142,13 @@ export function formatVialVariant(
   }
 
   return strength;
+}
+
+/** Category-aware alias used by shop, cart, checkout, and orders. */
+export function formatProductVariant(
+  product: { code: string; dosage_vial?: string | null; name: string },
+): string {
+  return formatVialVariant(product);
 }
 
 function parseCoverageCsv(csv: string): Map<string, ProductVariantMeta> {
@@ -172,5 +242,15 @@ export function shopProductTitle(
 ): string {
   if (hasMultipleVariants) return displayName;
   const variantLabel = formatVialVariant(product);
+  if (isOralCustomerLabel(variantLabel)) return displayName;
   return variantLabel !== "Standard" ? `${displayName} ${variantLabel}` : displayName;
+}
+
+/** Single-variant orals show pack size as its own line instead of concatenating it into the name. */
+export function showsStandaloneVariantLabel(
+  product: { code: string; dosage_vial?: string | null; name: string },
+  hasMultipleVariants: boolean,
+): boolean {
+  if (hasMultipleVariants) return false;
+  return isOralCustomerLabel(formatVialVariant(product));
 }

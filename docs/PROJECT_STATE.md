@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-08-29** (finalization commit `feat: finalize research platform`).
+Last documentation pass: **2026-08-31** (orals variant display + final 0-price audit).
+
+**Update 2026-08-31**: Orals pack labels are formatted from existing `products.dosage_vial` via `formatProductVariant()` (no DB/SKU/price writes). Oral shop grouping no longer merges lexicon aliases (`BPC` ≠ `BPC157`). Five active SKUs remain `price_usd = 0` (BLOCKER: import source and price history are also 0; Excel file missing).
 
 **Update 2026-08-30**: migration `0039_fix_kit_share_partial_order_completion.sql` deployed to `cartwise-prod` (local = remote through `0039`, verified via `supabase migration list`). Fixes the kit-share `create_order` bug where the whole kit flipped to `'ordered'` after the first participant ordered, blocking everyone else; adds `kit_share_participants.ordered_at`/`.order_id`; Dashboard now hides ordered carts (`isOpenCart` filter); `OrderDetail.tsx` now shows `payment_method`. See `docs/CHANGELOG.md` for the full entry.
 

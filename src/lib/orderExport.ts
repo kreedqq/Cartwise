@@ -2,6 +2,7 @@ import { formatDateTime, formatEur, formatMoney, formatQuantity, formatUsd, GRAN
 import { downloadCsv } from "@/services/csvProducts";
 import { ORDER_STATUS_LABELS } from "@/services/orders";
 import { BRAND_NAME } from "@/lib/constants";
+import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 import type { OrderStatus, Tables } from "@/types/database";
 
 export interface OrderExportLine {
@@ -61,7 +62,7 @@ export function buildOrderCsv(doc: OrderExportDoc): string {
       formatDateTime(doc.submitted_at),
       item.product_code_snapshot,
       item.product_name_snapshot,
-      item.dosage_vial_snapshot ?? "",
+      cartItemVariantSubtitle(item) ?? item.dosage_vial_snapshot ?? "",
       formatQuantity(item.quantity),
       item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normalpreis",
       item.unit_price_usd_snapshot,
@@ -170,7 +171,10 @@ export function printOrderDocument(doc: OrderExportDoc): void {
     .map(
       (item) => `<tr>
         <td>${escapeHtml(item.product_code_snapshot)}</td>
-        <td>${escapeHtml(item.product_name_snapshot)}${item.dosage_vial_snapshot ? `<br><span class="muted">${escapeHtml(item.dosage_vial_snapshot)}</span>` : ""}</td>
+        <td>${escapeHtml(cartItemDisplayName(item))}${(() => {
+          const variant = cartItemVariantSubtitle(item);
+          return variant ? `<br><span class="muted">${escapeHtml(variant)}</span>` : "";
+        })()}</td>
         <td class="num">${escapeHtml(formatQuantity(item.quantity))}</td>
         <td>${item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normalpreis"}</td>
         <td class="num">${escapeHtml(formatUsd(item.unit_price_usd_snapshot))}</td>

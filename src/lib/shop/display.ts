@@ -9,6 +9,7 @@ import {
 import { resolveLexiconSlugForShopFamily } from "@/lib/peptide/lexiconV2/pdfResearch/slugMap";
 import { substanceLabelForSlug } from "@/lib/peptide/shopCoverage/formClass";
 import type { ShopCatalogProduct } from "@/lib/peptide/shopCoverage/types";
+import { shopCategoryIdFor } from "@/lib/shopCategories";
 import { variantStrengthLabel } from "@/lib/shop/variantCoverage";
 import type { Tables } from "@/types/database";
 
@@ -78,6 +79,33 @@ function toCatalogProduct(product: Pick<Tables<"products">, "code" | "name">): S
   };
 }
 
+/**
+ * Shop card title. Lexicon aliases must not rename distinct oral SKUs
+ * (e.g. oral "BPC" must not become "BPC157").
+ */
+export function shopCardDisplayName(
+  product: Pick<Tables<"products">, "name"> & { category?: string | null; code?: string | null },
+): string {
+  if (shopCategoryIdFor(product) === "orals") {
+    const stripped = stripTrailingStrength(product.name);
+    const aliases = catalogNamesForSlug(familySlugForCatalogName(product.name));
+    const exact = aliases.find((alias) => normalizeCatalogName(alias) === normalizeCatalogName(stripped));
+    if (exact) return exact;
+    return stripped || product.name.trim();
+  }
+  return normalizeShopDisplayName(product.name);
+}
+
+/** Group orals by stored name so lexicon aliases do not merge distinct SKUs. */
+function shopGroupKey(
+  product: Pick<Tables<"products">, "name"> & { category?: string | null; code?: string | null },
+): string {
+  if (shopCategoryIdFor(product) === "orals") {
+    return `oral::${normalizeCatalogName(stripTrailingStrength(product.name))}`;
+  }
+  return familySlugForCatalogName(product.name);
+}
+
 export function lexiconHrefForShopProduct(product: Pick<Tables<"products">, "code" | "name">): string | null {
   const catalogProduct = toCatalogProduct(product);
   const status = coverageStatusForProduct(catalogProduct);
@@ -108,10 +136,16 @@ export function variantLabelForProduct(
 }
 
 function variantSortKey(label: string): number {
-  const match = /(\d+(?:[.,]\d+)?)/.exec(label);
+  const oral = /(\d+(?:[.,]\d+)?)\s*(mcg|µg|ug|mg)\s*×/i.exec(label);
+  const peptide = /(\d+(?:[.,]\d+)?)\s*(mcg|µg|ug|mg|iu|ml|g)/i.exec(label.replace(/^\d+x\s*/i, ""));
+  const match = oral ?? peptide ?? /(\d+(?:[.,]\d+)?)/.exec(label);
   if (!match) return Number.MAX_SAFE_INTEGER;
   const value = Number(match[1].replace(",", "."));
-  return Number.isFinite(value) ? value : Number.MAX_SAFE_INTEGER;
+  if (!Number.isFinite(value)) return Number.MAX_SAFE_INTEGER;
+  const unit = (match[2] ?? "").toLowerCase();
+  if (unit === "mcg" || unit === "µg" || unit === "ug") return value * 0.001;
+  if (unit === "g") return value * 1000;
+  return value;
 }
 
 export interface ShopProductGroup {
@@ -126,15 +160,15 @@ export function groupAndSortShopProducts(products: readonly Tables<"products">[]
   const byFamily = new Map<string, Tables<"products">[]>();
 
   for (const product of products) {
-    const slug = familySlugForCatalogName(product.name);
-    const list = byFamily.get(slug) ?? [];
+    const key = shopGroupKey(product);
+    const list = byFamily.get(key) ?? [];
     list.push(product);
-    byFamily.set(slug, list);
+    byFamily.set(key, list);
   }
 
   const groups: ShopProductGroup[] = [];
 
-  for (const [familySlug, variants] of byFamily) {
+  for (const [groupKey, variants] of byFamily) {
     const sortedVariants = [...variants].sort((a, b) => {
       const labelDiff =
         variantSortKey(variantLabelForProduct(a)) - variantSortKey(variantLabelForProduct(b));
@@ -143,11 +177,11 @@ export function groupAndSortShopProducts(products: readonly Tables<"products">[]
     });
 
     const primary = sortedVariants[0];
-    const displayName = normalizeShopDisplayName(primary.name);
+    const displayName = shopCardDisplayName(primary);
     groups.push({
       displayName,
       sortKey: displayName.toLocaleLowerCase("de"),
-      familySlug,
+      familySlug: shopCategoryIdFor(primary) === "orals" ? familySlugForCatalogName(primary.name) : groupKey,
       lexiconHref: lexiconHrefForShopProduct(primary),
       variants: sortedVariants,
     });

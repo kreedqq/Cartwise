@@ -24,7 +24,7 @@ import {
   variantLabelForProduct,
   type ShopProductGroup,
 } from "@/lib/shop/display";
-import { shopProductTitle } from "@/lib/shop/variantCoverage";
+import { shopProductTitle, showsStandaloneVariantLabel } from "@/lib/shop/variantCoverage";
 import { listKitShareMembers } from "@/services/kitShareMembers";
 import type { Tables } from "@/types/database";
 
@@ -137,7 +137,7 @@ function ShopProductGroupCard({
 
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold">{title}</p>
-            {row.hasMultipleVariants && (
+            {row.hasMultipleVariants ? (
               <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
                 <SelectTrigger className="mt-2 h-9 w-full min-w-[11rem]" aria-label="Variante wählen">
                   <SelectValue />
@@ -150,7 +150,9 @@ function ShopProductGroupCard({
                   ))}
                 </SelectContent>
               </Select>
-            )}
+            ) : showsStandaloneVariantLabel(product, false) ? (
+              <p className="mt-1 text-xs text-muted-foreground">{variantLabelForProduct(product)}</p>
+            ) : null}
             <div className="mt-2">
               <KitShareButton
                 group={group}

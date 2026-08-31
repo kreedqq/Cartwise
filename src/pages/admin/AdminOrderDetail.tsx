@@ -21,6 +21,7 @@ import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/or
 import { formatDateTime, formatQuantity, formatRate, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { canPermanentlyDeleteOrder, nextOrderStatuses, ORDER_STATUS_LABELS } from "@/services/orders";
 import { toast } from "@/components/ui/toaster";
+import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 import type { OrderStatus } from "@/types/database";
 
 export default function AdminOrderDetailPage() {
@@ -158,9 +159,9 @@ export default function AdminOrderDetailPage() {
                 <TableRow key={item.id}>
                   <TableCell className="pl-4 font-mono text-xs">{item.product_code_snapshot}</TableCell>
                   <TableCell>
-                    <p className="text-sm font-medium">{item.product_name_snapshot}</p>
-                    {item.dosage_vial_snapshot && (
-                      <p className="text-[11px] text-muted-foreground">{item.dosage_vial_snapshot}</p>
+                    <p className="text-sm font-medium">{cartItemDisplayName(item)}</p>
+                    {cartItemVariantSubtitle(item) && (
+                      <p className="text-[11px] text-muted-foreground">{cartItemVariantSubtitle(item)}</p>
                     )}
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-sm">

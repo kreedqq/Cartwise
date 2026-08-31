@@ -2,6 +2,20 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-08-31 (orals variant display + shop 0-price audit)
+
+### Fixed
+
+- **Root cause**: Orals already stored pack size in `products.dosage_vial` (e.g. `50mg x 25tablets`). `formatVialVariant()` only formatted peptide kits (`10x 5 mg Vials`) and oil strength, so shop/cart/checkout/orders dropped the pack unit. There is no `product_variants` table; each SKU is a `products` row grouped by name.
+- Extended `formatVialVariant` / `formatProductVariant` with `formatOralVariantLabel()`: `5 mg × 100 Tabletten`, `50 mg × 60 Kapseln`, `20 mg × 25 Stück`, B12 `10 ml × 1 mg/ml × 1 Flasche`. Source unit vocabulary is preserved; missing packs are not invented (`HHB`/`GGH` stay `Blend`).
+- Shop cards: oral titles are name-only; pack is a standalone line or the existing variant dropdown. Cart, checkout, order detail, admin order, and PDF/CSV export use the same formatter (SKU coverage fallback when cart lines have no `dosage_vial`).
+- Oral grouping uses the stored name so lexicon aliases do not merge distinct SKUs (`BPC` vs `BPC157`). Peptide family grouping is unchanged.
+- Zero-price audit (final): 5 active SKUs have stored `price_usd = 0` with a non-zero bulk price (`B1201`, `B1210`, `GGH`, `HHB`, `SHB`). Source is `GENXELL_IMPORT_FINAL.csv` (create + update 2026-08-27, quality warning “Mengenpreis ist höher als der Normalpreis”). `product_price_history` never had a non-zero unit price (`old_price_usd` null → `0`). `GENXELL_Warenkorb_Final.xlsm` is not on disk. Bulk was not copied to unit price.
+
+### Tests
+
+- `src/tests/oralVariants.test.ts` plus coverage in `variantCoverage.test.ts`, `cartDisplay.test.ts`, `shopDisplay.test.ts`.
+
 ## 2026-08-30 (fix: admin order views did not render payment_method)
 
 ### Fixed
