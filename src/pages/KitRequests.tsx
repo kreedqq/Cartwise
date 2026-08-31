@@ -35,19 +35,15 @@ import {
   kitRequestStatusLabel,
   type KitRequestSort,
 } from "@/lib/kitRequests";
-import { groupAndSortShopProducts } from "@/lib/shop/display";
+import { shopGroupsForCategory } from "@/lib/shop/display";
 import { formatProductVariant } from "@/lib/shop/variantCoverage";
-import { SHOP_CATEGORIES } from "@/lib/shopCategories";
+import { SHOP_CATEGORIES, isShopCategoryId } from "@/lib/shopCategories";
 import type { KitRequestCard } from "@/services/kitRequests";
 
 const PAGE_SIZE = 20;
 
 export default function KitRequestsPage() {
   const productsQuery = useShopProducts();
-  const groups = React.useMemo(
-    () => groupAndSortShopProducts(productsQuery.data ?? []),
-    [productsQuery.data],
-  );
 
   const [tab, setTab] = React.useState("open");
   const [search, setSearch] = React.useState("");
@@ -63,6 +59,15 @@ export default function KitRequestsPage() {
   const [leaveTarget, setLeaveTarget] = React.useState<KitRequestCard | null>(null);
   const [cancelTarget, setCancelTarget] = React.useState<KitRequestCard | null>(null);
   const [myStatus, setMyStatus] = React.useState<string>("all");
+
+  const groups = React.useMemo(
+    () =>
+      shopGroupsForCategory(
+        productsQuery.data ?? [],
+        isShopCategoryId(category) ? category : null,
+      ),
+    [productsQuery.data, category],
+  );
 
   const filters: OpenKitRequestFilters = {
     search,
@@ -194,7 +199,7 @@ export default function KitRequestsPage() {
                   <SelectItem value="all">Alle Produkte</SelectItem>
                   {groups.map((group) => (
                     <SelectItem
-                      key={group.familySlug || group.displayName}
+                      key={group.groupKey}
                       value={group.variants[0]?.name ?? group.displayName}
                     >
                       {group.displayName}

@@ -56,7 +56,7 @@ export function ShopProductsMobileList({ products, rate, favoriteProductIds, cat
       <div className="space-y-3">
         {groups.map((group) => (
           <ShopProductGroupCard
-            key={group.familySlug}
+            key={group.groupKey}
             group={group}
             rate={rate}
             favoriteProductIds={favoriteProductIds}
@@ -67,7 +67,7 @@ export function ShopProductsMobileList({ products, rate, favoriteProductIds, cat
       </div>
       {kitShareContext && (
         <KitShareDialog
-          key={`${kitShareContext.group.familySlug}-${kitShareContext.initialProductId}`}
+          key={`${kitShareContext.group.groupKey}-${kitShareContext.initialProductId}`}
           group={kitShareContext.group}
           initialProductId={kitShareContext.initialProductId}
           members={membersQuery.data ?? []}

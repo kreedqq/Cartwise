@@ -73,7 +73,8 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] Glow-blend: scientific notes per component, still no shop prices
 - [ ] Split or lazy-load `published.json` (catalog chunk size)
 - [x] Logged-in browser QA of peptide + shop (2026-08-29): shop/cart/admin pass; lexicon detail + calculator FAIL (`docs/RESEARCH_PRODUCTION_ADMIN_BROWSER_QA.md`)
-- [ ] Import `GENXELL_…xlsx` if the file is provided (file is not in the repo)
+- [x] Import/abgleich `GENXELL_Warenkorb_8_Kunden_FINAL(1).xlsx` (read-only): 22 OUT OF STOCK already inactive; five 0-price SKUs AVAILABLE (BLOCKER, no invented prices)
+- [x] Keep BPC / BPC157 out of Reconstitution Water in shop mapping and Kit Gesuche filters
 
 # Low
 

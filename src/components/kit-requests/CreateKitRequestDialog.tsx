@@ -48,7 +48,7 @@ export function CreateKitRequestDialog({ open, onOpenChange }: CreateKitRequestD
   const [note, setNote] = React.useState("");
   const [expiresAt, setExpiresAt] = React.useState("");
 
-  const selectedGroup = groups.find((g) => g.familySlug === groupKey || g.displayName === groupKey);
+  const selectedGroup = groups.find((g) => g.groupKey === groupKey || g.displayName === groupKey);
   const variants = React.useMemo(
     () => (selectedGroup ? kitShareableVariants(selectedGroup.variants) : []),
     [selectedGroup],
@@ -123,7 +123,7 @@ export function CreateKitRequestDialog({ open, onOpenChange }: CreateKitRequestD
               </SelectTrigger>
               <SelectContent>
                 {groups.map((group) => (
-                  <SelectItem key={group.familySlug || group.displayName} value={group.familySlug || group.displayName}>
+                  <SelectItem key={group.groupKey} value={group.groupKey}>
                     {group.displayName}
                   </SelectItem>
                 ))}

@@ -67,7 +67,7 @@ export function ShopProductsTable({ products, rate, favoriteProductIds, category
         <TableBody>
           {groups.map((group) => (
             <ShopProductGroupTableRow
-              key={group.familySlug}
+              key={group.groupKey}
               group={group}
               rate={rate}
               favoriteProductIds={favoriteProductIds}
@@ -79,7 +79,7 @@ export function ShopProductsTable({ products, rate, favoriteProductIds, category
       </Table>
       {kitShareContext && (
         <KitShareDialog
-          key={`${kitShareContext.group.familySlug}-${kitShareContext.initialProductId}`}
+          key={`${kitShareContext.group.groupKey}-${kitShareContext.initialProductId}`}
           group={kitShareContext.group}
           initialProductId={kitShareContext.initialProductId}
           members={membersQuery.data ?? []}

@@ -2,6 +2,19 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-01 (kit Gesuche BPC filter + 0-price Excel audit)
+
+### Fixed
+
+- Kit Gesuche product dropdown is scoped to the selected shop category, so BPC / BPC157 / BPC 157 cannot appear under Reconstitution Water.
+- Shop and kit-request lists use unique `groupKey` instead of colliding lexicon `familySlug` (`bpc-157` was shared by oral BPC, oral BPC157, and peptide BPC 157).
+- Mapping guard: exact BPC catalog names never resolve to the reconstitution-water storefront group. AA10 / BA03 / BA10 are unchanged.
+
+### Notes
+
+- GENXELL Excel: 298 AVAILABLE, 22 OUT OF STOCK (hellrot). Production already has those 22 inactive. Active 0-price SKUs B1201, B1210, GGH, HHB, SHB are AVAILABLE — not deactivated, prices not changed.
+- No product IDs, SKUs, prices, or migrations in this pass.
+
 ## 2026-08-31 (Kit Gesuche / open kit marketplace)
 
 ### Added

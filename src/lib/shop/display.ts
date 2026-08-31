@@ -9,7 +9,7 @@ import {
 import { resolveLexiconSlugForShopFamily } from "@/lib/peptide/lexiconV2/pdfResearch/slugMap";
 import { substanceLabelForSlug } from "@/lib/peptide/shopCoverage/formClass";
 import type { ShopCatalogProduct } from "@/lib/peptide/shopCoverage/types";
-import { shopCategoryIdFor } from "@/lib/shopCategories";
+import { productInShopCategory, shopCategoryIdFor, type ShopCategoryId } from "@/lib/shopCategories";
 import { variantStrengthLabel } from "@/lib/shop/variantCoverage";
 import type { Tables } from "@/types/database";
 
@@ -97,7 +97,7 @@ export function shopCardDisplayName(
 }
 
 /** Group orals by stored name so lexicon aliases do not merge distinct SKUs. */
-function shopGroupKey(
+export function shopGroupKey(
   product: Pick<Tables<"products">, "name"> & { category?: string | null; code?: string | null },
 ): string {
   if (shopCategoryIdFor(product) === "orals") {
@@ -149,6 +149,8 @@ function variantSortKey(label: string): number {
 }
 
 export interface ShopProductGroup {
+  /** Unique UI/select key. Lexicon `familySlug` can collide (BPC vs BPC157). */
+  groupKey: string;
   displayName: string;
   sortKey: string;
   familySlug: string;
@@ -179,6 +181,7 @@ export function groupAndSortShopProducts(products: readonly Tables<"products">[]
     const primary = sortedVariants[0];
     const displayName = shopCardDisplayName(primary);
     groups.push({
+      groupKey,
       displayName,
       sortKey: displayName.toLocaleLowerCase("de"),
       familySlug: shopCategoryIdFor(primary) === "orals" ? familySlugForCatalogName(primary.name) : groupKey,
@@ -190,10 +193,20 @@ export function groupAndSortShopProducts(products: readonly Tables<"products">[]
   groups.sort((a, b) => {
     const byName = a.sortKey.localeCompare(b.sortKey, "de", { sensitivity: "base" });
     if (byName !== 0) return byName;
-    return a.familySlug.localeCompare(b.familySlug, "en");
+    return a.groupKey.localeCompare(b.groupKey, "en");
   });
 
   return groups;
+}
+
+export function shopGroupsForCategory(
+  products: readonly Tables<"products">[],
+  categoryId: ShopCategoryId | null,
+): ShopProductGroup[] {
+  const source = categoryId
+    ? products.filter((product) => productInShopCategory(product, categoryId))
+    : products;
+  return groupAndSortShopProducts(source);
 }
 
 export function productMatchesShopSearch(

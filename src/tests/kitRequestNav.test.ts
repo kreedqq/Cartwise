@@ -15,5 +15,8 @@ describe("Kit Gesuche navigation", () => {
     expect(read("src/components/layout/MobileNav.tsx")).toMatch("/kit-gesuche");
     expect(read("src/App.tsx")).toMatch("/kit-gesuche");
     expect(read("src/components/layout/AdminNav.tsx")).not.toMatch("/kit-gesuche");
+    expect(read("src/pages/KitRequests.tsx")).toMatch("shopGroupsForCategory");
+    expect(read("src/pages/KitRequests.tsx")).toMatch("group.groupKey");
+    expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toMatch("group.groupKey");
   });
 });

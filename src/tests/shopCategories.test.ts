@@ -64,6 +64,22 @@ describe("shop category mapping", () => {
     ).toBe("injectable-oils");
   });
 
+  it("never places BPC, BPC157, or BPC 157 in reconstitution water", () => {
+    const bpcOral = { category: "ORALS", name: "BPC", code: "BC500" };
+    const bpc157Oral = { category: "ORALS", name: "BPC157", code: "B157" };
+    const bpcPeptide = { category: "PEPTIDES", name: "BPC 157", code: "BC5" };
+    const mislabeled = { category: "RECONSTITUTION-WATER", name: "BPC", code: "BC500" };
+    for (const product of [bpcOral, bpc157Oral, bpcPeptide, mislabeled]) {
+      expect(isReconstitutionWaterProduct(product)).toBe(false);
+      expect(shopCategoryIdFor(product)).not.toBe("reconstitution-water");
+      expect(productInShopCategory(product, "reconstitution-water")).toBe(false);
+    }
+    expect(shopCategoryIdFor(bpcOral)).toBe("orals");
+    expect(shopCategoryIdFor(bpc157Oral)).toBe("orals");
+    expect(shopCategoryIdFor(bpcPeptide)).toBe("peptides");
+    expect(shopCategoryIdFor(mislabeled)).toBe("peptides");
+  });
+
   it("never hides an unmapped product from the storefront", () => {
     expect(shopCategoryIdFor({ category: null, name: "Unknown", code: "X" })).toBe("peptides");
     expect(SHOP_CATEGORIES).toHaveLength(4);

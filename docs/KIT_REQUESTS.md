@@ -57,3 +57,5 @@ Cart items are created only when the request becomes `full`, via existing `kit_s
 ## Privacy
 
 Public cards: product, variant, quantities, creator `profiles.username`, viewer unit price, status, timestamps. No email, phone, `display_name`, role, markup, or other users' prices. Participant usernames appear only after the viewer has joined.
+
+The open-list product dropdown is filtered by the selected shop category (`shopGroupsForCategory`). BPC / BPC157 never appear under Reconstitution Water. Select keys use unique `groupKey` so oral BPC, oral BPC157, and peptide BPC 157 stay separate.

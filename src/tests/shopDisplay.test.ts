@@ -6,6 +6,7 @@ import {
   lexiconHrefForShopProduct,
   normalizeShopDisplayName,
   productMatchesShopSearch,
+  shopGroupsForCategory,
 } from "@/lib/shop/display";
 import type { Tables } from "@/types/database";
 
@@ -97,6 +98,36 @@ describe("groupAndSortShopProducts", () => {
     ]);
     expect(groups).toHaveLength(1);
     expect(groups[0]?.variants.map((variant) => variant.code).sort()).toEqual(["BC10", "BC5"]);
+  });
+
+  it("keeps BPC, BPC157, and peptide BPC 157 as three unique groups", () => {
+    const groups = groupAndSortShopProducts([
+      shopRow("BC500", "BPC", { category: "ORALS", dosage_vial: "500mcg x 60pcs", id: "bc500" }),
+      shopRow("B157", "BPC157", { category: "ORALS", dosage_vial: "500mcg x 100tablets", id: "b157" }),
+      shopRow("BC5", "BPC 157", { category: "PEPTIDES", dosage_vial: "5mg/vial x 10vials", id: "bc5" }),
+    ]);
+    expect(groups).toHaveLength(3);
+    expect(new Set(groups.map((group) => group.groupKey)).size).toBe(3);
+    expect(groups.map((group) => group.displayName).sort()).toEqual(["BPC", "BPC157", "BPC157"]);
+  });
+
+  it("does not include BPC in reconstitution water groups", () => {
+    const catalog = [
+      shopRow("AA10", "AA Water", { category: "RECONSTITUTION-WATER", dosage_vial: "10ml/vial x10vials" }),
+      shopRow("BA03", "BAC Water", { category: "RECONSTITUTION-WATER", dosage_vial: "3ml/vial x10vials" }),
+      shopRow("BA10", "BAC Water", { category: "RECONSTITUTION-WATER", dosage_vial: "10ml/vial x10vials" }),
+      shopRow("BC500", "BPC", { category: "ORALS", dosage_vial: "500mcg x 60pcs" }),
+      shopRow("B157", "BPC157", { category: "ORALS", dosage_vial: "500mcg x 100tablets" }),
+      shopRow("BC5", "BPC 157", { category: "PEPTIDES", dosage_vial: "5mg/vial x 10vials" }),
+    ];
+    const water = shopGroupsForCategory(catalog, "reconstitution-water");
+    expect(water.map((group) => group.displayName).sort()).toEqual(["AA Water", "BAC Water"]);
+    expect(water.flatMap((group) => group.variants.map((variant) => variant.code)).sort()).toEqual([
+      "AA10",
+      "BA03",
+      "BA10",
+    ]);
+    expect(water.some((group) => /bpc/i.test(group.displayName))).toBe(false);
   });
 
   it("sorts case-insensitively with stable slug tie-break", () => {

@@ -42,8 +42,15 @@ export const SHOP_CATEGORIES: readonly ShopCategory[] = [
 
 const RECONSTITUTION_CODES = new Set(["AA10", "BA03", "BA10"]);
 
+/** Exact catalog names that must never appear under Reconstitution Water. */
+const BPC_SHOP_NAMES = new Set(["bpc", "bpc157", "bpc 157"]);
+
 function normalize(value: string): string {
   return value.trim().toLowerCase().replace(/[_]+/g, "-").replace(/\s+/g, " ");
+}
+
+export function isBpcShopCatalogName(name: string | null | undefined): boolean {
+  return BPC_SHOP_NAMES.has(normalize(name ?? ""));
 }
 
 export function isShopCategoryId(value: string | null | undefined): value is ShopCategoryId {
@@ -59,6 +66,7 @@ export function isReconstitutionWaterProduct(product: {
   name?: string | null;
   code?: string | null;
 }): boolean {
+  if (isBpcShopCatalogName(product.name)) return false;
   const name = normalize(product.name ?? "");
   if (name === "bac water" || name === "aa water") return true;
   const code = (product.code ?? "").trim().toUpperCase();
@@ -76,6 +84,13 @@ export function shopCategoryIdFor(product: {
   name?: string | null;
   code?: string | null;
 }): ShopCategoryId {
+  if (isBpcShopCatalogName(product.name)) {
+    const stored = normalize(product.category ?? "");
+    if (stored.includes("oral")) return "orals";
+    if (stored.includes("oil") || stored.includes("inject")) return "injectable-oils";
+    return "peptides";
+  }
+
   if (isReconstitutionWaterProduct(product)) return "reconstitution-water";
 
   const stored = product.category?.trim() ?? "";
