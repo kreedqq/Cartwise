@@ -6,11 +6,11 @@ import { createHash } from "node:crypto";
 import { execFileSync, execSync, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { createServer } from "vite";
 
 const EXPECTED_SHA = "dae0ef581968cdd7a33eb5dc34c44064a0ff8fbfaa89a666b6e25d5897cb973a";
-const DUMP = "C:\\Users\\PolatMehmetErkan\\Documents\\cartwise-prod-backup\\cartwise-prod-0023-2026-08-28-full.sql";
+const DUMP = join(homedir(), "Documents", "cartwise-prod-backup", "cartwise-prod-0023-2026-08-28-full.sql");
 const ROOT = process.cwd();
 const MIGRATIONS = resolve(ROOT, "supabase/migrations");
 const SNAPSHOT_DIR = resolve(ROOT, "docs/snapshots");

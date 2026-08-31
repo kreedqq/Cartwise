@@ -17,7 +17,7 @@
 | Admin Research (working tree) | Postgres primary (Phase 8, **not in the hosted SPA**) |
 | Dual-read | available in the working tree; production env stays `legacy` |
 
-`https://cartwise.vercel.app` returns a generic Vite 404 (`index-BeHRNOV-.js`). It is **not** the Peptix SPA. Deployment hashes under `*-pepsi7.vercel.app` are SSO-protected. GitHub Pages `kreedqq.github.io/Cartwise` is 404.
+`https://cartwise.vercel.app` returns a generic Vite 404 (`index-BeHRNOV-.js`). It is **not** the Peptix SPA. Deployment hashes under `*-pepsi7.vercel.app` are SSO-protected. GitHub Pages `<ORG>.github.io/Cartwise` is 404.
 
 The hosted Peptix SPA (`index-3Jxwuqf6.js`) predates uncommitted Phase 7–8 client work. Live **data** is Phase 6C (`0024`–`0029`). Live **Admin Research UI** on Vercel is still the pre-Phase-8 page until that client is deployed (not done here).
 

@@ -2,6 +2,14 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-08-31 (personal data / privacy cleanup)
+
+### Changed
+
+- Replaced developer-identifying test fixtures and example handles with generic `Test User` / `testuser` / `ExampleUser`.
+- Replaced local Windows account paths in docs and scripts with `<USERNAME>` placeholders or `os.homedir()`.
+- Username, kit sharing, pricing, RLS, and product data are unchanged. No production database writes. No commit/push/deploy in this pass.
+
 ## 2026-08-31 (fix: unify usernames and clean up quantity pricing UI)
 
 ### Fixed

@@ -24,7 +24,7 @@
 
 ## Backup files
 
-Location **outside** the git repo: `C:\Users\PolatMehmetErkan\Documents\cartwise-prod-backup\`
+Location **outside** the git repo: `C:\Users\<USERNAME>\Documents\cartwise-prod-backup\`
 
 | File | Type | Size | SHA-256 |
 |---|---|---|---|

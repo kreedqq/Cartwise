@@ -26,7 +26,7 @@ alter table public.profiles
     or username ~ '^[A-Za-z][A-Za-z0-9_.]{2,23}$'
   );
 
--- Case-insensitive uniqueness (MaxMustermann and maxmustermann collide).
+-- Case-insensitive uniqueness (ExampleUser and exampleuser collide).
 drop index if exists profiles_username_unique_idx;
 create unique index profiles_username_unique_idx
   on public.profiles (lower(username))

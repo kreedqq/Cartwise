@@ -80,7 +80,7 @@ export function RequireUsernameDialog() {
             <Input
               id="require-username"
               autoComplete="username"
-              placeholder="MaxMustermann"
+              placeholder="ExampleUser"
               value={value}
               invalid={!!error}
               onChange={(e) => setValue(e.target.value)}

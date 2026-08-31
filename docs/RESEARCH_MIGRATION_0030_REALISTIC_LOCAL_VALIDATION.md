@@ -23,7 +23,7 @@ Machine JSON: `docs/snapshots/2026-08-29-phase-16a-local.json`
 
 | | |
 |---|---|
-| File | `C:\Users\PolatMehmetErkan\Documents\cartwise-prod-backup\cartwise-prod-0023-2026-08-28-full.sql` |
+| File | `C:\Users\<USERNAME>\Documents\cartwise-prod-backup\cartwise-prod-0023-2026-08-28-full.sql` |
 | Present | yes |
 | Size | **1230487** bytes |
 | SHA-256 | `dae0ef581968cdd7a33eb5dc34c44064a0ff8fbfaa89a666b6e25d5897cb973a` |

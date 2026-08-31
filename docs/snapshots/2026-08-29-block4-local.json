@@ -1,7 +1,7 @@
 {
   "startedAt": "2026-08-29T08:18:35.115Z",
   "dump": {
-    "path": "C:\\Users\\PolatMehmetErkan\\Documents\\cartwise-prod-backup\\cartwise-prod-0023-2026-08-28-full.sql",
+    "path": "C:\\Users\\<USERNAME>\\Documents\\cartwise-prod-backup\\cartwise-prod-0023-2026-08-28-full.sql",
     "exists": true,
     "bytes": 1230487,
     "sha256": "dae0ef581968cdd7a33eb5dc34c44064a0ff8fbfaa89a666b6e25d5897cb973a",

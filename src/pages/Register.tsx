@@ -118,7 +118,7 @@ export default function RegisterPage() {
           <Input
             id="username"
             autoComplete="username"
-            placeholder="MaxMustermann"
+            placeholder="ExampleUser"
             value={form.username}
             invalid={!!errors.username}
             onChange={(e) => update("username", e.target.value)}

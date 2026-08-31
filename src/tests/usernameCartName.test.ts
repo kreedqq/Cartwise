@@ -5,7 +5,7 @@ import { accountInitials, publicUsername, visibleAccountLabel } from "@/lib/user
 
 describe("publicUsername", () => {
   it("returns the canonical profiles.username", () => {
-    expect(publicUsername({ username: "erkan123" })).toBe("erkan123");
+    expect(publicUsername({ username: "testuser" })).toBe("testuser");
   });
 
   it("never falls back to an email prefix", () => {
@@ -16,24 +16,24 @@ describe("publicUsername", () => {
 
 describe("visibleAccountLabel", () => {
   it("uses username, not display_name or email", () => {
-    expect(visibleAccountLabel({ username: "erkan123" })).toBe("erkan123");
+    expect(visibleAccountLabel({ username: "testuser" })).toBe("testuser");
     expect(visibleAccountLabel({ username: null }, "dort")).toBe("dort");
   });
 
   it("builds initials from username only", () => {
-    expect(accountInitials("erkan123")).toBe("ER");
+    expect(accountInitials("testuser")).toBe("TE");
     expect(accountInitials(null)).toBe("");
   });
 });
 
 describe("defaultCartName", () => {
   it("uses the username as the first cart name", () => {
-    expect(defaultCartName("erkan123", [])).toBe("erkan123");
+    expect(defaultCartName("testuser", [])).toBe("testuser");
   });
 
   it("numbers a second cart instead of storing Warenkorb", () => {
-    expect(defaultCartName("erkan123", ["erkan123"])).toBe("erkan123 – Warenkorb 2");
-    expect(defaultCartName("erkan123", ["erkan123", "erkan123 – Warenkorb 2"])).toBe("erkan123 – Warenkorb 3");
+    expect(defaultCartName("testuser", ["testuser"])).toBe("testuser – Warenkorb 2");
+    expect(defaultCartName("testuser", ["testuser", "testuser – Warenkorb 2"])).toBe("testuser – Warenkorb 3");
   });
 
   it("does not invent a name from an email address", () => {

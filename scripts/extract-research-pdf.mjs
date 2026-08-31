@@ -3,6 +3,7 @@
  * Usage: node scripts/extract-research-pdf.mjs [pdfPath]
  */
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { createRequire } from "node:module";
 
@@ -11,7 +12,7 @@ const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.mjs");
 
 const pdfPath =
   process.argv[2] ??
-  "C:/Users/PolatMehmetErkan/Downloads/PEPTIX_Complete_Product_Research_2026.pdf";
+  path.join(os.homedir(), "Downloads", "PEPTIX_Complete_Product_Research_2026.pdf");
 
 const data = new Uint8Array(fs.readFileSync(pdfPath));
 const pdf = await pdfjsLib.getDocument({ data, useSystemFonts: true }).promise;

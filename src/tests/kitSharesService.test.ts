@@ -181,7 +181,7 @@ describe("assertKitSharePricePrivacy", () => {
   it("rejects foreign price fields", () => {
     const badView = {
       ...sampleView,
-      participants: [{ isSelf: false, displayName: "Max", quantity: 7, hasOrdered: false, priceUsd: 210 }],
+      participants: [{ isSelf: false, displayName: "Example User", quantity: 7, hasOrdered: false, priceUsd: 210 }],
     } as typeof sampleView & { participants: Array<{ priceUsd?: number }> };
     expect(() => assertKitSharePricePrivacy(badView as never)).toThrow(/Preisfelder/);
   });

@@ -24,7 +24,7 @@ Applied to production via Supabase MCP `apply_migration` name `research_operatio
 
 | File | Bytes | SHA-256 | Timestamp | Kind |
 |---|---|---|---|---|
-| `C:\Users\PolatMehmetErkan\Documents\cartwise-prod-backup\cartwise-prod-0023-2026-08-28-full.sql` | 1230487 | `dae0ef581968cdd7a33eb5dc34c44064a0ff8fbfaa89a666b6e25d5897cb973a` | 2026-08-28 21:30 | Restore-capable full dump (0023) |
+| `C:\Users\<USERNAME>\Documents\cartwise-prod-backup\cartwise-prod-0023-2026-08-28-full.sql` | 1230487 | `dae0ef581968cdd7a33eb5dc34c44064a0ff8fbfaa89a666b6e25d5897cb973a` | 2026-08-28 21:30 | Restore-capable full dump (0023) |
 | `...\cartwise-prod-0030-2026-08-29-full.sql` | 154380 | `4fa7999f27b42d8e56fd2f6fb402626d42d4ecdb4db39ac76412666ab73cc821` | 2026-08-29 10:07 | Schema-only 0030 |
 | `...\cartwise-prod-0030-2026-08-29-data.sql` | 1605541 | `2ec97dd8935a388b80f98b69da595b466fe55eb4a86d7670b813c6d3520bdc8e` | 2026-08-29 10:18 | Data-only 0030 (`pg_dump` warned circular FK on `claims`) |
 

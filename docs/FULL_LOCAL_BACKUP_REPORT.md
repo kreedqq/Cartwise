@@ -2,10 +2,10 @@
 
 **Verdict: BACKUP_COMPLETE_WITH_LIMITATIONS**
 
-Date: 2026-08-29  
-Project: Peptix / Cartwise (`shared-cart-app`)  
-Local path: `C:\Users\PolatMehmetErkan\Documents\Cartwise`  
-Backup root: `C:\Users\PolatMehmetErkan\Documents\PEPTIX-BACKUPS\PEPTIX-FULL-BACKUP-2026-08-29`
+Date: 2026-08-29
+Project: Peptix / Cartwise (`shared-cart-app`)
+Local path: `C:\Users\<USERNAME>\Documents\Cartwise`
+Backup root: `C:\Users\<USERNAME>\Documents\PEPTIX-BACKUPS\PEPTIX-FULL-BACKUP-2026-08-29`
 
 This backup is **read-only**. No production writes, no migrations, no deploy, no git commit, no git push, no `.env.local` copy.
 
@@ -17,7 +17,7 @@ This backup is **read-only**. No production writes, no migrations, no deploy, no
 | Branch | `main` |
 | HEAD | `5e38cf1111b1b615703cb7db745e49362425a6f4` (`5e38cf1`) `feat: switch public lexicon to postgres` |
 | Prompt expected HEAD | `a6f660d` or later — **actual HEAD takes precedence** (`5e38cf1` is later) |
-| Remote | `origin` `https://github.com/kreedqq/Cartwise.git` |
+| Remote | `origin` `https://github.com/<ORG>/Cartwise.git` |
 | vs `origin/main` | **ahead by 9 commits** (`origin/main` = `aa26e9f`) |
 | Working tree | **dirty** (Block 2–4 and later docs/code uncommitted) |
 | Last commit | `5e38cf1` |

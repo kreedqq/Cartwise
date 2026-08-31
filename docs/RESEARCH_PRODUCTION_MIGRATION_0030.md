@@ -33,7 +33,7 @@
 
 | | |
 |---|---|
-| File | `C:\Users\PolatMehmetErkan\Documents\cartwise-prod-backup\cartwise-prod-0023-2026-08-28-full.sql` |
+| File | `C:\Users\<USERNAME>\Documents\cartwise-prod-backup\cartwise-prod-0023-2026-08-28-full.sql` |
 | Present | yes |
 | Size | 1230487 bytes |
 | LastWriteTime | 2026-08-28 21:30:08 |

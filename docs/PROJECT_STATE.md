@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-08-31** (username/cart names + bulk-price UI).
+Last documentation pass: **2026-08-31** (personal-data cleanup in docs/tests/scripts).
+
+**Update 2026-08-31 (privacy)**: Developer-identifying test fixtures and local Windows account paths in docs/scripts were replaced with generic placeholders (`Test User`, `testuser`, `ExampleUser`, `C:\Users\<USERNAME>\...`, `os.homedir()`). Username/kit/shop/pricing logic unchanged. No production DB writes.
 
 **Update 2026-08-31 (later)**: Canonical `profiles.username` is shown in Topbar/Dashboard/Profile; new carts are named after the username; kit-share auto-create uses the same name (migration `0040`). Redundant shop `ab 10` badge removed. No price/SKU/kit-pricing changes.
 

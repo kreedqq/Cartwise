@@ -14,7 +14,7 @@ const { isUsernameAvailable, claimUsername, mapUsernameError } = await import("@
 
 describe("usernameSchema", () => {
   it("accepts a valid username", () => {
-    expect(usernameSchema.safeParse("MaxMustermann").success).toBe(true);
+    expect(usernameSchema.safeParse("ExampleUser").success).toBe(true);
     expect(usernameSchema.safeParse("Lisa123").success).toBe(true);
     expect(usernameSchema.safeParse("Pep.Tix_1").success).toBe(true);
   });
@@ -28,15 +28,15 @@ describe("usernameSchema", () => {
   });
 
   it("rejects a username that does not start with a letter", () => {
-    expect(usernameSchema.safeParse("1MaxMuster").success).toBe(false);
-    expect(usernameSchema.safeParse("_Max").success).toBe(false);
+    expect(usernameSchema.safeParse("1Example").success).toBe(false);
+    expect(usernameSchema.safeParse("_Example").success).toBe(false);
   });
 
   it("rejects dangerous / disallowed characters", () => {
-    expect(usernameSchema.safeParse("Max<script>").success).toBe(false);
-    expect(usernameSchema.safeParse("Max Muster").success).toBe(false);
-    expect(usernameSchema.safeParse("Max'; DROP TABLE").success).toBe(false);
-    expect(usernameSchema.safeParse("max@mustermann.de").success).toBe(false);
+    expect(usernameSchema.safeParse("Example<script>").success).toBe(false);
+    expect(usernameSchema.safeParse("Example User").success).toBe(false);
+    expect(usernameSchema.safeParse("Example'; DROP TABLE").success).toBe(false);
+    expect(usernameSchema.safeParse("user@example.com").success).toBe(false);
   });
 });
 
@@ -65,16 +65,16 @@ describe("username service", () => {
 
   it("checks availability via RPC", async () => {
     rpc.mockResolvedValue({ data: true, error: null });
-    const available = await isUsernameAvailable("MaxMustermann");
-    expect(rpc).toHaveBeenCalledWith("username_available", { _username: "MaxMustermann" });
+    const available = await isUsernameAvailable("ExampleUser");
+    expect(rpc).toHaveBeenCalledWith("username_available", { _username: "ExampleUser" });
     expect(available).toBe(true);
   });
 
   it("claims a username via RPC", async () => {
-    rpc.mockResolvedValue({ data: "MaxMustermann", error: null });
-    const claimed = await claimUsername("MaxMustermann");
-    expect(rpc).toHaveBeenCalledWith("set_username", { _username: "MaxMustermann" });
-    expect(claimed).toBe("MaxMustermann");
+    rpc.mockResolvedValue({ data: "ExampleUser", error: null });
+    const claimed = await claimUsername("ExampleUser");
+    expect(rpc).toHaveBeenCalledWith("set_username", { _username: "ExampleUser" });
+    expect(claimed).toBe("ExampleUser");
   });
 
   it("rejects a duplicate username with a clear error", async () => {

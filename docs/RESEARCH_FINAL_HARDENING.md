@@ -88,7 +88,7 @@ Shop fingerprint **unchanged**: 320 products, 0 orders, `product_fp` `afd9f04bbf
 
 ## Production dump (Phase 29–30)
 
-Location: `C:\Users\PolatMehmetErkan\Documents\PEPTIX-BACKUPS\` (not in git)
+Location: `C:\Users\<USERNAME>\Documents\PEPTIX-BACKUPS\` (not in git)
 
 | File | Bytes | SHA-256 |
 |---|---|---|

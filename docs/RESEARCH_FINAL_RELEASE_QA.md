@@ -9,7 +9,7 @@ No Batch 04. No production SQL in this finalization. No push.
 
 ## Backup
 
-Folder: `C:\Users\PolatMehmetErkan\Documents\PEPTIX-BACKUPS\PEPTIX-FULL-BACKUP-FINAL-2026-08-29-1143`
+Folder: `C:\Users\<USERNAME>\Documents\PEPTIX-BACKUPS\PEPTIX-FULL-BACKUP-FINAL-2026-08-29-1143`
 
 | Artifact | Bytes | SHA-256 (re-hashed match) |
 |---|---|---|

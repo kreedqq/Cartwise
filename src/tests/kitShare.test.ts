@@ -20,7 +20,7 @@ const baseDraft = createKitShareDraft({
   product: { id: "p1", code: "10AD", name: "AOD9604" },
   kitSizeUnits: 10,
   creatorUserId: "user-a",
-  creatorDisplayName: "Erkan",
+  creatorDisplayName: "Test User",
   creatorQuantity: 3,
 })!;
 
@@ -52,7 +52,7 @@ describe("kit allocation validation", () => {
 describe("multi-participant kit sharing", () => {
   it("supports more than two participants", () => {
     let draft = baseDraft;
-    const b = addKitParticipant(draft, { userId: "user-b", displayName: "Max", quantity: 3 });
+    const b = addKitParticipant(draft, { userId: "user-b", displayName: "Example User", quantity: 3 });
     expect(b.ok).toBe(true);
     draft = b.ok ? b.draft : draft;
     const c = addKitParticipant(draft, { userId: "user-c", displayName: "Alex", quantity: 4 });
@@ -64,9 +64,9 @@ describe("multi-participant kit sharing", () => {
   });
 
   it("prevents duplicate participants", () => {
-    const withB = addKitParticipant(baseDraft, { userId: "user-b", displayName: "Max", quantity: 4 });
+    const withB = addKitParticipant(baseDraft, { userId: "user-b", displayName: "Example User", quantity: 4 });
     if (!withB.ok) throw new Error("setup failed");
-    const dup = addKitParticipant(withB.draft, { userId: "user-b", displayName: "Max", quantity: 2 });
+    const dup = addKitParticipant(withB.draft, { userId: "user-b", displayName: "Example User", quantity: 2 });
     expect(dup.ok).toBe(false);
   });
 });
@@ -86,7 +86,7 @@ describe("kit price split", () => {
 describe("price privacy sanitizer", () => {
   it("does not expose foreign prices in viewer payload", () => {
     let draft = baseDraft;
-    const added = addKitParticipant(draft, { userId: "user-b", displayName: "Max", quantity: 7 });
+    const added = addKitParticipant(draft, { userId: "user-b", displayName: "Example User", quantity: 7 });
     if (!added.ok) throw new Error("setup failed");
     draft = added.draft;
 
@@ -108,7 +108,7 @@ describe("participant quantity edits", () => {
   });
 
   it("blocks non-participants from editing foreign quantities", () => {
-    const withB = addKitParticipant(baseDraft, { userId: "user-b", displayName: "Max", quantity: 4 });
+    const withB = addKitParticipant(baseDraft, { userId: "user-b", displayName: "Example User", quantity: 4 });
     if (!withB.ok) throw new Error("setup failed");
     const blocked = updateParticipantQuantity(withB.draft, "user-b", 5, "user-c");
     expect(blocked.ok).toBe(false);
@@ -149,28 +149,28 @@ describe("ten-unit rule", () => {
       product: { id: "p1", code: "10AD", name: "AOD9604" },
       kitSizeUnits: 11,
       creatorUserId: "user-a",
-      creatorDisplayName: "Erkan",
+      creatorDisplayName: "Test User",
       creatorQuantity: 5,
     })).toBeNull();
     expect(createKitShareDraft({
       product: { id: "p1", code: "10AD", name: "AOD9604" },
       kitSizeUnits: 15,
       creatorUserId: "user-a",
-      creatorDisplayName: "Erkan",
+      creatorDisplayName: "Test User",
       creatorQuantity: 5,
     })).toBeNull();
     expect(createKitShareDraft({
       product: { id: "p1", code: "10AD", name: "AOD9604" },
       kitSizeUnits: 21,
       creatorUserId: "user-a",
-      creatorDisplayName: "Erkan",
+      creatorDisplayName: "Test User",
       creatorQuantity: 10,
     })).toBeNull();
     expect(createKitShareDraft({
       product: { id: "p1", code: "10AD", name: "AOD9604" },
       kitSizeUnits: 25,
       creatorUserId: "user-a",
-      creatorDisplayName: "Erkan",
+      creatorDisplayName: "Test User",
       creatorQuantity: 10,
     })).toBeNull();
   });
@@ -178,7 +178,7 @@ describe("ten-unit rule", () => {
 
 describe("distribution updates", () => {
   function fullDraft() {
-    const withB = addKitParticipant(baseDraft, { userId: "user-b", displayName: "Max", quantity: 7 });
+    const withB = addKitParticipant(baseDraft, { userId: "user-b", displayName: "Example User", quantity: 7 });
     if (!withB.ok) throw new Error("setup failed");
     return withB.draft;
   }
