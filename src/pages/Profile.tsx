@@ -13,6 +13,7 @@ import { profileSchema } from "@/lib/validation";
 import { updateDisplayName } from "@/services/profiles";
 import { formatDateTime } from "@/lib/money";
 import { PageHeader } from "@/components/common/PageHeader";
+import { visibleAccountLabel } from "@/lib/username";
 
 export default function ProfilePage() {
   const { user, profile, roles, customerRoleName, refreshProfile } = useAuth();
@@ -62,12 +63,21 @@ export default function ProfilePage() {
         <form onSubmit={handleSave}>
           <CardHeader>
             <CardTitle>Persönliche Angaben</CardTitle>
-            <CardDescription>Dein Anzeigename wird an anderen Stellen in der App verwendet.</CardDescription>
+            <CardDescription>
+              Dein Benutzername ist die öffentliche Identität. Der Anzeigename bleibt nur für dich.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="email">E-Mail-Adresse</Label>
               <Input id="email" value={user?.email ?? ""} disabled />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="username">Benutzername</Label>
+              <Input id="username" value={visibleAccountLabel(profile)} disabled />
+              <p className="text-xs text-muted-foreground">
+                Dieser Name gilt überall: Profil, Warenkörbe und Kit Sharing. Er wird bei der Registrierung festgelegt.
+              </p>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="displayName">Anzeigename</Label>

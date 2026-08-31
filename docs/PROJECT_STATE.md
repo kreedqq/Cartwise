@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-08-31** (orals variant display + final 0-price audit).
+Last documentation pass: **2026-08-31** (username/cart names + bulk-price UI).
+
+**Update 2026-08-31 (later)**: Canonical `profiles.username` is shown in Topbar/Dashboard/Profile; new carts are named after the username; kit-share auto-create uses the same name (migration `0040`). Redundant shop `ab 10` badge removed. No price/SKU/kit-pricing changes.
 
 **Update 2026-08-31**: Orals pack labels are formatted from existing `products.dosage_vial` via `formatProductVariant()` (no DB/SKU/price writes). Oral shop grouping no longer merges lexicon aliases (`BPC` ≠ `BPC157`). Five active SKUs remain `price_usd = 0` (BLOCKER: import source and price history are also 0; Excel file missing).
 

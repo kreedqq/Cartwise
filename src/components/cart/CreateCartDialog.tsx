@@ -15,9 +15,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createCartSchema } from "@/lib/validation";
-import { useCartMutations } from "@/hooks/useCarts";
+import { defaultCartName } from "@/lib/cart/defaultCartName";
+import { useCarts, useCartMutations } from "@/hooks/useCarts";
 import { toast } from "@/components/ui/toaster";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthProvider";
 
 export function CreateCartDialog() {
   const [open, setOpen] = React.useState(false);
@@ -25,7 +27,25 @@ export function CreateCartDialog() {
   const [note, setNote] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const { create } = useCartMutations();
+  const cartsQuery = useCarts();
+  const { profile } = useAuth();
   const navigate = useNavigate();
+
+  function suggestedName() {
+    return defaultCartName(
+      profile?.username,
+      (cartsQuery.data ?? []).map((cart) => cart.name),
+    );
+  }
+
+  function handleOpenChange(next: boolean) {
+    setOpen(next);
+    if (next) {
+      setName(suggestedName());
+      setNote("");
+      setError(null);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,7 +69,7 @@ export function CreateCartDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <Plus /> Neuer Warenkorb
@@ -59,7 +79,9 @@ export function CreateCartDialog() {
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Neuen Warenkorb erstellen</DialogTitle>
-            <DialogDescription>Gib einen aussagekräftigen Namen ein, z. B. „Büro Q3-Bestellung".</DialogDescription>
+            <DialogDescription>
+              Neue Warenkörbe starten mit deinem Benutzernamen. Du kannst den Namen vor dem Speichern anpassen.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-1.5">
@@ -70,7 +92,7 @@ export function CreateCartDialog() {
                 value={name}
                 invalid={!!error}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="z. B. Büro Q3-Bestellung"
+                placeholder={suggestedName()}
               />
               {error && <p className="text-xs text-destructive">{error}</p>}
             </div>

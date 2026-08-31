@@ -185,8 +185,7 @@ function ShopProductGroupTableRow({
         {bulk ? (
           <>
             <p className="text-base font-semibold tabular-nums tracking-tight text-foreground">
-              {formatUsd(product.bulk_price_usd)}{" "}
-              <span className="font-normal text-muted-foreground">ab {formatQuantity(product.bulk_price_min_quantity)}</span>
+              {formatUsd(product.bulk_price_usd)}
             </p>
             <p className="text-xs tabular-nums text-muted-foreground">
               {formatEur(convertUsdToEur(product.bulk_price_usd as number, rate))}

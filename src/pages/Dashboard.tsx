@@ -18,6 +18,7 @@ import { useCarts } from "@/hooks/useCarts";
 import { useCartSummaries } from "@/hooks/useCartSummaries";
 import { isOpenCart } from "@/services/carts";
 import { useAuth } from "@/context/AuthProvider";
+import { visibleAccountLabel } from "@/lib/username";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useMyOrders } from "@/hooks/useOrders";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
@@ -30,8 +31,8 @@ export default function DashboardPage() {
   const ordersQuery = useMyOrders();
   const favoritesQuery = useFavorites();
   const rateQuery = useExchangeRate();
-  const { customerRoleName, profile, user } = useAuth();
-  const greetingName = profile?.display_name || user?.email?.split("@")[0] || "dort";
+  const { customerRoleName, profile } = useAuth();
+  const greetingName = visibleAccountLabel(profile, "dort");
   const recentOrders = (ordersQuery.data ?? []).slice(0, 4);
   const favoriteCount = favoritesQuery.data?.length ?? 0;
   // Submitted carts have already become an order (visible under "Bestellungen")

@@ -176,7 +176,6 @@ function ShopProductGroupCard({
             {bulk ? (
               <>
                 <p className="text-base font-semibold tabular-nums tracking-tight">{formatUsd(product.bulk_price_usd)}</p>
-                <p className="text-[11px] text-muted-foreground">ab {formatQuantity(product.bulk_price_min_quantity)}</p>
               </>
             ) : (
               <p className="text-xs text-muted-foreground">Keiner</p>

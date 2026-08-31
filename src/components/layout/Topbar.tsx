@@ -22,6 +22,7 @@ import { toast } from "@/components/ui/toaster";
 import { BrandMark } from "@/components/layout/BrandMark";
 import { useNavShell } from "@/context/NavShellProvider";
 import { useQueryClient } from "@tanstack/react-query";
+import { accountInitials, visibleAccountLabel } from "@/lib/username";
 
 export function Topbar() {
   const { profile, user } = useAuth();
@@ -47,12 +48,8 @@ export function Topbar() {
     }
   }
 
-  const initials = (profile?.display_name ?? user?.email ?? "?")
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((s) => s[0]?.toUpperCase())
-    .join("");
+  const accountName = visibleAccountLabel(profile);
+  const initials = accountInitials(profile?.username);
 
   return (
     <header className="sticky top-0 z-30 flex min-h-[4.5rem] items-center justify-between gap-3 border-b border-border/80 bg-background/90 px-4 py-2 backdrop-blur-md sm:px-6 lg:min-h-24">
@@ -100,7 +97,7 @@ export function Topbar() {
                 {initials || <UserCircle className="h-4 w-4" />}
               </span>
               <span className="hidden max-w-[140px] truncate text-sm font-medium sm:inline">
-                {profile?.display_name ?? user?.email}
+                {accountName}
               </span>
             </Button>
           </DropdownMenuTrigger>

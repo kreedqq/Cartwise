@@ -2,6 +2,14 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-08-31 (fix: unify usernames and clean up quantity pricing UI)
+
+### Fixed
+
+- **Username**: Topbar, Dashboard greeting, and Profile now show `profiles.username`. Email prefixes and `display_name` are no longer used as a public handle. Kit sharing already returned username via `list_kit_share_members` / `get_my_kit_share`.
+- **Cart names**: New carts (Create dialog, first shop add, kit-share auto-create) use the username. Open `Warenkorb` / previous-username draft carts are renamed on `set_username`. Ordered carts are not rewritten.
+- **Bulk UI**: Removed the redundant `ab 10` line next to the bulk price. Column/card label remains `Preis ab 10 Stück`; remaining-to-bulk copy is unchanged. Pricing math is unchanged.
+
 ## 2026-08-31 (orals variant display + shop 0-price audit)
 
 ### Fixed
