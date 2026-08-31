@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-08-31** (personal-data cleanup in docs/tests/scripts).
+Last documentation pass: **2026-09-01** (Kit Gesuche marketplace applied to production).
+
+**Update 2026-09-01 (Kit Gesuche production)**: Open kit marketplace at `/kit-gesuche`. Additive migration `0041_kit_requests.sql` applied to `cartwise-prod` (`is_open_request` default false; all existing invite kits remain false). Join is an atomic RPC with `FOR UPDATE`. Cart sync reuses existing kit-share helpers and only runs when the request is full. Invite kit sharing, 10er rule, markup, and `profiles.username` cart names are unchanged.
 
 **Update 2026-08-31 (privacy)**: Developer-identifying test fixtures and local Windows account paths in docs/scripts were replaced with generic placeholders (`Test User`, `testuser`, `ExampleUser`, `C:\Users\<USERNAME>\...`, `os.homedir()`). Username/kit/shop/pricing logic unchanged. No production DB writes.
 
@@ -53,9 +55,9 @@ Peptide routes sit behind `ProtectedRoute` (same login as shop).
 
 ### Navigation (logged-in `AppShell`)
 
-Sidebar: Übersicht `/dashboard`, Shop `/shop`, **Lexikon & Rechner** `/peptide`, Bestellungen `/orders`, Profil `/profile`, Admin `/admin` (admins).
+Sidebar: Übersicht `/dashboard`, Shop `/shop`, **Kit Gesuche** `/kit-gesuche`, **Lexikon & Rechner** `/peptide`, Bestellungen `/orders`, Profil `/profile`, Admin `/admin` (admins).
 
-Mobile: same set; peptide label **Lexikon & Rechner**.
+Mobile: same set plus Favorites in `MAIN_NAV_ITEMS`; peptide label **Lexikon & Rechner**; Kit Gesuche short label **Kits** on the bottom bar.
 
 Admin nav: Übersicht, Bestellungen, Rollen & Preisregeln, Versandkosten, Produkte, Produktimport, Import-Historie, Benutzer, Audit-Log, Research.
 
@@ -63,7 +65,7 @@ Admin nav: Übersicht, Bestellungen, Rollen & Preisregeln, Versandkosten, Produk
 
 Public: `/login`, `/auth/callback`, `/register`, `/forgot-password`, `/reset-password`, `/403`.
 
-Protected: `/shop`, `/favorites`, `/dashboard`, `/carts/:cartId`, `/carts/:cartId/checkout`, `/orders`, `/orders/:orderId`, `/profile`, `/peptide`, `/peptide/rechner`, `/peptide/lexikon`, `/peptide/lexikon/:slug`.
+Protected: `/shop`, `/kit-gesuche`, `/favorites`, `/dashboard`, `/carts/:cartId`, `/carts/:cartId/checkout`, `/orders`, `/orders/:orderId`, `/profile`, `/peptide`, `/peptide/rechner`, `/peptide/lexikon`, `/peptide/lexikon/:slug`.
 
 Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/roles`, `/admin/shipping`, `/admin/products`, `/admin/pdf-import`, `/admin/import-history`, `/admin/users`, `/admin/audit-log`, `/admin/research`.
 

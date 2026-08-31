@@ -27,7 +27,7 @@ export type ImportRowResult = "created" | "updated" | "skipped" | "failed";
 /** Which price tier produced the unit price applied to a cart line. */
 export type PriceTier = "normal" | "bulk";
 export type PaymentMethod = "crypto" | "bank_transfer" | "paypal";
-export type KitShareStatus = "open" | "full" | "cancelled" | "ordered";
+export type KitShareStatus = "open" | "full" | "cancelled" | "ordered" | "expired";
 
 export interface Database {
   public: {
@@ -283,6 +283,10 @@ export interface Database {
           creator_user_id: string;
           kit_size_vials: number;
           status: KitShareStatus;
+          is_open_request: boolean;
+          note: string | null;
+          expires_at: string | null;
+          completed_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -1177,6 +1181,47 @@ export interface Database {
       };
       leave_kit_share: { Args: { _kit_share_id: string }; Returns: undefined };
       cancel_kit_share: { Args: { _kit_share_id: string }; Returns: undefined };
+      create_kit_request: {
+        Args: {
+          _product_id: string;
+          _kit_size_vials: number;
+          _my_quantity: number;
+          _note?: string | null;
+          _expires_at?: string | null;
+        };
+        Returns: Record<string, unknown>;
+      };
+      join_kit_request: {
+        Args: { _kit_share_id: string; _quantity: number };
+        Returns: Record<string, unknown>;
+      };
+      preview_kit_request_join: {
+        Args: { _kit_share_id: string; _quantity: number };
+        Returns: Record<string, unknown>;
+      };
+      leave_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
+      cancel_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
+      sync_completed_kit_request_carts: {
+        Args: { _kit_share_id: string };
+        Returns: Record<string, unknown>;
+      };
+      list_open_kit_requests: {
+        Args: {
+          _search?: string | null;
+          _category?: string | null;
+          _product_id?: string | null;
+          _product_name?: string | null;
+          _variant?: string | null;
+          _min_remaining?: number | null;
+          _sort?: string | null;
+          _page?: number;
+          _page_size?: number;
+        };
+        Returns: Record<string, unknown>;
+      };
+      list_my_kit_requests: { Args: Record<string, never>; Returns: Record<string, unknown> };
+      list_my_kit_request_participations: { Args: Record<string, never>; Returns: Record<string, unknown> };
+      get_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
       set_order_status: {
         Args: { _order_id: string; _status: OrderStatus; _admin_note: string | null };
         Returns: Database["public"]["Tables"]["orders"]["Row"];

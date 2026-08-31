@@ -2,6 +2,20 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-08-31 (Kit Gesuche / open kit marketplace)
+
+### Added
+
+- Marketplace for open kit requests: users can post a kit without invitees; others browse, pick a vial quantity, and join. When allocated volume equals kit size, existing kit-share cart sync creates each participant's line (username cart names unchanged).
+- Navigation: **Kit Gesuche** (`/kit-gesuche`) on desktop sidebar, mobile drawer, and mobile bottom bar. Admin nav unchanged.
+- Migration `0041_kit_requests.sql` (additive): `kit_shares.is_open_request`, `note`, `expires_at`, `completed_at`, status `expired`, join RPCs with row locks, unique cart index for kit-share lines. Invite kit shares (`is_open_request = false`) keep existing RLS and RPCs.
+
+### Notes
+
+- Pricing still comes only from `kit_share_catalog_unit_usd` / participant share + role markup. Cart items are not created until the request is `full`.
+- Completed marketplace kits cannot return to `open` via `kit_share_refresh_status_locked`.
+- Applied to production (`cartwise-prod`) as migration `0041` / `kit_requests`. Existing 28 invite kits remain `is_open_request = false`.
+
 ## 2026-08-31 (personal data / privacy cleanup)
 
 ### Changed

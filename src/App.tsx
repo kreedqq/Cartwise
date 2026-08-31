@@ -18,6 +18,7 @@ import DashboardPage from "@/pages/Dashboard";
 import CartDetailPage from "@/pages/CartDetail";
 import CheckoutPage from "@/pages/Checkout";
 import ShopPage from "@/pages/Shop";
+import KitRequestsPage from "@/pages/KitRequests";
 import FavoritesPage from "@/pages/Favorites";
 import OrdersPage from "@/pages/Orders";
 import OrderDetailPage from "@/pages/OrderDetail";
@@ -68,6 +69,7 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route element={<AppShell />}>
                 <Route path="/shop" element={<ShopPage />} />
+                <Route path="/kit-gesuche" element={<KitRequestsPage />} />
                 <Route path="/favorites" element={<FavoritesPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/carts/:cartId" element={<CartDetailPage />} />

@@ -37,6 +37,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 # High
 
 - [x] Unify public username (`profiles.username`) + cart titles; remove redundant shop `ab X` badge (migration `0040`)
+- [x] Kit Gesuche marketplace on existing `kit_shares` (migration `0041` applied to production; invite kit sharing unchanged)
 - [x] Personal-data cleanup: generic test fixtures and anonymized local paths in docs/scripts (no product/price/RLS changes)
 - [x] Orals pack/variant display (`formatProductVariant`) + BPC/BPC157 shop split; 0-price SKUs audited as BLOCKER (no DB price writes)
 - [x] Peptide routes outside `/shop`
