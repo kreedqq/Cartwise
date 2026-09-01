@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   calculateCartTotals,
   calculateLineTotalUsd,
+  catalogBulkUnitPriceUsd,
   convertUsdToEur,
   formatBulkTier,
   formatEur,
@@ -20,6 +21,10 @@ import {
 /** The worked example from the spec: 1-9 x 60 USD, from 10 on 55 USD. */
 const TIERED = { price_usd: 60, bulk_price_usd: 55, bulk_price_min_quantity: 10 };
 const FLAT = { price_usd: 60, bulk_price_usd: null, bulk_price_min_quantity: null };
+/** Injectable Oils catalog: pack total 160 for 10 pieces = 16 per unit. */
+const OIL_PACK = { price_usd: 18, bulk_price_usd: 160, bulk_price_min_quantity: 10 };
+/** Oils row that already stores a unit bulk (PA20-style). */
+const OIL_UNIT_BULK = { price_usd: 110, bulk_price_usd: 100, bulk_price_min_quantity: 10 };
 
 describe("roundHalfUp", () => {
   it("rounds .005 up to the next cent (round-half-up, not banker's rounding)", () => {
@@ -120,6 +125,43 @@ describe("getEffectiveUnitPrice", () => {
     expect(effective.bulkPriceUsd).toBe(55);
     expect(effective.bulkPriceMinQuantity).toBe(10);
   });
+
+  it("treats an oils pack-total bulk as a per-unit price, never 160 × quantity", () => {
+    const total = (quantity: number) =>
+      calculateLineTotalUsd(quantity, getEffectiveUnitPrice(OIL_PACK, quantity).unitPriceUsd);
+
+    expect(getEffectiveUnitPrice(OIL_PACK, 1).unitPriceUsd).toBe(18);
+    expect(getEffectiveUnitPrice(OIL_PACK, 9).unitPriceUsd).toBe(18);
+    expect(getEffectiveUnitPrice(OIL_PACK, 10).unitPriceUsd).toBe(16);
+    expect(getEffectiveUnitPrice(OIL_PACK, 11).unitPriceUsd).toBe(16);
+    expect(getEffectiveUnitPrice(OIL_PACK, 20).unitPriceUsd).toBe(16);
+    expect(getEffectiveUnitPrice(OIL_PACK, 21).unitPriceUsd).toBe(16);
+    expect(getEffectiveUnitPrice(OIL_PACK, 10).bulkPriceUsd).toBe(16);
+
+    expect(total(1)).toBe(18);
+    expect(total(9)).toBe(162);
+    expect(total(10)).toBe(160);
+    expect(total(11)).toBe(176);
+    expect(total(20)).toBe(320);
+    expect(total(21)).toBe(336);
+    expect(total(10)).not.toBe(1600);
+  });
+
+  it("does not divide a bulk that is already a unit price (peptides / PA20)", () => {
+    expect(catalogBulkUnitPriceUsd(TIERED)).toBe(55);
+    expect(getEffectiveUnitPrice(TIERED, 10).unitPriceUsd).toBe(55);
+    expect(catalogBulkUnitPriceUsd(OIL_UNIT_BULK)).toBe(100);
+    expect(getEffectiveUnitPrice(OIL_UNIT_BULK, 10).unitPriceUsd).toBe(100);
+    expect(calculateLineTotalUsd(10, getEffectiveUnitPrice(OIL_UNIT_BULK, 10).unitPriceUsd)).toBe(1000);
+  });
+});
+
+describe("catalogBulkUnitPriceUsd", () => {
+  it("converts oils pack totals and leaves unit bulks unchanged", () => {
+    expect(catalogBulkUnitPriceUsd(OIL_PACK)).toBe(16);
+    expect(catalogBulkUnitPriceUsd(TIERED)).toBe(55);
+    expect(catalogBulkUnitPriceUsd(FLAT)).toBeNull();
+  });
 });
 
 describe("hasBulkTier", () => {
@@ -139,6 +181,10 @@ describe("formatBulkTier", () => {
 
   it("returns null when there is no tier to describe", () => {
     expect(formatBulkTier(FLAT)).toBeNull();
+  });
+
+  it("keeps the stored oils pack total in the admin catalog label", () => {
+    expect(formatBulkTier(OIL_PACK)).toContain("160,00");
   });
 });
 
@@ -192,6 +238,18 @@ describe("calculateCartTotals", () => {
     expect(totals.totalEur).toBe(27.6);
     expect(totals.itemCount).toBe(2);
     expect(totals.totalQuantity).toBe(3);
+  });
+
+  it("cart total for oils qty 10 is 160, never 1600", () => {
+    const unit = getEffectiveUnitPrice(OIL_PACK, 10).unitPriceUsd;
+    const lineTotal = calculateLineTotalUsd(10, unit);
+    const totals = calculateCartTotals([
+      { quantity: 10, totalUsd: lineTotal, totalEur: null, resolutionStatus: "resolved" },
+    ]);
+    expect(unit).toBe(16);
+    expect(lineTotal).toBe(160);
+    expect(totals.totalUsd).toBe(160);
+    expect(totals.totalUsd).not.toBe(1600);
   });
 
   it("returns totalEur = null (not 0, not partial) when any priced line lacks a EUR value", () => {

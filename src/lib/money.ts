@@ -72,25 +72,47 @@ export function hasBulkTier(product: PricedProduct): boolean {
 }
 
 /**
+ * Catalog `bulk_price_usd` as a per-unit price.
+ *
+ * Peptides/orals store a unit bulk (55 vs 60). Injectable oils store a pack
+ * total for `bulk_price_min_quantity` pieces (160 vs 18 at min 10 = 16/unit).
+ * Discriminator is the stored values, not the category name: a bulk greater
+ * than the single-unit price with min > 1 is a pack total. Already-unit
+ * values (including PA20-style 100 vs 110) are returned unchanged.
+ *
+ * Matches public.catalog_bulk_unit_price. Never divide blindly by 10.
+ */
+export function catalogBulkUnitPriceUsd(product: PricedProduct): number | null {
+  if (!hasBulkTier(product)) return null;
+  const bulk = product.bulk_price_usd as number;
+  const min = product.bulk_price_min_quantity as number;
+  if (bulk > product.price_usd && min > 1) {
+    return roundHalfUp(bulk / min, 4);
+  }
+  return bulk;
+}
+
+/**
  * THE single source of truth for "what does one unit cost at this quantity".
  * Every add, quantity edit, merge, price refresh and preview in the app goes
  * through this function - there must never be a second place that decides
  * between the normal and the bulk price.
  *
- *   quantity <  bulk_price_min_quantity -> price_usd      (tier "normal")
- *   quantity >= bulk_price_min_quantity -> bulk_price_usd (tier "bulk")
- *   no bulk tier configured             -> price_usd      (tier "normal")
+ *   quantity <  bulk_price_min_quantity -> price_usd              (tier "normal")
+ *   quantity >= bulk_price_min_quantity -> catalog bulk unit price (tier "bulk")
+ *   no bulk tier configured             -> price_usd              (tier "normal")
  *
  * The bulk price replaces the normal price for the whole line, it is not a
  * graduated surcharge: 12 units at a bulk price of 55 cost 660, not
- * 9 * 60 + 3 * 55.
+ * 9 * 60 + 3 * 55. Oils stored as 18 / pack-total 160 at min 10 cost
+ * 10 × 16 = 160, never 10 × 160.
  */
 export function getEffectiveUnitPrice(
   product: PricedProduct,
   quantity: number | null | undefined,
 ): EffectiveUnitPrice {
   const bulkAvailable = hasBulkTier(product);
-  const bulkPriceUsd = bulkAvailable ? (product.bulk_price_usd as number) : null;
+  const bulkPriceUsd = catalogBulkUnitPriceUsd(product);
   const bulkPriceMinQuantity = bulkAvailable ? (product.bulk_price_min_quantity as number) : null;
 
   const useBulk =

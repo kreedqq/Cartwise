@@ -2,7 +2,11 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-01** (Telegram login via Custom OIDC `custom:telegram`).
+Last documentation pass: **2026-09-01** (quantity tier unit price for Injectable Oils pack totals).
+
+**Update 2026-09-01 (quantity tier pricing)**: Oils `bulk_price_usd` greater than `price_usd` with `bulk_price_min_quantity > 1` is a pack total (18 / 160 at min 10 → 16 per unit). Client `getEffectiveUnitPrice` and SQL `sell_unit_price` / `selling_prices_for` convert that to a unit price before `quantity × unit`. Peptide/oral unit bulks (60 / 55) are unchanged. Kit pricing functions were not modified. Catalog product rows were not updated. Migration `0043` is function-only.
+
+**Update 2026-09-01 (Telegram login via Custom OIDC `custom:telegram`)**.
 
 **Update 2026-09-01 (0€ shop cleanup)**: Production `is_active = false` only for `B1201`, `B1210`, `GGH`, `HHB`, `SHB`. Rows remain; prices/SKUs/IDs unchanged. Shop and Kit Gesuche already load via `list_shop_products` (`is_active = true`). Active catalog 293 / inactive 27 / active `price_usd = 0` = 0.
 

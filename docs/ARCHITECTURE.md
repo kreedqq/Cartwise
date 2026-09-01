@@ -60,7 +60,7 @@ Defined in `supabase/migrations/` (0001–0031 in Git; **live `cartwise-prod` is
 
 **Auth-adjacent:** `profiles`, `user_roles` (`user` \| `admin`).
 
-**Catalog:** `products`, `product_price_history`. Selling prices for the current user come from RPCs (`list_shop_products`), not a raw table select of list prices.
+**Catalog:** `products`, `product_price_history`. Selling prices for the current user come from RPCs (`list_shop_products`), not a raw table select of list prices. `bulk_price_usd` is a per-unit tier price except when it is greater than `price_usd` with `bulk_price_min_quantity > 1` (Injectable Oils pack totals); `catalog_bulk_unit_price` / `getEffectiveUnitPrice` convert that to a unit price before quantity multiplication. Kit share pricing uses separate functions and does not share this conversion.
 
 **Cart:** `carts`, `cart_items` (version/optimistic lock, `price_tier` bulk/normal). View `cart_summaries`.
 

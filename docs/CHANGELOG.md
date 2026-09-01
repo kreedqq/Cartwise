@@ -2,6 +2,16 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-01 (quantity tier unit price)
+
+### Fixed
+
+- Injectable Oils catalog `bulk_price_usd` is a pack total (e.g. 160 USD for 10 pieces). Cart, shop RPC, and `sell_unit_price` treated it as a per-unit price, so quantity 10 became 1600 instead of 160. `catalog_bulk_unit_price` / `catalogBulkUnitPriceUsd` now convert pack totals (`bulk > unit` and `min > 1`) to a unit price; peptides/orals that already store a unit bulk are unchanged.
+
+### Notes
+
+- Product rows, SKUs, and stored catalog numbers were not rewritten. Kit pricing (`kit_share_catalog_unit_usd`) is unchanged. Function-only migration `0043_quantity_tier_unit_price.sql` (no tables, RLS, or product UPDATEs).
+
 ## 2026-09-01 (Telegram origin required)
 
 ### Fixed

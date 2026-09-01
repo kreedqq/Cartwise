@@ -40,6 +40,14 @@ describe("sellingUnitPrice bulk-then-markup", () => {
     expect(sellingUnitPrice(CATALOG, 1, 0)).toBe(100);
   });
 
+  it("oils pack-total 160 at min 10 is 16 per unit, not 160 × qty", () => {
+    const oil = { price_usd: 18, bulk_price_usd: 160, bulk_price_min_quantity: 10 };
+    expect(sellingUnitPrice(oil, 9, 0)).toBe(18);
+    expect(sellingUnitPrice(oil, 10, 0)).toBe(16);
+    expect(sellingUnitPrice(oil, 11, 0)).toBe(16);
+    expect(sellingUnitPrice(oil, 20, 0)).toBe(16);
+  });
+
   it("role switch Kunde → Stammkunde changes the selling price", () => {
     expect(sellingUnitPrice(CATALOG, 1, 25)).toBe(125);
     expect(sellingUnitPrice(CATALOG, 1, 0)).toBe(100);

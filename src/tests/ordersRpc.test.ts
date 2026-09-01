@@ -69,6 +69,30 @@ describe("createOrder RPC", () => {
     expect(payload).not.toHaveProperty("total");
     expect(payload).not.toHaveProperty("markup");
     expect(result.totalUsd).toBe(12);
+    expect(payload).not.toHaveProperty("unitPriceUsd");
+    expect(payload).not.toHaveProperty("lineTotal");
+  });
+
+  it("trusts the server total for oils qty 10 (16 × 10 = 160), never a client 1600", async () => {
+    rpc.mockResolvedValue({
+      data: { orderId: "ord-oil", orderNumber: "CW-2026-000160", totalUsd: 160 },
+      error: null,
+    });
+    const result = await createOrder("cart-oil", null, "crypto", {
+      firstName: "Ada",
+      lastName: "Lovelace",
+      street: "Example Street",
+      houseNumber: "10",
+      postalCode: "10115",
+      city: "Berlin",
+      country: "Deutschland",
+    });
+    const payload = rpc.mock.calls[0]?.[1] as Record<string, unknown>;
+    expect(payload).not.toHaveProperty("totalUsd");
+    expect(payload).not.toHaveProperty("total");
+    expect(payload).not.toHaveProperty("unit_price");
+    expect(result.totalUsd).toBe(160);
+    expect(result.totalUsd).not.toBe(1600);
   });
 });
 

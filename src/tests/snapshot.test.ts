@@ -72,6 +72,20 @@ describe("buildSnapshot", () => {
     // 12 x 55 = 660 USD, at 0.9 -> 594 EUR (not 12 x 60 x 0.9 = 648).
     expect(buildSnapshot(TIERED_PRODUCT, 12, 0.9).eurValueSnapshot).toBe(594);
   });
+
+  it("snapshots oils pack-total bulk as 16 per unit and 160 for quantity 10", () => {
+    const oil = {
+      code: "OXO50",
+      name: "ANADROL",
+      price_usd: 18,
+      bulk_price_usd: 160,
+      bulk_price_min_quantity: 10,
+    };
+    const snapshot = buildSnapshot(oil, 10, null);
+    expect(snapshot.unitPriceUsdSnapshot).toBe(16);
+    expect(snapshot.bulkPriceUsdSnapshot).toBe(16);
+    expect(snapshot.appliedPriceTier).toBe("bulk");
+  });
 });
 
 describe("snapshotToColumns", () => {
@@ -122,6 +136,20 @@ describe("repriceForQuantity", () => {
   it("applies the bulk price exactly at the threshold", () => {
     expect(repriceForQuantity(lineAt7, 10)?.unit_price_usd_snapshot).toBe(55);
     expect(repriceForQuantity(lineAt7, 9)?.unit_price_usd_snapshot).toBe(60);
+  });
+
+  it("reprices an oils pack-total snapshot to 16 per unit, not 1600", () => {
+    const oilLine = {
+      unit_price_usd_snapshot: 18,
+      normal_price_usd_snapshot: 18,
+      bulk_price_usd_snapshot: 160,
+      bulk_price_min_quantity_snapshot: 10,
+      exchange_rate_snapshot: null,
+    };
+    expect(repriceForQuantity(oilLine, 9)?.unit_price_usd_snapshot).toBe(18);
+    expect(repriceForQuantity(oilLine, 10)?.unit_price_usd_snapshot).toBe(16);
+    expect(repriceForQuantity(oilLine, 11)?.unit_price_usd_snapshot).toBe(16);
+    expect(repriceForQuantity(oilLine, 20)?.unit_price_usd_snapshot).toBe(16);
   });
 
   it("touches the price date only when the effective price actually moved", () => {
