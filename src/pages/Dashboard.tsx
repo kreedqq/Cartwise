@@ -35,7 +35,7 @@ export default function DashboardPage() {
   const greetingName = visibleAccountLabel(profile, "dort");
   const recentOrders = (ordersQuery.data ?? []).slice(0, 4);
   const favoriteCount = favoritesQuery.data?.length ?? 0;
-  // Submitted carts have already become an order (visible under "Bestellungen")
+  // Submitted carts have already become an order (visible under "Meine Bestellungen")
   // and must not linger in the active "Warenkörbe" overview.
   const openCarts = (cartsQuery.data ?? []).filter((cart) => isOpenCart(cart.status));
 
@@ -64,7 +64,7 @@ export default function DashboardPage() {
           title={PEPTIDE_NAV_LABEL}
           description="Mathematische Rechner und wissenschaftliche Substanzprofile."
         />
-        <ShortcutCard to="/orders" icon={ClipboardList} title="Bestellungen" description="Status und Gesamt Endpreis." />
+        <ShortcutCard to="/orders" icon={ClipboardList} title="Meine Bestellungen" description="Status und Gesamt Endpreis." />
         <ShortcutCard
           to="/favorites"
           icon={Star}

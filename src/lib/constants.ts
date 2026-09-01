@@ -30,6 +30,7 @@ export const QUERY_KEYS = {
   order: (id: string) => ["orders", id] as const,
   orderStatusHistory: (id: string) => ["orders", id, "history"] as const,
   adminOrders: ["admin-orders"] as const,
+  adminRoleSurcharges: ["admin-role-surcharges"] as const,
   adminUserDirectory: ["admin-user-directory"] as const,
   favorites: ["favorites"] as const,
   orderTemplates: ["order-templates"] as const,

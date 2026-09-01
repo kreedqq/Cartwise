@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, FileDown, Printer, Trash2 } from "lucide-react";
 
@@ -20,7 +21,10 @@ import { useDeleteOrder, useOrder, useOrderAdminNote, useOrderStatusHistory, use
 import { useAdminUserDirectory } from "@/hooks/useAdminOrders";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
 import { formatDateTime, formatQuantity, formatRate, formatUsd, summarizeOrderCharges } from "@/lib/money";
+import { orderRoleSurchargeFromSnapshots } from "@/lib/roleSurcharge";
+import { QUERY_KEYS } from "@/lib/constants";
 import { canPermanentlyDeleteOrder, nextOrderStatuses, ORDER_STATUS_LABELS } from "@/services/orders";
+import { listRoleSurchargeLinesForOrder } from "@/services/roleSurcharge";
 import { toast } from "@/components/ui/toaster";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 import type { OrderStatus } from "@/types/database";
@@ -34,6 +38,11 @@ export default function AdminOrderDetailPage() {
   const directoryQuery = useAdminUserDirectory();
   const setStatus = useSetOrderStatus(orderId ?? "");
   const deleteOrderMutation = useDeleteOrder();
+  const surchargeQuery = useQuery({
+    queryKey: [...QUERY_KEYS.adminRoleSurcharges, orderId],
+    queryFn: () => listRoleSurchargeLinesForOrder(orderId ?? ""),
+    enabled: Boolean(orderId),
+  });
 
   const [adminNoteDraft, setAdminNoteDraft] = React.useState<string | null>(null);
   const [pendingStatus, setPendingStatus] = React.useState<OrderStatus | null>(null);
@@ -52,10 +61,22 @@ export default function AdminOrderDetailPage() {
   const customer = directoryQuery.data?.get(order.user_id);
   const telegramHandle = order.telegram_username_snapshot?.trim() || null;
   const next = nextOrderStatuses(order.status);
-  const exportDoc = toOrderExportDoc(order, order.items, {
-    displayName: telegramHandle ?? customer?.displayName ?? order.user_id,
-    email: customer?.email ?? null,
-  });
+  const roleSurcharge =
+    surchargeQuery.data &&
+    order.items.length > 0 &&
+    surchargeQuery.data.length === order.items.length
+      ? orderRoleSurchargeFromSnapshots(surchargeQuery.data)
+      : null;
+  const exportDoc = toOrderExportDoc(
+    order,
+    order.items,
+    {
+      displayName: telegramHandle ?? customer?.displayName ?? order.user_id,
+      email: customer?.email ?? null,
+    },
+    roleSurcharge,
+    { audience: "admin" },
+  );
 
   async function applyStatus(status: OrderStatus) {
     try {
@@ -94,7 +115,7 @@ export default function AdminOrderDetailPage() {
     <div className="space-y-5">
       {/* Back + breadcrumb */}
       <Button variant="ghost" size="sm" className="-ml-2 text-muted-foreground" onClick={() => navigate("/admin/orders")}>
-        <ArrowLeft className="h-3.5 w-3.5" /> Bestellungen
+        <ArrowLeft className="h-3.5 w-3.5" /> Bestelleingänge
       </Button>
 
       {/* Order header card */}
@@ -214,6 +235,8 @@ export default function AdminOrderDetailPage() {
                 deCurrency: order.de_shipping_currency,
                 usdToEurRate: order.exchange_rate,
               })}
+              catalogSubtotalUsd={roleSurcharge?.catalogSubtotalUsd}
+              roleSurchargeUsd={roleSurcharge?.surchargeUsd}
             />
             <div className="flex justify-between border-t border-border pt-2 text-muted-foreground">
               <span>Wechselkurs</span>

@@ -10,7 +10,7 @@ const items = [
   { to: "/shop", label: "Shop", icon: ShoppingBag },
   { to: "/kit-gesuche", label: "Kits", icon: Layers },
   { to: "/peptide", label: PEPTIDE_NAV_LABEL, icon: BookOpen },
-  { to: "/orders", label: "Bestellungen", icon: ClipboardList },
+  { to: "/orders", label: "Meine Bestellungen", icon: ClipboardList },
   { to: "/profile", label: "Profil", icon: UserCircle },
 ];
 
@@ -25,13 +25,13 @@ export function MobileNav() {
           to={item.to}
           className={({ isActive }) =>
             cn(
-              "flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium tracking-wide",
+              "flex min-h-[3.25rem] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-0.5 py-2 text-[9px] font-medium leading-tight tracking-wide",
               isActive ? "text-primary" : "text-sidebar-muted",
             )
           }
         >
-          <item.icon className="h-4 w-4" />
-          {item.label}
+          <item.icon className="h-4 w-4 shrink-0" />
+          <span className="max-w-full text-center">{item.label}</span>
         </NavLink>
       ))}
       {isAdmin && (
@@ -39,13 +39,13 @@ export function MobileNav() {
           to="/admin"
           className={({ isActive }) =>
             cn(
-              "flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium tracking-wide",
+              "flex min-h-[3.25rem] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-0.5 py-2 text-[9px] font-medium leading-tight tracking-wide",
               isActive ? "text-primary" : "text-sidebar-muted",
             )
           }
         >
-          <ShieldCheck className="h-4 w-4" />
-          Admin
+          <ShieldCheck className="h-4 w-4 shrink-0" />
+          <span className="max-w-full text-center">Admin</span>
         </NavLink>
       )}
     </nav>

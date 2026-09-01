@@ -1,15 +1,21 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { ShippingAddressInput } from "@/lib/shippingAddress";
+import type { CheckoutShippingField, CheckoutShippingForm, DeliveryMethod } from "@/lib/shippingAddress";
 
 interface ShippingAddressFieldsProps {
-  value: ShippingAddressInput;
-  onChange: (next: ShippingAddressInput) => void;
-  errors?: Partial<Record<keyof ShippingAddressInput, string>>;
+  value: CheckoutShippingForm;
+  onChange: (next: CheckoutShippingForm) => void;
+  deliveryMethod: DeliveryMethod;
+  errors?: Partial<Record<CheckoutShippingField, string>>;
 }
 
-export function ShippingAddressFields({ value, onChange, errors }: ShippingAddressFieldsProps) {
-  function patch<K extends keyof ShippingAddressInput>(key: K, next: ShippingAddressInput[K]) {
+export function ShippingAddressFields({
+  value,
+  onChange,
+  deliveryMethod,
+  errors,
+}: ShippingAddressFieldsProps) {
+  function patch<K extends keyof CheckoutShippingForm>(key: K, next: CheckoutShippingForm[K]) {
     onChange({ ...value, [key]: next });
   }
 
@@ -45,41 +51,74 @@ export function ShippingAddressFields({ value, onChange, errors }: ShippingAddre
           {errors?.lastName && <p className="text-xs text-destructive">{errors.lastName}</p>}
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-[1fr_7rem]">
-        <div className="space-y-1.5 min-w-0">
-          <Label htmlFor="shipping-street">Straße</Label>
-          <Input
-            id="shipping-street"
-            autoComplete="address-line1"
-            value={value.street}
-            invalid={!!errors?.street}
-            onChange={(e) => patch("street", e.target.value)}
-          />
-          {errors?.street && <p className="text-xs text-destructive">{errors.street}</p>}
+      {deliveryMethod === "home" ? (
+        <>
+          <div className="grid gap-3 sm:grid-cols-[1fr_7rem]">
+            <div className="space-y-1.5 min-w-0">
+              <Label htmlFor="shipping-street">Straße</Label>
+              <Input
+                id="shipping-street"
+                autoComplete="address-line1"
+                value={value.street}
+                invalid={!!errors?.street}
+                onChange={(e) => patch("street", e.target.value)}
+              />
+              {errors?.street && <p className="text-xs text-destructive">{errors.street}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="shipping-house-number">Hausnummer</Label>
+              <Input
+                id="shipping-house-number"
+                autoComplete="address-line2"
+                value={value.houseNumber}
+                invalid={!!errors?.houseNumber}
+                onChange={(e) => patch("houseNumber", e.target.value)}
+              />
+              {errors?.houseNumber && <p className="text-xs text-destructive">{errors.houseNumber}</p>}
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="shipping-extra">Adresszusatz (optional)</Label>
+            <Input
+              id="shipping-extra"
+              autoComplete="address-line3"
+              value={value.addressExtra ?? ""}
+              invalid={!!errors?.addressExtra}
+              onChange={(e) => patch("addressExtra", e.target.value)}
+            />
+            {errors?.addressExtra && <p className="text-xs text-destructive">{errors.addressExtra}</p>}
+          </div>
+        </>
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="shipping-packstation">Packstation Nummer</Label>
+            <Input
+              id="shipping-packstation"
+              inputMode="numeric"
+              autoComplete="off"
+              value={value.packstationNumber}
+              invalid={!!errors?.packstationNumber}
+              onChange={(e) => patch("packstationNumber", e.target.value)}
+            />
+            {errors?.packstationNumber && (
+              <p className="text-xs text-destructive">{errors.packstationNumber}</p>
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="shipping-post-number">Postnummer</Label>
+            <Input
+              id="shipping-post-number"
+              inputMode="numeric"
+              autoComplete="off"
+              value={value.postNumber}
+              invalid={!!errors?.postNumber}
+              onChange={(e) => patch("postNumber", e.target.value)}
+            />
+            {errors?.postNumber && <p className="text-xs text-destructive">{errors.postNumber}</p>}
+          </div>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="shipping-house-number">Hausnummer</Label>
-          <Input
-            id="shipping-house-number"
-            autoComplete="address-line2"
-            value={value.houseNumber}
-            invalid={!!errors?.houseNumber}
-            onChange={(e) => patch("houseNumber", e.target.value)}
-          />
-          {errors?.houseNumber && <p className="text-xs text-destructive">{errors.houseNumber}</p>}
-        </div>
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="shipping-extra">Adresszusatz (optional)</Label>
-        <Input
-          id="shipping-extra"
-          autoComplete="address-line3"
-          value={value.addressExtra ?? ""}
-          invalid={!!errors?.addressExtra}
-          onChange={(e) => patch("addressExtra", e.target.value)}
-        />
-        {errors?.addressExtra && <p className="text-xs text-destructive">{errors.addressExtra}</p>}
-      </div>
+      )}
       <div className="grid gap-3 sm:grid-cols-[8rem_1fr]">
         <div className="space-y-1.5">
           <Label htmlFor="shipping-postal">PLZ</Label>

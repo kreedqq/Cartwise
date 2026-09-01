@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  formatDeliveryMethodLabel,
   formatShippingAddressLines,
   formatShippingRecipient,
   hasShippingSnapshot,
@@ -11,12 +12,17 @@ export function OrderShippingDetails({ snapshot }: { snapshot: OrderShippingSnap
   const recipient = formatShippingRecipient(snapshot);
   const lines = formatShippingAddressLines(snapshot);
   const hasAddress = hasShippingSnapshot(snapshot);
+  const deliveryLabel = formatDeliveryMethodLabel(snapshot.shipping_delivery_method);
 
   return (
     <div className="space-y-3 text-sm">
       <div>
         <p className="text-xs text-muted-foreground">Telegram Benutzername</p>
         <p className="font-medium">{telegram || "—"}</p>
+      </div>
+      <div>
+        <p className="text-xs text-muted-foreground">Lieferart</p>
+        <p className="font-medium">{deliveryLabel || "Nicht gespeichert"}</p>
       </div>
       {hasAddress ? (
         <div>

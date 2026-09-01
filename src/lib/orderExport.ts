@@ -1,9 +1,9 @@
-import { formatDateTime, formatEur, formatMoney, formatQuantity, formatUsd, GRAND_TOTAL_LABEL, SHIPPING_LABEL_CHINA, SHIPPING_LABEL_GERMANY, summarizeOrderCharges } from "@/lib/money";
+import { formatDateTime, formatMoney, formatQuantity, formatUsd, GRAND_TOTAL_LABEL, SHIPPING_LABEL_CHINA, SHIPPING_LABEL_GERMANY, summarizeOrderCharges } from "@/lib/money";
 import { downloadCsv } from "@/services/csvProducts";
 import { ORDER_STATUS_LABELS } from "@/services/orders";
 import { BRAND_NAME } from "@/lib/constants";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
-import { formatShippingAddressLines, formatShippingRecipient, hasShippingSnapshot } from "@/lib/shippingAddress";
+import { formatShippingAddressLines, formatShippingRecipient, formatDeliveryMethodLabel, hasShippingSnapshot } from "@/lib/shippingAddress";
 import type { OrderStatus, Tables } from "@/types/database";
 
 export interface OrderExportLine {
@@ -30,12 +30,16 @@ export interface OrderExportDoc {
   customerLabel?: string;
   customerEmail?: string | null;
   telegramUsername?: string | null;
+  deliveryMethodLabel?: string | null;
   shippingRecipient?: string | null;
   shippingLines?: string[];
   china_shipping_amount?: number | null;
   china_shipping_currency?: string | null;
   de_shipping_amount?: number | null;
   de_shipping_currency?: string | null;
+  catalogSubtotalUsd?: number | null;
+  roleSurchargeUsd?: number | null;
+  roleSurchargeUnavailable?: boolean;
   items: OrderExportLine[];
 }
 
@@ -51,6 +55,7 @@ export function buildOrderCsv(doc: OrderExportDoc): string {
     "Status",
     "Datum",
     "Telegram Benutzername",
+    "Lieferart",
     "Lieferadresse",
     "Code",
     "Name",
@@ -67,6 +72,7 @@ export function buildOrderCsv(doc: OrderExportDoc): string {
       ORDER_STATUS_LABELS[doc.status],
       formatDateTime(doc.submitted_at),
       doc.telegramUsername ?? "",
+      doc.deliveryMethodLabel ?? "",
       [doc.shippingRecipient, ...(doc.shippingLines ?? [])].filter(Boolean).join(", "),
       item.product_code_snapshot,
       item.product_name_snapshot,
@@ -91,11 +97,16 @@ export function buildOrderCsv(doc: OrderExportDoc): string {
   });
   const summary = [
     "",
+    doc.catalogSubtotalUsd != null && doc.roleSurchargeUsd != null
+      ? ["Zwischensumme USD", doc.catalogSubtotalUsd].map(csvEscape).join(";")
+      : "",
+    doc.roleSurchargeUsd != null ? ["Rollenaufschlag USD", doc.roleSurchargeUsd].map(csvEscape).join(";") : "",
+    doc.roleSurchargeUnavailable ? ["Rollenaufschlag", "nicht verfügbar"].map(csvEscape).join(";") : "",
     ["Produktsumme USD", doc.total_usd].map(csvEscape).join(";"),
     [SHIPPING_LABEL_CHINA, doc.china_shipping_amount ?? "", doc.china_shipping_currency ?? ""].map(csvEscape).join(";"),
     [SHIPPING_LABEL_GERMANY, doc.de_shipping_amount ?? "", doc.de_shipping_currency ?? ""].map(csvEscape).join(";"),
     [GRAND_TOTAL_LABEL, charges.grandDisplay].map(csvEscape).join(";"),
-  ];
+  ].filter(Boolean);
   return [header.join(";"), ...rows, ...summary].join("\n");
 }
 
@@ -107,6 +118,8 @@ export function buildOrdersListCsv(
     total_usd: number;
     total_eur: number | null;
     customerLabel: string;
+    telegramUsername?: string | null;
+    deliveryMethodLabel?: string | null;
     china_shipping_amount?: number | null;
     china_shipping_currency?: string | null;
     de_shipping_amount?: number | null;
@@ -117,8 +130,10 @@ export function buildOrdersListCsv(
   const header = [
     "Bestellnummer",
     "Kunde",
+    "Telegram Benutzername",
     "Datum",
     "Status",
+    "Lieferart",
     "Produktsumme USD",
     "Produktsumme EUR",
     SHIPPING_LABEL_CHINA,
@@ -140,8 +155,10 @@ export function buildOrdersListCsv(
     return [
       order.order_number,
       order.customerLabel,
+      order.telegramUsername ?? "",
       formatDateTime(order.submitted_at),
       ORDER_STATUS_LABELS[order.status],
+      order.deliveryMethodLabel ?? "",
       order.total_usd,
       order.total_eur ?? "",
       order.china_shipping_amount ?? "",
@@ -154,6 +171,54 @@ export function buildOrdersListCsv(
       .join(";");
   });
   return [header.join(";"), ...rows].join("\n");
+}
+
+export function buildAdminOrderItemsCsv(
+  rows: Array<{
+    order_number: string;
+    submitted_at: string;
+    telegramUsername: string | null;
+    productCode: string;
+    productName: string;
+    quantity: number;
+    unitPriceUsd: number;
+    lineTotalUsd: number;
+    deliveryMethodLabel: string | null;
+    roleSurchargeUsd: number | null;
+    orderTotalUsd: number;
+  }>,
+): string {
+  const header = [
+    "Bestellnummer",
+    "Datum",
+    "Telegram Benutzername",
+    "Artikel Code",
+    "Produktname",
+    "Menge",
+    "Stückpreis",
+    "Gesamtpreis",
+    "Lieferart",
+    "Rollenaufschlag",
+    "Gesamt",
+  ];
+  const body = rows.map((row) =>
+    [
+      row.order_number,
+      formatDateTime(row.submitted_at),
+      row.telegramUsername ?? "",
+      row.productCode,
+      row.productName,
+      formatQuantity(row.quantity),
+      row.unitPriceUsd,
+      row.lineTotalUsd,
+      row.deliveryMethodLabel ?? "",
+      row.roleSurchargeUsd ?? "",
+      row.orderTotalUsd,
+    ]
+      .map(csvEscape)
+      .join(";"),
+  );
+  return [header.join(";"), ...body].join("\n");
 }
 
 export function downloadOrderCsv(doc: OrderExportDoc): void {
@@ -172,9 +237,8 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-/** Opens a print window with a professional order document. The browser's
- * "Als PDF speichern" then produces the actual PDF from the frozen snapshots. */
-export function printOrderDocument(doc: OrderExportDoc): void {
+/** HTML for the Bestellzusammenfassung print window / PDF. */
+export function buildOrderPrintHtml(doc: OrderExportDoc): string {
   const rows = doc.items
     .map(
       (item) => `<tr>
@@ -184,10 +248,8 @@ export function printOrderDocument(doc: OrderExportDoc): void {
           return variant ? `<br><span class="muted">${escapeHtml(variant)}</span>` : "";
         })()}</td>
         <td class="num">${escapeHtml(formatQuantity(item.quantity))}</td>
-        <td>${item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normalpreis"}</td>
         <td class="num">${escapeHtml(formatUsd(item.unit_price_usd_snapshot))}</td>
         <td class="num">${escapeHtml(formatUsd(item.line_total_usd))}</td>
-        <td class="num">${item.eur_value_snapshot != null ? escapeHtml(formatEur(item.eur_value_snapshot)) : "—"}</td>
       </tr>`,
     )
     .join("");
@@ -201,11 +263,23 @@ export function printOrderDocument(doc: OrderExportDoc): void {
     deCurrency: doc.de_shipping_currency,
     usdToEurRate: doc.exchange_rate,
   });
-  const html = `<!DOCTYPE html>
+  const surchargeBlock =
+    doc.catalogSubtotalUsd != null && doc.roleSurchargeUsd != null
+      ? `<div>Zwischensumme: ${escapeHtml(formatUsd(doc.catalogSubtotalUsd))}</div>
+    <div>Rollenaufschlag: ${escapeHtml(formatUsd(doc.roleSurchargeUsd))}</div>`
+      : doc.roleSurchargeUnavailable
+        ? `<div>Rollenaufschlag nicht verfügbar</div>`
+        : "";
+  const addressHtml =
+    doc.shippingRecipient || (doc.shippingLines && doc.shippingLines.length > 0)
+      ? `<p>Lieferadresse<br>${doc.shippingRecipient ? `<strong>${escapeHtml(doc.shippingRecipient)}</strong><br>` : ""}${(doc.shippingLines ?? []).map((line) => escapeHtml(line)).join("<br>")}</p>`
+      : "";
+
+  return `<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <title>${escapeHtml(doc.order_number)}</title>
+  <title>Bestellzusammenfassung ${escapeHtml(doc.order_number)}</title>
   <style>
     body { font-family: "Segoe UI", system-ui, sans-serif; color: #1a1612; margin: 32px; font-size: 13px; background: #fff; }
     h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: 0.18em; text-transform: uppercase; color: #b8893a; }
@@ -224,7 +298,8 @@ export function printOrderDocument(doc: OrderExportDoc): void {
   <header>
     <div>
       <h1>${escapeHtml(BRAND_NAME)}</h1>
-      <p class="muted">Bestellung ${escapeHtml(doc.order_number)}</p>
+      <p class="muted">BESTELLZUSAMMENFASSUNG</p>
+      <p>Bestellung: <strong>${escapeHtml(doc.order_number)}</strong></p>
     </div>
     <div class="muted" style="text-align:right">
       <div>${escapeHtml(ORDER_STATUS_LABELS[doc.status])}</div>
@@ -233,27 +308,35 @@ export function printOrderDocument(doc: OrderExportDoc): void {
   </header>
   ${doc.customerLabel ? `<p>Kunde: <strong>${escapeHtml(doc.customerLabel)}</strong>${doc.customerEmail ? ` · ${escapeHtml(doc.customerEmail)}` : ""}</p>` : ""}
   ${doc.telegramUsername ? `<p>Telegram Benutzername: <strong>${escapeHtml(doc.telegramUsername)}</strong></p>` : ""}
-  ${doc.shippingRecipient || (doc.shippingLines && doc.shippingLines.length > 0) ? `<p>Lieferadresse<br>${doc.shippingRecipient ? `<strong>${escapeHtml(doc.shippingRecipient)}</strong><br>` : ""}${(doc.shippingLines ?? []).map((line) => escapeHtml(line)).join("<br>")}</p>` : ""}
+  ${doc.deliveryMethodLabel ? `<p>Lieferart: <strong>${escapeHtml(doc.deliveryMethodLabel)}</strong></p>` : ""}
+  ${addressHtml}
   <table>
     <thead>
       <tr>
-        <th>Code</th><th>Artikel</th><th class="num">Menge</th><th>Preisart</th>
-        <th class="num">Einzelpreis</th><th class="num">Gesamt USD</th><th class="num">Gesamt EUR</th>
+        <th>SKU</th><th>Produkt</th><th class="num">Menge</th>
+        <th class="num">Einzelpreis</th><th class="num">Gesamt</th>
       </tr>
     </thead>
     <tbody>${rows}</tbody>
   </table>
   <div class="totals">
-    <div>Produktsumme: ${escapeHtml(formatUsd(doc.total_usd))}</div>
+    ${surchargeBlock}
+    <div>Gesamt: ${escapeHtml(formatUsd(doc.total_usd))}</div>
     ${charges.china ? `<div>${SHIPPING_LABEL_CHINA}: ${escapeHtml(formatMoney(charges.china.amount, charges.china.currency))}</div>` : ""}
     ${charges.germany ? `<div>${SHIPPING_LABEL_GERMANY}: ${escapeHtml(formatMoney(charges.germany.amount, charges.germany.currency))}</div>` : ""}
     <div><strong>${GRAND_TOTAL_LABEL}: ${escapeHtml(charges.grandDisplay)}</strong></div>
     ${doc.exchange_rate != null ? `<div class="muted">Wechselkurs USD→EUR: ${doc.exchange_rate}</div>` : ""}
+    <div class="muted">Währung: USD</div>
   </div>
   ${doc.note ? `<p><strong>Bestellnotiz</strong><br>${escapeHtml(doc.note)}</p>` : ""}
 </body>
 </html>`;
+}
 
+/** Opens a print window with a professional order document. The browser's
+ * "Als PDF speichern" then produces the actual PDF from the frozen snapshots. */
+export function printOrderDocument(doc: OrderExportDoc): void {
+  const html = buildOrderPrintHtml(doc);
   const frame = window.open("", "_blank", "noopener,noreferrer,width=900,height=700");
   if (!frame) return;
   frame.document.write(html);
@@ -266,8 +349,12 @@ export function toOrderExportDoc(
   order: Tables<"orders">,
   items: Tables<"order_items">[],
   customer?: { displayName: string; email: string | null },
+  roleSurcharge?: { catalogSubtotalUsd: number; surchargeUsd: number } | null,
+  options?: { audience?: "admin" | "customer" },
 ): OrderExportDoc {
   const telegramUsername = order.telegram_username_snapshot?.trim() || customer?.displayName || undefined;
+  const audience = options?.audience ?? "customer";
+  const surchargeUnavailable = audience === "admin" && !roleSurcharge;
   return {
     order_number: order.order_number,
     status: order.status,
@@ -283,8 +370,12 @@ export function toOrderExportDoc(
     customerLabel: telegramUsername ?? customer?.displayName,
     customerEmail: customer?.email,
     telegramUsername: order.telegram_username_snapshot?.trim() || null,
+    deliveryMethodLabel: formatDeliveryMethodLabel(order.shipping_delivery_method),
     shippingRecipient: formatShippingRecipient(order),
     shippingLines: hasShippingSnapshot(order) ? formatShippingAddressLines(order) : [],
+    catalogSubtotalUsd: roleSurcharge?.catalogSubtotalUsd ?? null,
+    roleSurchargeUsd: roleSurcharge?.surchargeUsd ?? null,
+    roleSurchargeUnavailable: surchargeUnavailable,
     items,
   };
 }

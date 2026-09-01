@@ -36,6 +36,7 @@ const AdminAuditLogPage = lazy(() => import("@/pages/admin/AdminAuditLog"));
 const AdminOrdersPage = lazy(() => import("@/pages/admin/AdminOrders"));
 const AdminOrderDetailPage = lazy(() => import("@/pages/admin/AdminOrderDetail"));
 const AdminRolesPage = lazy(() => import("@/pages/admin/AdminRoles"));
+const AdminRoleSurchargesPage = lazy(() => import("@/pages/admin/AdminRoleSurcharges"));
 const AdminShippingPage = lazy(() => import("@/pages/admin/AdminShipping"));
 const AdminResearchPage = lazy(() => import("@/pages/admin/AdminResearch"));
 const PeptideHubPage = lazy(() => import("@/pages/peptide/PeptideHub"));
@@ -123,6 +124,7 @@ export default function App() {
                     <Route path="orders" element={<AdminOrdersPage />} />
                     <Route path="orders/:orderId" element={<AdminOrderDetailPage />} />
                     <Route path="roles" element={<AdminRolesPage />} />
+                    <Route path="surcharges" element={<AdminRoleSurchargesPage />} />
                     <Route path="shipping" element={<AdminShippingPage />} />
                     <Route path="products" element={<AdminProductsPage />} />
                     <Route path="pdf-import" element={<AdminPdfImportPage />} />

@@ -2,7 +2,13 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-01** (quantity tier unit price for Injectable Oils pack totals).
+Last documentation pass: **2026-09-01** (checkout Lieferart, Meine Bestellungen / Bestelleingänge, grouped admin nav, admin Bestellzusammenfassung PDF).
+
+**Update 2026-09-01 (orders checkout admin nav)**: Checkout requires Lieferart (`home` / `packstation`) plus the matching address fields; `create_order` snapshots them on the order (migration `0045`). Customer nav is **Meine Bestellungen**; admin inbox is **Bestelleingänge**. Admin nav is grouped (Übersicht, Bestellungen, Produkte, Finanzen, Benutzer, Inhalte). Role pricing, quantity tier, kits, cart naming, auth, and payment methods were not changed.
+
+**Update 2026-09-01 (role surcharge reporting)**: Admin `/admin/surcharges` reports actual USD markups from `order_role_surcharge_lines` written at `create_order`. Catalog unit = existing pricing engine at 0% after quantity tier; selling = stored line total. Current `user_customer_roles` are not used. Migration `0044` is additive (admin-only table). Product prices, kit pricing, and role percents were not changed.
+
+**Update 2026-09-01 (quantity tier unit price for Injectable Oils pack totals).**
 
 **Update 2026-09-01 (quantity tier pricing)**: Oils `bulk_price_usd` greater than `price_usd` with `bulk_price_min_quantity > 1` is a pack total (18 / 160 at min 10 → 16 per unit). Client `getEffectiveUnitPrice` and SQL `sell_unit_price` / `selling_prices_for` convert that to a unit price before `quantity × unit`. Peptide/oral unit bulks (60 / 55) are unchanged. Kit pricing functions were not modified. Catalog product rows were not updated. Migration `0043` is function-only.
 
@@ -66,11 +72,11 @@ Peptide routes sit behind `ProtectedRoute` (same login as shop).
 
 ### Navigation (logged-in `AppShell`)
 
-Sidebar: Übersicht `/dashboard`, Shop `/shop`, **Kit Gesuche** `/kit-gesuche`, **Lexikon & Rechner** `/peptide`, Bestellungen `/orders`, Profil `/profile`, Admin `/admin` (admins).
+Sidebar: Übersicht `/dashboard`, Shop `/shop`, **Kit Gesuche** `/kit-gesuche`, **Lexikon & Rechner** `/peptide`, **Meine Bestellungen** `/orders`, Profil `/profile`, Admin `/admin` (admins).
 
 Mobile: same set plus Favorites in `MAIN_NAV_ITEMS`; peptide label **Lexikon & Rechner**; Kit Gesuche short label **Kits** on the bottom bar.
 
-Admin nav: Übersicht, Bestellungen, Rollen & Preisregeln, Versandkosten, Produkte, Produktimport, Import-Historie, Benutzer, Audit-Log, Research.
+Admin nav (grouped): Übersicht; Bestellungen → Bestelleingänge; Produkte → Produktkatalog / Import / Import-Verlauf; Finanzen → Rollenaufschläge / Rollen & Preise / Versand; Benutzer → Benutzer / Audit-Log; Inhalte → Research.
 
 ### Routes (`src/App.tsx`)
 
@@ -78,7 +84,7 @@ Public: `/login`, `/auth/callback`, `/register`, `/forgot-password`, `/reset-pas
 
 Protected: `/shop`, `/kit-gesuche`, `/favorites`, `/dashboard`, `/carts/:cartId`, `/carts/:cartId/checkout`, `/orders`, `/orders/:orderId`, `/profile`, `/peptide`, `/peptide/rechner`, `/peptide/lexikon`, `/peptide/lexikon/:slug`.
 
-Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/roles`, `/admin/shipping`, `/admin/products`, `/admin/pdf-import`, `/admin/import-history`, `/admin/users`, `/admin/audit-log`, `/admin/research`.
+Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/roles`, `/admin/surcharges`, `/admin/shipping`, `/admin/products`, `/admin/pdf-import`, `/admin/import-history`, `/admin/users`, `/admin/audit-log`, `/admin/research`.
 
 `/` → `/dashboard`. Unknown → `NotFound`.
 

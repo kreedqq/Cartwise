@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildOrderCsv, buildOrdersListCsv, toOrderExportDoc } from "@/lib/orderExport";
+import { buildAdminOrderItemsCsv, buildOrderCsv, buildOrderPrintHtml, buildOrdersListCsv, toOrderExportDoc } from "@/lib/orderExport";
 import {
   canPermanentlyDeleteOrder,
   CUSTOMER_ORDER_COLUMNS,
@@ -21,11 +21,14 @@ function makeOrder(overrides: Partial<Tables<"orders">> = {}): Tables<"orders"> 
     note: "Bitte hier liefern",
     payment_method: null,
     telegram_username_snapshot: null,
+    shipping_delivery_method: null,
     shipping_first_name: null,
     shipping_last_name: null,
     shipping_street: null,
     shipping_house_number: null,
     shipping_address_extra: null,
+    shipping_packstation_number: null,
+    shipping_post_number: null,
     shipping_postal_code: null,
     shipping_city: null,
     shipping_country: null,
@@ -121,9 +124,12 @@ describe("nextOrderStatuses", () => {
         "shipping_address_extra",
         "shipping_city",
         "shipping_country",
+        "shipping_delivery_method",
         "shipping_first_name",
         "shipping_house_number",
         "shipping_last_name",
+        "shipping_packstation_number",
+        "shipping_post_number",
         "shipping_postal_code",
         "shipping_street",
         "status",
@@ -155,6 +161,22 @@ describe("order CSV / PDF snapshot source", () => {
     expect(csv).toContain("Gesamt Endpreis inkl. Versand");
   });
 
+  it("includes a frozen role surcharge on admin export when snapshots exist", () => {
+    const csv = buildOrderCsv(
+      toOrderExportDoc(makeOrder(), [makeItem()], undefined, { catalogSubtotalUsd: 160, surchargeUsd: 40 }),
+    );
+    expect(csv).toContain("Zwischensumme USD");
+    expect(csv).toContain("160");
+    expect(csv).toContain("Rollenaufschlag USD");
+    expect(csv).toContain("40");
+  });
+
+  it("does not invent a surcharge percent when no snapshot is provided", () => {
+    const csv = buildOrderCsv(toOrderExportDoc(makeOrder(), [makeItem()]));
+    expect(csv).not.toContain("Rollenaufschlag");
+    expect(csv).not.toContain("25 %");
+  });
+
   it("exports a filtered admin list", () => {
     const csv = buildOrdersListCsv([
       {
@@ -164,11 +186,88 @@ describe("order CSV / PDF snapshot source", () => {
         total_usd: 420,
         total_eur: 360,
         customerLabel: "Ada",
+        telegramUsername: "ExampleUser",
+        deliveryMethodLabel: "Paketstation",
       },
     ]);
     expect(csv).toContain("CW-2026-000002");
     expect(csv).toContain("Ada");
+    expect(csv).toContain("ExampleUser");
+    expect(csv).toContain("Paketstation");
     expect(csv).toContain("In Bearbeitung");
     expect(csv).toContain("420");
+  });
+
+  it("exports admin line items with SKU, name, qty, prices, delivery and total", () => {
+    const csv = buildAdminOrderItemsCsv([
+      {
+        order_number: "CW-2026-000045",
+        submitted_at: "2026-09-01T08:00:00.000Z",
+        telegramUsername: "ExampleUser",
+        productCode: "OXO50",
+        productName: "Anadrol",
+        quantity: 10,
+        unitPriceUsd: 20,
+        lineTotalUsd: 200,
+        deliveryMethodLabel: "Haustür Zustellung",
+        roleSurchargeUsd: 40,
+        orderTotalUsd: 200,
+      },
+    ]);
+    expect(csv).toContain("Bestellnummer");
+    expect(csv).toContain("CW-2026-000045");
+    expect(csv).toContain("ExampleUser");
+    expect(csv).toContain("OXO50");
+    expect(csv).toContain("Anadrol");
+    expect(csv).toContain("Haustür Zustellung");
+    expect(csv).toContain("40");
+    expect(csv).toContain("200");
+  });
+
+  it("builds a Bestellzusammenfassung PDF with article, delivery, address and surcharge", () => {
+    const html = buildOrderPrintHtml(
+      toOrderExportDoc(
+        makeOrder({
+          telegram_username_snapshot: "ExampleUser",
+          shipping_delivery_method: "home",
+          shipping_first_name: "Max",
+          shipping_last_name: "Mustermann",
+          shipping_street: "Musterstraße",
+          shipping_house_number: "10",
+          shipping_postal_code: "12345",
+          shipping_city: "Hamburg",
+          shipping_country: "Deutschland",
+          total_usd: 200,
+        }),
+        [makeItem({ product_code_snapshot: "OXO50", product_name_snapshot: "Anadrol", quantity: 10, unit_price_usd_snapshot: 20, line_total_usd: 200 })],
+        undefined,
+        { catalogSubtotalUsd: 160, surchargeUsd: 40 },
+        { audience: "admin" },
+      ),
+    );
+    expect(html).toContain("BESTELLZUSAMMENFASSUNG");
+    expect(html).toContain("OXO50");
+    expect(html).toContain("ANADROL");
+    expect(html).toContain("ExampleUser");
+    expect(html).toContain("Haustür Zustellung");
+    expect(html).toContain("Musterstraße");
+    expect(html).toContain("Hamburg");
+    expect(html).toContain("Zwischensumme");
+    expect(html).toContain("Rollenaufschlag");
+    expect(html).toContain("160,00");
+    expect(html).toContain("40,00");
+    expect(html).toContain("200,00");
+    expect(html).not.toContain("1,25");
+  });
+
+  it("does not invent a surcharge on admin PDF when the snapshot is missing", () => {
+    const html = buildOrderPrintHtml(toOrderExportDoc(makeOrder(), [makeItem()], undefined, null, { audience: "admin" }));
+    expect(html).toContain("Rollenaufschlag nicht verfügbar");
+    expect(html).not.toContain("25 %");
+  });
+
+  it("hides role surcharge on customer PDF even when no snapshot exists", () => {
+    const html = buildOrderPrintHtml(toOrderExportDoc(makeOrder(), [makeItem()]));
+    expect(html).not.toContain("Rollenaufschlag");
   });
 });

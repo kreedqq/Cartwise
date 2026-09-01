@@ -8,7 +8,7 @@ export interface OrderWithItems extends Tables<"orders"> {
 }
 
 export const CUSTOMER_ORDER_COLUMNS =
-  "id, order_number, user_id, cart_id, status, note, payment_method, telegram_username_snapshot, shipping_first_name, shipping_last_name, shipping_street, shipping_house_number, shipping_address_extra, shipping_postal_code, shipping_city, shipping_country, total_usd, total_eur, exchange_rate, submitted_at, created_at, updated_at, china_shipping_amount, china_shipping_currency, de_shipping_amount, de_shipping_currency";
+  "id, order_number, user_id, cart_id, status, note, payment_method, telegram_username_snapshot, shipping_delivery_method, shipping_first_name, shipping_last_name, shipping_street, shipping_house_number, shipping_address_extra, shipping_packstation_number, shipping_post_number, shipping_postal_code, shipping_city, shipping_country, total_usd, total_eur, exchange_rate, submitted_at, created_at, updated_at, china_shipping_amount, china_shipping_currency, de_shipping_amount, de_shipping_currency";
 
 /** Customer: their own orders (RLS-scoped), most recent first. */
 export async function listMyOrders(): Promise<Tables<"orders">[]> {
@@ -74,19 +74,41 @@ export async function createOrder(
   paymentMethod: PaymentMethod,
   shipping: ShippingAddress,
 ): Promise<CreateOrderResult> {
-  const { data, error } = await supabase.rpc("create_order", {
-    _cart_id: cartId,
-    _note: note,
-    _payment_method: paymentMethod,
-    _shipping_first_name: shipping.firstName,
-    _shipping_last_name: shipping.lastName,
-    _shipping_street: shipping.street,
-    _shipping_house_number: shipping.houseNumber,
-    _shipping_address_extra: shipping.addressExtra ?? null,
-    _shipping_postal_code: shipping.postalCode,
-    _shipping_city: shipping.city,
-    _shipping_country: shipping.country,
-  });
+  const payload =
+    shipping.deliveryMethod === "home"
+      ? {
+          _cart_id: cartId,
+          _note: note,
+          _payment_method: paymentMethod,
+          _shipping_delivery_method: shipping.deliveryMethod,
+          _shipping_first_name: shipping.firstName,
+          _shipping_last_name: shipping.lastName,
+          _shipping_street: shipping.street,
+          _shipping_house_number: shipping.houseNumber,
+          _shipping_address_extra: shipping.addressExtra ?? null,
+          _shipping_packstation_number: null,
+          _shipping_post_number: null,
+          _shipping_postal_code: shipping.postalCode,
+          _shipping_city: shipping.city,
+          _shipping_country: shipping.country,
+        }
+      : {
+          _cart_id: cartId,
+          _note: note,
+          _payment_method: paymentMethod,
+          _shipping_delivery_method: shipping.deliveryMethod,
+          _shipping_first_name: shipping.firstName,
+          _shipping_last_name: shipping.lastName,
+          _shipping_street: null,
+          _shipping_house_number: null,
+          _shipping_address_extra: null,
+          _shipping_packstation_number: shipping.packstationNumber,
+          _shipping_post_number: shipping.postNumber,
+          _shipping_postal_code: shipping.postalCode,
+          _shipping_city: shipping.city,
+          _shipping_country: shipping.country,
+        };
+  const { data, error } = await supabase.rpc("create_order", payload);
   if (error) throw error;
   return data as unknown as CreateOrderResult;
 }

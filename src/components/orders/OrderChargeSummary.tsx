@@ -12,14 +12,37 @@ interface OrderChargeSummaryProps {
   charges: OrderCharges;
   /** Checkout: shipping is assigned by an admin after the order exists. */
   shippingPending?: boolean;
+  /** Admin-only frozen role surcharge. Omitted when no snapshot exists. */
+  catalogSubtotalUsd?: number | null;
+  roleSurchargeUsd?: number | null;
 }
 
-export function OrderChargeSummary({ charges, shippingPending = false }: OrderChargeSummaryProps) {
+export function OrderChargeSummary({
+  charges,
+  shippingPending = false,
+  catalogSubtotalUsd,
+  roleSurchargeUsd,
+}: OrderChargeSummaryProps) {
   const showConversion = !shippingPending && charges.convertedEur != null;
+  const showRoleSurcharge =
+    catalogSubtotalUsd != null && roleSurchargeUsd != null && Number.isFinite(catalogSubtotalUsd) && Number.isFinite(roleSurchargeUsd);
 
   return (
     <div className="space-y-2 rounded-xl border border-border bg-card p-4 text-sm">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Summen</p>
+
+      {showRoleSurcharge && (
+        <>
+          <div className="flex justify-between">
+            <span>Zwischensumme</span>
+            <span className="tabular-nums">{formatUsd(catalogSubtotalUsd)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Rollenaufschlag</span>
+            <span className="tabular-nums">{formatUsd(roleSurchargeUsd)}</span>
+          </div>
+        </>
+      )}
 
       <div className="flex justify-between">
         <span>Produktsumme</span>

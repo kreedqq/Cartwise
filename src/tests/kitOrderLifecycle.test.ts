@@ -93,6 +93,51 @@ describe("0042 create_order preserves kit completion and adds checkout snapshots
   });
 });
 
+describe("0044 create_order still preserves kit completion and snapshots surcharge", () => {
+  const sql = readMigration("0044_order_role_surcharge_snapshots.sql");
+
+  it("still only promotes the kit after every participant ordered", () => {
+    expect(sql).toMatch(/_kit\.status not in \('full', 'ordered'\)/);
+    expect(sql).toMatch(/where kit_share_id = _kit_share_id and ordered_at is null/);
+    expect(sql).toMatch(/if _remaining_unordered = 0 then/);
+  });
+
+  it("still rejects a second submit of an already ordered cart", () => {
+    expect(sql).toMatch(/if _cart\.status not in \('draft', 'ready'\) then/);
+  });
+
+  it("records catalog unit via sell_unit_price at 0% and does not hardcode 25%", () => {
+    expect(sql).toMatch(/sell_unit_price\(/);
+    expect(sql).toMatch(/order_role_surcharge_lines/);
+    expect(sql).not.toMatch(/0\.25|1\.25/);
+  });
+});
+
+describe("0045 create_order still preserves kit completion and snapshots surcharge plus Lieferart", () => {
+  const sql = readMigration("0045_order_delivery_method.sql");
+
+  it("still only promotes the kit after every participant ordered", () => {
+    expect(sql).toMatch(/_kit\.status not in \('full', 'ordered'\)/);
+    expect(sql).toMatch(/where kit_share_id = _kit_share_id and ordered_at is null/);
+    expect(sql).toMatch(/if _remaining_unordered = 0 then/);
+  });
+
+  it("still rejects a second submit of an already ordered cart", () => {
+    expect(sql).toMatch(/if _cart\.status not in \('draft', 'ready'\) then/);
+  });
+
+  it("still records catalog unit via sell_unit_price at 0% and does not hardcode 25%", () => {
+    expect(sql).toMatch(/sell_unit_price\(/);
+    expect(sql).toMatch(/order_role_surcharge_lines/);
+    expect(sql).not.toMatch(/0\.25|1\.25/);
+  });
+
+  it("requires Lieferart on the server", () => {
+    expect(sql).toMatch(/Bitte wählen Sie eine Lieferart aus/);
+    expect(sql).toMatch(/shipping_delivery_method/);
+  });
+});
+
 describe("Dashboard: ordered carts must disappear from the active cart overview (Phase 5)", () => {
   it("filters carts through isOpenCart before rendering the 'Warenkörbe' grid", () => {
     const tsx = readFileSync(resolve(process.cwd(), "src/pages/Dashboard.tsx"), "utf8");

@@ -14,8 +14,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { useAdminOrderItems, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
-import { buildOrdersListCsv, downloadOrdersListCsv } from "@/lib/orderExport";
+import { buildAdminOrderItemsCsv, downloadOrdersListCsv } from "@/lib/orderExport";
 import { formatDateTime, formatUsd, summarizeOrderCharges } from "@/lib/money";
+import { formatDeliveryMethodLabel } from "@/lib/shippingAddress";
 import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS } from "@/lib/shop/paymentMethod";
 import { ORDER_STATUS_LABELS } from "@/services/orders";
 import type { OrderStatus } from "@/types/database";
@@ -58,7 +59,7 @@ export default function AdminOrdersPage() {
       }
       if (!term) return true;
       const customer = directory?.get(order.user_id);
-      const customerHay = `${customer?.displayName ?? ""} ${customer?.email ?? ""}`.toLowerCase();
+      const customerHay = `${customer?.displayName ?? ""} ${customer?.email ?? ""} ${order.telegram_username_snapshot ?? ""}`.toLowerCase();
       if (order.order_number.toLowerCase().includes(term)) return true;
       if (customerHay.includes(term)) return true;
       return items.some(
@@ -71,23 +72,45 @@ export default function AdminOrdersPage() {
   }, [ordersQuery.data, itemsQuery.data, directoryQuery.data, search, status, payment]);
 
   function handleExport() {
-    const directory = directoryQuery.data;
+    const items = itemsQuery.data ?? [];
     downloadOrdersListCsv(
-      "bestellungen.csv",
-      buildOrdersListCsv(
-        filtered.map((order) => ({
-          order_number: order.order_number,
-          status: order.status,
-          submitted_at: order.submitted_at,
-          total_usd: order.total_usd,
-          total_eur: order.total_eur,
-          customerLabel: directory?.get(order.user_id)?.displayName ?? order.user_id,
-          china_shipping_amount: order.china_shipping_amount,
-          china_shipping_currency: order.china_shipping_currency,
-          de_shipping_amount: order.de_shipping_amount,
-          de_shipping_currency: order.de_shipping_currency,
-          exchange_rate: order.exchange_rate,
-        })),
+      "bestelleingaenge.csv",
+      buildAdminOrderItemsCsv(
+        filtered.flatMap((order) => {
+          const telegram = order.telegram_username_snapshot?.trim() || null;
+          const delivery = formatDeliveryMethodLabel(order.shipping_delivery_method);
+          const orderItems = items.filter((item) => item.order_id === order.id);
+          if (orderItems.length === 0) {
+            return [
+              {
+                order_number: order.order_number,
+                submitted_at: order.submitted_at,
+                telegramUsername: telegram,
+                productCode: "",
+                productName: "",
+                quantity: 0,
+                unitPriceUsd: 0,
+                lineTotalUsd: 0,
+                deliveryMethodLabel: delivery,
+                roleSurchargeUsd: null,
+                orderTotalUsd: order.total_usd,
+              },
+            ];
+          }
+          return orderItems.map((item) => ({
+            order_number: order.order_number,
+            submitted_at: order.submitted_at,
+            telegramUsername: telegram,
+            productCode: item.product_code_snapshot,
+            productName: item.product_name_snapshot,
+            quantity: item.quantity,
+            unitPriceUsd: item.unit_price_usd_snapshot,
+            lineTotalUsd: item.line_total_usd,
+            deliveryMethodLabel: delivery,
+            roleSurchargeUsd: null,
+            orderTotalUsd: order.total_usd,
+          }));
+        }),
       ),
     );
   }
@@ -97,7 +120,7 @@ export default function AdminOrdersPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        title="Bestellungen"
+        title="Bestelleingänge"
         description={`${filtered.length} ${filtered.length === 1 ? "Bestellung" : "Bestellungen"}${hasFilters ? " gefunden" : " gesamt"}`}
         actions={
           <Button variant="outline" size="sm" onClick={handleExport} disabled={filtered.length === 0}>

@@ -73,6 +73,40 @@ describe("0042 telegram identity carts and checkout", () => {
   });
 });
 
+describe("0044 create_order keeps telegram shipping snapshots", () => {
+  const sql = readSource("supabase/migrations/0044_order_role_surcharge_snapshots.sql");
+
+  it("still snapshots telegram username and shipping address", () => {
+    expect(sql).toMatch(/telegram_username_snapshot/);
+    expect(sql).toMatch(/shipping_street/);
+    expect(sql).toMatch(/Bitte Vorname angeben/);
+  });
+});
+
+describe("0045 create_order snapshots Lieferart", () => {
+  const sql = readSource("supabase/migrations/0045_order_delivery_method.sql");
+
+  it("adds delivery method and Packstation snapshot columns", () => {
+    expect(sql).toMatch(/shipping_delivery_method/);
+    expect(sql).toMatch(/shipping_packstation_number/);
+    expect(sql).toMatch(/shipping_post_number/);
+    expect(sql).toMatch(/Bitte wählen Sie eine Lieferart aus/);
+    expect(sql).toMatch(/Bitte Packstation Nummer angeben/);
+    expect(sql).toMatch(/Bitte Postnummer angeben/);
+  });
+
+  it("validates Haustür and Packstation server-side and does not hardcode 25%", () => {
+    expect(sql).toMatch(/_delivery = 'home'/);
+    expect(sql).toMatch(/Bitte Straße angeben/);
+    expect(sql).not.toMatch(/0\.25|1\.25/);
+  });
+
+  it("still snapshots telegram username", () => {
+    expect(sql).toMatch(/telegram_username_snapshot/);
+    expect(sql).toMatch(/Bitte zuerst einen Telegram Benutzernamen festlegen/);
+  });
+});
+
 describe("address privacy", () => {
   it("does not expose shipping columns in kit request SQL payloads", () => {
     const kitSql = readSource("supabase/migrations/0041_kit_requests.sql");
@@ -89,18 +123,21 @@ describe("address privacy", () => {
   it("customer order columns include own shipping snapshot but never admin_note", () => {
     const orders = readSource("src/services/orders.ts");
     expect(orders).toContain("shipping_street");
+    expect(orders).toContain("shipping_delivery_method");
     expect(orders).toContain("telegram_username_snapshot");
     const columns = orders.match(/export const CUSTOMER_ORDER_COLUMNS =\s*"([^"]+)"/)?.[1] ?? "";
     expect(columns).toContain("shipping_street");
+    expect(columns).toContain("shipping_delivery_method");
     expect(columns).not.toContain("admin_note");
   });
 });
 
 describe("checkout and auth race guards", () => {
-  it("checkout validates address before create_order", () => {
+  it("checkout validates Lieferart and address before create_order", () => {
     const checkout = readSource("src/pages/Checkout.tsx");
     expect(checkout).toContain("ShippingAddressFields");
-    expect(checkout).toContain("shippingAddressSchema");
+    expect(checkout).toContain("DeliveryMethodSelector");
+    expect(checkout).toContain("parseCheckoutShipping");
     expect(checkout).toContain("PaymentMethodSelector");
   });
 

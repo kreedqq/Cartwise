@@ -261,11 +261,14 @@ export interface Database {
           note: string | null;
           payment_method: PaymentMethod | null;
           telegram_username_snapshot: string | null;
+          shipping_delivery_method: "home" | "packstation" | null;
           shipping_first_name: string | null;
           shipping_last_name: string | null;
           shipping_street: string | null;
           shipping_house_number: string | null;
           shipping_address_extra: string | null;
+          shipping_packstation_number: string | null;
+          shipping_post_number: string | null;
           shipping_postal_code: string | null;
           shipping_city: string | null;
           shipping_country: string | null;
@@ -349,6 +352,23 @@ export interface Database {
         Insert: Partial<Database["public"]["Tables"]["order_items"]["Row"]> & {
           order_id: string;
         };
+        Update: never;
+        Relationships: never[];
+      };
+      order_role_surcharge_lines: {
+        Row: {
+          order_item_id: string;
+          order_id: string;
+          catalog_unit_price_usd: number;
+          selling_unit_price_usd: number;
+          quantity: number;
+          base_line_usd: number;
+          selling_line_usd: number;
+          surcharge_usd: number;
+          customer_role_name_snapshot: string | null;
+          created_at: string;
+        };
+        Insert: Database["public"]["Tables"]["order_role_surcharge_lines"]["Row"];
         Update: never;
         Relationships: never[];
       };
@@ -1151,6 +1171,9 @@ export interface Database {
           _shipping_postal_code?: string | null;
           _shipping_city?: string | null;
           _shipping_country?: string | null;
+          _shipping_delivery_method?: "home" | "packstation" | null;
+          _shipping_packstation_number?: string | null;
+          _shipping_post_number?: string | null;
         };
         Returns: { orderId: string; orderNumber: string; totalUsd: number };
       };

@@ -12,7 +12,7 @@ const navItems = [
   { to: "/shop", label: "Shop", icon: ShoppingBag },
   { to: "/kit-gesuche", label: "Kit Gesuche", icon: Layers },
   { to: "/peptide", label: PEPTIDE_NAV_LABEL, icon: BookOpen },
-  { to: "/orders", label: "Bestellungen", icon: ClipboardList },
+  { to: "/orders", label: "Meine Bestellungen", icon: ClipboardList },
   { to: "/profile", label: "Profil", icon: UserCircle },
 ];
 

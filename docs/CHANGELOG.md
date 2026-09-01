@@ -2,6 +2,28 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-01 (checkout Lieferart, orders, admin nav)
+
+### Added
+
+- Checkout **Lieferart** is required: Haustür Zustellung or Paketstation, with the matching address fields. `create_order` validates and snapshots Lieferart + address on the order (`0045`). Historical orders without the column stay unaudited for Lieferart.
+- Customer navigation uses **Meine Bestellungen**; admin inbox uses **Bestelleingänge**. Admin nav is grouped like Lexikon & Rechner (fewer top-level tabs, subpages per group).
+- Admin Bestellzusammenfassung PDF/CSV include SKU, product, qty, unit/line prices, Telegram Benutzername snapshot, Lieferart, address, and frozen role surcharge when snapshots exist (otherwise “nicht verfügbar”, never estimated).
+
+### Notes
+
+- Existing role markup, quantity tier, oils pack-total unit conversion, kits, cart naming, auth, and payment methods are unchanged. No product/SKU/price writes.
+
+## 2026-09-01 (role surcharge reporting)
+
+### Added
+
+- Admin page **Rollenaufschläge** (`/admin/surcharges`) sums frozen checkout snapshots: catalog unit (quantity tier, `sell_unit_price` at 0%) versus stored selling line total. Amounts are USD first; EUR uses each order's stored rate via `convertUsdToEur`. Breakdown uses the role **name** snapshotted at checkout, never the customer's current role.
+
+### Notes
+
+- Existing markup percents and `apply_role_markup` / `sell_unit_price` are unchanged. No hardcoded 25%. Historical orders without a snapshot are omitted, not estimated. Kit selling prices still come from the kit cart snapshot; catalog unit for those lines is `kit_share_catalog_unit_usd`. Customer PDFs do not show the surcharge.
+
 ## 2026-09-01 (quantity tier unit price)
 
 ### Fixed
