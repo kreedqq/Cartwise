@@ -19,6 +19,57 @@ export function getRedirectUrl(path: string): string {
   return `${window.location.origin}${base}${path}`;
 }
 
+export type OAuthCallbackResult =
+  | { status: "authenticated" }
+  | { status: "failed"; message: string }
+  | { status: "pending" };
+
+type SessionLookup = () => Promise<{
+  data: { session: unknown | null };
+  error: { message: string } | null;
+}>;
+
+/**
+ * Completes the PKCE callback without racing `detectSessionInUrl`.
+ * A consumed OAuth code must not send the user to /login if a session already exists.
+ */
+export async function completeOAuthCallback(args: {
+  href: string;
+  search?: string;
+  hash?: string;
+  getSession: SessionLookup;
+  exchangeCodeForSession: (url: string) => Promise<{ error: { message: string } | null }>;
+}): Promise<OAuthCallbackResult> {
+  const oauthError = readOAuthCallbackError(args.search ?? "", args.hash ?? "");
+  if (oauthError) return { status: "failed", message: oauthError };
+
+  const existing = await args.getSession();
+  if (existing.error) return { status: "failed", message: existing.error.message };
+  if (existing.data.session) return { status: "authenticated" };
+
+  const hrefCode = (() => {
+    try {
+      return new URL(args.href).searchParams.get("code");
+    } catch {
+      return null;
+    }
+  })();
+  const search = args.search ?? "";
+  const searchCode = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search).get("code");
+  const code = hrefCode ?? searchCode;
+
+  if (code) {
+    const { error } = await args.exchangeCodeForSession(args.href);
+    const after = await args.getSession();
+    if (after.data.session) return { status: "authenticated" };
+    if (error) return { status: "failed", message: error.message };
+    if (after.error) return { status: "failed", message: after.error.message };
+    return { status: "failed", message: "session missing" };
+  }
+
+  return { status: "pending" };
+}
+
 export type FetchLike = (
   input: string,
   init?: RequestInit,
@@ -250,6 +301,9 @@ export function mapAuthError(error: unknown): string {
   if (msg.includes("invalid") && (msg.includes("callback") || msg.includes("code") || msg.includes("state"))) {
     return "Die Anmeldung konnte nicht abgeschlossen werden. Bitte starte den Vorgang erneut.";
   }
+  if (msg.includes("session missing")) {
+    return "Die Anmeldung konnte nicht abgeschlossen werden. Bitte starte den Vorgang erneut.";
+  }
   if (msg.includes("rate") || msg.includes("too many")) {
     return "Zu viele Versuche. Bitte warte einen Moment.";
   }
@@ -275,7 +329,14 @@ export async function signUp(email: string, password: string, displayName: strin
 export async function signIn(email: string, password: string) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
-  return data;
+  if (data.session) return data;
+
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) throw sessionError;
+  if (!sessionData.session) {
+    throw new Error("session missing");
+  }
+  return { user: sessionData.session.user, session: sessionData.session };
 }
 
 export async function signInWithMagicLink(email: string) {

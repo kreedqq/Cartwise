@@ -2,6 +2,20 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-01 (auth session / Discord redirect)
+
+### Fixed
+
+- Password login waits for a client session and AuthProvider session before navigating to `/dashboard`, so ProtectedRoute cannot bounce a successful login back to `/login`.
+- `/login` with an existing session redirects to `/dashboard` after auth bootstrap.
+- OAuth callback no longer sends the user to `/login` when `exchangeCodeForSession` fails but `getSession` already has a session (consumed PKCE code).
+- Profile/role fetch errors no longer call `signOut` (missing username still only opens RequireUsernameDialog).
+
+### Notes
+
+- Frontend `redirectTo` remains `window.location.origin + /auth/callback`. Production Discord localhost is a Supabase Site URL / allowlist issue; dashboard must use Site URL `https://peptix.app` and keep `http://localhost:5173/**` for development.
+- Anonymization commit `c475f5a` was not reverted.
+
 ## 2026-09-01 (disable zero-price shop SKUs)
 
 ### Changed

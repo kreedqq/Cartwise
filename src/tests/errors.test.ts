@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ConcurrencyError, toAppError } from "@/lib/errors";
+import { ConcurrencyError, isSupabaseSessionError, toAppError } from "@/lib/errors";
 
 describe("toAppError", () => {
   it("maps a Postgres unique-violation code to a helpful German message", () => {
@@ -25,6 +25,19 @@ describe("toAppError", () => {
     const result = toAppError(new Error("some obscure internal detail"));
     expect(result.message).not.toContain("obscure internal detail");
     expect(result.retryable).toBe(true);
+  });
+});
+
+describe("isSupabaseSessionError", () => {
+  it("treats 401 and expired JWT as session errors", () => {
+    expect(isSupabaseSessionError({ status: 401 })).toBe(true);
+    expect(isSupabaseSessionError({ code: "PGRST301" })).toBe(true);
+    expect(isSupabaseSessionError({ message: "JWT expired" })).toBe(true);
+  });
+
+  it("does not treat a missing username or generic profile error as a session failure", () => {
+    expect(isSupabaseSessionError({ message: "username is required" })).toBe(false);
+    expect(isSupabaseSessionError({ message: "could not load profile session cache" })).toBe(false);
   });
 });
 

@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthProvider";
 import { usernameSchema } from "@/lib/validation";
-import { claimUsername, mapUsernameError } from "@/services/username";
+import { claimUsername, mapUsernameError, shouldPromptForUsername } from "@/services/username";
 
 /**
  * Transition mechanism for pre-existing users (Discord or email) who signed
@@ -27,7 +27,7 @@ export function RequireUsernameDialog() {
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
 
-  const open = Boolean(!loading && user && profile && !profile.username);
+  const open = shouldPromptForUsername({ loading, user, profile });
 
   // Discord (or any OAuth provider) may suggest a handle — pre-filled only,
   // never auto-saved, and always sanitized to the allowed username charset.

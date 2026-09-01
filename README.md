@@ -222,12 +222,18 @@ Workflow auf `/` geändert werden.
 Supabase muss wissen, wohin es nach Login/Registrierung/Passwort-Reset/
 Magic-Link umleiten darf. Unter **Authentication → URL Configuration**:
 
-- **Site URL**: die Produktions-URL, z. B.
-  `https://<dein-github-name>.github.io/<repo-name>/`
-- **Redirect URLs** (zusätzlich erlauben):
-  - `http://localhost:5173` (lokale Entwicklung)
-  - `http://localhost:5173/*`
-  - `https://<dein-github-name>.github.io/<repo-name>/*` (Produktion)
+- **Site URL** (Production, niemals localhost): `https://peptix.app`
+- **Redirect URLs**:
+  - `https://peptix.app/**`
+  - `https://www.peptix.app/**`
+  - `http://localhost:5173/**` (lokale Entwicklung — nicht entfernen)
+
+Die Discord-App **Redirect URI** bleibt die GoTrue-Callback-URL, nicht die Peptix-Domain:
+
+`https://cnjrjinvxycdkrmzcime.supabase.co/auth/v1/callback`
+
+Wenn die Site URL auf localhost steht, landet Discord nach der Autorisierung
+auf localhost statt auf peptix.app.
 
 Ohne diese Einträge schlagen Passwort-Reset- und Magic-Link-E-Mails mit einem
 Redirect-Fehler fehl.

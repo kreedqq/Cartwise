@@ -32,6 +32,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] Final research hardening — **FINAL_RELEASE_READY_WITH_LIMITATIONS** (`docs/RESEARCH_FINAL_HARDENING.md`); persist UNCHANGED preserves status; Claim Sources vs Source References; Dual Read exclusive; dump 1130; no deploy
 - [x] Finalization backup + commit `feat: finalize research platform` — `PEPTIX-FULL-BACKUP-FINAL-2026-08-29-1143`; dump SHA-256 `32ebd1db5430f5b9aede9cf19f9c980a0988ab78fc956b3919d245c571684b37`; not pushed
 - [x] Keep Discord OAuth `skipBrowserRedirect` / no `authorize.json` download
+- [x] Stabilize password-login session redirect and OAuth callback double-exchange; document Production Site URL `https://peptix.app` (manual dashboard if CLI cannot set it)
 - [x] Shop selling prices only via shop RPCs (not lexicon)
 
 # High

@@ -20,3 +20,11 @@ export function mapUsernameError(error: unknown): string {
   if (/Ungültiger Benutzername/i.test(raw)) return raw;
   return raw || "Der Benutzername konnte nicht gespeichert werden.";
 }
+
+export function shouldPromptForUsername(input: {
+  loading: boolean;
+  user: { id: string } | null;
+  profile: { username: string | null } | null;
+}): boolean {
+  return Boolean(!input.loading && input.user && input.profile && !input.profile.username);
+}

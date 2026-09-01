@@ -14,10 +14,6 @@ export function ProtectedRoute() {
   const location = useLocation();
 
   if (loading) return <FullScreenSpinner />;
-
-  if (!session) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
-  }
-
-  return <Outlet />;
+  if (session) return <Outlet />;
+  return <Navigate to="/login" replace state={{ from: location }} />;
 }

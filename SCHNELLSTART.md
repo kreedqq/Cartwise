@@ -60,8 +60,16 @@ supabase functions deploy set-user-role
 In Supabase unter **Authentication → URL Configuration** eintragen:
 
 ```text
-http://localhost:5173/*
-https://DEIN-GITHUB-NAME.github.io/cartwise/*
+Site URL: https://peptix.app
+https://peptix.app/**
+https://www.peptix.app/**
+http://localhost:5173/**
+```
+
+Discord Redirect URI (Developer Portal, nicht Peptix):
+
+```text
+https://cnjrjinvxycdkrmzcime.supabase.co/auth/v1/callback
 ```
 
 ## 4. Ersten Admin anlegen

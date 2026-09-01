@@ -23,6 +23,7 @@ const {
   beginOAuthRedirect,
   stripSkipHttpRedirect,
   readOAuthCallbackError,
+  completeOAuthCallback,
   OAUTH_CALLBACK_PATH,
   POST_LOGIN_PATH,
   OAUTH_SUCCESS_PATH,
@@ -84,10 +85,16 @@ describe("OAuth client helpers", () => {
     expect(url.endsWith("/auth/callback")).toBe(true);
   });
 
+  it("builds the production callback from the peptix.app origin", () => {
+    vi.stubGlobal("location", { origin: "https://peptix.app" });
+    expect(getRedirectUrl(OAUTH_CALLBACK_PATH)).toBe("https://peptix.app/auth/callback");
+  });
+
   it("does not hardcode localhost in the OAuth redirect helper", () => {
     const source = readFileSync(resolve(process.cwd(), "src/services/auth.ts"), "utf8");
     expect(source).toContain("window.location.origin");
     expect(source).not.toMatch(/redirectTo:\s*["'`]https?:\/\/localhost/i);
+    expect(source).not.toMatch(/https?:\/\/localhost:\d+\/auth\/callback/);
   });
 
   it("redirects Discord to discord.com when Location is readable, never as authorize.json", async () => {
@@ -259,8 +266,48 @@ describe("OAuth UI surface", () => {
   it("sends OAuth users to /shop after PKCE callback", () => {
     const callback = readFileSync(resolve(process.cwd(), "src/pages/AuthCallback.tsx"), "utf8");
     expect(callback).toContain("OAUTH_SUCCESS_PATH");
-    expect(callback).toContain("exchangeCodeForSession");
+    expect(callback).toContain("completeOAuthCallback");
     expect(OAUTH_SUCCESS_PATH).toBe("/shop");
+  });
+});
+
+describe("completeOAuthCallback", () => {
+  const session = { user: { id: "user-1" } };
+
+  it("treats a successful code exchange as authenticated", async () => {
+    const result = await completeOAuthCallback({
+      href: "https://peptix.app/auth/callback?code=abc",
+      search: "?code=abc",
+      getSession: vi
+        .fn()
+        .mockResolvedValueOnce({ data: { session: null }, error: null })
+        .mockResolvedValueOnce({ data: { session }, error: null }),
+      exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }),
+    });
+    expect(result).toEqual({ status: "authenticated" });
+  });
+
+  it("keeps an existing session when the code exchange fails", async () => {
+    const result = await completeOAuthCallback({
+      href: "https://peptix.app/auth/callback?code=abc",
+      search: "?code=abc",
+      getSession: vi
+        .fn()
+        .mockResolvedValueOnce({ data: { session: null }, error: null })
+        .mockResolvedValueOnce({ data: { session }, error: null }),
+      exchangeCodeForSession: vi.fn().mockResolvedValue({ error: { message: "invalid flow state" } }),
+    });
+    expect(result).toEqual({ status: "authenticated" });
+  });
+
+  it("fails to login only when exchange fails and no session exists", async () => {
+    const result = await completeOAuthCallback({
+      href: "https://peptix.app/auth/callback?code=abc",
+      search: "?code=abc",
+      getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+      exchangeCodeForSession: vi.fn().mockResolvedValue({ error: { message: "invalid flow state" } }),
+    });
+    expect(result).toEqual({ status: "failed", message: "invalid flow state" });
   });
 });
 

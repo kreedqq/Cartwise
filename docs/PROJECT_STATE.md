@@ -2,7 +2,7 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-01** (zero-price shop SKUs deactivated).
+Last documentation pass: **2026-09-01** (auth session / Discord redirect stabilization).
 
 **Update 2026-09-01 (0€ shop cleanup)**: Production `is_active = false` only for `B1201`, `B1210`, `GGH`, `HHB`, `SHB`. Rows remain; prices/SKUs/IDs unchanged. Shop and Kit Gesuche already load via `list_shop_products` (`is_active = true`). Active catalog 293 / inactive 27 / active `price_usd = 0` = 0.
 
@@ -53,6 +53,8 @@ Peptide routes sit behind `ProtectedRoute` (same login as shop).
 - Email/password login and register, magic link, forgot/reset password
 - OAuth: **Discord only** (`OAUTH_PROVIDERS = ["discord"]`)
 - `skipBrowserRedirect: true` plus strip `skip_http_redirect` so GoTrue JSON is not saved as `authorize.json`
+- Password login waits for a client session and AuthProvider session before `/dashboard`; `/login` with an existing session goes to `/dashboard`
+- OAuth callback keeps an existing session if the PKCE code was already consumed
 - OAuth success path `/shop`; other post-login `/dashboard`
 - Auth layout uses `/peptix-brand.jpg`
 - New users: `user` role via `handle_new_user`; customer role assignment is server-side (not self-serve admin)

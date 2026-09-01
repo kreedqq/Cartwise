@@ -8,16 +8,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toaster";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
+import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
+import { useAuth } from "@/context/AuthProvider";
 import { loginSchema, magicLinkSchema } from "@/lib/validation";
 import { mapAuthError, POST_LOGIN_PATH, signIn, signInWithMagicLink } from "@/services/auth";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { session, loading: authLoading } = useAuth();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [loading, setLoading] = React.useState(false);
+  const [awaitingSession, setAwaitingSession] = React.useState(false);
   const [magicSent, setMagicSent] = React.useState(false);
+
+  React.useEffect(() => {
+    if (authLoading || !session) return;
+    navigate(POST_LOGIN_PATH, { replace: true });
+  }, [authLoading, session, navigate]);
 
   async function handlePassword(e: React.FormEvent) {
     e.preventDefault();
@@ -30,8 +39,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signIn(result.data.email, result.data.password);
-      navigate(POST_LOGIN_PATH, { replace: true });
+      setAwaitingSession(true);
     } catch (error) {
+      setAwaitingSession(false);
       toast.error(mapAuthError(error));
     } finally {
       setLoading(false);
@@ -55,6 +65,10 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (authLoading || session || awaitingSession) {
+    return <FullScreenSpinner label="Anmeldung wird abgeschlossen …" />;
   }
 
   return (

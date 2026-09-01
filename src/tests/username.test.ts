@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { usernameSchema, registerSchema } from "@/lib/validation";
+import { shouldPromptForUsername } from "@/services/username";
 
 const rpc = vi.fn();
 
@@ -11,6 +12,19 @@ vi.mock("@/lib/supabaseClient", () => ({
 }));
 
 const { isUsernameAvailable, claimUsername, mapUsernameError } = await import("@/services/username");
+
+describe("shouldPromptForUsername", () => {
+  it("prompts only when auth is ready, a user exists, and username is missing", () => {
+    expect(
+      shouldPromptForUsername({ loading: false, user: { id: "u1" }, profile: { username: null } }),
+    ).toBe(true);
+    expect(
+      shouldPromptForUsername({ loading: false, user: { id: "u1" }, profile: { username: "ExampleUser" } }),
+    ).toBe(false);
+    expect(shouldPromptForUsername({ loading: true, user: { id: "u1" }, profile: { username: null } })).toBe(false);
+    expect(shouldPromptForUsername({ loading: false, user: null, profile: { username: null } })).toBe(false);
+  });
+});
 
 describe("usernameSchema", () => {
   it("accepts a valid username", () => {

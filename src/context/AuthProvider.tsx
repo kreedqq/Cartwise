@@ -3,12 +3,10 @@ import type { Session, User } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/lib/supabaseClient";
-import { isSupabaseSessionError } from "@/lib/errors";
 import { clearUserScopedQueries } from "@/lib/userSessionCache";
 import { getOwnProfile } from "@/services/profiles";
 import { getOwnRoles } from "@/services/roles";
 import { getMyCustomerRoleName } from "@/services/customerRoles";
-import { signOut } from "@/services/auth";
 import type { Role, Tables } from "@/types/database";
 
 interface AuthState {
@@ -60,16 +58,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setRoles(roleData);
         setCustomerRoleName(pricingRoleName);
       } catch (error) {
-        if (isSupabaseSessionError(error)) {
-          await signOut();
-          setSession(null);
-          resetUserState();
-          return;
-        }
+        // Keep the auth session. A missing username is handled by
+        // RequireUsernameDialog; a profile/role fetch error must not bounce to /login.
         console.error("Profil/Rollen konnten nicht geladen werden:", error);
       }
     },
-    [resetUserState],
+    [],
   );
 
   React.useEffect(() => {

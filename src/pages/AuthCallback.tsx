@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { toast } from "@/components/ui/toaster";
 import { supabase } from "@/lib/supabaseClient";
-import { mapAuthError, OAUTH_SUCCESS_PATH, readOAuthCallbackError } from "@/services/auth";
+import { completeOAuthCallback, mapAuthError, OAUTH_SUCCESS_PATH } from "@/services/auth";
 
 /**
  * Completes the OAuth PKCE round-trip. This route always renders HTML.
@@ -15,13 +15,6 @@ export default function AuthCallbackPage() {
 
   React.useEffect(() => {
     let cancelled = false;
-
-    const oauthError = readOAuthCallbackError();
-    if (oauthError) {
-      toast.error(mapAuthError(oauthError));
-      navigate("/login", { replace: true });
-      return;
-    }
 
     const timeout = window.setTimeout(() => {
       if (cancelled) return;
@@ -42,34 +35,23 @@ export default function AuthCallbackPage() {
     });
 
     async function complete() {
-      const existing = await supabase.auth.getSession();
+      const result = await completeOAuthCallback({
+        href: window.location.href,
+        search: window.location.search,
+        hash: window.location.hash,
+        getSession: () => supabase.auth.getSession(),
+        exchangeCodeForSession: (url) => supabase.auth.exchangeCodeForSession(url),
+      });
       if (cancelled) return;
-      if (existing.data.session) {
+      if (result.status === "authenticated") {
         go(true);
         return;
       }
-
-      const code = new URLSearchParams(window.location.search).get("code");
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
-        if (cancelled) return;
-        if (error) {
-          window.clearTimeout(timeout);
-          toast.error(mapAuthError(error));
-          navigate("/login", { replace: true });
-          return;
-        }
-      }
-
-      const { data, error } = await supabase.auth.getSession();
-      if (cancelled) return;
-      if (error) {
+      if (result.status === "failed") {
         window.clearTimeout(timeout);
-        toast.error(mapAuthError(error));
+        toast.error(mapAuthError(result.message));
         navigate("/login", { replace: true });
-        return;
       }
-      go(!!data.session);
     }
 
     void complete();

@@ -41,7 +41,7 @@ Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PA
 
 ## Authentication
 
-`AuthProvider` + `ProtectedRoute` / `AdminRoute`. Discord OAuth uses `skipBrowserRedirect` and never assigns GoTrue JSON to `window.location`. Anon key is public; authorization is RLS + RPCs.
+`AuthProvider` + `ProtectedRoute` / `AdminRoute`. Discord OAuth uses `skipBrowserRedirect` and never assigns GoTrue JSON to `window.location`. Password login does not navigate to `/dashboard` until AuthProvider has a session. OAuth callback (`completeOAuthCallback`) keeps a session if `exchangeCodeForSession` fails after `detectSessionInUrl` already consumed the code. Anon key is public; authorization is RLS + RPCs. Production Site URL must be `https://peptix.app` (not localhost).
 
 ## Shop vs peptide
 

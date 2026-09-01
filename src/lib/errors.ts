@@ -25,7 +25,13 @@ export function isSupabaseSessionError(error: unknown): boolean {
   const err = error as { message?: string; code?: string; status?: number };
   if (err.status === 401 || err.code === "PGRST301") return true;
   const msg = err.message?.toLowerCase() ?? "";
-  return msg.includes("jwt") || msg.includes("session") || msg.includes("token expired");
+  return (
+    msg.includes("invalid jwt") ||
+    msg.includes("jwt expired") ||
+    msg.includes("token expired") ||
+    msg.includes("refresh_token") ||
+    msg.includes("auth session missing")
+  );
 }
 
 export function toAppError(error: unknown): AppError {
