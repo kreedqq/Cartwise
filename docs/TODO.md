@@ -38,7 +38,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 
 # High
 
-- [x] Checkout Lieferart (Haustür / Paketstation) + order snapshot (`0045`); customer **Meine Bestellungen**; admin **Bestelleingänge** + grouped admin nav; admin Bestellzusammenfassung PDF
+- [x] Customer `/orders` owner-scoped; admin hubs (Übersicht / Bestellungen / Produkte / Benutzer & Rollen / Inhalte); Interner Name removed from UI identity
 - [x] Telegram Benutzername as the only public handle; stable cart ordinals; checkout shipping + telegram order snapshots (migration `0042`)
 - [x] Unify public username (`profiles.username`) + cart titles; remove redundant shop `ab X` badge (migration `0040`)
 - [x] Kit Gesuche marketplace on existing `kit_shares` (migration `0041` applied to production; invite kit sharing unchanged)

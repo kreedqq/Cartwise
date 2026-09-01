@@ -32,7 +32,7 @@ Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PA
 ## Frontend layout
 
 - `src/pages/` — route screens
-- `src/components/layout/` — AppShell, Sidebar, MobileNav, Topbar, AdminNav, BrandMark
+- `src/components/layout/` — AppShell, Sidebar, MobileNav, Topbar, AdminNav (five hubs + in-page `AdminSectionTabs`), BrandMark
 - `src/components/shop|cart|orders|auth|admin|ui/`
 - `src/hooks/` — React Query wrappers
 - `src/services/` — Supabase RPC/table access for shop and admin research

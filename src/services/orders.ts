@@ -10,16 +10,50 @@ export interface OrderWithItems extends Tables<"orders"> {
 export const CUSTOMER_ORDER_COLUMNS =
   "id, order_number, user_id, cart_id, status, note, payment_method, telegram_username_snapshot, shipping_delivery_method, shipping_first_name, shipping_last_name, shipping_street, shipping_house_number, shipping_address_extra, shipping_packstation_number, shipping_post_number, shipping_postal_code, shipping_city, shipping_country, total_usd, total_eur, exchange_rate, submitted_at, created_at, updated_at, china_shipping_amount, china_shipping_currency, de_shipping_amount, de_shipping_currency";
 
-/** Customer: their own orders (RLS-scoped), most recent first. */
+async function requireCurrentUserId(): Promise<string> {
+  const { data, error } = await supabase.auth.getUser();
+  if (error) throw error;
+  const userId = data.user?.id;
+  if (!userId) throw new Error("Nicht angemeldet.");
+  return userId;
+}
+
+/** Frozen Telegram handle from the order snapshot. Not a live profile lookup. */
+export function orderTelegramUsername(order: { telegram_username_snapshot: string | null }): string | null {
+  const value = order.telegram_username_snapshot?.trim();
+  return value ? value : null;
+}
+
+/**
+ * Customer list: orders owned by the signed-in auth user.
+ * Always sends `.eq("user_id", auth uid)` so an admin visiting /orders cannot
+ * load the admin inbox. RLS `orders_select_own_or_admin` is unchanged.
+ */
 export async function listMyOrders(): Promise<Tables<"orders">[]> {
+  const userId = await requireCurrentUserId();
   const { data, error } = await supabase
     .from("orders")
     .select(CUSTOMER_ORDER_COLUMNS)
+    .eq("user_id", userId)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as Tables<"orders">[];
 }
 
+/** Customer detail: owner-scoped. Foreign ids resolve to null even for admins. */
+export async function getMyOrder(id: string): Promise<Tables<"orders"> | null> {
+  const userId = await requireCurrentUserId();
+  const { data, error } = await supabase
+    .from("orders")
+    .select(CUSTOMER_ORDER_COLUMNS)
+    .eq("id", id)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return data as Tables<"orders"> | null;
+}
+
+/** Admin inbox detail. No owner filter; AdminRoute + RLS still apply. */
 export async function getOrder(id: string): Promise<Tables<"orders"> | null> {
   const { data, error } = await supabase
     .from("orders")
@@ -40,10 +74,23 @@ export async function listOrderItems(orderId: string): Promise<Tables<"order_ite
   return data ?? [];
 }
 
-export async function getOrderWithItems(id: string): Promise<OrderWithItems | null> {
+export async function getMyOrderWithItems(id: string): Promise<OrderWithItems | null> {
+  const order = await getMyOrder(id);
+  if (!order) return null;
+  const items = await listOrderItems(id);
+  return { ...order, items };
+}
+
+export async function getAdminOrderWithItems(id: string): Promise<OrderWithItems | null> {
   const [order, items] = await Promise.all([getOrder(id), listOrderItems(id)]);
   if (!order) return null;
   return { ...order, items };
+}
+
+export async function listMyOrderStatusHistory(orderId: string): Promise<Tables<"order_status_history">[]> {
+  const order = await getMyOrder(orderId);
+  if (!order) return [];
+  return listOrderStatusHistory(orderId);
 }
 
 export async function listOrderStatusHistory(orderId: string): Promise<Tables<"order_status_history">[]> {

@@ -17,7 +17,7 @@ import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { OrderShippingDetails } from "@/components/orders/OrderShippingCard";
-import { useDeleteOrder, useOrder, useOrderAdminNote, useOrderStatusHistory, useSetOrderStatus } from "@/hooks/useOrders";
+import { useAdminOrder, useDeleteOrder, useOrderAdminNote, useOrderStatusHistory, useSetOrderStatus } from "@/hooks/useOrders";
 import { useAdminUserDirectory } from "@/hooks/useAdminOrders";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
 import { formatDateTime, formatQuantity, formatRate, formatUsd, summarizeOrderCharges } from "@/lib/money";
@@ -32,7 +32,7 @@ import type { OrderStatus } from "@/types/database";
 export default function AdminOrderDetailPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
-  const orderQuery = useOrder(orderId);
+  const orderQuery = useAdminOrder(orderId);
   const historyQuery = useOrderStatusHistory(orderId);
   const noteQuery = useOrderAdminNote(orderId);
   const directoryQuery = useAdminUserDirectory();
@@ -71,7 +71,7 @@ export default function AdminOrderDetailPage() {
     order,
     order.items,
     {
-      displayName: telegramHandle ?? customer?.displayName ?? order.user_id,
+      displayName: telegramHandle ?? order.user_id,
       email: customer?.email ?? null,
     },
     roleSurcharge,
@@ -115,7 +115,7 @@ export default function AdminOrderDetailPage() {
     <div className="space-y-5">
       {/* Back + breadcrumb */}
       <Button variant="ghost" size="sm" className="-ml-2 text-muted-foreground" onClick={() => navigate("/admin/orders")}>
-        <ArrowLeft className="h-3.5 w-3.5" /> Bestelleingänge
+        <ArrowLeft className="h-3.5 w-3.5" /> Eingegangene Bestellungen
       </Button>
 
       {/* Order header card */}
@@ -129,7 +129,7 @@ export default function AdminOrderDetailPage() {
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
               <span className="font-medium text-foreground">
-                {telegramHandle ?? customer?.displayName ?? "—"}
+                {telegramHandle ?? "—"}
               </span>
               {customer?.email && <span>{customer.email}</span>}
               <span>{formatDateTime(order.submitted_at)}</span>

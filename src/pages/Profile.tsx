@@ -9,8 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/toaster";
 import { useAuth } from "@/context/AuthProvider";
-import { profileSchema, usernameSchema } from "@/lib/validation";
-import { updateDisplayName } from "@/services/profiles";
+import { usernameSchema } from "@/lib/validation";
 import { claimUsername, mapUsernameError } from "@/services/username";
 import { formatDateTime } from "@/lib/money";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -18,32 +17,23 @@ import { PageHeader } from "@/components/common/PageHeader";
 export default function ProfilePage() {
   const { user, profile, roles, customerRoleName, refreshProfile } = useAuth();
   const [username, setUsername] = React.useState(profile?.username ?? "");
-  const [displayName, setDisplayName] = React.useState(profile?.display_name ?? "");
   const [usernameError, setUsernameError] = React.useState<string | null>(null);
-  const [displayError, setDisplayError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
 
   /* eslint-disable react-hooks/set-state-in-effect */
   React.useEffect(() => {
     setUsername(profile?.username ?? "");
-    setDisplayName(profile?.display_name ?? "");
-  }, [profile?.username, profile?.display_name]);
+  }, [profile?.username]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
     setUsernameError(null);
-    setDisplayError(null);
 
     const usernameResult = usernameSchema.safeParse(username);
     if (!usernameResult.success) {
       setUsernameError(usernameResult.error.issues[0]?.message ?? "Ungültiger Telegram Benutzername.");
-      return;
-    }
-    const displayResult = profileSchema.safeParse({ displayName });
-    if (!displayResult.success) {
-      setDisplayError(displayResult.error.issues[0]?.message ?? "Ungültige Eingabe.");
       return;
     }
 
@@ -51,9 +41,8 @@ export default function ProfilePage() {
     try {
       if (usernameResult.data !== (profile?.username ?? "")) {
         await claimUsername(usernameResult.data);
+        await refreshProfile();
       }
-      await updateDisplayName(user.id, displayResult.data.displayName);
-      await refreshProfile();
       toast.success("Profil gespeichert.");
     } catch (error) {
       console.error("Profil speichern fehlgeschlagen:", error);
@@ -68,7 +57,7 @@ export default function ProfilePage() {
       <PageHeader
         eyebrow="Konto"
         title="Profil"
-        description="Telegram Benutzername, interner Name, Rolle und Kontodaten. Du siehst nur deine eigene Rolle."
+        description="Telegram Benutzername, Rolle und Kontodaten. Du siehst nur deine eigene Rolle."
       />
 
       <Card>
@@ -77,7 +66,7 @@ export default function ProfilePage() {
             <CardTitle>Persönliche Angaben</CardTitle>
             <CardDescription>
               Der Telegram Benutzername ist die einzige öffentliche Identität. Warenkörbe folgen automatisch diesem
-              Namen. Der interne Name bleibt nur für dich sichtbar.
+              Namen.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -101,17 +90,6 @@ export default function ProfilePage() {
                   Dieser Name gilt überall: Profil, Warenkörbe, Kit Sharing und Kit Gesuche.
                 </p>
               )}
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="displayName">Interner Name</Label>
-              <Input
-                id="displayName"
-                value={displayName}
-                invalid={!!displayError}
-                onChange={(e) => setDisplayName(e.target.value)}
-              />
-              {displayError && <p className="text-xs text-destructive">{displayError}</p>}
-              <p className="text-xs text-muted-foreground">Nur für dich. Wird anderen Nutzerinnen und Nutzern nicht angezeigt.</p>
             </div>
             <div className="space-y-1.5">
               <Label>Meine Rolle</Label>

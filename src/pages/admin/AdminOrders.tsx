@@ -18,7 +18,7 @@ import { buildAdminOrderItemsCsv, downloadOrdersListCsv } from "@/lib/orderExpor
 import { formatDateTime, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { formatDeliveryMethodLabel } from "@/lib/shippingAddress";
 import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS } from "@/lib/shop/paymentMethod";
-import { ORDER_STATUS_LABELS } from "@/services/orders";
+import { ORDER_STATUS_LABELS, orderTelegramUsername } from "@/services/orders";
 import type { OrderStatus } from "@/types/database";
 
 const STATUS_FILTERS: Array<{ value: "all" | OrderStatus; label: string }> = [
@@ -59,7 +59,7 @@ export default function AdminOrdersPage() {
       }
       if (!term) return true;
       const customer = directory?.get(order.user_id);
-      const customerHay = `${customer?.displayName ?? ""} ${customer?.email ?? ""} ${order.telegram_username_snapshot ?? ""}`.toLowerCase();
+      const customerHay = `${orderTelegramUsername(order) ?? ""} ${customer?.email ?? ""}`.toLowerCase();
       if (order.order_number.toLowerCase().includes(term)) return true;
       if (customerHay.includes(term)) return true;
       return items.some(
@@ -120,7 +120,7 @@ export default function AdminOrdersPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        title="Bestelleingänge"
+        title="Eingegangene Bestellungen"
         description={`${filtered.length} ${filtered.length === 1 ? "Bestellung" : "Bestellungen"}${hasFilters ? " gefunden" : " gesamt"}`}
         actions={
           <Button variant="outline" size="sm" onClick={handleExport} disabled={filtered.length === 0}>
@@ -136,7 +136,7 @@ export default function AdminOrdersPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Bestellnummer, Kunde, E-Mail …"
+            placeholder="Bestellnummer, Telegram Benutzername, E-Mail …"
             className="pl-8 text-sm"
           />
         </div>
@@ -190,7 +190,7 @@ export default function AdminOrdersPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="pl-4">Bestellnummer</TableHead>
-                  <TableHead>Kunde</TableHead>
+                  <TableHead>Telegram Benutzername</TableHead>
                   <TableHead>Datum</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Zahlung</TableHead>
@@ -208,7 +208,7 @@ export default function AdminOrdersPage() {
                     >
                       <TableCell className="pl-4 font-mono text-xs font-semibold">{order.order_number}</TableCell>
                       <TableCell>
-                        <p className="text-sm font-medium">{customer?.displayName ?? "—"}</p>
+                        <p className="text-sm font-medium">{orderTelegramUsername(order) ?? "—"}</p>
                         {customer?.email && (
                           <p className="text-[11px] text-muted-foreground">{customer.email}</p>
                         )}

@@ -19,6 +19,15 @@ describe("canonical username identity", () => {
     expect(topbar).not.toMatch(/profile\?\.display_name \?\? user\?\.email/);
   });
 
+  it("does not show Interner Name as a user identity in the UI", () => {
+    expect(readSource("src/pages/Profile.tsx")).not.toContain("Interner Name");
+    expect(readSource("src/pages/admin/AdminUsers.tsx")).not.toContain("Interner Name");
+    expect(readSource("src/pages/admin/AdminRoles.tsx")).not.toContain("user.displayName");
+    expect(readSource("src/pages/admin/AdminOrders.tsx")).toContain("orderTelegramUsername");
+    expect(readSource("src/pages/admin/AdminOrders.tsx")).not.toContain("customer?.displayName");
+    expect(readSource("src/pages/Profile.tsx")).toContain("Telegram Benutzername");
+  });
+
   it("kit member list maps the username RPC column and never email", () => {
     const members = readSource("src/services/kitShareMembers.ts");
     expect(members).toContain("list_kit_share_members");

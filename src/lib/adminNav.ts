@@ -1,28 +1,14 @@
-import {
-  BookOpen,
-  ClipboardList,
-  History,
-  LayoutDashboard,
-  Package,
-  ScrollText,
-  DollarSign,
-  ShieldCheck,
-  Truck,
-  Upload,
-  Users,
-  type LucideIcon,
-} from "lucide-react";
-
 export interface AdminNavItem {
   to: string;
   label: string;
-  icon: LucideIcon;
-  end?: boolean;
+  /** Keep the tab active for nested routes such as `/admin/orders/:id`. */
+  matchPrefix?: boolean;
 }
 
 export interface AdminNavGroup {
   id: string;
   label: string;
+  to: string;
   match: (pathname: string) => boolean;
   items: AdminNavItem[];
 }
@@ -31,54 +17,66 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
     id: "overview",
     label: "Übersicht",
+    to: "/admin",
     match: (pathname) => pathname === "/admin",
-    items: [{ to: "/admin", label: "Übersicht", icon: LayoutDashboard, end: true }],
+    items: [],
   },
   {
     id: "orders",
     label: "Bestellungen",
-    match: (pathname) => pathname.startsWith("/admin/orders"),
-    items: [{ to: "/admin/orders", label: "Bestelleingänge", icon: ClipboardList }],
+    to: "/admin/orders",
+    match: (pathname) => pathname.startsWith("/admin/orders") || pathname.startsWith("/admin/shipping"),
+    items: [
+      { to: "/admin/orders", label: "Eingegangene Bestellungen", matchPrefix: true },
+      { to: "/admin/shipping", label: "Versand" },
+    ],
   },
   {
     id: "products",
     label: "Produkte",
+    to: "/admin/products",
     match: (pathname) =>
       pathname.startsWith("/admin/products") ||
       pathname.startsWith("/admin/pdf-import") ||
       pathname.startsWith("/admin/import-history"),
     items: [
-      { to: "/admin/products", label: "Produktkatalog", icon: Package },
-      { to: "/admin/pdf-import", label: "Import", icon: Upload },
-      { to: "/admin/import-history", label: "Import-Verlauf", icon: History },
-    ],
-  },
-  {
-    id: "finance",
-    label: "Finanzen",
-    match: (pathname) =>
-      pathname.startsWith("/admin/surcharges") ||
-      pathname.startsWith("/admin/roles") ||
-      pathname.startsWith("/admin/shipping"),
-    items: [
-      { to: "/admin/surcharges", label: "Rollenaufschläge", icon: DollarSign },
-      { to: "/admin/roles", label: "Rollen & Preise", icon: ShieldCheck },
-      { to: "/admin/shipping", label: "Versand", icon: Truck },
+      { to: "/admin/products", label: "Produktkatalog" },
+      { to: "/admin/pdf-import", label: "Import" },
+      { to: "/admin/import-history", label: "Import-Verlauf" },
     ],
   },
   {
     id: "users",
-    label: "Benutzer",
-    match: (pathname) => pathname.startsWith("/admin/users") || pathname.startsWith("/admin/audit-log"),
+    label: "Benutzer & Rollen",
+    to: "/admin/users",
+    match: (pathname) =>
+      pathname.startsWith("/admin/users") ||
+      pathname.startsWith("/admin/roles") ||
+      pathname.startsWith("/admin/surcharges") ||
+      pathname.startsWith("/admin/audit-log"),
     items: [
-      { to: "/admin/users", label: "Benutzer", icon: Users },
-      { to: "/admin/audit-log", label: "Audit-Log", icon: ScrollText },
+      { to: "/admin/users", label: "Benutzer" },
+      { to: "/admin/roles", label: "Rollen & Preisaufschlag" },
+      { to: "/admin/surcharges", label: "Rollenaufschläge" },
+      { to: "/admin/audit-log", label: "Audit-Log" },
     ],
   },
   {
     id: "content",
     label: "Inhalte",
+    to: "/admin/research",
     match: (pathname) => pathname.startsWith("/admin/research"),
-    items: [{ to: "/admin/research", label: "Research", icon: BookOpen }],
+    items: [{ to: "/admin/research", label: "Research" }],
   },
 ];
+
+export function adminSectionForPath(pathname: string): AdminNavGroup | undefined {
+  return ADMIN_NAV_GROUPS.find((group) => group.match(pathname));
+}
+
+export function adminTabIsActive(pathname: string, item: AdminNavItem): boolean {
+  if (item.matchPrefix) {
+    return pathname === item.to || pathname.startsWith(`${item.to}/`);
+  }
+  return pathname === item.to;
+}

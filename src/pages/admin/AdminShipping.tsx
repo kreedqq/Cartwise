@@ -14,15 +14,15 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/common/ErrorState";
 import { toast } from "@/components/ui/toaster";
-import { useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
+import { useAdminOrders } from "@/hooks/useAdminOrders";
 import { applyChinaSplit, previewChinaSplit, setDeShipping } from "@/services/shipping";
+import { orderTelegramUsername } from "@/services/orders";
 import { formatUsd, formatEur } from "@/lib/money";
 import type { ShippingCurrency } from "@/types/database";
 
 export default function AdminShippingPage() {
   const queryClient = useQueryClient();
   const ordersQuery = useAdminOrders();
-  const directoryQuery = useAdminUserDirectory();
   const orders = ordersQuery.data ?? [];
 
   const [chinaAmount, setChinaAmount] = React.useState("100");
@@ -167,7 +167,7 @@ export default function AdminShippingPage() {
               <TableRow>
                 <TableHead className="w-10" />
                 <TableHead>Bestellung</TableHead>
-                <TableHead>Kunde</TableHead>
+                <TableHead>Telegram Benutzername</TableHead>
                 <TableHead className="text-right">Aktueller Versand aus China</TableHead>
               </TableRow>
             </TableHeader>
@@ -178,7 +178,7 @@ export default function AdminShippingPage() {
                     <Checkbox checked={selected.has(order.id)} onCheckedChange={() => toggle(order.id)} />
                   </TableCell>
                   <TableCell className="font-mono text-xs">{order.order_number}</TableCell>
-                  <TableCell className="text-sm">{directoryQuery.data?.get(order.user_id)?.displayName ?? "—"}</TableCell>
+                  <TableCell className="text-sm">{orderTelegramUsername(order) ?? "—"}</TableCell>
                   <TableCell className="text-right tabular-nums text-sm">
                     {order.china_shipping_amount != null
                       ? `${order.china_shipping_amount} ${order.china_shipping_currency}`

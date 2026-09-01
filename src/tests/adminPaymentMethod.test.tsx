@@ -11,7 +11,7 @@ import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
  *
  * Root cause was NOT a missing query/column — `orders.payment_method` was
  * already fetched by both the customer and the admin order detail page
- * (they share `getOrder`/`useOrder`, and the admin list uses `select("*")`).
+ * (`CUSTOMER_ORDER_COLUMNS` includes `payment_method`; the admin list uses `select("*")`).
  * It was a pure UI omission: neither `AdminOrders.tsx` nor
  * `AdminOrderDetail.tsx` ever rendered `order.payment_method` anywhere.
  */
@@ -58,8 +58,10 @@ describe("Admin order views surface the real orders.payment_method (no hardcodin
     expect(ts).toMatch(/export async function listAllOrders[\s\S]*?\.from\("orders"\)\.select\("\*"\)/);
   });
 
-  it("customer + admin order detail share the same query, which already includes payment_method", () => {
+  it("customer and admin order detail columns include payment_method", () => {
     const ts = readSource("src/services/orders.ts");
     expect(ts).toMatch(/CUSTOMER_ORDER_COLUMNS =\s*\n?\s*"[^"]*payment_method[^"]*"/);
+    expect(ts).toContain("getMyOrderWithItems");
+    expect(ts).toContain("getAdminOrderWithItems");
   });
 });

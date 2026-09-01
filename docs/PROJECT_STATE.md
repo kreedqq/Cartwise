@@ -2,9 +2,13 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-01** (checkout Lieferart, Meine Bestellungen / Bestelleingänge, grouped admin nav, admin Bestellzusammenfassung PDF).
+Last documentation pass: **2026-09-01** (customer order isolation, hub admin nav, Telegram Benutzername only).
 
-**Update 2026-09-01 (orders checkout admin nav)**: Checkout requires Lieferart (`home` / `packstation`) plus the matching address fields; `create_order` snapshots them on the order (migration `0045`). Customer nav is **Meine Bestellungen**; admin inbox is **Bestelleingänge**. Admin nav is grouped (Übersicht, Bestellungen, Produkte, Finanzen, Benutzer, Inhalte). Role pricing, quantity tier, kits, cart naming, auth, and payment methods were not changed.
+**Update 2026-09-01 (orders isolation + admin hubs)**: `/orders` always queries `orders.user_id = auth.uid()`. An admin visiting Meine Bestellungen no longer sees the inbox (RLS `orders_select_own_or_admin` is unchanged). Admin inbox stays `/admin/orders`. Admin chrome is five hubs (Übersicht, Bestellungen, Produkte, Benutzer & Rollen, Inhalte) with in-page subtabs. `profiles.display_name` remains in the database but is not shown as identity. Role pricing, quantity tier, kits, cart naming, auth, and payment methods were not changed.
+
+**Update 2026-09-01 (orders isolation + admin hubs)**: `/orders` always queries `orders.user_id = auth.uid()`. An admin visiting Meine Bestellungen no longer sees the inbox (RLS `orders_select_own_or_admin` is unchanged). Admin inbox stays `/admin/orders`. Admin chrome is five hubs (Übersicht, Bestellungen, Produkte, Benutzer & Rollen, Inhalte) with in-page subtabs. `profiles.display_name` remains in the database but is not shown as identity. Role pricing, quantity tier, kits, cart naming, auth, and payment methods were not changed.
+
+**Update 2026-09-01 (orders checkout admin nav)**: Checkout requires Lieferart (`home` / `packstation`) plus the matching address fields; `create_order` snapshots them on the order (migration `0045`). Customer nav is **Meine Bestellungen**; admin inbox is **Eingegangene Bestellungen**. Role pricing, quantity tier, kits, cart naming, auth, and payment methods were not changed.
 
 **Update 2026-09-01 (role surcharge reporting)**: Admin `/admin/surcharges` reports actual USD markups from `order_role_surcharge_lines` written at `create_order`. Catalog unit = existing pricing engine at 0% after quantity tier; selling = stored line total. Current `user_customer_roles` are not used. Migration `0044` is additive (admin-only table). Product prices, kit pricing, and role percents were not changed.
 
@@ -76,7 +80,7 @@ Sidebar: Übersicht `/dashboard`, Shop `/shop`, **Kit Gesuche** `/kit-gesuche`, 
 
 Mobile: same set plus Favorites in `MAIN_NAV_ITEMS`; peptide label **Lexikon & Rechner**; Kit Gesuche short label **Kits** on the bottom bar.
 
-Admin nav (grouped): Übersicht; Bestellungen → Bestelleingänge; Produkte → Produktkatalog / Import / Import-Verlauf; Finanzen → Rollenaufschläge / Rollen & Preise / Versand; Benutzer → Benutzer / Audit-Log; Inhalte → Research.
+Admin nav (five hubs, in-page tabs): Übersicht `/admin`; Bestellungen → Eingegangene Bestellungen `/admin/orders`, Versand `/admin/shipping`; Produkte → Produktkatalog / Import / Import-Verlauf; Benutzer & Rollen → Benutzer / Rollen & Preisaufschlag / Rollenaufschläge / Audit-Log; Inhalte → Research.
 
 ### Routes (`src/App.tsx`)
 

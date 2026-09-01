@@ -216,7 +216,7 @@ export default function AdminRolesPage() {
                 return (
                   <TableRow key={user.id}>
                     <TableCell>
-                      <p className="text-sm font-medium">{user.displayName}</p>
+                      <p className="text-sm font-medium">{user.username ?? "—"}</p>
                       {user.roles.includes("admin") && (
                         <p className="text-xs text-muted-foreground">Admin</p>
                       )}

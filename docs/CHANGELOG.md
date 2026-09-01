@@ -2,6 +2,21 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-01 (orders isolation, admin hubs, Telegram identity)
+
+### Fixed
+
+- **Meine Bestellungen** (`/orders`) now always queries `orders.user_id = auth.uid()`. Admins no longer see other users' incoming orders there. The admin inbox remains `/admin/orders` with `listAllOrders`. RLS `orders_select_own_or_admin` was not loosened.
+
+### Changed
+
+- Admin chrome is five hubs: Übersicht, Bestellungen, Produkte, Benutzer & Rollen, Inhalte. Each hub has its own wrapping subtabs. Existing admin URLs still work.
+- Visible identity is **Telegram Benutzername** (`profiles.username` / order snapshot). Interner Name is no longer shown. `profiles.display_name` stays in the database.
+
+### Notes
+
+- No DB migration. Role markup, quantity tier, oils pack totals, kits, cart naming, auth, payment, and order snapshots are unchanged.
+
 ## 2026-09-01 (checkout Lieferart, orders, admin nav)
 
 ### Added

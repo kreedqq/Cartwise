@@ -5,9 +5,11 @@ import { useAuth } from "@/context/AuthProvider";
 import {
   createOrder,
   deleteOrder,
+  getAdminOrderWithItems,
+  getMyOrderWithItems,
   getOrderAdminNote,
-  getOrderWithItems,
   listMyOrders,
+  listMyOrderStatusHistory,
   listOrderStatusHistory,
   setOrderStatus,
 } from "@/services/orders";
@@ -15,15 +17,42 @@ import type { PaymentMethod } from "@/lib/shop/paymentMethod";
 import type { ShippingAddress } from "@/lib/shippingAddress";
 import type { OrderStatus } from "@/types/database";
 
+const MY_ORDERS_ROOT = ["my-orders"] as const;
+
 export function useMyOrders() {
-  return useQuery({ queryKey: QUERY_KEYS.myOrders, queryFn: listMyOrders });
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: QUERY_KEYS.myOrders(user?.id ?? ""),
+    queryFn: listMyOrders,
+    enabled: Boolean(user?.id),
+  });
 }
 
-export function useOrder(orderId: string | undefined) {
+/** Customer order detail. Never shares the admin inbox query. */
+export function useMyOrder(orderId: string | undefined) {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: QUERY_KEYS.myOrder(user?.id ?? "", orderId ?? ""),
+    queryFn: () => getMyOrderWithItems(orderId as string),
+    enabled: Boolean(orderId) && Boolean(user?.id),
+  });
+}
+
+/** Admin inbox detail. Caller must sit behind AdminRoute. */
+export function useAdminOrder(orderId: string | undefined) {
   return useQuery({
     queryKey: QUERY_KEYS.order(orderId ?? ""),
-    queryFn: () => getOrderWithItems(orderId as string),
-    enabled: !!orderId,
+    queryFn: () => getAdminOrderWithItems(orderId as string),
+    enabled: Boolean(orderId),
+  });
+}
+
+export function useMyOrderStatusHistory(orderId: string | undefined) {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: [...QUERY_KEYS.myOrder(user?.id ?? "", orderId ?? ""), "history"],
+    queryFn: () => listMyOrderStatusHistory(orderId as string),
+    enabled: Boolean(orderId) && Boolean(user?.id),
   });
 }
 
@@ -59,7 +88,7 @@ export function useCreateOrder() {
       shipping: ShippingAddress;
     }) => createOrder(cartId, note, paymentMethod, shipping),
     onSuccess: (_result, { cartId }) => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myOrders });
+      queryClient.invalidateQueries({ queryKey: MY_ORDERS_ROOT });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });
       if (user) {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts(user.id) });
@@ -79,7 +108,7 @@ export function useSetOrderStatus(orderId: string) {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.order(orderId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orderStatusHistory(orderId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myOrders });
+      queryClient.invalidateQueries({ queryKey: MY_ORDERS_ROOT });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orderAdminNote(orderId) });
     },
   });
@@ -92,7 +121,7 @@ export function useDeleteOrder() {
     onSuccess: (_void, orderId) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.order(orderId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myOrders });
+      queryClient.invalidateQueries({ queryKey: MY_ORDERS_ROOT });
       queryClient.invalidateQueries({ queryKey: ["admin-order-items"] });
     },
   });

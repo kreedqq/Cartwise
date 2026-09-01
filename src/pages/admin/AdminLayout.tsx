@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-import { AdminNav } from "@/components/layout/AdminNav";
+import { AdminNav, AdminSectionTabs } from "@/components/layout/AdminNav";
 
 export default function AdminLayout() {
   return (
@@ -14,9 +14,11 @@ export default function AdminLayout() {
         </span>
       </div>
 
-      <div className="mb-5 border-b border-border pb-1">
+      <div className="mb-4 border-b border-border pb-3">
         <AdminNav />
       </div>
+
+      <AdminSectionTabs />
 
       <Outlet />
     </div>

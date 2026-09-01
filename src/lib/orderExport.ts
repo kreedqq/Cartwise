@@ -352,7 +352,7 @@ export function toOrderExportDoc(
   roleSurcharge?: { catalogSubtotalUsd: number; surchargeUsd: number } | null,
   options?: { audience?: "admin" | "customer" },
 ): OrderExportDoc {
-  const telegramUsername = order.telegram_username_snapshot?.trim() || customer?.displayName || undefined;
+  const telegramUsername = order.telegram_username_snapshot?.trim() || undefined;
   const audience = options?.audience ?? "customer";
   const surchargeUnavailable = audience === "admin" && !roleSurcharge;
   return {
@@ -367,7 +367,7 @@ export function toOrderExportDoc(
     china_shipping_currency: order.china_shipping_currency,
     de_shipping_amount: order.de_shipping_amount,
     de_shipping_currency: order.de_shipping_currency,
-    customerLabel: telegramUsername ?? customer?.displayName,
+    customerLabel: telegramUsername,
     customerEmail: customer?.email,
     telegramUsername: order.telegram_username_snapshot?.trim() || null,
     deliveryMethodLabel: formatDeliveryMethodLabel(order.shipping_delivery_method),
