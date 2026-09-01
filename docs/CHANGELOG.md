@@ -2,6 +2,13 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-01 (disable zero-price shop SKUs)
+
+### Changed
+
+- Production catalog: `is_active = false` for `B1201`, `B1210`, `GGH`, `HHB`, `SHB` only. Rows kept; `price_usd`, bulk price, SKU, product ID, dosage, and category unchanged.
+- Shop and Kit Gesuche already omit inactive products (`list_shop_products` / `create_kit_request` require `is_active`). No pricing, kit, or RLS code changes.
+
 ## 2026-09-01 (kit Gesuche BPC filter + 0-price Excel audit)
 
 ### Fixed

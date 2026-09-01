@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-01** (final security + product-data audit).
+Last documentation pass: **2026-09-01** (zero-price shop SKUs deactivated).
+
+**Update 2026-09-01 (0€ shop cleanup)**: Production `is_active = false` only for `B1201`, `B1210`, `GGH`, `HHB`, `SHB`. Rows remain; prices/SKUs/IDs unchanged. Shop and Kit Gesuche already load via `list_shop_products` (`is_active = true`). Active catalog 293 / inactive 27 / active `price_usd = 0` = 0.
 
 **Update 2026-09-01 (product data + Kit Gesuche display)**: GENXELL `Preiskatalog` (Status + hellrot `FFF4CCCC` = OUT OF STOCK) matches production: 298 AVAILABLE / 22 already inactive. Five active `price_usd = 0` SKUs (`B1201`, `B1210`, `GGH`, `HHB`, `SHB`) are Excel AVAILABLE — not deactivated; unit prices not invented. Shop reconstitution water remains AA10/BA03/BA10. Kit Gesuche product filter uses `shopGroupsForCategory` so BPC/BPC157 cannot appear under Reconstitution Water; shop React keys use unique `groupKey`.
 
@@ -12,7 +14,7 @@ Last documentation pass: **2026-09-01** (final security + product-data audit).
 
 **Update 2026-08-31 (later)**: Canonical `profiles.username` is shown in Topbar/Dashboard/Profile; new carts are named after the username; kit-share auto-create uses the same name (migration `0040`). Redundant shop `ab 10` badge removed. No price/SKU/kit-pricing changes.
 
-**Update 2026-08-31**: Orals pack labels are formatted from existing `products.dosage_vial` via `formatProductVariant()` (no DB/SKU/price writes). Oral shop grouping no longer merges lexicon aliases (`BPC` ≠ `BPC157`). Five active SKUs remain `price_usd = 0` (BLOCKER: Excel AVAILABLE, bulk only; no unit price invented).
+**Update 2026-08-31**: Orals pack labels are formatted from existing `products.dosage_vial` via `formatProductVariant()` (no DB/SKU/price writes). Oral shop grouping no longer merges lexicon aliases (`BPC` ≠ `BPC157`). Five 0-price SKUs (`B1201`, `B1210`, `GGH`, `HHB`, `SHB`) were later deactivated (`is_active = false`) without price changes.
 
 **Update 2026-08-30**: migration `0039_fix_kit_share_partial_order_completion.sql` deployed to `cartwise-prod` (local = remote through `0039`, verified via `supabase migration list`). Fixes the kit-share `create_order` bug where the whole kit flipped to `'ordered'` after the first participant ordered, blocking everyone else; adds `kit_share_participants.ordered_at`/`.order_id`; Dashboard now hides ordered carts (`isOpenCart` filter); `OrderDetail.tsx` now shows `payment_method`. See `docs/CHANGELOG.md` for the full entry.
 
