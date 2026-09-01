@@ -52,7 +52,7 @@ Peptide routes sit behind `ProtectedRoute` (same login as shop).
 
 - Email/password login and register, magic link, forgot/reset password
 - Canonical public identity is `profiles.username` (UI: Telegram Benutzername). Cart titles use `name_ordinal`. Orders snapshot telegram handle + shipping at checkout.
-- OAuth: Discord (`discord`) and Telegram Custom OIDC (`custom:telegram`, scopes `openid profile`, email optional). Existing accounts are not auto-merged by Telegram username; they must link Telegram explicitly.
+- OAuth: Discord (`discord`) and Telegram Custom OIDC (`custom:telegram`, scopes `openid profile`, email optional). Telegram authorize includes `origin` from `window.location.origin` because `oauth.telegram.org/auth` returns "origin required" without it. Existing accounts are not auto-merged by Telegram username; they must link Telegram explicitly.
 - `skipBrowserRedirect: true` plus strip `skip_http_redirect` so GoTrue JSON is not saved as `authorize.json`
 - Password login waits for a client session and AuthProvider session before `/dashboard`; `/login` with an existing session goes to `/dashboard`
 - OAuth callback keeps an existing session if the PKCE code was already consumed

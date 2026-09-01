@@ -19,6 +19,7 @@ const {
   isDiscordGoTrueAuthorizeUrl,
   isEnabledGoTrueOAuthAuthorizeUrl,
   stripSkipHttpRedirect,
+  withTelegramOriginParam,
   OAUTH_CALLBACK_PATH,
   OAUTH_PROVIDERS,
   TELEGRAM_OAUTH_PROVIDER,
@@ -91,7 +92,10 @@ describe("Telegram login", () => {
     expect(String(payload.options.redirectTo).endsWith("/auth/callback")).toBe(true);
     expect(payload.options.scopes).toBe("openid profile");
     expect(String(payload.options.scopes)).not.toMatch(/phone/i);
-    expect(assign).toHaveBeenCalledWith(TELEGRAM);
+    expect(payload.options.queryParams).toEqual({ origin: window.location.origin });
+    const landed = String(assign.mock.calls[0][0]);
+    expect(landed.startsWith("https://oauth.telegram.org/auth")).toBe(true);
+    expect(new URL(landed).searchParams.get("origin")).toBe(window.location.origin);
   });
 
   it("does not require an email for Telegram sign-in", async () => {
@@ -113,7 +117,9 @@ describe("Telegram login", () => {
     vi.stubGlobal("location", { origin: window.location.origin, assign });
 
     await startOAuth(TELEGRAM_OAUTH_PROVIDER, fetchImpl);
-    expect(assign).toHaveBeenCalledWith(TELEGRAM_AUTHORIZE);
+    const landed = String(assign.mock.calls[0][0]);
+    expect(new URL(landed).searchParams.get("provider")).toBe("custom:telegram");
+    expect(new URL(landed).searchParams.get("origin")).toBe(window.location.origin);
   });
 
   it("falls back to document navigation on CORS/network for Telegram", async () => {
@@ -122,7 +128,9 @@ describe("Telegram login", () => {
     vi.stubGlobal("location", { origin: window.location.origin, assign });
 
     await startOAuth(TELEGRAM_OAUTH_PROVIDER, fetchImpl);
-    expect(assign).toHaveBeenCalledWith(TELEGRAM_AUTHORIZE);
+    const landed = String(assign.mock.calls[0][0]);
+    expect(new URL(landed).searchParams.get("provider")).toBe("custom:telegram");
+    expect(new URL(landed).searchParams.get("origin")).toBe(window.location.origin);
   });
 });
 
@@ -143,9 +151,20 @@ describe("Telegram redirect safety", () => {
     expect(stripped).not.toContain("custom%3Atelegram");
   });
 
+  it("adds origin for Telegram and leaves Discord URLs untouched", () => {
+    const withOrigin = withTelegramOriginParam(TELEGRAM, "https://peptix.app");
+    expect(new URL(withOrigin).searchParams.get("origin")).toBe("https://peptix.app");
+    expect(withTelegramOriginParam(DISCORD, "https://peptix.app")).toBe(DISCORD);
+    expect(withTelegramOriginParam(DISCORD_AUTHORIZE, "https://peptix.app")).toBe(DISCORD_AUTHORIZE);
+    const goTrue = withTelegramOriginParam(TELEGRAM_AUTHORIZE, "https://peptix.app");
+    expect(new URL(goTrue).searchParams.get("origin")).toBe("https://peptix.app");
+    expect(new URL(goTrue).searchParams.get("provider")).toBe("custom:telegram");
+  });
+
   it("builds production callback from peptix.app origin, never a hardcoded localhost", () => {
     vi.stubGlobal("location", { origin: "https://peptix.app" });
     expect(getRedirectUrl(OAUTH_CALLBACK_PATH)).toBe("https://peptix.app/auth/callback");
+    expect(withTelegramOriginParam(TELEGRAM, window.location.origin)).toContain("origin=https%3A%2F%2Fpeptix.app");
     const auth = readSource("src/services/auth.ts");
     expect(auth).toContain("window.location.origin");
     expect(auth).not.toMatch(/redirectTo:\s*["'`]https?:\/\/localhost/i);
@@ -179,6 +198,7 @@ describe("Discord login remains unchanged", () => {
     expect(payload.options.skipBrowserRedirect).toBe(true);
     expect(payload.options.redirectTo).toBe(getRedirectUrl(OAUTH_CALLBACK_PATH));
     expect(payload.options).not.toHaveProperty("scopes");
+    expect(payload.options).not.toHaveProperty("queryParams");
     expect(assign).toHaveBeenCalledWith(DISCORD);
   });
 });

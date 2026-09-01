@@ -190,6 +190,26 @@ export function stripSkipHttpRedirect(url: string): string {
   }
 }
 
+/**
+ * Telegram's authorization page (`oauth.telegram.org/auth`) returns the body
+ * "origin required" unless `origin` is present. GoTrue's custom OIDC redirect
+ * omits it. Discord does not use this parameter.
+ */
+export function withTelegramOriginParam(url: string, origin: string): string {
+  if (!origin) return url;
+  try {
+    const parsed = new URL(url);
+    const telegramHost = parsed.hostname === "oauth.telegram.org" || parsed.hostname.endsWith(".oauth.telegram.org");
+    const goTrueTelegram =
+      parsed.pathname.includes("/auth/v1/authorize") && parsed.searchParams.get("provider") === TELEGRAM_OAUTH_PROVIDER;
+    if (!telegramHost && !goTrueTelegram) return url;
+    parsed.searchParams.set("origin", origin);
+    return parsed.toString().replaceAll("provider=custom%3Atelegram", `provider=${TELEGRAM_OAUTH_PROVIDER}`);
+  } catch {
+    return url;
+  }
+}
+
 function isRedirectStatus(status: number): boolean {
   return status === 301 || status === 302 || status === 303 || status === 307 || status === 308;
 }
@@ -285,18 +305,22 @@ export function readOAuthCallbackError(
  * `window.location` (Chrome then downloads it as `authorize.json`).
  */
 export async function signInWithOAuth(provider: OAuthProvider, fetchImpl?: FetchLike) {
+  const origin = window.location.origin;
   const { data, error } = await supabase.auth.signInWithOAuth({
     // `custom:telegram` is a dashboard Custom OIDC id; supabase-js Provider is built-ins only.
     provider: provider as "discord",
     options: {
       redirectTo: getRedirectUrl(OAUTH_CALLBACK_PATH),
       skipBrowserRedirect: true,
-      ...(provider === TELEGRAM_OAUTH_PROVIDER ? { scopes: TELEGRAM_OAUTH_SCOPES } : {}),
+      ...(provider === TELEGRAM_OAUTH_PROVIDER
+        ? { scopes: TELEGRAM_OAUTH_SCOPES, queryParams: { origin } }
+        : {}),
     },
   });
   if (error) throw error;
   if (!data.url) throw new Error("provider is not enabled");
-  const providerUrl = await resolveOAuthRedirectUrl(data.url, fetchImpl);
+  const resolved = await resolveOAuthRedirectUrl(data.url, fetchImpl);
+  const providerUrl = provider === TELEGRAM_OAUTH_PROVIDER ? withTelegramOriginParam(resolved, origin) : resolved;
   beginOAuthRedirect(providerUrl);
   return data;
 }

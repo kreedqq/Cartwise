@@ -2,6 +2,17 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-01 (Telegram origin required)
+
+### Fixed
+
+- Telegram OIDC authorize (`oauth.telegram.org/auth`) was called without `origin`, so Telegram returned **Origin required**. Telegram login now sends `origin` from `window.location.origin` (production: `https://peptix.app`). Discord is unchanged.
+
+### Notes
+
+- Telegram's OIDC `redirect_uri` remains the Supabase callback `https://cnjrjinvxycdkrmzcime.supabase.co/auth/v1/callback`. The SPA still returns to `https://peptix.app/auth/callback`.
+- After `origin` is present, Telegram may still return **Bot domain invalid** until BotFather Allowed URLs include `https://peptix.app` and the Supabase callback URL.
+
 ## 2026-09-01 (Telegram login)
 
 ### Added
