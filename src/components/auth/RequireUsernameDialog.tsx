@@ -34,6 +34,7 @@ export function RequireUsernameDialog() {
   React.useEffect(() => {
     if (!open || value) return;
     const suggestionRaw =
+      (user?.user_metadata?.preferred_username as string | undefined) ??
       (user?.user_metadata?.user_name as string | undefined) ??
       (user?.user_metadata?.username as string | undefined) ??
       (user?.user_metadata?.full_name as string | undefined) ??

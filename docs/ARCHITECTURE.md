@@ -4,7 +4,7 @@ Peptix is a **Vite + React 19 + TypeScript** SPA. Backend is **Supabase** (Postg
 
 ```
 Browser (Peptix SPA)
-  ├─ Auth (GoTrue) ── Discord OAuth / email
+  ├─ Auth (GoTrue) ── Discord / Telegram OAuth / email
   ├─ RPCs / tables (shop, carts, orders) ── RLS
   ├─ Edge: get-exchange-rate, set-user-role
   └─ Peptide platform
@@ -41,7 +41,7 @@ Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PA
 
 ## Authentication
 
-`AuthProvider` + `ProtectedRoute` / `AdminRoute`. Discord OAuth uses `skipBrowserRedirect` and never assigns GoTrue JSON to `window.location`. Password login does not navigate to `/dashboard` until AuthProvider has a session. OAuth callback (`completeOAuthCallback`) keeps a session if `exchangeCodeForSession` fails after `detectSessionInUrl` already consumed the code. Anon key is public; authorization is RLS + RPCs. Production Site URL must be `https://peptix.app` (not localhost).
+`AuthProvider` + `ProtectedRoute` / `AdminRoute`. Discord and Telegram (`custom:telegram`) OAuth use `skipBrowserRedirect` and never assign GoTrue JSON to `window.location`. Password login does not navigate to `/dashboard` until AuthProvider has a session. OAuth callback (`completeOAuthCallback`) keeps a session if `exchangeCodeForSession` fails after `detectSessionInUrl` already consumed the code. Telegram login does not merge accounts by username. Anon key is public; authorization is RLS + RPCs. Production Site URL must be `https://peptix.app` (not localhost).
 
 ## Shop vs peptide
 

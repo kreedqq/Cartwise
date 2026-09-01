@@ -2,7 +2,7 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-01** (Telegram identity, cart titles, checkout address snapshots).
+Last documentation pass: **2026-09-01** (Telegram login via Custom OIDC `custom:telegram`).
 
 **Update 2026-09-01 (0€ shop cleanup)**: Production `is_active = false` only for `B1201`, `B1210`, `GGH`, `HHB`, `SHB`. Rows remain; prices/SKUs/IDs unchanged. Shop and Kit Gesuche already load via `list_shop_products` (`is_active = true`). Active catalog 293 / inactive 27 / active `price_usd = 0` = 0.
 
@@ -52,7 +52,7 @@ Peptide routes sit behind `ProtectedRoute` (same login as shop).
 
 - Email/password login and register, magic link, forgot/reset password
 - Canonical public identity is `profiles.username` (UI: Telegram Benutzername). Cart titles use `name_ordinal`. Orders snapshot telegram handle + shipping at checkout.
-- OAuth: **Discord only** (`OAUTH_PROVIDERS = ["discord"]`)
+- OAuth: Discord (`discord`) and Telegram Custom OIDC (`custom:telegram`, scopes `openid profile`, email optional). Existing accounts are not auto-merged by Telegram username; they must link Telegram explicitly.
 - `skipBrowserRedirect: true` plus strip `skip_http_redirect` so GoTrue JSON is not saved as `authorize.json`
 - Password login waits for a client session and AuthProvider session before `/dashboard`; `/login` with an existing session goes to `/dashboard`
 - OAuth callback keeps an existing session if the PKCE code was already consumed

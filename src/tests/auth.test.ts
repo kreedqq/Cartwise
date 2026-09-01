@@ -53,6 +53,7 @@ describe("OAuth URL safety", () => {
   it("allows only Discord identity hosts", () => {
     expect(isSafeOAuthProviderUrl(DISCORD)).toBe(true);
     expect(isSafeOAuthProviderUrl("https://discordapp.com/oauth2/authorize")).toBe(true);
+    expect(isSafeOAuthProviderUrl("https://oauth.telegram.org/auth")).toBe(true);
     expect(isSafeOAuthProviderUrl(GOOGLE)).toBe(false);
     expect(isSafeOAuthProviderUrl(APPLE)).toBe(false);
     expect(isSafeOAuthProviderUrl(AUTHORIZE)).toBe(false);
@@ -175,7 +176,8 @@ describe("OAuth client helpers", () => {
   it("does not treat OAuth success as an admin landing page", () => {
     expect(POST_LOGIN_PATH).toBe("/dashboard");
     expect(OAUTH_SUCCESS_PATH).toBe("/shop");
-    expect(OAUTH_PROVIDERS).toEqual(["discord"]);
+    expect(OAUTH_PROVIDERS).toContain("discord");
+    expect(OAUTH_PROVIDERS).toEqual(["discord", "custom:telegram"]);
   });
 });
 
@@ -244,6 +246,7 @@ describe("OAuth UI surface", () => {
     const register = readFileSync(resolve(process.cwd(), "src/pages/Register.tsx"), "utf8");
     const combined = `${buttons}\n${login}\n${register}`;
     expect(combined).toMatch(/Mit Discord fortfahren/);
+    expect(combined).toMatch(/Mit Telegram anmelden/);
     expect(combined).not.toMatch(/Mit Google fortfahren/);
     expect(combined).not.toMatch(/Mit Apple fortfahren/);
     expect(buttons).not.toMatch(/handleOAuth\("google"\)/);

@@ -2,6 +2,18 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-01 (Telegram login)
+
+### Added
+
+- Login and register offer **Mit Telegram anmelden** next to Discord, using the existing Custom OIDC provider `custom:telegram` (`openid profile`, no phone). Redirect still uses `getRedirectUrl("/auth/callback")`.
+- Telegram users without an email are accepted. New users follow the existing Auth → `profiles` → `RequireUsernameDialog` path. `preferred_username` may prefill that dialog; it is never auto-saved.
+
+### Notes
+
+- No account merge by Telegram username, name, or email. Existing Peptix accounts must link Telegram explicitly in Supabase (identity linking). The SPA does not look up `profiles` by Telegram handle.
+- Discord, email login, Safari callback, cart naming, kits, checkout, RLS, and migrations are unchanged. No Client Secret / bot token in the frontend.
+
 ## 2026-09-01 (telegram identity, cart titles, checkout address)
 
 ### Changed

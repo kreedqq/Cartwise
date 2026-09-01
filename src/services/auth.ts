@@ -1,6 +1,10 @@
 import { supabase } from "@/lib/supabaseClient";
 
-export const OAUTH_PROVIDERS = ["discord"] as const;
+export const DISCORD_OAUTH_PROVIDER = "discord" as const;
+export const TELEGRAM_OAUTH_PROVIDER = "custom:telegram" as const;
+/** Dashboard Custom OIDC scopes. Space-separated for supabase-js; never include phone. */
+export const TELEGRAM_OAUTH_SCOPES = "openid profile";
+export const OAUTH_PROVIDERS = [DISCORD_OAUTH_PROVIDER, TELEGRAM_OAUTH_PROVIDER] as const;
 export type OAuthProvider = (typeof OAUTH_PROVIDERS)[number];
 
 export const OAUTH_CALLBACK_PATH = "/auth/callback";
@@ -108,7 +112,7 @@ export type FetchLike = (
   text(): Promise<string>;
 }>;
 
-const OAUTH_PROVIDER_HOSTS = ["discord.com", "discordapp.com"] as const;
+const OAUTH_PROVIDER_HOSTS = ["discord.com", "discordapp.com", "oauth.telegram.org"] as const;
 
 function messageFromAuthorizeBody(raw: string): string {
   try {
@@ -132,7 +136,7 @@ function messageFromAuthorizeBody(raw: string): string {
   }
 }
 
-/** Only Discord identity pages — never GoTrue `/authorize` (that JSON is downloaded as authorize.json). */
+/** Only Discord / Telegram identity pages — never GoTrue `/authorize` (that JSON is downloaded as authorize.json). */
 export function isSafeOAuthProviderUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
@@ -155,18 +159,32 @@ export function isDiscordGoTrueAuthorizeUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
     if (!parsed.pathname.includes("/auth/v1/authorize")) return false;
-    return parsed.searchParams.get("provider") === "discord";
+    return parsed.searchParams.get("provider") === DISCORD_OAUTH_PROVIDER;
   } catch {
     return false;
   }
 }
 
-/** supabase-js appends this flag; GoTrue ignores it and may forward it to Discord. */
+/** GoTrue `/authorize` for the OAuth providers Peptix actually enables. */
+export function isEnabledGoTrueOAuthAuthorizeUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (!parsed.pathname.includes("/auth/v1/authorize")) return false;
+    const provider = parsed.searchParams.get("provider");
+    return provider === DISCORD_OAUTH_PROVIDER || provider === TELEGRAM_OAUTH_PROVIDER;
+  } catch {
+    return false;
+  }
+}
+
+/** supabase-js appends this flag; GoTrue ignores it and may forward it to Discord/Telegram. */
 export function stripSkipHttpRedirect(url: string): string {
   try {
     const parsed = new URL(url);
+    if (!parsed.searchParams.has("skip_http_redirect")) return url;
     parsed.searchParams.delete("skip_http_redirect");
-    return parsed.toString();
+    // URL() encodes `custom:telegram` as `custom%3Atelegram`; GoTrue needs the literal id.
+    return parsed.toString().replaceAll("provider=custom%3Atelegram", `provider=${TELEGRAM_OAUTH_PROVIDER}`);
   } catch {
     return url;
   }
@@ -201,9 +219,9 @@ export async function resolveOAuthRedirectUrl(authorizeUrl: string, fetchImpl: F
       },
     });
   } catch {
-    // CORS/network: Discord is enabled server-side and GoTrue 302s to discord.com.
+    // CORS/network: enabled providers 302 to their identity host.
     // Document navigation follows that redirect. JSON 400 is not this path.
-    if (isDiscordGoTrueAuthorizeUrl(authorizeUrl)) return stripSkipHttpRedirect(authorizeUrl);
+    if (isEnabledGoTrueOAuthAuthorizeUrl(authorizeUrl)) return stripSkipHttpRedirect(authorizeUrl);
     throw new Error("oauth_network");
   }
 
@@ -211,7 +229,7 @@ export async function resolveOAuthRedirectUrl(authorizeUrl: string, fetchImpl: F
   if (location && isSafeOAuthProviderUrl(location)) return location;
 
   const opaqueRedirect = response.status === 0 || response.type === "opaqueredirect";
-  if ((isRedirectStatus(response.status) || opaqueRedirect) && isDiscordGoTrueAuthorizeUrl(authorizeUrl)) {
+  if ((isRedirectStatus(response.status) || opaqueRedirect) && isEnabledGoTrueOAuthAuthorizeUrl(authorizeUrl)) {
     return stripSkipHttpRedirect(authorizeUrl);
   }
 
@@ -236,7 +254,7 @@ export function beginOAuthRedirect(url: string): void {
     window.location.assign(url);
     return;
   }
-  if (isDiscordGoTrueAuthorizeUrl(url)) {
+  if (isEnabledGoTrueOAuthAuthorizeUrl(url)) {
     window.location.assign(stripSkipHttpRedirect(url));
     return;
   }
@@ -258,19 +276,22 @@ export function readOAuthCallbackError(
 }
 
 /**
- * Discord sign-in via Supabase Auth.
+ * Discord / Telegram sign-in via Supabase Auth.
  * New users are created by Auth; `handle_new_user` assigns role `user` and
- * customer role Kunde server-side. This helper never sends a role.
+ * customer role Kunde server-side. This helper never sends a role, never
+ * merges accounts by username/email, and never requires an email for Telegram.
  *
  * `skipBrowserRedirect` is required so a JSON error body is never assigned to
  * `window.location` (Chrome then downloads it as `authorize.json`).
  */
 export async function signInWithOAuth(provider: OAuthProvider, fetchImpl?: FetchLike) {
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider,
+    // `custom:telegram` is a dashboard Custom OIDC id; supabase-js Provider is built-ins only.
+    provider: provider as "discord",
     options: {
       redirectTo: getRedirectUrl(OAUTH_CALLBACK_PATH),
       skipBrowserRedirect: true,
+      ...(provider === TELEGRAM_OAUTH_PROVIDER ? { scopes: TELEGRAM_OAUTH_SCOPES } : {}),
     },
   });
   if (error) throw error;
