@@ -3,6 +3,7 @@ import { downloadCsv } from "@/services/csvProducts";
 import { ORDER_STATUS_LABELS } from "@/services/orders";
 import { BRAND_NAME } from "@/lib/constants";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
+import { formatShippingAddressLines, formatShippingRecipient, hasShippingSnapshot } from "@/lib/shippingAddress";
 import type { OrderStatus, Tables } from "@/types/database";
 
 export interface OrderExportLine {
@@ -28,6 +29,9 @@ export interface OrderExportDoc {
   exchange_rate: number | null;
   customerLabel?: string;
   customerEmail?: string | null;
+  telegramUsername?: string | null;
+  shippingRecipient?: string | null;
+  shippingLines?: string[];
   china_shipping_amount?: number | null;
   china_shipping_currency?: string | null;
   de_shipping_amount?: number | null;
@@ -46,6 +50,8 @@ export function buildOrderCsv(doc: OrderExportDoc): string {
     "Bestellnummer",
     "Status",
     "Datum",
+    "Telegram Benutzername",
+    "Lieferadresse",
     "Code",
     "Name",
     "Dosage",
@@ -60,6 +66,8 @@ export function buildOrderCsv(doc: OrderExportDoc): string {
       doc.order_number,
       ORDER_STATUS_LABELS[doc.status],
       formatDateTime(doc.submitted_at),
+      doc.telegramUsername ?? "",
+      [doc.shippingRecipient, ...(doc.shippingLines ?? [])].filter(Boolean).join(", "),
       item.product_code_snapshot,
       item.product_name_snapshot,
       cartItemVariantSubtitle(item) ?? item.dosage_vial_snapshot ?? "",
@@ -224,6 +232,8 @@ export function printOrderDocument(doc: OrderExportDoc): void {
     </div>
   </header>
   ${doc.customerLabel ? `<p>Kunde: <strong>${escapeHtml(doc.customerLabel)}</strong>${doc.customerEmail ? ` · ${escapeHtml(doc.customerEmail)}` : ""}</p>` : ""}
+  ${doc.telegramUsername ? `<p>Telegram Benutzername: <strong>${escapeHtml(doc.telegramUsername)}</strong></p>` : ""}
+  ${doc.shippingRecipient || (doc.shippingLines && doc.shippingLines.length > 0) ? `<p>Lieferadresse<br>${doc.shippingRecipient ? `<strong>${escapeHtml(doc.shippingRecipient)}</strong><br>` : ""}${(doc.shippingLines ?? []).map((line) => escapeHtml(line)).join("<br>")}</p>` : ""}
   <table>
     <thead>
       <tr>
@@ -257,6 +267,7 @@ export function toOrderExportDoc(
   items: Tables<"order_items">[],
   customer?: { displayName: string; email: string | null },
 ): OrderExportDoc {
+  const telegramUsername = order.telegram_username_snapshot?.trim() || customer?.displayName || undefined;
   return {
     order_number: order.order_number,
     status: order.status,
@@ -269,8 +280,11 @@ export function toOrderExportDoc(
     china_shipping_currency: order.china_shipping_currency,
     de_shipping_amount: order.de_shipping_amount,
     de_shipping_currency: order.de_shipping_currency,
-    customerLabel: customer?.displayName,
+    customerLabel: telegramUsername ?? customer?.displayName,
     customerEmail: customer?.email,
+    telegramUsername: order.telegram_username_snapshot?.trim() || null,
+    shippingRecipient: formatShippingRecipient(order),
+    shippingLines: hasShippingSnapshot(order) ? formatShippingAddressLines(order) : [],
     items,
   };
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultCartName } from "@/lib/cart/defaultCartName";
+import { cartTitleFromOrdinal, defaultCartName } from "@/lib/cart/defaultCartName";
 import { accountInitials, publicUsername, visibleAccountLabel } from "@/lib/username";
 
 describe("publicUsername", () => {
@@ -39,5 +39,18 @@ describe("defaultCartName", () => {
   it("does not invent a name from an email address", () => {
     expect(defaultCartName(null, [])).toBe("Warenkorb");
     expect(defaultCartName("  ", [])).toBe("Warenkorb");
+  });
+});
+
+describe("cartTitleFromOrdinal", () => {
+  it("keeps ordinal 1 as the bare Telegram handle", () => {
+    expect(cartTitleFromOrdinal("testuser", 1)).toBe("testuser");
+    expect(cartTitleFromOrdinal("testuser", 2)).toBe("testuser – Warenkorb 2");
+    expect(cartTitleFromOrdinal("testuser", 3)).toBe("testuser – Warenkorb 3");
+  });
+
+  it("does not change ordinals when the handle changes", () => {
+    expect(cartTitleFromOrdinal("newhandle", 1)).toBe("newhandle");
+    expect(cartTitleFromOrdinal("newhandle", 3)).toBe("newhandle – Warenkorb 3");
   });
 });

@@ -7,6 +7,34 @@ export const OAUTH_CALLBACK_PATH = "/auth/callback";
 export const POST_LOGIN_PATH = "/dashboard";
 export const OAUTH_SUCCESS_PATH = "/shop";
 
+const BLOCKED_POST_LOGIN_PREFIXES = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/auth",
+  "/403",
+];
+
+/**
+ * Honors ProtectedRoute's `location.state.from` when it is an in-app path.
+ * External URLs and auth pages fall back to the dashboard.
+ */
+export function safePostLoginPath(from: unknown): string {
+  if (!from || typeof from !== "object") return POST_LOGIN_PATH;
+  const loc = from as { pathname?: unknown; search?: unknown };
+  if (typeof loc.pathname !== "string") return POST_LOGIN_PATH;
+  const pathname = loc.pathname;
+  if (!pathname.startsWith("/") || pathname.startsWith("//") || pathname.includes("\\")) {
+    return POST_LOGIN_PATH;
+  }
+  if (BLOCKED_POST_LOGIN_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))) {
+    return POST_LOGIN_PATH;
+  }
+  const search = typeof loc.search === "string" ? loc.search : "";
+  return `${pathname}${search}`;
+}
+
 /**
  * Redirect target after email confirmation / password reset / magic link / OAuth.
  * Derived from `window.location.origin` + Vite BASE_URL at runtime so

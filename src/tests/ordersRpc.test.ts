@@ -21,11 +21,27 @@ describe("createOrder RPC", () => {
       data: { orderId: "ord-9", orderNumber: "CW-2026-000009", totalUsd: 660 },
       error: null,
     });
-    const result = await createOrder("cart-1", "Bitte schnell", "paypal");
+    const result = await createOrder("cart-1", "Bitte schnell", "paypal", {
+      firstName: "Ada",
+      lastName: "Lovelace",
+      street: "Example Street",
+      houseNumber: "10",
+      postalCode: "10115",
+      city: "Berlin",
+      country: "Deutschland",
+    });
     expect(rpc).toHaveBeenCalledWith("create_order", {
       _cart_id: "cart-1",
       _note: "Bitte schnell",
       _payment_method: "paypal",
+      _shipping_first_name: "Ada",
+      _shipping_last_name: "Lovelace",
+      _shipping_street: "Example Street",
+      _shipping_house_number: "10",
+      _shipping_address_extra: null,
+      _shipping_postal_code: "10115",
+      _shipping_city: "Berlin",
+      _shipping_country: "Deutschland",
     });
     expect(result).toEqual({ orderId: "ord-9", orderNumber: "CW-2026-000009", totalUsd: 660 });
   });
@@ -35,9 +51,20 @@ describe("createOrder RPC", () => {
       data: { orderId: "ord-9", orderNumber: "CW-2026-000009", totalUsd: 12 },
       error: null,
     });
-    const result = await createOrder("cart-1", null, "crypto");
+    const result = await createOrder("cart-1", null, "crypto", {
+      firstName: "Ada",
+      lastName: "Lovelace",
+      street: "Example Street",
+      houseNumber: "10",
+      postalCode: "10115",
+      city: "Berlin",
+      country: "Deutschland",
+    });
     const payload = rpc.mock.calls[0]?.[1] as Record<string, unknown>;
-    expect(payload).toEqual({ _cart_id: "cart-1", _note: null, _payment_method: "crypto" });
+    expect(payload._cart_id).toBe("cart-1");
+    expect(payload._note).toBeNull();
+    expect(payload._payment_method).toBe("crypto");
+    expect(payload._shipping_street).toBe("Example Street");
     expect(payload).not.toHaveProperty("unit_price");
     expect(payload).not.toHaveProperty("total");
     expect(payload).not.toHaveProperty("markup");

@@ -15,6 +15,7 @@ import { useShopCart } from "@/hooks/useShopCart";
 import { useOrderTemplateMutations } from "@/hooks/useOrderTemplates";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
+import { OrderShippingCard } from "@/components/orders/OrderShippingCard";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
 import { formatDateTime, formatEur, formatQuantity, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { PAYMENT_METHOD_LABELS, isPaymentMethod } from "@/lib/shop/paymentMethod";
@@ -150,6 +151,7 @@ export default function OrderDetailPage() {
       </Card>
 
       <div className="grid gap-4 sm:grid-cols-2">
+        <OrderShippingCard snapshot={order} />
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Summe</CardTitle>

@@ -20,6 +20,15 @@ function makeOrder(overrides: Partial<Tables<"orders">> = {}): Tables<"orders"> 
     status: "pending",
     note: "Bitte hier liefern",
     payment_method: null,
+    telegram_username_snapshot: null,
+    shipping_first_name: null,
+    shipping_last_name: null,
+    shipping_street: null,
+    shipping_house_number: null,
+    shipping_address_extra: null,
+    shipping_postal_code: null,
+    shipping_city: null,
+    shipping_country: null,
     total_usd: 660,
     total_eur: 565.6,
     exchange_rate: 0.857,
@@ -109,8 +118,17 @@ describe("nextOrderStatuses", () => {
         "note",
         "order_number",
         "payment_method",
+        "shipping_address_extra",
+        "shipping_city",
+        "shipping_country",
+        "shipping_first_name",
+        "shipping_house_number",
+        "shipping_last_name",
+        "shipping_postal_code",
+        "shipping_street",
         "status",
         "submitted_at",
+        "telegram_username_snapshot",
         "total_eur",
         "total_usd",
         "updated_at",
@@ -124,6 +142,8 @@ describe("order CSV / PDF snapshot source", () => {
   it("writes frozen snapshot prices, not live catalog values", () => {
     const csv = buildOrderCsv(toOrderExportDoc(makeOrder(), [makeItem()]));
     expect(csv).toContain("CW-2026-000001");
+    expect(csv).toContain("Telegram Benutzername");
+    expect(csv).toContain("Lieferadresse");
     expect(csv).toContain("ART-5001");
     expect(csv).toContain("Mengenpreis");
     expect(csv).toContain("55");

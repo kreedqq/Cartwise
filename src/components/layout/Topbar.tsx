@@ -102,7 +102,12 @@ export function Topbar() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              <span className="block truncate">{accountName || "Konto"}</span>
+              {user?.email ? (
+                <span className="mt-0.5 block truncate text-xs font-normal text-muted-foreground">{user.email}</span>
+              ) : null}
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => navigate("/profile")}>
               <UserCircle /> Profil &amp; Einstellungen

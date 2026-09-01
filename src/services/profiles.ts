@@ -17,6 +17,7 @@ export async function updateDisplayName(userId: string, displayName: string) {
 
 export interface UserWithRoles {
   id: string;
+  username: string | null;
   displayName: string;
   createdAt: string;
   roles: string[];
@@ -26,7 +27,7 @@ export interface UserWithRoles {
 export async function listUsersWithRoles(): Promise<UserWithRoles[]> {
   const { data: profiles, error: profilesError } = await supabase
     .from("profiles")
-    .select("id, display_name, created_at")
+    .select("id, username, display_name, created_at")
     .order("created_at", { ascending: false });
   if (profilesError) throw profilesError;
 
@@ -42,6 +43,7 @@ export async function listUsersWithRoles(): Promise<UserWithRoles[]> {
 
   return (profiles ?? []).map((p) => ({
     id: p.id,
+    username: p.username,
     displayName: p.display_name,
     createdAt: p.created_at,
     roles: rolesByUser.get(p.id) ?? [],

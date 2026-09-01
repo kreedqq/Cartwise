@@ -7,7 +7,6 @@ import {
   createCart,
   duplicateCart,
   listCarts,
-  renameCart,
   setActiveCart,
   softDeleteCart,
   updateCartNote,
@@ -38,15 +37,10 @@ export function useCartMutations() {
   }
 
   const create = useMutation({
-    mutationFn: ({ name, note }: { name: string; note?: string }) => {
+    mutationFn: (input?: { note?: string }) => {
       if (!user) throw new Error("Nicht angemeldet.");
-      return createCart(user.id, name, note);
+      return createCart(user.id, input?.note);
     },
-    onSuccess: invalidate,
-  });
-
-  const rename = useMutation({
-    mutationFn: ({ cart, name }: { cart: Tables<"carts">; name: string }) => renameCart(cart.id, cart.version, name),
     onSuccess: invalidate,
   });
 
@@ -68,7 +62,7 @@ export function useCartMutations() {
   });
 
   const duplicate = useMutation({
-    mutationFn: ({ cartId, newName }: { cartId: string; newName: string }) => duplicateCart(cartId, newName),
+    mutationFn: (cartId: string) => duplicateCart(cartId),
     onSuccess: invalidate,
   });
 
@@ -82,5 +76,5 @@ export function useCartMutations() {
     onSuccess: invalidate,
   });
 
-  return { create, rename, updateNote, updateStatus, activate, duplicate, archive, remove };
+  return { create, updateNote, updateStatus, activate, duplicate, archive, remove };
 }

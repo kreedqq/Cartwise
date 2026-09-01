@@ -111,6 +111,7 @@ export interface Database {
           id: string;
           user_id: string;
           name: string;
+          name_ordinal: number;
           status: CartStatus;
           note: string | null;
           is_active_cart: boolean;
@@ -259,6 +260,15 @@ export interface Database {
           status: OrderStatus;
           note: string | null;
           payment_method: PaymentMethod | null;
+          telegram_username_snapshot: string | null;
+          shipping_first_name: string | null;
+          shipping_last_name: string | null;
+          shipping_street: string | null;
+          shipping_house_number: string | null;
+          shipping_address_extra: string | null;
+          shipping_postal_code: string | null;
+          shipping_city: string | null;
+          shipping_country: string | null;
           total_usd: number;
           total_eur: number | null;
           exchange_rate: number | null;
@@ -1129,7 +1139,19 @@ export interface Database {
         Returns: undefined;
       };
       create_order: {
-        Args: { _cart_id: string; _note: string | null; _payment_method?: PaymentMethod | null };
+        Args: {
+          _cart_id: string;
+          _note: string | null;
+          _payment_method?: PaymentMethod | null;
+          _shipping_first_name?: string | null;
+          _shipping_last_name?: string | null;
+          _shipping_street?: string | null;
+          _shipping_house_number?: string | null;
+          _shipping_address_extra?: string | null;
+          _shipping_postal_code?: string | null;
+          _shipping_city?: string | null;
+          _shipping_country?: string | null;
+        };
         Returns: { orderId: string; orderNumber: string; totalUsd: number };
       };
       list_kit_share_members: {

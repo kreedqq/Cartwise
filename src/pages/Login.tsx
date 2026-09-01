@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,11 +11,17 @@ import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { useAuth } from "@/context/AuthProvider";
 import { loginSchema, magicLinkSchema } from "@/lib/validation";
-import { mapAuthError, POST_LOGIN_PATH, signIn, signInWithMagicLink } from "@/services/auth";
+import { mapAuthError, safePostLoginPath, signIn, signInWithMagicLink } from "@/services/auth";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { session, loading: authLoading } = useAuth();
+  const destination = safePostLoginPath(
+    location.state && typeof location.state === "object" && "from" in location.state
+      ? (location.state as { from: unknown }).from
+      : null,
+  );
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -25,8 +31,8 @@ export default function LoginPage() {
 
   React.useEffect(() => {
     if (authLoading || !session) return;
-    navigate(POST_LOGIN_PATH, { replace: true });
-  }, [authLoading, session, navigate]);
+    navigate(destination, { replace: true });
+  }, [authLoading, session, navigate, destination]);
 
   async function handlePassword(e: React.FormEvent) {
     e.preventDefault();

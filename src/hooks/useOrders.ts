@@ -12,6 +12,7 @@ import {
   setOrderStatus,
 } from "@/services/orders";
 import type { PaymentMethod } from "@/lib/shop/paymentMethod";
+import type { ShippingAddress } from "@/lib/shippingAddress";
 import type { OrderStatus } from "@/types/database";
 
 export function useMyOrders() {
@@ -50,11 +51,13 @@ export function useCreateOrder() {
       cartId,
       note,
       paymentMethod,
+      shipping,
     }: {
       cartId: string;
       note: string | null;
       paymentMethod: PaymentMethod;
-    }) => createOrder(cartId, note, paymentMethod),
+      shipping: ShippingAddress;
+    }) => createOrder(cartId, note, paymentMethod, shipping),
     onSuccess: (_result, { cartId }) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myOrders });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });

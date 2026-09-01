@@ -19,19 +19,19 @@ export const passwordSchema = z
 export const displayNameSchema = z
   .string()
   .trim()
-  .min(1, "Bitte gib einen Anzeigenamen ein.")
-  .max(80, "Der Anzeigename darf höchstens 80 Zeichen lang sein.");
+  .min(1, "Bitte gib Vor- und Nachname ein.")
+  .max(80, "Der Name darf höchstens 80 Zeichen lang sein.");
 
 /**
- * Public handle shown during kit sharing. Never the real name, email, or
- * user id: 3-24 chars, must start with a letter, then letters/digits/"_"/".".
+ * Public Telegram handle stored in profiles.username. Never the real name,
+ * email, or user id: 3-24 chars, must start with a letter, then letters/digits/"_"/".".
  * Mirrors the server-side check in `profiles_username_format_check`.
  */
 export const usernameSchema = z
   .string()
   .trim()
-  .min(3, "Der Benutzername muss mindestens 3 Zeichen lang sein.")
-  .max(24, "Der Benutzername darf höchstens 24 Zeichen lang sein.")
+  .min(3, "Der Telegram Benutzername muss mindestens 3 Zeichen lang sein.")
+  .max(24, "Der Telegram Benutzername darf höchstens 24 Zeichen lang sein.")
   .regex(
     /^[A-Za-z][A-Za-z0-9_.]{2,23}$/,
     "Erlaubt: Buchstaben, Zahlen, \"_\" und \".\", beginnend mit einem Buchstaben.",
@@ -117,7 +117,6 @@ export const cartNameSchema = z
   .max(120, "Der Name darf höchstens 120 Zeichen lang sein.");
 
 export const createCartSchema = z.object({
-  name: cartNameSchema,
   note: z.string().max(2000).optional(),
 });
 export type CreateCartInput = z.infer<typeof createCartSchema>;

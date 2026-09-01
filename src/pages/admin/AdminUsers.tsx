@@ -52,7 +52,8 @@ export default function AdminUsersPage() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Anzeigename</TableHead>
+            <TableHead>Telegram Benutzername</TableHead>
+            <TableHead>Interner Name</TableHead>
             <TableHead>Rollen</TableHead>
             <TableHead>Registriert seit</TableHead>
             <TableHead className="text-right">Aktionen</TableHead>
@@ -64,7 +65,8 @@ export default function AdminUsersPage() {
             const isSelf = u.id === currentUser?.id;
             return (
               <TableRow key={u.id}>
-                <TableCell className="text-sm font-medium">{u.displayName}</TableCell>
+                <TableCell className="text-sm font-medium">{u.username ?? "—"}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">{u.displayName}</TableCell>
                 <TableCell>
                   <div className="flex gap-1.5">
                     {u.roles.map((role) => (
@@ -108,8 +110,8 @@ export default function AdminUsersPage() {
         title={target?.grant ? "Admin-Rolle vergeben?" : "Admin-Rolle entziehen?"}
         description={
           target?.grant
-            ? `„${target.user.displayName}" erhält vollen Zugriff auf Produktverwaltung, Importe und Benutzerrollen.`
-            : `„${target?.user.displayName}" verliert den Zugriff auf den Admin-Bereich.`
+            ? `„${target.user.username ?? target.user.displayName}" erhält vollen Zugriff auf Produktverwaltung, Importe und Benutzerrollen.`
+            : `„${target?.user.username ?? target?.user.displayName}" verliert den Zugriff auf den Admin-Bereich.`
         }
         confirmLabel={target?.grant ? "Admin machen" : "Rolle entziehen"}
         variant={target?.grant ? "default" : "destructive"}

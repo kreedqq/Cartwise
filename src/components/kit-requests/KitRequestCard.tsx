@@ -69,7 +69,7 @@ export function KitRequestCardView({
           <Badge variant={statusVariant(request.status)}>{kitRequestStatusLabel(request.status)}</Badge>
         </div>
         <p className="text-sm text-muted-foreground">
-          von <span className="font-medium text-foreground">{request.creatorUsername}</span>
+          von Telegram Benutzername <span className="font-medium text-foreground">{request.creatorUsername}</span>
         </p>
       </CardHeader>
       <CardContent className="flex min-w-0 flex-1 flex-col gap-4">

@@ -16,9 +16,11 @@ export async function claimUsername(username: string): Promise<string> {
 
 export function mapUsernameError(error: unknown): string {
   const raw = error instanceof Error ? error.message : typeof error === "string" ? error : "";
-  if (/bereits vergeben/i.test(raw)) return "Dieser Benutzername ist bereits vergeben.";
-  if (/Ungültiger Benutzername/i.test(raw)) return raw;
-  return raw || "Der Benutzername konnte nicht gespeichert werden.";
+  if (/bereits vergeben/i.test(raw)) return "Dieser Telegram Benutzername ist bereits vergeben.";
+  if (/Ungültiger (Telegram )?Benutzername/i.test(raw)) {
+    return raw.includes("Telegram") ? raw : raw.replace("Benutzername", "Telegram Benutzername");
+  }
+  return raw || "Der Telegram Benutzername konnte nicht gespeichert werden.";
 }
 
 export function shouldPromptForUsername(input: {

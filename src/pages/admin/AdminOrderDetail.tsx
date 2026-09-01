@@ -15,6 +15,7 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
+import { OrderShippingDetails } from "@/components/orders/OrderShippingCard";
 import { useDeleteOrder, useOrder, useOrderAdminNote, useOrderStatusHistory, useSetOrderStatus } from "@/hooks/useOrders";
 import { useAdminUserDirectory } from "@/hooks/useAdminOrders";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
@@ -49,9 +50,10 @@ export default function AdminOrderDetailPage() {
 
   const order = orderQuery.data;
   const customer = directoryQuery.data?.get(order.user_id);
+  const telegramHandle = order.telegram_username_snapshot?.trim() || null;
   const next = nextOrderStatuses(order.status);
   const exportDoc = toOrderExportDoc(order, order.items, {
-    displayName: customer?.displayName ?? order.user_id,
+    displayName: telegramHandle ?? customer?.displayName ?? order.user_id,
     email: customer?.email ?? null,
   });
 
@@ -105,7 +107,9 @@ export default function AdminOrderDetailPage() {
               <PaymentMethodBadge paymentMethod={order.payment_method} />
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">{customer?.displayName ?? "—"}</span>
+              <span className="font-medium text-foreground">
+                {telegramHandle ?? customer?.displayName ?? "—"}
+              </span>
               {customer?.email && <span>{customer.email}</span>}
               <span>{formatDateTime(order.submitted_at)}</span>
             </div>
@@ -195,6 +199,9 @@ export default function AdminOrderDetailPage() {
 
       {/* Charges + note */}
       <div className="grid gap-4 lg:grid-cols-2">
+        <AdminSection title="Lieferung" padded>
+          <OrderShippingDetails snapshot={order} />
+        </AdminSection>
         <AdminSection title="Summen & Versand" padded>
           <div className="space-y-3 text-sm">
             <OrderChargeSummary

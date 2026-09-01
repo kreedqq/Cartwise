@@ -25,10 +25,12 @@ describe("canonical username identity", () => {
     expect(members).not.toMatch(/email/i);
   });
 
-  it("shop cart creation uses defaultCartName from username", () => {
+  it("shop cart creation does not invent a name from email", () => {
     const shopCart = readSource("src/hooks/useShopCart.ts");
-    expect(shopCart).toContain("defaultCartName");
-    expect(shopCart).not.toMatch(/name: "Warenkorb"/);
+    expect(shopCart).toContain("create.mutateAsync");
+    expect(shopCart).not.toMatch(/email/);
+    expect(shopCart).not.toMatch(/display_name/);
+    expect(shopCart).not.toContain("defaultCartName");
   });
 });
 
@@ -49,5 +51,19 @@ describe("0040 username cart names", () => {
     const kitSql = readSource("supabase/migrations/0038_username_and_kit_participant_removal.sql");
     expect(kitSql).toMatch(/p\.username as display_name/);
     expect(kitSql).toMatch(/never real name\/display_name\/email/);
+  });
+});
+
+describe("0042 cart titles follow the current Telegram handle", () => {
+  const sql = readSource("supabase/migrations/0042_telegram_identity_carts_and_checkout.sql");
+
+  it("derives cart titles from profiles.username and a frozen ordinal", () => {
+    expect(sql).toMatch(/create or replace function public\.cart_title/);
+    expect(sql).toMatch(/trim\(_username\) \|\| ' – Warenkorb ' \|\| _ordinal::text/);
+  });
+
+  it("rewrites ordered and archived carts when the handle changes", () => {
+    expect(sql).toContain("Rewrites every non-deleted cart title from the stable ordinal");
+    expect(sql).toMatch(/and deleted_at is null/);
   });
 });

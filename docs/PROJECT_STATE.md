@@ -2,7 +2,7 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-01** (auth session / Discord redirect stabilization).
+Last documentation pass: **2026-09-01** (Telegram identity, cart titles, checkout address snapshots).
 
 **Update 2026-09-01 (0€ shop cleanup)**: Production `is_active = false` only for `B1201`, `B1210`, `GGH`, `HHB`, `SHB`. Rows remain; prices/SKUs/IDs unchanged. Shop and Kit Gesuche already load via `list_shop_products` (`is_active = true`). Active catalog 293 / inactive 27 / active `price_usd = 0` = 0.
 
@@ -51,6 +51,7 @@ Peptide routes sit behind `ProtectedRoute` (same login as shop).
 ### Auth / login
 
 - Email/password login and register, magic link, forgot/reset password
+- Canonical public identity is `profiles.username` (UI: Telegram Benutzername). Cart titles use `name_ordinal`. Orders snapshot telegram handle + shipping at checkout.
 - OAuth: **Discord only** (`OAUTH_PROVIDERS = ["discord"]`)
 - `skipBrowserRedirect: true` plus strip `skip_http_redirect` so GoTrue JSON is not saved as `authorize.json`
 - Password login waits for a client session and AuthProvider session before `/dashboard`; `/login` with an existing session goes to `/dashboard`

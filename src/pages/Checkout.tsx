@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
+import { ShippingAddressFields } from "@/components/checkout/ShippingAddressFields";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -24,6 +25,11 @@ import {
   PAYMENT_METHOD_REQUIRED_MESSAGE,
   type PaymentMethod,
 } from "@/lib/shop/paymentMethod";
+import {
+  EMPTY_SHIPPING_ADDRESS,
+  shippingAddressSchema,
+  type ShippingAddressInput,
+} from "@/lib/shippingAddress";
 import { toast } from "@/components/ui/toaster";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 
@@ -37,6 +43,8 @@ export default function CheckoutPage() {
   const [note, setNote] = React.useState("");
   const [paymentMethod, setPaymentMethod] = React.useState<PaymentMethod | null>(null);
   const [paymentError, setPaymentError] = React.useState<string | null>(null);
+  const [shipping, setShipping] = React.useState<ShippingAddressInput>(EMPTY_SHIPPING_ADDRESS);
+  const [shippingErrors, setShippingErrors] = React.useState<Partial<Record<keyof ShippingAddressInput, string>>>({});
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 
   const cart = cartsQuery.data?.find((c) => c.id === cartId);
@@ -85,8 +93,31 @@ export default function CheckoutPage() {
     );
   }
 
+  function validatedShipping() {
+    const result = shippingAddressSchema.safeParse(shipping);
+    if (!result.success) {
+      const next: Partial<Record<keyof ShippingAddressInput, string>> = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path[0];
+        if (typeof key === "string" && !(key in next)) {
+          next[key as keyof ShippingAddressInput] = issue.message;
+        }
+      }
+      setShippingErrors(next);
+      return null;
+    }
+    setShippingErrors({});
+    return result.data;
+  }
+
   async function handleSubmit() {
     if (!cart) return;
+    const address = validatedShipping();
+    if (!address) {
+      setConfirmOpen(false);
+      toast.error("Bitte prüfe die Lieferadresse.");
+      return;
+    }
     if (!paymentMethod) {
       setPaymentError(PAYMENT_METHOD_REQUIRED_MESSAGE);
       setConfirmOpen(false);
@@ -97,6 +128,7 @@ export default function CheckoutPage() {
         cartId: cart.id,
         note: note.trim() || null,
         paymentMethod,
+        shipping: address,
       });
       toast.success(`Bestellung ${result.orderNumber} wurde übermittelt.`);
       navigate(`/orders/${result.orderId}`);
@@ -109,6 +141,11 @@ export default function CheckoutPage() {
   }
 
   function handleOpenConfirm() {
+    const address = validatedShipping();
+    if (!address) {
+      toast.error("Bitte fülle die Lieferadresse vollständig aus.");
+      return;
+    }
     if (!paymentMethod) {
       setPaymentError(PAYMENT_METHOD_REQUIRED_MESSAGE);
       toast.error(PAYMENT_METHOD_REQUIRED_MESSAGE);
@@ -221,6 +258,27 @@ export default function CheckoutPage() {
             </CardContent>
           </Card>
 
+          <Card>
+            <CardContent className="space-y-6 p-5">
+              <ShippingAddressFields
+                value={shipping}
+                onChange={(next) => {
+                  setShipping(next);
+                  setShippingErrors({});
+                }}
+                errors={shippingErrors}
+              />
+              <PaymentMethodSelector
+                value={paymentMethod}
+                onChange={(method) => {
+                  setPaymentMethod(method);
+                  setPaymentError(null);
+                }}
+                error={paymentError}
+              />
+            </CardContent>
+          </Card>
+
           <Card className="sm:ml-auto sm:max-w-sm">
             <CardContent className="space-y-4 p-5">
               <OrderChargeSummary
@@ -230,14 +288,6 @@ export default function CheckoutPage() {
                   productEur: eligibleTotals.totalEur,
                   usdToEurRate: eligible.find((i) => i.exchange_rate_snapshot)?.exchange_rate_snapshot ?? null,
                 })}
-              />
-              <PaymentMethodSelector
-                value={paymentMethod}
-                onChange={(method) => {
-                  setPaymentMethod(method);
-                  setPaymentError(null);
-                }}
-                error={paymentError}
               />
               <Button className="mt-1 w-full" size="lg" onClick={handleOpenConfirm}>
                 Bestellung absenden
@@ -251,7 +301,7 @@ export default function CheckoutPage() {
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title="Bestellung jetzt absenden?"
-        description={`Du bestellst ${eligible.length} Position(en) im Gesamtwert von ${formatUsd(eligibleTotals.totalUsd)}. Diese Aktion kann nicht rückgängig gemacht werden.`}
+        description={`Du bestellst ${eligible.length} Position(en) im Gesamtwert von ${formatUsd(eligibleTotals.totalUsd)}. Lieferadresse und Telegram Benutzername werden mit der Bestellung gespeichert. Diese Aktion kann nicht rückgängig gemacht werden.`}
         confirmLabel="Verbindlich bestellen"
         loading={createOrder.isPending}
         onConfirm={handleSubmit}

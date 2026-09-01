@@ -114,7 +114,7 @@ export default function RegisterPage() {
         </div>
         {errors.displayName && <p className="text-xs text-destructive">{errors.displayName}</p>}
         <div className="space-y-1.5">
-          <Label htmlFor="username">Benutzername</Label>
+          <Label htmlFor="username">Telegram Benutzername</Label>
           <Input
             id="username"
             autoComplete="username"
@@ -127,7 +127,7 @@ export default function RegisterPage() {
             <p className="text-xs text-destructive">{errors.username}</p>
           ) : (
             <p className="text-xs text-muted-foreground">
-              3–24 Zeichen, wird beim Kit Sharing anderen Nutzern angezeigt (nie deine E-Mail).
+              3–24 Zeichen. Das ist deine öffentliche Identität beim Kit Sharing (nie deine E-Mail).
             </p>
           )}
         </div>

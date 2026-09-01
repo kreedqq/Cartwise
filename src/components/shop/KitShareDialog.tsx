@@ -508,8 +508,8 @@ export function KitShareDialog({
                     Mitglied hinzufügen
                   </p>
                   <Select value={selectedMemberId} onValueChange={setSelectedMemberId} disabled={membersLoading || busy}>
-                    <SelectTrigger className="min-w-[11rem] w-full" aria-label="Mitglied auswählen">
-                      <SelectValue placeholder={membersLoading ? "Mitglieder werden geladen …" : "Mitglied auswählen"} />
+                    <SelectTrigger className="min-w-[11rem] w-full" aria-label="Telegram Benutzername auswählen">
+                      <SelectValue placeholder={membersLoading ? "Mitglieder werden geladen …" : "Telegram Benutzername"} />
                     </SelectTrigger>
                     <SelectContent>
                       {members.length === 0 && !membersLoading ? (

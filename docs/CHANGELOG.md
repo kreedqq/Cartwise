@@ -2,6 +2,22 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-01 (telegram identity, cart titles, checkout address)
+
+### Changed
+
+- Public UI label for `profiles.username` is **Telegram Benutzername**. `display_name` stays internal and is not used as a public handle.
+- Cart titles are derived from the current Telegram handle plus a frozen `carts.name_ordinal` (oldest cart = handle, then `handle – Warenkorb 2`, …). Username changes rewrite every non-deleted cart, including ordered and archived carts. Manual cart rename was removed.
+- Checkout collects a delivery address next to the payment method. `create_order` stores `telegram_username_snapshot` and shipping columns on the order. Later profile or username changes do not rewrite those snapshots.
+- Admin order detail, customer order detail, and order PDF/CSV show the Telegram snapshot and shipping address. Kit payloads and carts do not include addresses.
+- Login honors a safe in-app `state.from` return path after the existing session wait.
+
+### Notes
+
+- Additive migration `0042_telegram_identity_carts_and_checkout.sql`. Kit pricing, payment methods, shop SKUs, and existing RLS were not redesigned.
+- Historical orders created before 0042 have null shipping / telegram snapshots.
+- Discord Site URL remains a dashboard setting (`https://peptix.app`); the SPA still builds `redirectTo` from `window.location.origin`.
+
 ## 2026-09-01 (auth session / Discord redirect)
 
 ### Fixed

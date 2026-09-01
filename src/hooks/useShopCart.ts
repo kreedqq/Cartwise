@@ -2,7 +2,6 @@ import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@/lib/constants";
-import { defaultCartName } from "@/lib/cart/defaultCartName";
 import { useAuth } from "@/context/AuthProvider";
 import { useCarts, useCartMutations } from "@/hooks/useCarts";
 import { addCartItem, addCartItemsBulk, type BulkImportLine } from "@/services/cartItems";
@@ -22,7 +21,7 @@ import type { Tables } from "@/types/database";
  * render. Reading/writing the query cache directly avoids that race.
  */
 export function useShopCart() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const cartsQuery = useCarts();
   const { create, activate } = useCartMutations();
@@ -35,12 +34,7 @@ export function useShopCart() {
     if (!user) throw new Error("Nicht angemeldet.");
     setEnsuring(true);
     try {
-      const created = await create.mutateAsync({
-        name: defaultCartName(
-          profile?.username,
-          (cartsQuery.data ?? []).map((cart) => cart.name),
-        ),
-      });
+      const created = await create.mutateAsync({});
       await activate.mutateAsync(created.id);
       return created.id;
     } finally {

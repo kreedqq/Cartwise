@@ -49,7 +49,7 @@ export function RequireUsernameDialog() {
     e.preventDefault();
     const result = usernameSchema.safeParse(value);
     if (!result.success) {
-      setError(result.error.issues[0]?.message ?? "Ungültiger Benutzername.");
+      setError(result.error.issues[0]?.message ?? "Ungültiger Telegram Benutzername.");
       return;
     }
     setBusy(true);
@@ -68,15 +68,15 @@ export function RequireUsernameDialog() {
     <Dialog open={open} onOpenChange={() => undefined}>
       <DialogContent className="sm:max-w-sm" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>Wähle deinen Benutzernamen</DialogTitle>
+          <DialogTitle>Telegram Benutzername festlegen</DialogTitle>
           <DialogDescription>
-            Dieser Name wird beim Kit Sharing anderen Nutzern angezeigt — niemals deine E-Mail-Adresse oder dein
+            Dein Telegram Benutzername ist die öffentliche Identität — niemals deine E-Mail-Adresse oder dein
             echter Name.
           </DialogDescription>
         </DialogHeader>
         <form className="space-y-3" onSubmit={handleSubmit}>
           <div className="space-y-1.5">
-            <Label htmlFor="require-username">Benutzername</Label>
+            <Label htmlFor="require-username">Telegram Benutzername</Label>
             <Input
               id="require-username"
               autoComplete="username"

@@ -9,43 +9,55 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/toaster";
 import { useAuth } from "@/context/AuthProvider";
-import { profileSchema } from "@/lib/validation";
+import { profileSchema, usernameSchema } from "@/lib/validation";
 import { updateDisplayName } from "@/services/profiles";
+import { claimUsername, mapUsernameError } from "@/services/username";
 import { formatDateTime } from "@/lib/money";
 import { PageHeader } from "@/components/common/PageHeader";
-import { visibleAccountLabel } from "@/lib/username";
 
 export default function ProfilePage() {
   const { user, profile, roles, customerRoleName, refreshProfile } = useAuth();
+  const [username, setUsername] = React.useState(profile?.username ?? "");
   const [displayName, setDisplayName] = React.useState(profile?.display_name ?? "");
-  const [error, setError] = React.useState<string | null>(null);
+  const [usernameError, setUsernameError] = React.useState<string | null>(null);
+  const [displayError, setDisplayError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
 
-  // Syncs the editable field once the profile finishes loading from the
-  // server (React's own docs endorse "adjust state when a prop changes").
   /* eslint-disable react-hooks/set-state-in-effect */
   React.useEffect(() => {
+    setUsername(profile?.username ?? "");
     setDisplayName(profile?.display_name ?? "");
-  }, [profile?.display_name]);
+  }, [profile?.username, profile?.display_name]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    const result = profileSchema.safeParse({ displayName });
-    if (!result.success) {
-      setError(result.error.issues[0]?.message ?? "Ungültige Eingabe.");
+    if (!user) return;
+    setUsernameError(null);
+    setDisplayError(null);
+
+    const usernameResult = usernameSchema.safeParse(username);
+    if (!usernameResult.success) {
+      setUsernameError(usernameResult.error.issues[0]?.message ?? "Ungültiger Telegram Benutzername.");
       return;
     }
-    setError(null);
-    if (!user) return;
+    const displayResult = profileSchema.safeParse({ displayName });
+    if (!displayResult.success) {
+      setDisplayError(displayResult.error.issues[0]?.message ?? "Ungültige Eingabe.");
+      return;
+    }
+
     setSaving(true);
     try {
-      await updateDisplayName(user.id, result.data.displayName);
+      if (usernameResult.data !== (profile?.username ?? "")) {
+        await claimUsername(usernameResult.data);
+      }
+      await updateDisplayName(user.id, displayResult.data.displayName);
       await refreshProfile();
       toast.success("Profil gespeichert.");
     } catch (error) {
       console.error("Profil speichern fehlgeschlagen:", error);
-      toast.error("Profil konnte nicht gespeichert werden.");
+      toast.error(mapUsernameError(error));
     } finally {
       setSaving(false);
     }
@@ -56,7 +68,7 @@ export default function ProfilePage() {
       <PageHeader
         eyebrow="Konto"
         title="Profil"
-        description="Anzeigename, Rolle und Kontodaten. Du siehst nur deine eigene Rolle."
+        description="Telegram Benutzername, interner Name, Rolle und Kontodaten. Du siehst nur deine eigene Rolle."
       />
 
       <Card>
@@ -64,7 +76,8 @@ export default function ProfilePage() {
           <CardHeader>
             <CardTitle>Persönliche Angaben</CardTitle>
             <CardDescription>
-              Dein Benutzername ist die öffentliche Identität. Der Anzeigename bleibt nur für dich.
+              Der Telegram Benutzername ist die einzige öffentliche Identität. Warenkörbe folgen automatisch diesem
+              Namen. Der interne Name bleibt nur für dich sichtbar.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -73,21 +86,32 @@ export default function ProfilePage() {
               <Input id="email" value={user?.email ?? ""} disabled />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="username">Benutzername</Label>
-              <Input id="username" value={visibleAccountLabel(profile)} disabled />
-              <p className="text-xs text-muted-foreground">
-                Dieser Name gilt überall: Profil, Warenkörbe und Kit Sharing. Er wird bei der Registrierung festgelegt.
-              </p>
+              <Label htmlFor="username">Telegram Benutzername</Label>
+              <Input
+                id="username"
+                autoComplete="username"
+                value={username}
+                invalid={!!usernameError}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              {usernameError ? (
+                <p className="text-xs text-destructive">{usernameError}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Dieser Name gilt überall: Profil, Warenkörbe, Kit Sharing und Kit Gesuche.
+                </p>
+              )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="displayName">Anzeigename</Label>
+              <Label htmlFor="displayName">Interner Name</Label>
               <Input
                 id="displayName"
                 value={displayName}
-                invalid={!!error}
+                invalid={!!displayError}
                 onChange={(e) => setDisplayName(e.target.value)}
               />
-              {error && <p className="text-xs text-destructive">{error}</p>}
+              {displayError && <p className="text-xs text-destructive">{displayError}</p>}
+              <p className="text-xs text-muted-foreground">Nur für dich. Wird anderen Nutzerinnen und Nutzern nicht angezeigt.</p>
             </div>
             <div className="space-y-1.5">
               <Label>Meine Rolle</Label>

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Archive, Copy, Pencil, Pin, PinOff, Trash2 } from "lucide-react";
+import { ArrowLeft, Archive, Copy, Pin, PinOff, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +18,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CartStatusBadge, CART_STATUS_LABELS } from "@/components/cart/CartStatusBadge";
-import { RenameCartDialog } from "@/components/cart/RenameCartDialog";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { useCartMutations } from "@/hooks/useCarts";
 import { isOpenCart } from "@/services/carts";
@@ -29,21 +28,9 @@ const EDITABLE_STATUSES = (Object.keys(CART_STATUS_LABELS) as CartStatus[]).filt
 
 export function CartHeader({ cart }: { cart: Tables<"carts"> }) {
   const navigate = useNavigate();
-  const { rename, updateStatus, activate, duplicate, remove } = useCartMutations();
-  const [renameOpen, setRenameOpen] = React.useState(false);
+  const { updateStatus, activate, duplicate, remove } = useCartMutations();
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const open = isOpenCart(cart.status);
-
-  async function handleRename(name: string) {
-    try {
-      await rename.mutateAsync({ cart, name });
-      setRenameOpen(false);
-      toast.success("Warenkorb umbenannt.");
-    } catch (error) {
-      console.error("Warenkorb umbenennen fehlgeschlagen:", error);
-      toast.error("Umbenennen fehlgeschlagen.");
-    }
-  }
 
   async function handleStatusChange(status: CartStatus) {
     try {
@@ -56,7 +43,7 @@ export function CartHeader({ cart }: { cart: Tables<"carts"> }) {
 
   async function handleDuplicate() {
     try {
-      const newId = await duplicate.mutateAsync({ cartId: cart.id, newName: `${cart.name} (Kopie)` });
+      const newId = await duplicate.mutateAsync(cart.id);
       toast.success("Warenkorb dupliziert.");
       navigate(`/carts/${newId}`);
     } catch (error) {
@@ -87,11 +74,6 @@ export function CartHeader({ cart }: { cart: Tables<"carts"> }) {
           <div className="flex items-center gap-2">
             {cart.is_active_cart && <Pin className="h-4 w-4 shrink-0 text-primary" />}
             <h1 className="truncate font-display text-2xl font-semibold tracking-tight">{cart.name}</h1>
-            {open && (
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setRenameOpen(true)}>
-                <Pencil className="h-3.5 w-3.5" />
-              </Button>
-            )}
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <CartStatusBadge status={cart.status} />
@@ -151,14 +133,6 @@ export function CartHeader({ cart }: { cart: Tables<"carts"> }) {
           </DropdownMenu>
         </div>
       </div>
-
-      <RenameCartDialog
-        open={renameOpen}
-        onOpenChange={setRenameOpen}
-        initialName={cart.name}
-        loading={rename.isPending}
-        onConfirm={handleRename}
-      />
 
       <ConfirmDialog
         open={deleteOpen}

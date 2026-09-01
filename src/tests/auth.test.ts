@@ -28,6 +28,7 @@ const {
   POST_LOGIN_PATH,
   OAUTH_SUCCESS_PATH,
   OAUTH_PROVIDERS,
+  safePostLoginPath,
 } = await import("@/services/auth");
 
 const AUTHORIZE = "https://example.supabase.co/auth/v1/authorize?provider=discord";
@@ -95,6 +96,15 @@ describe("OAuth client helpers", () => {
     expect(source).toContain("window.location.origin");
     expect(source).not.toMatch(/redirectTo:\s*["'`]https?:\/\/localhost/i);
     expect(source).not.toMatch(/https?:\/\/localhost:\d+\/auth\/callback/);
+  });
+
+  it("only follows in-app return paths after login", () => {
+    expect(safePostLoginPath({ pathname: "/shop" })).toBe("/shop");
+    expect(safePostLoginPath({ pathname: "/carts/abc", search: "?x=1" })).toBe("/carts/abc?x=1");
+    expect(safePostLoginPath({ pathname: "/login" })).toBe(POST_LOGIN_PATH);
+    expect(safePostLoginPath({ pathname: "//evil.example" })).toBe(POST_LOGIN_PATH);
+    expect(safePostLoginPath({ pathname: "https://evil.example" })).toBe(POST_LOGIN_PATH);
+    expect(safePostLoginPath(null)).toBe(POST_LOGIN_PATH);
   });
 
   it("redirects Discord to discord.com when Location is readable, never as authorize.json", async () => {

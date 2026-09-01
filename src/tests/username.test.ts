@@ -94,16 +94,19 @@ describe("username service", () => {
   it("rejects a duplicate username with a clear error", async () => {
     rpc.mockResolvedValue({
       data: null,
-      error: { code: "P0001", message: "Dieser Benutzername ist bereits vergeben.", details: null, hint: null },
+      error: { code: "P0001", message: "Dieser Telegram Benutzername ist bereits vergeben.", details: null, hint: null },
     });
     await expect(claimUsername("Lisa123")).rejects.toMatchObject({
-      message: "Dieser Benutzername ist bereits vergeben.",
+      message: "Dieser Telegram Benutzername ist bereits vergeben.",
     });
   });
 
   it("maps duplicate-username errors to a stable user-facing message", () => {
     expect(mapUsernameError(new Error("Dieser Benutzername ist bereits vergeben."))).toBe(
-      "Dieser Benutzername ist bereits vergeben.",
+      "Dieser Telegram Benutzername ist bereits vergeben.",
+    );
+    expect(mapUsernameError(new Error("Dieser Telegram Benutzername ist bereits vergeben."))).toBe(
+      "Dieser Telegram Benutzername ist bereits vergeben.",
     );
   });
 });

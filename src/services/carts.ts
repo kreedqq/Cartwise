@@ -19,18 +19,14 @@ export async function getCart(id: string): Promise<Tables<"carts"> | null> {
   return data;
 }
 
-export async function createCart(userId: string, name: string, note?: string): Promise<Tables<"carts">> {
+export async function createCart(userId: string, note?: string): Promise<Tables<"carts">> {
   const { data, error } = await supabase
     .from("carts")
-    .insert({ user_id: userId, name, note: note || null })
+    .insert({ user_id: userId, name: "Warenkorb", note: note || null })
     .select()
     .single();
   if (error) throw error;
   return data;
-}
-
-export async function renameCart(id: string, expectedVersion: number, name: string): Promise<Tables<"carts">> {
-  return updateCartOptimistic(id, expectedVersion, { name });
 }
 
 export async function updateCartNote(id: string, expectedVersion: number, note: string): Promise<Tables<"carts">> {
@@ -92,8 +88,8 @@ export async function setActiveCart(id: string): Promise<void> {
   if (error) throw error;
 }
 
-export async function duplicateCart(id: string, newName: string): Promise<string> {
-  const { data, error } = await supabase.rpc("duplicate_cart", { _cart_id: id, _new_name: newName });
+export async function duplicateCart(id: string): Promise<string> {
+  const { data, error } = await supabase.rpc("duplicate_cart", { _cart_id: id, _new_name: "Warenkorb" });
   if (error) throw error;
   return data as string;
 }

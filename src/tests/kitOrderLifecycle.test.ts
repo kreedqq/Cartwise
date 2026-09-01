@@ -79,6 +79,20 @@ describe("create_order idempotency (Phase 15: no duplicate orders)", () => {
   });
 });
 
+describe("0042 create_order preserves kit completion and adds checkout snapshots", () => {
+  const sql = readMigration("0042_telegram_identity_carts_and_checkout.sql");
+
+  it("still only promotes the kit after every participant ordered", () => {
+    expect(sql).toMatch(/_kit\.status not in \('full', 'ordered'\)/);
+    expect(sql).toMatch(/where kit_share_id = _kit_share_id and ordered_at is null/);
+    expect(sql).toMatch(/if _remaining_unordered = 0 then/);
+  });
+
+  it("still rejects a second submit of an already ordered cart", () => {
+    expect(sql).toMatch(/if _cart\.status not in \('draft', 'ready'\) then/);
+  });
+});
+
 describe("Dashboard: ordered carts must disappear from the active cart overview (Phase 5)", () => {
   it("filters carts through isOpenCart before rendering the 'Warenkörbe' grid", () => {
     const tsx = readFileSync(resolve(process.cwd(), "src/pages/Dashboard.tsx"), "utf8");

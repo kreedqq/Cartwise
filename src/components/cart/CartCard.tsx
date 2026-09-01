@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CartStatusBadge } from "@/components/cart/CartStatusBadge";
-import { RenameCartDialog } from "@/components/cart/RenameCartDialog";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { useCartMutations } from "@/hooks/useCarts";
 import { formatDateTime, formatEur, formatQuantity, formatUsd } from "@/lib/money";
@@ -27,26 +26,14 @@ interface CartCardProps {
 
 export function CartCard({ cart, summary }: CartCardProps) {
   const navigate = useNavigate();
-  const { rename, duplicate, activate, archive, remove } = useCartMutations();
+  const { duplicate, activate, archive, remove } = useCartMutations();
 
-  const [renameOpen, setRenameOpen] = React.useState(false);
   const [archiveOpen, setArchiveOpen] = React.useState(false);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
 
-  async function handleRename(name: string) {
-    try {
-      await rename.mutateAsync({ cart, name });
-      setRenameOpen(false);
-      toast.success("Warenkorb umbenannt.");
-    } catch (error) {
-      console.error("Warenkorb umbenennen fehlgeschlagen:", error);
-      toast.error("Umbenennen fehlgeschlagen.");
-    }
-  }
-
   async function handleDuplicate() {
     try {
-      const newId = await duplicate.mutateAsync({ cartId: cart.id, newName: `${cart.name} (Kopie)` });
+      const newId = await duplicate.mutateAsync(cart.id);
       toast.success("Warenkorb dupliziert.");
       navigate(`/carts/${newId}`);
     } catch (error) {
@@ -132,9 +119,6 @@ export function CartCard({ cart, summary }: CartCardProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => navigate(`/carts/${cart.id}`)}>Öffnen</DropdownMenuItem>
-              {isOpenCart(cart.status) && (
-                <DropdownMenuItem onClick={() => setRenameOpen(true)}>Umbenennen</DropdownMenuItem>
-              )}
               <DropdownMenuItem onClick={handleDuplicate}>
                 <Copy /> Duplizieren
               </DropdownMenuItem>
@@ -187,14 +171,6 @@ export function CartCard({ cart, summary }: CartCardProps) {
           <span>Geändert: {formatDateTime(cart.updated_at)}</span>
         </CardFooter>
       </Card>
-
-      <RenameCartDialog
-        open={renameOpen}
-        onOpenChange={setRenameOpen}
-        initialName={cart.name}
-        loading={rename.isPending}
-        onConfirm={handleRename}
-      />
 
       <ConfirmDialog
         open={archiveOpen}

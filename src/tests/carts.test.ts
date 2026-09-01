@@ -46,6 +46,7 @@ describe("pickActiveOpenCart", () => {
       id: partial.id,
       user_id: partial.user_id ?? userA,
       name: partial.name ?? "Cart",
+      name_ordinal: partial.name_ordinal ?? 1,
       status: partial.status ?? "draft",
       note: partial.note ?? null,
       is_active_cart: partial.is_active_cart ?? false,
