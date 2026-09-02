@@ -24,6 +24,7 @@ describe("canonical username identity", () => {
     expect(readSource("src/pages/admin/AdminUsers.tsx")).not.toContain("Interner Name");
     expect(readSource("src/pages/admin/AdminRoles.tsx")).not.toContain("user.displayName");
     expect(readSource("src/pages/admin/AdminOrders.tsx")).toContain("orderTelegramUsername");
+    expect(readSource("src/pages/admin/AdminOrders.tsx")).toContain("formatOrderTelegramSnapshot");
     expect(readSource("src/pages/admin/AdminOrders.tsx")).not.toContain("customer?.displayName");
     expect(readSource("src/pages/Profile.tsx")).toContain("Telegram Benutzername");
   });

@@ -18,7 +18,7 @@ import { buildAdminOrderItemsCsv, downloadOrdersListCsv } from "@/lib/orderExpor
 import { formatDateTime, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { formatDeliveryMethodLabel } from "@/lib/shippingAddress";
 import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS } from "@/lib/shop/paymentMethod";
-import { ORDER_STATUS_LABELS, orderTelegramUsername } from "@/services/orders";
+import { ORDER_STATUS_LABELS, formatOrderTelegramSnapshot, orderTelegramUsername } from "@/services/orders";
 import type { OrderStatus } from "@/types/database";
 
 const STATUS_FILTERS: Array<{ value: "all" | OrderStatus; label: string }> = [
@@ -182,14 +182,14 @@ export default function AdminOrdersPage() {
         />
       )}
 
-      {/* Table */}
+      {/* Table — desktop */}
       {filtered.length > 0 && (
         <AdminSection>
-          <div className="overflow-x-auto">
+          <div className="hidden md:block">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-4">Bestellnummer</TableHead>
+                  <TableHead className="pl-4">Bestellung</TableHead>
                   <TableHead>Telegram Benutzername</TableHead>
                   <TableHead>Datum</TableHead>
                   <TableHead>Status</TableHead>
@@ -198,53 +198,85 @@ export default function AdminOrdersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((order) => {
-                  const customer = order.user_id ? directoryQuery.data?.get(order.user_id) : undefined;
-                  return (
-                    <TableRow
-                      key={order.id}
-                      className="cursor-pointer"
-                      onClick={() => navigate(`/admin/orders/${order.id}`)}
-                    >
-                      <TableCell className="pl-4 font-mono text-xs font-semibold">{order.order_number}</TableCell>
-                      <TableCell>
-                        <p className="text-sm font-medium">{orderTelegramUsername(order) ?? "—"}</p>
-                        {customer?.email && (
-                          <p className="text-[11px] text-muted-foreground">{customer.email}</p>
-                        )}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
-                        {formatDateTime(order.submitted_at)}
-                      </TableCell>
-                      <TableCell>
-                        <OrderStatusBadge status={order.status} />
-                      </TableCell>
-                      <TableCell>
-                        <PaymentMethodBadge paymentMethod={order.payment_method} />
-                      </TableCell>
-                      <TableCell className="pr-4 text-right">
-                        <p className="tabular-nums text-sm font-semibold">
-                          {
-                            summarizeOrderCharges({
-                              productUsd: order.total_usd,
-                              productEur: order.total_eur,
-                              chinaAmount: order.china_shipping_amount,
-                              chinaCurrency: order.china_shipping_currency,
-                              deAmount: order.de_shipping_amount,
-                              deCurrency: order.de_shipping_currency,
-                              usdToEurRate: order.exchange_rate,
-                            }).grandDisplay
-                          }
-                        </p>
-                        <p className="tabular-nums text-[11px] text-muted-foreground">
-                          {formatUsd(order.total_usd)}
-                        </p>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                {filtered.map((order) => (
+                  <TableRow
+                    key={order.id}
+                    className="cursor-pointer"
+                    onClick={() => navigate(`/admin/orders/${order.id}`)}
+                  >
+                    <TableCell className="pl-4 font-mono text-xs font-semibold">{order.order_number}</TableCell>
+                    <TableCell className="text-sm font-medium">
+                      {formatOrderTelegramSnapshot(order)}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                      {formatDateTime(order.submitted_at)}
+                    </TableCell>
+                    <TableCell>
+                      <OrderStatusBadge status={order.status} />
+                    </TableCell>
+                    <TableCell>
+                      <PaymentMethodBadge paymentMethod={order.payment_method} />
+                    </TableCell>
+                    <TableCell className="pr-4 text-right">
+                      <p className="tabular-nums text-sm font-semibold">
+                        {
+                          summarizeOrderCharges({
+                            productUsd: order.total_usd,
+                            productEur: order.total_eur,
+                            chinaAmount: order.china_shipping_amount,
+                            chinaCurrency: order.china_shipping_currency,
+                            deAmount: order.de_shipping_amount,
+                            deCurrency: order.de_shipping_currency,
+                            usdToEurRate: order.exchange_rate,
+                          }).grandDisplay
+                        }
+                      </p>
+                      <p className="tabular-nums text-[11px] text-muted-foreground">
+                        {formatUsd(order.total_usd)}
+                      </p>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
+          </div>
+
+          <div className="space-y-3 p-3 md:hidden">
+            {filtered.map((order) => (
+              <button
+                key={order.id}
+                type="button"
+                className="w-full space-y-2 rounded-lg border border-border bg-background p-3 text-left"
+                onClick={() => navigate(`/admin/orders/${order.id}`)}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-mono text-sm font-semibold">{order.order_number}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Telegram: {formatOrderTelegramSnapshot(order)}
+                    </p>
+                  </div>
+                  <OrderStatusBadge status={order.status} />
+                </div>
+                <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+                  <span>{formatDateTime(order.submitted_at)}</span>
+                  <span className="tabular-nums font-semibold text-foreground">
+                    {
+                      summarizeOrderCharges({
+                        productUsd: order.total_usd,
+                        productEur: order.total_eur,
+                        chinaAmount: order.china_shipping_amount,
+                        chinaCurrency: order.china_shipping_currency,
+                        deAmount: order.de_shipping_amount,
+                        deCurrency: order.de_shipping_currency,
+                        usdToEurRate: order.exchange_rate,
+                      }).grandDisplay
+                    }
+                  </span>
+                </div>
+                <PaymentMethodBadge paymentMethod={order.payment_method} />
+              </button>
+            ))}
           </div>
         </AdminSection>
       )}

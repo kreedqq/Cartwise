@@ -19,9 +19,16 @@ async function requireCurrentUserId(): Promise<string> {
 }
 
 /** Frozen Telegram handle from the order snapshot. Not a live profile lookup. */
-export function orderTelegramUsername(order: { telegram_username_snapshot: string | null }): string | null {
+export function orderTelegramUsername(order: { telegram_username_snapshot?: string | null }): string | null {
   const value = order.telegram_username_snapshot?.trim();
   return value ? value : null;
+}
+
+export const ORDER_TELEGRAM_SNAPSHOT_UNAVAILABLE = "Nicht verfügbar";
+
+/** Visible Telegram handle for historical orders. Never a live profiles.username lookup. */
+export function formatOrderTelegramSnapshot(order: { telegram_username_snapshot?: string | null }): string {
+  return orderTelegramUsername(order) ?? ORDER_TELEGRAM_SNAPSHOT_UNAVAILABLE;
 }
 
 /**

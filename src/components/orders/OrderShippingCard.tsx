@@ -6,9 +6,10 @@ import {
   hasShippingSnapshot,
   type OrderShippingSnapshot,
 } from "@/lib/shippingAddress";
+import { formatOrderTelegramSnapshot } from "@/services/orders";
 
 export function OrderShippingDetails({ snapshot }: { snapshot: OrderShippingSnapshot }) {
-  const telegram = snapshot.telegram_username_snapshot?.trim();
+  const telegram = formatOrderTelegramSnapshot(snapshot);
   const recipient = formatShippingRecipient(snapshot);
   const lines = formatShippingAddressLines(snapshot);
   const hasAddress = hasShippingSnapshot(snapshot);
@@ -18,7 +19,7 @@ export function OrderShippingDetails({ snapshot }: { snapshot: OrderShippingSnap
     <div className="space-y-3 text-sm">
       <div>
         <p className="text-xs text-muted-foreground">Telegram Benutzername</p>
-        <p className="font-medium">{telegram || "—"}</p>
+        <p className="font-medium">{telegram}</p>
       </div>
       <div>
         <p className="text-xs text-muted-foreground">Lieferart</p>

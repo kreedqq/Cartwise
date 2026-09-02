@@ -23,7 +23,7 @@ import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/or
 import { formatDateTime, formatQuantity, formatRate, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { orderRoleSurchargeFromSnapshots } from "@/lib/roleSurcharge";
 import { QUERY_KEYS } from "@/lib/constants";
-import { canPermanentlyDeleteOrder, nextOrderStatuses, ORDER_STATUS_LABELS } from "@/services/orders";
+import { canPermanentlyDeleteOrder, formatOrderTelegramSnapshot, nextOrderStatuses, ORDER_STATUS_LABELS } from "@/services/orders";
 import { listRoleSurchargeLinesForOrder } from "@/services/roleSurcharge";
 import { toast } from "@/components/ui/toaster";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
@@ -59,7 +59,7 @@ export default function AdminOrderDetailPage() {
 
   const order = orderQuery.data;
   const customer = order.user_id ? directoryQuery.data?.get(order.user_id) : undefined;
-  const telegramHandle = order.telegram_username_snapshot?.trim() || null;
+  const telegramHandle = formatOrderTelegramSnapshot(order);
   const next = nextOrderStatuses(order.status);
   const roleSurcharge =
     surchargeQuery.data &&
@@ -71,7 +71,7 @@ export default function AdminOrderDetailPage() {
     order,
     order.items,
     {
-      displayName: telegramHandle ?? "—",
+      displayName: telegramHandle,
       email: customer?.email ?? null,
     },
     roleSurcharge,
@@ -128,8 +128,9 @@ export default function AdminOrderDetailPage() {
               <PaymentMethodBadge paymentMethod={order.payment_method} />
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">
-                {telegramHandle ?? "—"}
+              <span>
+                <span className="text-xs">Telegram Benutzername: </span>
+                <span className="font-medium text-foreground">{telegramHandle}</span>
               </span>
               {customer?.email && <span>{customer.email}</span>}
               <span>{formatDateTime(order.submitted_at)}</span>

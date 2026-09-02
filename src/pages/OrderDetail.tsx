@@ -20,7 +20,7 @@ import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/or
 import { formatDateTime, formatEur, formatQuantity, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { PAYMENT_METHOD_LABELS, isPaymentMethod } from "@/lib/shop/paymentMethod";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
-import { ORDER_STATUS_LABELS, orderItemsToBulkLines } from "@/services/orders";
+import { ORDER_STATUS_LABELS, formatOrderTelegramSnapshot, orderItemsToBulkLines } from "@/services/orders";
 import { toast } from "@/components/ui/toaster";
 
 export default function OrderDetailPage() {
@@ -93,6 +93,7 @@ export default function OrderDetailPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-mono text-2xl font-semibold tracking-tight">{order.order_number}</h1>
+          <p className="text-sm text-muted-foreground">Telegram: {formatOrderTelegramSnapshot(order)}</p>
           <p className="text-sm text-muted-foreground">{formatDateTime(order.submitted_at)}</p>
         </div>
         <OrderStatusBadge status={order.status} />

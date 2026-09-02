@@ -4,9 +4,11 @@ import { buildAdminOrderItemsCsv, buildOrderCsv, buildOrderPrintHtml, buildOrder
 import {
   canPermanentlyDeleteOrder,
   CUSTOMER_ORDER_COLUMNS,
+  formatOrderTelegramSnapshot,
   nextOrderStatuses,
   ORDER_STATUS_LABELS,
   orderItemsToBulkLines,
+  orderTelegramUsername,
 } from "@/services/orders";
 import type { Tables } from "@/types/database";
 
@@ -98,7 +100,24 @@ describe("nextOrderStatuses", () => {
     expect(ORDER_STATUS_LABELS.completed).toBe("Abgeschlossen");
     expect(ORDER_STATUS_LABELS.cancelled).toBe("Storniert");
   });
+});
 
+describe("order Telegram snapshot display", () => {
+  it("returns the frozen snapshot and never a live profile username", () => {
+    expect(orderTelegramUsername({ telegram_username_snapshot: "PepsiDry" })).toBe("PepsiDry");
+    expect(formatOrderTelegramSnapshot({ telegram_username_snapshot: "PepsiDry" })).toBe("PepsiDry");
+    expect(formatOrderTelegramSnapshot({ telegram_username_snapshot: "PepsiDry" })).not.toBe("CurrentProfile");
+  });
+
+  it("falls back to Nicht verfügbar when the snapshot is missing", () => {
+    expect(orderTelegramUsername({ telegram_username_snapshot: null })).toBeNull();
+    expect(orderTelegramUsername({ telegram_username_snapshot: "  " })).toBeNull();
+    expect(formatOrderTelegramSnapshot({ telegram_username_snapshot: null })).toBe("Nicht verfügbar");
+    expect(formatOrderTelegramSnapshot({})).toBe("Nicht verfügbar");
+  });
+});
+
+describe("customer order columns", () => {
   it("maps order items to code+quantity lines for reorder at current prices", () => {
     expect(orderItemsToBulkLines([makeItem(), makeItem({ product_code_snapshot: "ART-5002", quantity: 5 })])).toEqual([
       { code: "ART-5001", quantity: 12 },

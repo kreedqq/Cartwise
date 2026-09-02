@@ -24,6 +24,7 @@ import { useMyOrders } from "@/hooks/useOrders";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { formatDateTime, summarizeOrderCharges } from "@/lib/money";
 import { PEPTIDE_NAV_LABEL } from "@/lib/navigation";
+import { OrderIdentity } from "@/components/orders/OrderIdentity";
 
 export default function DashboardPage() {
   const cartsQuery = useCarts();
@@ -137,7 +138,10 @@ export default function DashboardPage() {
                   className="flex items-center justify-between gap-3 py-3 transition-colors hover:bg-secondary/40"
                 >
                   <div>
-                    <p className="font-mono text-sm font-semibold">{order.order_number}</p>
+                    <OrderIdentity
+                      orderNumber={order.order_number}
+                      telegramSnapshot={order.telegram_username_snapshot}
+                    />
                     <p className="text-xs text-muted-foreground">{formatDateTime(order.submitted_at)}</p>
                   </div>
                   <div className="flex items-center gap-3">

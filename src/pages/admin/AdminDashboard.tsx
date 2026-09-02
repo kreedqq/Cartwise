@@ -24,6 +24,7 @@ import { listAllOrders } from "@/services/orders";
 import { listUsersWithRoles } from "@/services/profiles";
 import { formatDateTime, formatUsd } from "@/lib/money";
 import { cn } from "@/lib/utils";
+import { OrderIdentity } from "@/components/orders/OrderIdentity";
 
 export default function AdminDashboardPage() {
   const productsQuery = useQuery({ queryKey: ["admin-products-count"], queryFn: () => listAllProducts() });
@@ -135,7 +136,10 @@ export default function AdminDashboardPage() {
                 className="flex items-center justify-between gap-3 px-4 py-2.5 transition-colors hover:bg-secondary/60"
               >
                 <div className="min-w-0">
-                  <p className="font-mono text-[11px] font-semibold text-foreground">{order.order_number}</p>
+                  <OrderIdentity
+                    orderNumber={order.order_number}
+                    telegramSnapshot={order.telegram_username_snapshot}
+                  />
                   <p className="text-[11px] text-muted-foreground">{formatDateTime(order.submitted_at)}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">

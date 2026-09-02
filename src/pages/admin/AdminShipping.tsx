@@ -16,7 +16,7 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { toast } from "@/components/ui/toaster";
 import { useAdminOrders } from "@/hooks/useAdminOrders";
 import { applyChinaSplit, previewChinaSplit, setDeShipping } from "@/services/shipping";
-import { orderTelegramUsername } from "@/services/orders";
+import { formatOrderTelegramSnapshot } from "@/services/orders";
 import { formatUsd, formatEur } from "@/lib/money";
 import type { ShippingCurrency } from "@/types/database";
 
@@ -136,58 +136,105 @@ export default function AdminShippingPage() {
           </div>
 
           {preview && (
-            <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Bestellung</TableHead>
-                  <TableHead className="text-right">Anteil</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Bestellung</TableHead>
+                      <TableHead>Telegram Benutzername</TableHead>
+                      <TableHead className="text-right">Anteil</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {preview.map((row) => {
+                      const order = orders.find((o) => o.id === row.orderId);
+                      return (
+                        <TableRow key={row.orderId}>
+                          <TableCell className="font-mono text-xs">{order?.order_number}</TableCell>
+                          <TableCell className="text-sm">
+                            {order ? formatOrderTelegramSnapshot(order) : "Nicht verfügbar"}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {chinaCurrency === "EUR" ? formatEur(row.share) : formatUsd(row.share)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="space-y-2 md:hidden">
                 {preview.map((row) => {
                   const order = orders.find((o) => o.id === row.orderId);
                   return (
-                    <TableRow key={row.orderId}>
-                      <TableCell className="font-mono text-xs">{order?.order_number}</TableCell>
-                      <TableCell className="text-right tabular-nums">
+                    <div key={row.orderId} className="rounded-lg border border-border p-3 text-sm">
+                      <p className="font-mono text-xs font-semibold">{order?.order_number}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Telegram: {order ? formatOrderTelegramSnapshot(order) : "Nicht verfügbar"}
+                      </p>
+                      <p className="mt-1 text-right tabular-nums">
                         {chinaCurrency === "EUR" ? formatEur(row.share) : formatUsd(row.share)}
-                      </TableCell>
-                    </TableRow>
+                      </p>
+                    </div>
                   );
                 })}
-              </TableBody>
-            </Table>
-            </div>
+              </div>
+            </>
           )}
 
-          <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-10" />
-                <TableHead>Bestellung</TableHead>
-                <TableHead>Telegram Benutzername</TableHead>
-                <TableHead className="text-right">Aktueller Versand aus China</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>
-                    <Checkbox checked={selected.has(order.id)} onCheckedChange={() => toggle(order.id)} />
-                  </TableCell>
-                  <TableCell className="font-mono text-xs">{order.order_number}</TableCell>
-                  <TableCell className="text-sm">{orderTelegramUsername(order) ?? "—"}</TableCell>
-                  <TableCell className="text-right tabular-nums text-sm">
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-10" />
+                  <TableHead>Bestellung</TableHead>
+                  <TableHead>Telegram Benutzername</TableHead>
+                  <TableHead className="text-right">Aktueller Versand aus China</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell>
+                      <Checkbox checked={selected.has(order.id)} onCheckedChange={() => toggle(order.id)} />
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">{order.order_number}</TableCell>
+                    <TableCell className="text-sm">{formatOrderTelegramSnapshot(order)}</TableCell>
+                    <TableCell className="text-right tabular-nums text-sm">
+                      {order.china_shipping_amount != null
+                        ? `${order.china_shipping_amount} ${order.china_shipping_currency}`
+                        : "–"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="space-y-2 md:hidden">
+            {orders.map((order) => (
+              <label
+                key={order.id}
+                className="flex items-start gap-3 rounded-lg border border-border p-3"
+              >
+                <Checkbox
+                  className="mt-0.5"
+                  checked={selected.has(order.id)}
+                  onCheckedChange={() => toggle(order.id)}
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="block font-mono text-xs font-semibold">{order.order_number}</span>
+                  <span className="block text-xs text-muted-foreground">
+                    Telegram: {formatOrderTelegramSnapshot(order)}
+                  </span>
+                  <span className="mt-1 block text-sm tabular-nums">
                     {order.china_shipping_amount != null
                       ? `${order.china_shipping_amount} ${order.china_shipping_currency}`
-                      : "—"}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                      : "–"}
+                  </span>
+                </span>
+              </label>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -197,42 +244,96 @@ export default function AdminShippingPage() {
           <CardTitle className="text-base">Versand aus Deutschland</CardTitle>
           <CardDescription>Individuell pro Bestellung. Wird niemals durch die Anzahl der Besteller geteilt.</CardDescription>
         </CardHeader>
-        <CardContent className="overflow-x-auto p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Bestellung</TableHead>
-                <TableHead>Betrag</TableHead>
-                <TableHead>Währung</TableHead>
-                <TableHead />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {orders.map((order) => {
-                const draft = deDrafts[order.id] ?? {
-                  amount: order.de_shipping_amount != null ? String(order.de_shipping_amount) : "",
-                  currency: order.de_shipping_currency ?? "EUR",
-                };
-                return (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-mono text-xs">{order.order_number}</TableCell>
-                    <TableCell>
+        <CardContent className="p-0">
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Bestellung</TableHead>
+                  <TableHead>Telegram Benutzername</TableHead>
+                  <TableHead>Betrag</TableHead>
+                  <TableHead>Währung</TableHead>
+                  <TableHead />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orders.map((order) => {
+                  const draft = deDrafts[order.id] ?? {
+                    amount: order.de_shipping_amount != null ? String(order.de_shipping_amount) : "",
+                    currency: order.de_shipping_currency ?? "EUR",
+                  };
+                  return (
+                    <TableRow key={order.id}>
+                      <TableCell className="font-mono text-xs">{order.order_number}</TableCell>
+                      <TableCell className="text-sm">{formatOrderTelegramSnapshot(order)}</TableCell>
+                      <TableCell>
+                        <Input
+                          value={draft.amount}
+                          onChange={(e) =>
+                            setDeDrafts((prev) => ({ ...prev, [order.id]: { ...draft, amount: e.target.value } }))
+                          }
+                          className="w-28"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Select
+                          value={draft.currency}
+                          onValueChange={(v) =>
+                            setDeDrafts((prev) => ({ ...prev, [order.id]: { ...draft, currency: v as ShippingCurrency } }))
+                          }
+                        >
+                          <SelectTrigger className="w-28">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="USD">USD</SelectItem>
+                            <SelectItem value="EUR">EUR</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        <Button size="sm" variant="outline" onClick={() => handleSaveDe(order.id)}>
+                          Speichern
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="space-y-3 p-3 md:hidden">
+            {orders.map((order) => {
+              const draft = deDrafts[order.id] ?? {
+                amount: order.de_shipping_amount != null ? String(order.de_shipping_amount) : "",
+                currency: order.de_shipping_currency ?? "EUR",
+              };
+              return (
+                <div key={order.id} className="space-y-3 rounded-lg border border-border p-3">
+                  <div>
+                    <p className="font-mono text-xs font-semibold">{order.order_number}</p>
+                    <p className="text-xs text-muted-foreground">Telegram: {formatOrderTelegramSnapshot(order)}</p>
+                  </div>
+                  <div className="flex flex-wrap items-end gap-2">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <Label htmlFor={`de-amount-${order.id}`}>Betrag</Label>
                       <Input
+                        id={`de-amount-${order.id}`}
                         value={draft.amount}
                         onChange={(e) =>
                           setDeDrafts((prev) => ({ ...prev, [order.id]: { ...draft, amount: e.target.value } }))
                         }
-                        className="w-28"
                       />
-                    </TableCell>
-                    <TableCell>
+                    </div>
+                    <div className="space-y-1">
+                      <Label>Währung</Label>
                       <Select
                         value={draft.currency}
                         onValueChange={(v) =>
                           setDeDrafts((prev) => ({ ...prev, [order.id]: { ...draft, currency: v as ShippingCurrency } }))
                         }
                       >
-                        <SelectTrigger className="w-28">
+                        <SelectTrigger className="w-24">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -240,17 +341,15 @@ export default function AdminShippingPage() {
                           <SelectItem value="EUR">EUR</SelectItem>
                         </SelectContent>
                       </Select>
-                    </TableCell>
-                    <TableCell>
-                      <Button size="sm" variant="outline" onClick={() => handleSaveDe(order.id)}>
-                        Speichern
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => handleSaveDe(order.id)}>
+                      Speichern
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
 

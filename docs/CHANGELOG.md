@@ -2,6 +2,16 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-02 (order number + Telegram snapshot)
+
+### Changed
+
+- Order and shipping UI keep the existing **Bestellnummer** and additionally show the frozen **Telegram Benutzername** snapshot. Missing snapshots show „Nicht verfügbar“. Germany shipping lists Bestellung | Telegram Benutzername | Betrag | Währung.
+
+### Notes
+
+- No migration. Order numbers, snapshots, PDF, role pricing, and RLS are unchanged.
+
 ## 2026-09-02 (users/roles merge, username force, account delete)
 
 ### Added

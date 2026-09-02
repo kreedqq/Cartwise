@@ -9,6 +9,7 @@ import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { useMyOrders } from "@/hooks/useOrders";
 import { formatDateTime, summarizeOrderCharges } from "@/lib/money";
 import { PageHeader } from "@/components/common/PageHeader";
+import { OrderIdentity } from "@/components/orders/OrderIdentity";
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -52,7 +53,10 @@ export default function OrdersPage() {
             >
               <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
                 <div>
-                  <p className="font-mono text-sm font-semibold">{order.order_number}</p>
+                  <OrderIdentity
+                    orderNumber={order.order_number}
+                    telegramSnapshot={order.telegram_username_snapshot}
+                  />
                   <p className="text-xs text-muted-foreground">{formatDateTime(order.submitted_at)}</p>
                 </div>
                 <div className="flex items-center gap-4">

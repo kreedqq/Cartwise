@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-02** (merged Benutzer & Rollen, username-required gate, admin account delete).
+Last documentation pass: **2026-09-02** (order number + Telegram snapshot display).
+
+**Update 2026-09-02 (order display)**: Admin/customer order and shipping screens keep `order_number` as the primary reference and additionally show `telegram_username_snapshot` (fallback „Nicht verfügbar“). No DB/migration, PDF, pricing, or RLS changes.
 
 **Update 2026-09-02 (users/roles merge + username force + account delete)**: Admin subtabs Benutzer and Rollen & Preisaufschlag are one page `/admin/users` (Benutzer & Rollen). `/admin/roles` redirects there. Per-user `profiles.username_required_on_next_login` (default false) forces the `/username-required` page after login via `UsernameGate`. Admin `admin_delete_user` removes the auth account; `orders.user_id` is nullable ON DELETE SET NULL so historical orders and snapshots stay. Role pricing, quantity tier, kits, cart naming, Telegram/Discord auth, and payment were not changed.
 
