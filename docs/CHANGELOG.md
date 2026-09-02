@@ -2,6 +2,21 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-02 (users/roles merge, username force, account delete)
+
+### Added
+
+- Admin can require a Telegram username confirmation on the next login per user (`profiles.username_required_on_next_login`). `UsernameGate` blocks the app until `/username-required` succeeds; `set_username` clears the flag.
+- Admin can permanently remove an auth account (`admin_delete_user`) with confirmation. Historical orders stay (`orders.user_id` nullable, ON DELETE SET NULL). Kit participation of that user is dropped; kits with remaining members keep a new creator.
+
+### Changed
+
+- Admin subtabs **Benutzer** and **Rollen & Preisaufschlag** are one page **Benutzer & Rollen** (`/admin/users`). `/admin/roles` redirects there. **Rollenaufschläge** reporting is unchanged.
+
+### Notes
+
+- Migration `0046_username_required_and_admin_user_delete.sql`. Role markup engine, quantity tier, oils pack totals, kits (except delete cleanup), cart naming, Telegram/Discord auth, payment, and order snapshots are unchanged. No new 25% formula. RLS was not loosened.
+
 ## 2026-09-01 (orders isolation, admin hubs, Telegram identity)
 
 ### Fixed

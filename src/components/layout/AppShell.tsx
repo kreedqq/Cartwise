@@ -4,7 +4,6 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { MobileNavDrawer } from "@/components/layout/MobileNavDrawer";
-import { RequireUsernameDialog } from "@/components/auth/RequireUsernameDialog";
 import { NavShellProvider } from "@/context/NavShellProvider";
 
 export function AppShell() {
@@ -23,7 +22,6 @@ export function AppShell() {
         <MobileNav />
         <MobileNavDrawer />
       </div>
-      <RequireUsernameDialog />
     </NavShellProvider>
   );
 }

@@ -38,6 +38,8 @@ export interface Database {
           display_name: string;
           /** Unique public handle shown during kit sharing. Null until the user sets one. */
           username: string | null;
+          /** Admin-set: user must confirm/set username before using the app. */
+          username_required_on_next_login: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -255,7 +257,8 @@ export interface Database {
         Row: {
           id: string;
           order_number: string;
-          user_id: string;
+          /** Null after the placing customer's auth account is deleted. Snapshots stay. */
+          user_id: string | null;
           cart_id: string | null;
           status: OrderStatus;
           note: string | null;
@@ -1284,6 +1287,8 @@ export interface Database {
       };
       admin_delete_customer_role: { Args: { _id: string }; Returns: undefined };
       admin_assign_customer_role: { Args: { _user_id: string; _role_id: string }; Returns: undefined };
+      admin_set_username_required: { Args: { _user_id: string; _required: boolean }; Returns: undefined };
+      admin_delete_user: { Args: { _user_id: string }; Returns: undefined };
       admin_set_de_shipping: {
         Args: { _order_id: string; _amount: number | null; _currency: ShippingCurrency | null };
         Returns: Database["public"]["Tables"]["orders"]["Row"];

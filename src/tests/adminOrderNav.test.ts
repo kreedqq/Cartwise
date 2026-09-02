@@ -57,13 +57,13 @@ describe("hub admin navigation", () => {
         "/admin/pdf-import",
         "/admin/import-history",
         "/admin/users",
-        "/admin/roles",
         "/admin/surcharges",
         "/admin/shipping",
         "/admin/audit-log",
         "/admin/research",
       ]),
     );
+    expect(destinations).not.toContain("/admin/roles");
   });
 
   it("groups Bestellungen, Produkte, Benutzer & Rollen, and Inhalte as in-page tabs", () => {
@@ -73,11 +73,12 @@ describe("hub admin navigation", () => {
     expect(products?.items.map((item) => item.label)).toEqual(["Produktkatalog", "Import", "Import-Verlauf"]);
     const users = ADMIN_NAV_GROUPS.find((group) => group.id === "users");
     expect(users?.items.map((item) => item.label)).toEqual([
-      "Benutzer",
-      "Rollen & Preisaufschlag",
+      "Benutzer & Rollen",
       "Rollenaufschläge",
       "Audit-Log",
     ]);
+    expect(users?.items.map((item) => item.label)).not.toContain("Benutzer");
+    expect(users?.items.map((item) => item.label)).not.toContain("Rollen & Preisaufschlag");
     const content = ADMIN_NAV_GROUPS.find((group) => group.id === "content");
     expect(content?.items.map((item) => item.label)).toEqual(["Research"]);
   });

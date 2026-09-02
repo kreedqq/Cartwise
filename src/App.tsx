@@ -5,9 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/context/AuthProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
+import { UsernameGate } from "@/routes/UsernameGate";
 import { AdminRoute } from "@/routes/AdminRoute";
 import { AppShell } from "@/components/layout/AppShell";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
+import UsernameRequiredPage from "@/pages/UsernameRequired";
 
 import LoginPage from "@/pages/Login";
 import AuthCallbackPage from "@/pages/AuthCallback";
@@ -68,6 +70,8 @@ export default function App() {
             <Route path="/403" element={<ForbiddenPage />} />
 
             <Route element={<ProtectedRoute />}>
+              <Route path="/username-required" element={<UsernameRequiredPage />} />
+              <Route element={<UsernameGate />}>
               <Route element={<AppShell />}>
                 <Route path="/shop" element={<ShopPage />} />
                 <Route path="/kit-gesuche" element={<KitRequestsPage />} />
@@ -134,6 +138,7 @@ export default function App() {
                     <Route path="research" element={<AdminResearchPage />} />
                   </Route>
                 </Route>
+              </Route>
               </Route>
             </Route>
 

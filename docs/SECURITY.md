@@ -18,7 +18,11 @@
    dass der aufrufende Nutzer bereits `admin` ist (Ausnahme: der in
    `FIRST_ADMIN.md` beschriebene einmalige SQL-Bootstrap durch den
    Projektinhaber). `user_roles` hat daher **keine** clientseitigen
-   INSERT/UPDATE/DELETE-Policies für normale Nutzer.
+   INSERT/UPDATE/DELETE-Policies. Kundenrollen, Username-Erzwingung und
+   Account-Löschung laufen über admin-only SECURITY DEFINER RPCs
+   (`admin_assign_customer_role`, `admin_set_username_required`,
+   `admin_delete_user`), die `has_role(auth.uid(), 'admin')` prüfen. Die
+   Ziel-`user_id` kommt vom Client, die Berechtigung nicht.
 
 ## RLS-Policy-Matrix
 

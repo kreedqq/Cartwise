@@ -58,7 +58,7 @@ export default function AdminOrderDetailPage() {
   }
 
   const order = orderQuery.data;
-  const customer = directoryQuery.data?.get(order.user_id);
+  const customer = order.user_id ? directoryQuery.data?.get(order.user_id) : undefined;
   const telegramHandle = order.telegram_username_snapshot?.trim() || null;
   const next = nextOrderStatuses(order.status);
   const roleSurcharge =
@@ -71,7 +71,7 @@ export default function AdminOrderDetailPage() {
     order,
     order.items,
     {
-      displayName: telegramHandle ?? order.user_id,
+      displayName: telegramHandle ?? "—",
       email: customer?.email ?? null,
     },
     roleSurcharge,

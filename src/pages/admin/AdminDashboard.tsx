@@ -91,7 +91,7 @@ export default function AdminDashboardPage() {
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <QuickAction to="/admin/roles" icon={ShieldCheck} label="Rollen & Preisregeln" />
+        <QuickAction to="/admin/users" icon={ShieldCheck} label="Benutzer & Rollen" />
         <QuickAction to="/admin/surcharges" icon={DollarSign} label="Rollenaufschläge" />
         <QuickAction to="/admin/shipping" icon={Truck} label="Versandkosten" />
         <QuickAction to="/admin/products" icon={Package} label="Produkte verwalten" />

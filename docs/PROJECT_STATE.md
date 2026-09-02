@@ -2,9 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-01** (customer order isolation, hub admin nav, Telegram Benutzername only).
+Last documentation pass: **2026-09-02** (merged Benutzer & Rollen, username-required gate, admin account delete).
 
-**Update 2026-09-01 (orders isolation + admin hubs)**: `/orders` always queries `orders.user_id = auth.uid()`. An admin visiting Meine Bestellungen no longer sees the inbox (RLS `orders_select_own_or_admin` is unchanged). Admin inbox stays `/admin/orders`. Admin chrome is five hubs (Übersicht, Bestellungen, Produkte, Benutzer & Rollen, Inhalte) with in-page subtabs. `profiles.display_name` remains in the database but is not shown as identity. Role pricing, quantity tier, kits, cart naming, auth, and payment methods were not changed.
+**Update 2026-09-02 (users/roles merge + username force + account delete)**: Admin subtabs Benutzer and Rollen & Preisaufschlag are one page `/admin/users` (Benutzer & Rollen). `/admin/roles` redirects there. Per-user `profiles.username_required_on_next_login` (default false) forces the `/username-required` page after login via `UsernameGate`. Admin `admin_delete_user` removes the auth account; `orders.user_id` is nullable ON DELETE SET NULL so historical orders and snapshots stay. Role pricing, quantity tier, kits, cart naming, Telegram/Discord auth, and payment were not changed.
 
 **Update 2026-09-01 (orders isolation + admin hubs)**: `/orders` always queries `orders.user_id = auth.uid()`. An admin visiting Meine Bestellungen no longer sees the inbox (RLS `orders_select_own_or_admin` is unchanged). Admin inbox stays `/admin/orders`. Admin chrome is five hubs (Übersicht, Bestellungen, Produkte, Benutzer & Rollen, Inhalte) with in-page subtabs. `profiles.display_name` remains in the database but is not shown as identity. Role pricing, quantity tier, kits, cart naming, auth, and payment methods were not changed.
 
@@ -66,6 +66,7 @@ Peptide routes sit behind `ProtectedRoute` (same login as shop).
 
 - Email/password login and register, magic link, forgot/reset password
 - Canonical public identity is `profiles.username` (UI: Telegram Benutzername). Cart titles use `name_ordinal`. Orders snapshot telegram handle + shipping at checkout.
+- After login, `UsernameGate` blocks `AppShell` when username is missing or `username_required_on_next_login` is true; the user must complete `/username-required`. Telegram OIDC itself is unchanged.
 - OAuth: Discord (`discord`) and Telegram Custom OIDC (`custom:telegram`, scopes `openid profile`, email optional). Telegram authorize includes `origin` from `window.location.origin` because `oauth.telegram.org/auth` returns "origin required" without it. Existing accounts are not auto-merged by Telegram username; they must link Telegram explicitly.
 - `skipBrowserRedirect: true` plus strip `skip_http_redirect` so GoTrue JSON is not saved as `authorize.json`
 - Password login waits for a client session and AuthProvider session before `/dashboard`; `/login` with an existing session goes to `/dashboard`
@@ -80,13 +81,13 @@ Sidebar: Übersicht `/dashboard`, Shop `/shop`, **Kit Gesuche** `/kit-gesuche`, 
 
 Mobile: same set plus Favorites in `MAIN_NAV_ITEMS`; peptide label **Lexikon & Rechner**; Kit Gesuche short label **Kits** on the bottom bar.
 
-Admin nav (five hubs, in-page tabs): Übersicht `/admin`; Bestellungen → Eingegangene Bestellungen `/admin/orders`, Versand `/admin/shipping`; Produkte → Produktkatalog / Import / Import-Verlauf; Benutzer & Rollen → Benutzer / Rollen & Preisaufschlag / Rollenaufschläge / Audit-Log; Inhalte → Research.
+Admin nav (five hubs, in-page tabs): Übersicht `/admin`; Bestellungen → Eingegangene Bestellungen `/admin/orders`, Versand `/admin/shipping`; Produkte → Produktkatalog / Import / Import-Verlauf; Benutzer & Rollen → Benutzer & Rollen `/admin/users`, Rollenaufschläge `/admin/surcharges`, Audit-Log `/admin/audit-log`; Inhalte → Research. `/admin/roles` still exists and redirects to `/admin/users`.
 
 ### Routes (`src/App.tsx`)
 
 Public: `/login`, `/auth/callback`, `/register`, `/forgot-password`, `/reset-password`, `/403`.
 
-Protected: `/shop`, `/kit-gesuche`, `/favorites`, `/dashboard`, `/carts/:cartId`, `/carts/:cartId/checkout`, `/orders`, `/orders/:orderId`, `/profile`, `/peptide`, `/peptide/rechner`, `/peptide/lexikon`, `/peptide/lexikon/:slug`.
+Protected: `/username-required`, `/shop`, `/kit-gesuche`, `/favorites`, `/dashboard`, `/carts/:cartId`, `/carts/:cartId/checkout`, `/orders`, `/orders/:orderId`, `/profile`, `/peptide`, `/peptide/rechner`, `/peptide/lexikon`, `/peptide/lexikon/:slug`.
 
 Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/roles`, `/admin/surcharges`, `/admin/shipping`, `/admin/products`, `/admin/pdf-import`, `/admin/import-history`, `/admin/users`, `/admin/audit-log`, `/admin/research`.
 

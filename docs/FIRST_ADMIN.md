@@ -31,7 +31,7 @@ Projektinhaber per SQL angelegt.
 ## Weitere Admins anlegen
 
 Sobald mindestens ein Admin existiert, kannst du **weitere** Admins bequem im
-Admin-Bereich unter **Benutzerübersicht** ernennen — dort ruft die App die
+Admin-Bereich unter **Benutzer & Rollen** ernennen — dort ruft die App die
 Edge Function `set-user-role` auf, die serverseitig prüft, dass der
 aufrufende Nutzer selbst Admin ist. Ein erneuter manueller SQL-Befehl ist
 danach nicht mehr nötig.

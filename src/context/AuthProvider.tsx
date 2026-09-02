@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setCustomerRoleName(pricingRoleName);
       } catch (error) {
         // Keep the auth session. A missing username is handled by
-        // RequireUsernameDialog; a profile/role fetch error must not bounce to /login.
+        // UsernameGate; a profile/role fetch error must not bounce to /login.
         console.error("Profil/Rollen konnten nicht geladen werden:", error);
       }
     },

@@ -55,8 +55,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       pathname.startsWith("/admin/surcharges") ||
       pathname.startsWith("/admin/audit-log"),
     items: [
-      { to: "/admin/users", label: "Benutzer" },
-      { to: "/admin/roles", label: "Rollen & Preisaufschlag" },
+      { to: "/admin/users", label: "Benutzer & Rollen" },
       { to: "/admin/surcharges", label: "Rollenaufschläge" },
       { to: "/admin/audit-log", label: "Audit-Log" },
     ],

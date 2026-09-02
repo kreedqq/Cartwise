@@ -58,7 +58,7 @@ export default function AdminOrdersPage() {
         if (payment !== "none" && order.payment_method !== payment) return false;
       }
       if (!term) return true;
-      const customer = directory?.get(order.user_id);
+      const customer = order.user_id ? directory?.get(order.user_id) : undefined;
       const customerHay = `${orderTelegramUsername(order) ?? ""} ${customer?.email ?? ""}`.toLowerCase();
       if (order.order_number.toLowerCase().includes(term)) return true;
       if (customerHay.includes(term)) return true;
@@ -199,7 +199,7 @@ export default function AdminOrdersPage() {
               </TableHeader>
               <TableBody>
                 {filtered.map((order) => {
-                  const customer = directoryQuery.data?.get(order.user_id);
+                  const customer = order.user_id ? directoryQuery.data?.get(order.user_id) : undefined;
                   return (
                     <TableRow
                       key={order.id}

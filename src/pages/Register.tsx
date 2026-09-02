@@ -56,7 +56,7 @@ export default function RegisterPage() {
         // Best effort: claim the chosen username right away when a session
         // is available immediately (email confirmation disabled). If this
         // fails (e.g. a race on a rare duplicate), the user is prompted to
-        // choose a username on next login via <RequireUsernameDialog>.
+        // choose a username on next login via the username-required page.
         try {
           await claimUsername(result.data.username);
         } catch (usernameError) {

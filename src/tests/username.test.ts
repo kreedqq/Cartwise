@@ -24,6 +24,23 @@ describe("shouldPromptForUsername", () => {
     expect(shouldPromptForUsername({ loading: true, user: { id: "u1" }, profile: { username: null } })).toBe(false);
     expect(shouldPromptForUsername({ loading: false, user: null, profile: { username: null } })).toBe(false);
   });
+
+  it("prompts when the admin required-on-next-login flag is set even if a username exists", () => {
+    expect(
+      shouldPromptForUsername({
+        loading: false,
+        user: { id: "u1" },
+        profile: { username: "ExampleUser", username_required_on_next_login: true },
+      }),
+    ).toBe(true);
+    expect(
+      shouldPromptForUsername({
+        loading: false,
+        user: { id: "u1" },
+        profile: { username: "ExampleUser", username_required_on_next_login: false },
+      }),
+    ).toBe(false);
+  });
 });
 
 describe("usernameSchema", () => {

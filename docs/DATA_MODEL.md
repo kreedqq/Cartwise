@@ -9,7 +9,9 @@ Dokument beschreibt die Tabellen in Textform als Referenz.
 | Feld | Typ | Beschreibung |
 |---|---|---|
 | id | uuid, PK, FK → auth.users(id) ON DELETE CASCADE | |
-| display_name | text, NOT NULL, CHECK length 1–80 | Anzeigename |
+| display_name | text, NOT NULL, CHECK length 1–80 | Internal only; not shown as identity |
+| username | text, unique, nullable | Canonical Telegram handle |
+| username_required_on_next_login | boolean, NOT NULL, default false | Admin-set login gate; cleared by `set_username` |
 | created_at | timestamptz, default now() | |
 | updated_at | timestamptz, default now() | via Trigger aktualisiert |
 

@@ -18,6 +18,7 @@ const BLOCKED_POST_LOGIN_PREFIXES = [
   "/reset-password",
   "/auth",
   "/403",
+  "/username-required",
 ];
 
 /**

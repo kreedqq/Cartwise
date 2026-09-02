@@ -41,7 +41,7 @@ Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PA
 
 ## Authentication
 
-`AuthProvider` + `ProtectedRoute` / `AdminRoute`. Discord and Telegram (`custom:telegram`) OAuth use `skipBrowserRedirect` and never assign GoTrue JSON to `window.location`. Password login does not navigate to `/dashboard` until AuthProvider has a session. OAuth callback (`completeOAuthCallback`) keeps a session if `exchangeCodeForSession` fails after `detectSessionInUrl` already consumed the code. Telegram login does not merge accounts by username. Anon key is public; authorization is RLS + RPCs. Production Site URL must be `https://peptix.app` (not localhost).
+`AuthProvider` + `ProtectedRoute` / `UsernameGate` / `AdminRoute`. Discord and Telegram (`custom:telegram`) OAuth use `skipBrowserRedirect` and never assign GoTrue JSON to `window.location`. Password login does not navigate to `/dashboard` until AuthProvider has a session. After a session exists, `UsernameGate` sends users with a missing `profiles.username` or `username_required_on_next_login` to `/username-required` (outside `AppShell`). OAuth callback (`completeOAuthCallback`) keeps a session if `exchangeCodeForSession` fails after `detectSessionInUrl` already consumed the code. Telegram login does not merge accounts by username. Anon key is public; authorization is RLS + RPCs. Production Site URL must be `https://peptix.app` (not localhost). Admin user delete is `admin_delete_user` (admin-only SECURITY DEFINER); it does not cascade-delete orders.
 
 ## Shop vs peptide
 

@@ -26,7 +26,9 @@ export function mapUsernameError(error: unknown): string {
 export function shouldPromptForUsername(input: {
   loading: boolean;
   user: { id: string } | null;
-  profile: { username: string | null } | null;
+  profile: { username: string | null; username_required_on_next_login?: boolean } | null;
 }): boolean {
-  return Boolean(!input.loading && input.user && input.profile && !input.profile.username);
+  if (input.loading || !input.user || !input.profile) return false;
+  if (input.profile.username_required_on_next_login) return true;
+  return !input.profile.username;
 }

@@ -18,16 +18,16 @@ export async function updateDisplayName(userId: string, displayName: string) {
 export interface UserWithRoles {
   id: string;
   username: string | null;
-  displayName: string;
   createdAt: string;
   roles: string[];
+  usernameRequiredOnNextLogin: boolean;
 }
 
 /** Admin-only: list all users with their roles (joins profiles + user_roles). */
 export async function listUsersWithRoles(): Promise<UserWithRoles[]> {
   const { data: profiles, error: profilesError } = await supabase
     .from("profiles")
-    .select("id, username, display_name, created_at")
+    .select("id, username, created_at, username_required_on_next_login")
     .order("created_at", { ascending: false });
   if (profilesError) throw profilesError;
 
@@ -44,8 +44,23 @@ export async function listUsersWithRoles(): Promise<UserWithRoles[]> {
   return (profiles ?? []).map((p) => ({
     id: p.id,
     username: p.username,
-    displayName: p.display_name,
     createdAt: p.created_at,
     roles: rolesByUser.get(p.id) ?? [],
+    usernameRequiredOnNextLogin: Boolean(p.username_required_on_next_login),
   }));
+}
+
+/** Admin-only RPC: require Telegram username confirmation on the next login. */
+export async function adminSetUsernameRequired(userId: string, required: boolean): Promise<void> {
+  const { error } = await supabase.rpc("admin_set_username_required", {
+    _user_id: userId,
+    _required: required,
+  });
+  if (error) throw error;
+}
+
+/** Admin-only RPC: delete the auth account. Historical orders stay. */
+export async function adminDeleteUser(userId: string): Promise<void> {
+  const { error } = await supabase.rpc("admin_delete_user", { _user_id: userId });
+  if (error) throw error;
 }
