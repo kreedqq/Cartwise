@@ -2,6 +2,16 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-03 (live SK10/XA10 kit proof)
+
+### Verified
+
+- Production kits `42235edd-…` (SK10) and `d3f1c575-…` (XA10): PepQueen 030 + Penbuddy 036, 5+5 processing on the same `kit_share_id` each, merchant `1 Kit/s` (not two `5/10 Stück` lines, not `5 Kit/s`). PDF uses the same labels. Page 4 still lists each share as `5/10`. TE300 on 034 stays `5`.
+
+### Notes
+
+- No schema change. `order_items` still has no `kit_share_id`. Replay test uses live ids and Postgres `"5.000"` quantities.
+
 ## 2026-09-03 (kit identity is order/cart link only)
 
 ### Fixed

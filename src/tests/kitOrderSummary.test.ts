@@ -611,6 +611,205 @@ describe("kit vial aggregation regressions", () => {
     expect(buildProcessingOrderSummary(orders, items, [], undefined).groups.length).toBeGreaterThan(0);
   });
 
+  it("LIVE 2026-09-03: Selank+Semax 5/10+5/10 on the same kit_share_id become 1 Kit/s each; TE300 stays 5", () => {
+    const order030 = makeOrder({
+      id: "5539b116-bc33-4c63-9535-3a97cfe84dc4",
+      order_number: "CW-2026-000030",
+      user_id: "f6df0375-5d24-4ad4-b8b2-efcc6fd0b5f2",
+      cart_id: "f8673972-9403-4701-be72-aa3850ba0870",
+      telegram_username_snapshot: "PepQueen",
+    });
+    const order036 = makeOrder({
+      id: "7b02ae6e-25b8-4f7f-999d-5557e0931445",
+      order_number: "CW-2026-000036",
+      user_id: "641e5d33-177a-4b7e-ac31-47e40ffb1cc7",
+      cart_id: "a042b1df-cb53-4f02-9cdc-6461b91a2569",
+      telegram_username_snapshot: "Penbuddy",
+    });
+    const order034 = makeOrder({
+      id: "224ff4ce-38ae-41b8-8b0c-a68ba7cc5e07",
+      order_number: "CW-2026-000034",
+      user_id: "f0dc82df-7f75-4838-86c6-1e7161c7fa7b",
+      cart_id: "6a2c7296-6ee2-4154-be76-0c840b7657b7",
+      telegram_username_snapshot: "PepsiDry",
+    });
+    const selankId = "4c3de824-f70b-4cc4-8786-4293316d0fc1";
+    const semaxId = "ffc0afc4-d984-41c0-96f4-b3c441e8ac2b";
+    const te300Id = "a1ebe3d9-9c6e-4e1c-9146-0365f6ca2a61";
+    const kitSelank = "42235edd-5dac-4468-a119-e7eae1dde2dd";
+    const kitSemax = "d3f1c575-ca5d-406c-a169-5ba56dec75f8";
+    const kitTe300Open = "13067fa5-dcad-4e71-9dbe-9c2c4b06355f";
+    const liveQty = "5.000" as unknown as number;
+    const items = [
+      makeItem({
+        id: "4f6d2b73-e99b-4ed5-afc0-f378ffcb04ce",
+        order_id: order030.id,
+        product_id: selankId,
+        dosage_vial_snapshot: "10mg/vial x10vials",
+        quantity: liveQty,
+        line_total_usd: 30,
+      }),
+      makeItem({
+        id: "38392aca-3602-42b7-814c-b33d17adb580",
+        order_id: order030.id,
+        product_id: semaxId,
+        product_code_snapshot: "XA10",
+        product_name_snapshot: "Semax",
+        dosage_vial_snapshot: "10mg/vial x10vials",
+        quantity: liveQty,
+        line_total_usd: 27.5,
+      }),
+      makeItem({
+        id: "6c8ed1ae-75a9-4f37-9031-96ff70c42a33",
+        order_id: order036.id,
+        product_id: selankId,
+        dosage_vial_snapshot: "10mg/vial x10vials",
+        quantity: liveQty,
+        line_total_usd: 30,
+      }),
+      makeItem({
+        id: "7bed61da-06b1-4538-b21c-a84ab4465e80",
+        order_id: order036.id,
+        product_id: semaxId,
+        product_code_snapshot: "XA10",
+        product_name_snapshot: "Semax",
+        dosage_vial_snapshot: "10mg/vial x10vials",
+        quantity: liveQty,
+        line_total_usd: 27.5,
+      }),
+      makeItem({
+        id: "0102ac31-af11-4a93-91aa-3aec783f7dab",
+        order_id: order036.id,
+        product_id: "7b2e5f53-1db2-4108-bf6c-237eb915396a",
+        product_code_snapshot: "KP10",
+        product_name_snapshot: "KPV",
+        dosage_vial_snapshot: "10mg/vial x10vials",
+        quantity: 1,
+        line_total_usd: 55,
+      }),
+      makeItem({
+        id: "4b072d35-cd14-4bb0-90ff-b66e2d4129d7",
+        order_id: order036.id,
+        product_id: "d0472ac8-e4b1-40ba-9454-3af2010b14df",
+        product_code_snapshot: "2S10",
+        product_name_snapshot: "SS-31",
+        dosage_vial_snapshot: "10mg/vial x10vials",
+        quantity: 1,
+        line_total_usd: 80,
+      }),
+      makeItem({
+        id: "5728873c-2049-4822-98df-e8779ee8950b",
+        order_id: order036.id,
+        product_id: "a1ec32d2-ac99-4f24-a298-0f6b3ad32d4c",
+        product_code_snapshot: "NXA30",
+        product_name_snapshot: "NA Semax amide",
+        dosage_vial_snapshot: "30mg/vial x10vials",
+        quantity: 1,
+        line_total_usd: 135,
+      }),
+      makeOilItem({
+        id: "98133866-e21c-4c11-ae0a-43bbc89f609b",
+        order_id: order034.id,
+        product_id: te300Id,
+        dosage_vial_snapshot: "300mg",
+        quantity: liveQty,
+        line_total_usd: 85,
+      }),
+    ];
+    const catalog = [
+      { id: selankId, code: "SK10", name: "Selank", category: "PEPTIDES", dosage_vial: "10mg/vial x10vials" },
+      { id: semaxId, code: "XA10", name: "Semax", category: "PEPTIDES", dosage_vial: "10mg/vial x10vials" },
+      { id: te300Id, code: "TE300", name: "TEST ENANTHATE", category: "INJECTABLES-OILS", dosage_vial: "300mg" },
+      { id: "7b2e5f53-1db2-4108-bf6c-237eb915396a", code: "KP10", name: "KPV", category: "PEPTIDES" },
+      { id: "d0472ac8-e4b1-40ba-9454-3af2010b14df", code: "2S10", name: "SS-31", category: "PEPTIDES" },
+      { id: "a1ec32d2-ac99-4f24-a298-0f6b3ad32d4c", code: "NXA30", name: "NA Semax amide", category: "PEPTIDES" },
+    ];
+    const context: KitShareOrderContext = {
+      kits: [
+        { id: kitSelank, product_id: selankId, kit_size_vials: 10 },
+        { id: kitSemax, product_id: semaxId, kit_size_vials: 10 },
+        { id: kitTe300Open, product_id: te300Id, kit_size_vials: 10 },
+      ],
+      participants: [
+        { kit_share_id: kitSelank, user_id: order030.user_id as string, quantity: 5, order_id: order030.id },
+        { kit_share_id: kitSelank, user_id: order036.user_id as string, quantity: 5, order_id: order036.id },
+        { kit_share_id: kitSemax, user_id: order030.user_id as string, quantity: 5, order_id: order030.id },
+        { kit_share_id: kitSemax, user_id: order036.user_id as string, quantity: 5, order_id: order036.id },
+        { kit_share_id: kitTe300Open, user_id: order034.user_id as string, quantity: 1, order_id: null },
+      ],
+      cartLinks: [
+        { cart_id: order030.cart_id as string, kit_share_id: kitSelank, product_id: selankId, quantity: 5 },
+        { cart_id: order030.cart_id as string, kit_share_id: kitSemax, product_id: semaxId, quantity: 5 },
+        { cart_id: order036.cart_id as string, kit_share_id: kitSelank, product_id: selankId, quantity: 5 },
+        { cart_id: order036.cart_id as string, kit_share_id: kitSemax, product_id: semaxId, quantity: 5 },
+      ],
+    };
+
+    const bothProcessing = buildProcessingOrderSummary([order030, order036, order034], items, catalog, context);
+    const peptideLabels = bothProcessing.groups
+      .find((group) => group.categoryId === "peptides")
+      ?.lines.map((line) => `${line.code}|${line.quantityLabel}`)
+      .sort();
+    expect(peptideLabels).toEqual(["2S10|1", "KP10|1", "NXA30|1", "SK10|1 Kit/s", "XA10|1 Kit/s"]);
+    expect(peptideLabels).not.toContain("SK10|5/10 Stück");
+    expect(peptideLabels).not.toContain("XA10|5/10 Stück");
+    expect(peptideLabels?.some((label) => label.includes("5 Kit/s"))).toBe(false);
+    expect(bothProcessing.groups.find((group) => group.categoryId === "peptides")?.lines.find((line) => line.code === "SK10")).toMatchObject({
+      name: "Selank",
+      quantity: 1,
+      quantityLabel: "1 Kit/s",
+    });
+    expect(bothProcessing.groups.find((group) => group.categoryId === "peptides")?.lines.find((line) => line.code === "XA10")).toMatchObject({
+      name: "Semax",
+      quantity: 1,
+      quantityLabel: "1 Kit/s",
+    });
+    expect(bothProcessing.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]).toMatchObject({
+      code: "TE300",
+      quantityLabel: "5",
+    });
+    expect(
+      bothProcessing.personLines
+        .filter((line) => line.article === "Selank" || line.article === "Semax")
+        .map((line) => `${line.name}|${line.quantityLabel}|${line.article}`)
+        .sort(),
+    ).toEqual([
+      "Penbuddy|5/10|Selank",
+      "Penbuddy|5/10|Semax",
+      "PepQueen|5/10|Selank",
+      "PepQueen|5/10|Semax",
+    ]);
+    const pdf = buildProcessingOrderSummaryPdf(bothProcessing, "now");
+    expect(pdfContainsAscii(pdf, "1 Kit/s")).toBe(true);
+    expect(pdfContainsAscii(pdf, "5 Kit/s")).toBe(false);
+    expect(pdfContainsAscii(pdf, "5/10 Stück")).toBe(false);
+    expect(pdfContainsAscii(pdf, "SK10")).toBe(true);
+    expect(pdfContainsAscii(pdf, "XA10")).toBe(true);
+    expect(pdfContainsAscii(pdf, "TE300")).toBe(true);
+    expect(pdfContainsAscii(pdf, "Penbuddy")).toBe(true);
+    expect(pdfContainsAscii(pdf, "PepQueen")).toBe(true);
+
+    const only030 = buildProcessingOrderSummary(
+      [order030, { ...order036, status: "pending" }, order034],
+      items,
+      catalog,
+      context,
+    );
+    expect(
+      only030.groups
+        .find((group) => group.categoryId === "peptides")
+        ?.lines.filter((line) => line.code === "SK10" || line.code === "XA10")
+        .map((line) => line.quantityLabel),
+    ).toEqual(["5/10 Stück", "5/10 Stück"]);
+
+    const selankPanel = buildSharedKitsForOrder(order036.id, items.filter((item) => item.order_id === order036.id), [order030, order036], context);
+    expect(selankPanel.map((view) => `${view.productCode}|${view.progressLabel}|${view.complete}`).sort()).toEqual([
+      "SK10|10/10 bestellt|true",
+      "XA10|10/10 bestellt|true",
+    ]);
+    expect(selankPanel[0]?.participants.map((p) => p.telegramLabel).sort()).toEqual(["Penbuddy", "PepQueen"]);
+  });
+
   it("TEST oil: an open same-product kit membership does not turn TEST ENANTHATE 5 into a kit", () => {
     const order = makeOrder({ id: "order-34", user_id: "user-oil" });
     const context: KitShareOrderContext = {
