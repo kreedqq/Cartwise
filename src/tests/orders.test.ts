@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { buildAdminOrderItemsCsv, buildOrderCsv, buildOrderPrintHtml, buildOrdersListCsv, toOrderExportDoc } from "@/lib/orderExport";
 import {
+  ADMIN_WORKFLOW_STATUSES,
   canPermanentlyDeleteOrder,
   CUSTOMER_ORDER_COLUMNS,
   formatOrderTelegramSnapshot,
@@ -74,9 +75,15 @@ function makeItem(overrides: Partial<Tables<"order_items">> = {}): Tables<"order
 
 describe("nextOrderStatuses", () => {
 
-  it("blocks transitions out of completed and cancelled", () => {
-    expect(nextOrderStatuses("completed")).toEqual([]);
-    expect(nextOrderStatuses("cancelled")).toEqual([]);
+  it("lets admins move completed orders back into the workflow", () => {
+    expect(nextOrderStatuses("completed")).toEqual([
+      "pending",
+      "processing",
+      "dispatched",
+      "received",
+      "shipped",
+    ]);
+    expect(nextOrderStatuses("cancelled")).toEqual(ADMIN_WORKFLOW_STATUSES);
   });
 
   it("only allows permanent delete of terminal orders", () => {
@@ -85,19 +92,35 @@ describe("nextOrderStatuses", () => {
     expect(canPermanentlyDeleteOrder("pending")).toBe(false);
     expect(canPermanentlyDeleteOrder("processing")).toBe(false);
     expect(canPermanentlyDeleteOrder("confirmed")).toBe(false);
+    expect(canPermanentlyDeleteOrder("dispatched")).toBe(false);
   });
 
-  it("allows every other status except the current one", () => {
-    expect(nextOrderStatuses("pending")).toEqual(["processing", "cancelled"]);
-    expect(nextOrderStatuses("processing")).toEqual(["confirmed", "cancelled"]);
-    expect(nextOrderStatuses("confirmed")).toEqual(["completed", "cancelled"]);
+  it("offers the six workflow statuses except the current one", () => {
+    expect(nextOrderStatuses("pending")).toEqual([
+      "processing",
+      "dispatched",
+      "received",
+      "shipped",
+      "completed",
+    ]);
+    expect(nextOrderStatuses("processing")).toEqual([
+      "pending",
+      "dispatched",
+      "received",
+      "shipped",
+      "completed",
+    ]);
+    expect(nextOrderStatuses("confirmed")).toEqual(ADMIN_WORKFLOW_STATUSES);
   });
 
   it("exposes German labels for every status", () => {
     expect(ORDER_STATUS_LABELS.pending).toBe("Eingegangen");
     expect(ORDER_STATUS_LABELS.processing).toBe("In Bearbeitung");
-    expect(ORDER_STATUS_LABELS.confirmed).toBe("Bestätigt");
+    expect(ORDER_STATUS_LABELS.dispatched).toBe("Bestellung abgesendet");
+    expect(ORDER_STATUS_LABELS.received).toBe("Bestellung Empfangen");
+    expect(ORDER_STATUS_LABELS.shipped).toBe("Versendet");
     expect(ORDER_STATUS_LABELS.completed).toBe("Abgeschlossen");
+    expect(ORDER_STATUS_LABELS.confirmed).toBe("Bestätigt");
     expect(ORDER_STATUS_LABELS.cancelled).toBe("Storniert");
   });
 });

@@ -2,6 +2,17 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-03 (Bestell Zusammenfassung + workflow statuses)
+
+### Added
+
+- Admin Bestellungen tabs: Eingegangene Bestellungen, Versand, Bestell Zusammenfassung (`/admin/order-summary`). The summary aggregates SKUs from orders with status **In Bearbeitung**. Same product codes are summed; different strengths stay separate. Groups: Peptide, Injectable Oils, Orals, Reconstitution Water. PDF export includes the merchant list plus a customer overview headed `Bestellnummer | Telegram-Snapshot`.
+- Admin inbox and order detail can set status via dropdown: Eingegangen, In Bearbeitung, Bestellung abgesendet, Bestellung Empfangen, Versendet, Abgeschlossen.
+
+### Notes
+
+- Migration `0047_order_workflow_statuses.sql` expands the status check and `set_order_status`. Existing orders, order numbers, snapshots, prices, RLS, and auth are unchanged. `confirmed` and `cancelled` remain valid historical values.
+
 ## 2026-09-02 (order number + Telegram snapshot)
 
 ### Changed

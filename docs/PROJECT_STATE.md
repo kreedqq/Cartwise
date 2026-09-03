@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-02** (order number + Telegram snapshot display).
+Last documentation pass: **2026-09-03** (Bestell Zusammenfassung + workflow statuses).
+
+**Update 2026-09-03 (order summary)**: Admin Bestellungen has tab **Bestell Zusammenfassung**. It aggregates `order_items` from status `processing` only, by `product_code_snapshot`, grouped with existing shop categories. Inbox status dropdown writes through `set_order_status`. Migration `0047` adds `dispatched` / `received` / `shipped` without rewriting existing rows.
 
 **Update 2026-09-02 (order display)**: Admin/customer order and shipping screens keep `order_number` as the primary reference and additionally show `telegram_username_snapshot` (fallback „Nicht verfügbar“). No DB/migration, PDF, pricing, or RLS changes.
 

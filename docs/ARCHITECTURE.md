@@ -64,7 +64,7 @@ Defined in `supabase/migrations/` (0001–0031 in Git; **live `cartwise-prod` is
 
 **Cart:** `carts`, `cart_items` (version/optimistic lock, `price_tier` bulk/normal). View `cart_summaries`.
 
-**Orders:** `orders` (telegram username + Lieferart + address snapshots from checkout; `0042`/`0045`), `order_items`, `order_status_history`, `order_admin_notes`. Shipping cost fields (China/DE) from 0020+. `create_order` validates payment, Lieferart, and the matching address fields server-side.
+**Orders:** `orders` (telegram username + Lieferart + address snapshots from checkout; `0042`/`0045`), `order_items`, `order_status_history`, `order_admin_notes`. Status workflow (`0047`): pending, processing, dispatched, received, shipped, completed; historical confirmed/cancelled remain valid. Shipping cost fields (China/DE) from 0020+. `create_order` validates payment, Lieferart, and the matching address fields server-side. Admin Bestell Zusammenfassung aggregates processing `order_items` by SKU.
 
 **Customers:** `customer_roles`, `user_customer_roles`.
 

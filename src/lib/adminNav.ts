@@ -25,10 +25,14 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     id: "orders",
     label: "Bestellungen",
     to: "/admin/orders",
-    match: (pathname) => pathname.startsWith("/admin/orders") || pathname.startsWith("/admin/shipping"),
+    match: (pathname) =>
+      pathname.startsWith("/admin/orders") ||
+      pathname.startsWith("/admin/shipping") ||
+      pathname.startsWith("/admin/order-summary"),
     items: [
       { to: "/admin/orders", label: "Eingegangene Bestellungen", matchPrefix: true },
       { to: "/admin/shipping", label: "Versand" },
+      { to: "/admin/order-summary", label: "Bestell Zusammenfassung" },
     ],
   },
   {

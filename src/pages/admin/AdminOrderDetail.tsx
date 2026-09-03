@@ -14,6 +14,7 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
+import { OrderStatusSelect } from "@/components/orders/OrderStatusSelect";
 import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { OrderShippingDetails } from "@/components/orders/OrderShippingCard";
@@ -23,7 +24,7 @@ import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/or
 import { formatDateTime, formatQuantity, formatRate, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { orderRoleSurchargeFromSnapshots } from "@/lib/roleSurcharge";
 import { QUERY_KEYS } from "@/lib/constants";
-import { canPermanentlyDeleteOrder, formatOrderTelegramSnapshot, nextOrderStatuses, ORDER_STATUS_LABELS } from "@/services/orders";
+import { canPermanentlyDeleteOrder, formatOrderTelegramSnapshot, ORDER_STATUS_LABELS } from "@/services/orders";
 import { listRoleSurchargeLinesForOrder } from "@/services/roleSurcharge";
 import { toast } from "@/components/ui/toaster";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
@@ -45,7 +46,6 @@ export default function AdminOrderDetailPage() {
   });
 
   const [adminNoteDraft, setAdminNoteDraft] = React.useState<string | null>(null);
-  const [pendingStatus, setPendingStatus] = React.useState<OrderStatus | null>(null);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const adminNote = adminNoteDraft ?? noteQuery.data ?? "";
 
@@ -60,7 +60,6 @@ export default function AdminOrderDetailPage() {
   const order = orderQuery.data;
   const customer = order.user_id ? directoryQuery.data?.get(order.user_id) : undefined;
   const telegramHandle = formatOrderTelegramSnapshot(order);
-  const next = nextOrderStatuses(order.status);
   const roleSurcharge =
     surchargeQuery.data &&
     order.items.length > 0 &&
@@ -82,7 +81,6 @@ export default function AdminOrderDetailPage() {
     try {
       await setStatus.mutateAsync({ status, adminNote: adminNote.trim() || null });
       toast.success(`Status: ${ORDER_STATUS_LABELS[status]}`);
-      setPendingStatus(null);
     } catch (error) {
       console.error("Bestellstatus ändern fehlgeschlagen:", error);
       toast.error(error instanceof Error ? error.message : "Status konnte nicht geändert werden.");
@@ -138,17 +136,12 @@ export default function AdminOrderDetailPage() {
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap gap-2">
-            {next.map((st) => (
-              <Button
-                key={st}
-                size="sm"
-                variant={st === "cancelled" ? "destructive" : "outline"}
-                onClick={() => setPendingStatus(st)}
-              >
-                {ORDER_STATUS_LABELS[st]}
-              </Button>
-            ))}
+          <div className="flex flex-wrap items-center gap-2">
+            <OrderStatusSelect
+              value={order.status}
+              disabled={setStatus.isPending}
+              onValueChange={(status) => void applyStatus(status)}
+            />
             <Button variant="outline" size="sm" onClick={() => printOrderDocument(exportDoc)}>
               <Printer className="h-3.5 w-3.5" /> PDF
             </Button>
@@ -289,21 +282,6 @@ export default function AdminOrderDetailPage() {
           )}
         </div>
       </AdminSection>
-
-      <ConfirmDialog
-        open={pendingStatus != null}
-        onOpenChange={(open) => {
-          if (!open) setPendingStatus(null);
-        }}
-        title={pendingStatus ? `Status auf „${ORDER_STATUS_LABELS[pendingStatus]}" setzen?` : "Status ändern"}
-        description="Der Kunde sieht den neuen Status sofort. Abgeschlossen und Storniert können danach nicht mehr geändert werden."
-        confirmLabel="Status ändern"
-        variant={pendingStatus === "cancelled" ? "destructive" : "default"}
-        loading={setStatus.isPending}
-        onConfirm={() => {
-          if (pendingStatus) return applyStatus(pendingStatus);
-        }}
-      />
 
       <ConfirmDialog
         open={deleteOpen}

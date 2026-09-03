@@ -5,8 +5,11 @@ import type { OrderStatus } from "@/types/database";
 const VARIANTS: Record<OrderStatus, "warning" | "default" | "success" | "secondary" | "destructive"> = {
   pending: "warning",
   processing: "default",
-  confirmed: "success",
+  dispatched: "default",
+  received: "default",
+  shipped: "success",
   completed: "secondary",
+  confirmed: "success",
   cancelled: "destructive",
 };
 

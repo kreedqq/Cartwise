@@ -59,6 +59,7 @@ describe("hub admin navigation", () => {
         "/admin/users",
         "/admin/surcharges",
         "/admin/shipping",
+        "/admin/order-summary",
         "/admin/audit-log",
         "/admin/research",
       ]),
@@ -68,7 +69,11 @@ describe("hub admin navigation", () => {
 
   it("groups Bestellungen, Produkte, Benutzer & Rollen, and Inhalte as in-page tabs", () => {
     const orders = ADMIN_NAV_GROUPS.find((group) => group.id === "orders");
-    expect(orders?.items.map((item) => item.label)).toEqual(["Eingegangene Bestellungen", "Versand"]);
+    expect(orders?.items.map((item) => item.label)).toEqual([
+      "Eingegangene Bestellungen",
+      "Versand",
+      "Bestell Zusammenfassung",
+    ]);
     const products = ADMIN_NAV_GROUPS.find((group) => group.id === "products");
     expect(products?.items.map((item) => item.label)).toEqual(["Produktkatalog", "Import", "Import-Verlauf"]);
     const users = ADMIN_NAV_GROUPS.find((group) => group.id === "users");
@@ -100,6 +105,7 @@ describe("hub admin navigation", () => {
       'path="roles"',
       'path="surcharges"',
       'path="shipping"',
+      'path="order-summary"',
       'path="products"',
       'path="pdf-import"',
       'path="import-history"',

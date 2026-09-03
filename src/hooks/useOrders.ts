@@ -99,17 +99,29 @@ export function useCreateOrder() {
   });
 }
 
-export function useSetOrderStatus(orderId: string) {
+export function useSetOrderStatus(orderId?: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ status, adminNote }: { status: OrderStatus; adminNote?: string | null }) =>
-      setOrderStatus(orderId, status, adminNote),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.order(orderId) });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orderStatusHistory(orderId) });
+    mutationFn: ({
+      status,
+      adminNote,
+      orderId: id,
+    }: {
+      status: OrderStatus;
+      adminNote?: string | null;
+      orderId?: string;
+    }) => {
+      const target = id ?? orderId;
+      if (!target) throw new Error("Bestellung wurde nicht gefunden.");
+      return setOrderStatus(target, status, adminNote);
+    },
+    onSuccess: (_data, vars) => {
+      const target = vars.orderId ?? orderId ?? "";
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.order(target) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orderStatusHistory(target) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });
       queryClient.invalidateQueries({ queryKey: MY_ORDERS_ROOT });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orderAdminNote(orderId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orderAdminNote(target) });
     },
   });
 }

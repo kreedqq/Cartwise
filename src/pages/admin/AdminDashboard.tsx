@@ -38,7 +38,7 @@ export default function AdminDashboardPage() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const thisMonth = orders.filter((o) => o.submitted_at >= startOfMonth);
-  const open = orders.filter((o) => o.status === "pending" || o.status === "processing" || o.status === "confirmed");
+  const open = orders.filter((o) => o.status !== "completed" && o.status !== "cancelled");
   const monthValue = thisMonth.reduce((sum, o) => sum + Number(o.total_usd), 0);
 
   const isLoading = productsQuery.isLoading || ordersQuery.isLoading;

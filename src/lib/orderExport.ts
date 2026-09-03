@@ -2,6 +2,7 @@ import { formatDateTime, formatMoney, formatQuantity, formatUsd, GRAND_TOTAL_LAB
 import { downloadCsv } from "@/services/csvProducts";
 import { ORDER_STATUS_LABELS } from "@/services/orders";
 import { BRAND_NAME } from "@/lib/constants";
+import type { ProcessingOrderSummary } from "@/lib/orderSummary";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 import { formatShippingAddressLines, formatShippingRecipient, formatDeliveryMethodLabel, hasShippingSnapshot } from "@/lib/shippingAddress";
 import type { OrderStatus, Tables } from "@/types/database";
@@ -333,16 +334,114 @@ export function buildOrderPrintHtml(doc: OrderExportDoc): string {
 </html>`;
 }
 
-/** Opens a print window with a professional order document. The browser's
- * "Als PDF speichern" then produces the actual PDF from the frozen snapshots. */
-export function printOrderDocument(doc: OrderExportDoc): void {
-  const html = buildOrderPrintHtml(doc);
+export function printHtmlDocument(html: string): void {
   const frame = window.open("", "_blank", "noopener,noreferrer,width=900,height=700");
   if (!frame) return;
   frame.document.write(html);
   frame.document.close();
   frame.focus();
   frame.print();
+}
+
+/** Opens a print window with a professional order document. The browser's
+ * "Als PDF speichern" then produces the actual PDF from the frozen snapshots. */
+export function printOrderDocument(doc: OrderExportDoc): void {
+  printHtmlDocument(buildOrderPrintHtml(doc));
+}
+
+export function buildProcessingOrderSummaryPrintHtml(
+  summary: ProcessingOrderSummary,
+  exportedAt: string,
+): string {
+  const groupTables = summary.groups
+    .map((group) => {
+      const rows = group.lines
+        .map(
+          (line) => `<tr>
+        <td>${escapeHtml(line.code)}</td>
+        <td>${escapeHtml(line.name)}</td>
+        <td class="num">${escapeHtml(formatQuantity(line.quantity))}</td>
+        <td class="num">${escapeHtml(formatUsd(line.totalUsd))}</td>
+      </tr>`,
+        )
+        .join("");
+      return `<h2>${escapeHtml(group.label)}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Code</th><th>Artikel</th><th class="num">Menge</th><th class="num">Gesamtpreis</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+    })
+    .join("");
+
+  const customerBlocks =
+    summary.customers.length === 0
+      ? `<p class="muted">Keine Bestellungen in Bearbeitung</p>`
+      : summary.customers
+          .map((customer) => {
+            const lines = customer.lines
+              .map((line) => `<li>${escapeHtml(formatQuantity(line.quantity))} × ${escapeHtml(line.name)}</li>`)
+              .join("");
+            return `<h3>${escapeHtml(customer.heading)}</h3>
+    <ul>${lines}</ul>`;
+          })
+          .join("");
+
+  const body =
+    summary.orderCount === 0
+      ? `<p>Keine Bestellungen in Bearbeitung</p>`
+      : `${groupTables}
+  <div class="totals">
+    <div>Gesamtanzahl Produkte: ${summary.productCount}</div>
+    <div>Gesamtmenge: ${escapeHtml(formatQuantity(summary.totalQuantity))}</div>
+    <div><strong>Gesamtpreis: ${escapeHtml(formatUsd(summary.totalUsd))}</strong></div>
+  </div>
+  <h2>Kundenübersicht</h2>
+  ${customerBlocks}`;
+
+  return `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>Bestell Zusammenfassung</title>
+  <style>
+    body { font-family: "Segoe UI", system-ui, sans-serif; color: #1a1612; margin: 32px; font-size: 13px; background: #fff; }
+    h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: 0.18em; text-transform: uppercase; color: #b8893a; }
+    h2 { font-size: 14px; margin: 28px 0 8px; letter-spacing: 0.08em; text-transform: uppercase; color: #b8893a; }
+    h3 { font-size: 14px; margin: 16px 0 4px; }
+    .muted { color: #6b6258; font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { border-bottom: 1px solid #e6dfd4; padding: 8px 6px; text-align: left; vertical-align: top; }
+    th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: #6b6258; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .totals { margin-top: 16px; text-align: right; }
+    .totals strong { font-size: 16px; color: #b8893a; }
+    ul { margin: 0; padding-left: 18px; }
+    @media print { body { margin: 12mm; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>${escapeHtml(BRAND_NAME)}</h1>
+      <p class="muted">BESTELL ZUSAMMENFASSUNG</p>
+      <p>Nur Bestellungen mit Status <strong>In Bearbeitung</strong></p>
+    </div>
+    <div class="muted" style="text-align:right">
+      <div>Export: ${escapeHtml(exportedAt)}</div>
+    </div>
+  </header>
+  ${body}
+</body>
+</html>`;
+}
+
+export function printProcessingOrderSummary(summary: ProcessingOrderSummary, exportedAt: string): void {
+  if (summary.orderCount === 0) return;
+  printHtmlDocument(buildProcessingOrderSummaryPrintHtml(summary, exportedAt));
 }
 
 export function toOrderExportDoc(

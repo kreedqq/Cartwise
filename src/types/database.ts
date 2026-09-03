@@ -15,7 +15,15 @@ export type CartStatus = "draft" | "ready" | "ordered" | "archived";
 export type ResolutionStatus = "resolved" | "not_found" | "inactive" | "pending";
 export type PdfImportStatus = "uploaded" | "previewed" | "applied" | "failed" | "cancelled";
 export type ImportRowQuality = "ok" | "warning" | "error";
-export type OrderStatus = "pending" | "processing" | "confirmed" | "completed" | "cancelled";
+export type OrderStatus =
+  | "pending"
+  | "processing"
+  | "dispatched"
+  | "received"
+  | "shipped"
+  | "completed"
+  | "confirmed"
+  | "cancelled";
 export type ShippingCurrency = "USD" | "EUR";
 /**
  * "auto" hands the create-vs-update decision to apply_pdf_import, which

@@ -240,23 +240,32 @@ export async function getOrderAdminNote(orderId: string): Promise<string | null>
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   pending: "Eingegangen",
   processing: "In Bearbeitung",
-  confirmed: "Bestätigt",
+  dispatched: "Bestellung abgesendet",
+  received: "Bestellung Empfangen",
+  shipped: "Versendet",
   completed: "Abgeschlossen",
+  confirmed: "Bestätigt",
   cancelled: "Storniert",
 };
 
-/** Sensible next statuses from a given status (mirrors the DB guard in set_order_status). */
+/** Admin inbox/detail dropdown. Historical confirmed/cancelled stay stored, not offered as new targets. */
+export const ADMIN_WORKFLOW_STATUSES: OrderStatus[] = [
+  "pending",
+  "processing",
+  "dispatched",
+  "received",
+  "shipped",
+  "completed",
+];
+
+export function adminStatusSelectOptions(current: OrderStatus): OrderStatus[] {
+  if (ADMIN_WORKFLOW_STATUSES.some((status) => status === current)) return ADMIN_WORKFLOW_STATUSES;
+  return [current, ...ADMIN_WORKFLOW_STATUSES];
+}
+
+/** Workflow statuses the admin dropdown can move an order to (excludes the current value). */
 export function nextOrderStatuses(current: OrderStatus): OrderStatus[] {
-  switch (current) {
-    case "pending":
-      return ["processing", "cancelled"];
-    case "processing":
-      return ["confirmed", "cancelled"];
-    case "confirmed":
-      return ["completed", "cancelled"];
-    default:
-      return [];
-  }
+  return ADMIN_WORKFLOW_STATUSES.filter((status) => status !== current);
 }
 
 export function orderItemsToBulkLines(items: Tables<"order_items">[]): { code: string; quantity: number }[] {

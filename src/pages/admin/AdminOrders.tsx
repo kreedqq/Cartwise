@@ -11,22 +11,27 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
+import { OrderStatusSelect } from "@/components/orders/OrderStatusSelect";
 import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
+import { toast } from "@/components/ui/toaster";
 import { useAdminOrderItems, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
+import { useSetOrderStatus } from "@/hooks/useOrders";
 import { buildAdminOrderItemsCsv, downloadOrdersListCsv } from "@/lib/orderExport";
 import { formatDateTime, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { formatDeliveryMethodLabel } from "@/lib/shippingAddress";
 import { PAYMENT_METHODS, PAYMENT_METHOD_LABELS } from "@/lib/shop/paymentMethod";
-import { ORDER_STATUS_LABELS, formatOrderTelegramSnapshot, orderTelegramUsername } from "@/services/orders";
+import {
+  ADMIN_WORKFLOW_STATUSES,
+  ORDER_STATUS_LABELS,
+  formatOrderTelegramSnapshot,
+  orderTelegramUsername,
+} from "@/services/orders";
 import type { OrderStatus } from "@/types/database";
 
 const STATUS_FILTERS: Array<{ value: "all" | OrderStatus; label: string }> = [
   { value: "all", label: "Alle Status" },
-  { value: "pending", label: ORDER_STATUS_LABELS.pending },
-  { value: "processing", label: ORDER_STATUS_LABELS.processing },
+  ...ADMIN_WORKFLOW_STATUSES.map((value) => ({ value, label: ORDER_STATUS_LABELS[value] })),
   { value: "confirmed", label: ORDER_STATUS_LABELS.confirmed },
-  { value: "completed", label: ORDER_STATUS_LABELS.completed },
   { value: "cancelled", label: ORDER_STATUS_LABELS.cancelled },
 ];
 
@@ -41,9 +46,11 @@ export default function AdminOrdersPage() {
   const ordersQuery = useAdminOrders();
   const itemsQuery = useAdminOrderItems();
   const directoryQuery = useAdminUserDirectory();
+  const setStatusMutation = useSetOrderStatus();
   const [search, setSearch] = React.useState("");
   const [status, setStatus] = React.useState<"all" | OrderStatus>("all");
   const [payment, setPayment] = React.useState("all");
+  const [pendingOrderId, setPendingOrderId] = React.useState<string | null>(null);
 
   const filtered = React.useMemo(() => {
     const orders = ordersQuery.data ?? [];
@@ -70,6 +77,19 @@ export default function AdminOrdersPage() {
       );
     });
   }, [ordersQuery.data, itemsQuery.data, directoryQuery.data, search, status, payment]);
+
+  async function handleStatusChange(orderId: string, nextStatus: OrderStatus) {
+    setPendingOrderId(orderId);
+    try {
+      await setStatusMutation.mutateAsync({ orderId, status: nextStatus });
+      toast.success(`Status: ${ORDER_STATUS_LABELS[nextStatus]}`);
+    } catch (error) {
+      console.error("Bestellstatus ändern fehlgeschlagen:", error);
+      toast.error(error instanceof Error ? error.message : "Status konnte nicht geändert werden.");
+    } finally {
+      setPendingOrderId(null);
+    }
+  }
 
   function handleExport() {
     const items = itemsQuery.data ?? [];
@@ -211,8 +231,12 @@ export default function AdminOrdersPage() {
                     <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                       {formatDateTime(order.submitted_at)}
                     </TableCell>
-                    <TableCell>
-                      <OrderStatusBadge status={order.status} />
+                    <TableCell onClick={(event) => event.stopPropagation()}>
+                      <OrderStatusSelect
+                        value={order.status}
+                        disabled={pendingOrderId === order.id}
+                        onValueChange={(next) => void handleStatusChange(order.id, next)}
+                      />
                     </TableCell>
                     <TableCell>
                       <PaymentMethodBadge paymentMethod={order.payment_method} />
@@ -243,22 +267,33 @@ export default function AdminOrdersPage() {
 
           <div className="space-y-3 p-3 md:hidden">
             {filtered.map((order) => (
-              <button
+              <div
                 key={order.id}
-                type="button"
                 className="w-full space-y-2 rounded-lg border border-border bg-background p-3 text-left"
-                onClick={() => navigate(`/admin/orders/${order.id}`)}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
+                  <button
+                    type="button"
+                    className="min-w-0 text-left"
+                    onClick={() => navigate(`/admin/orders/${order.id}`)}
+                  >
                     <p className="font-mono text-sm font-semibold">{order.order_number}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       Telegram: {formatOrderTelegramSnapshot(order)}
                     </p>
-                  </div>
-                  <OrderStatusBadge status={order.status} />
+                  </button>
+                  <OrderStatusSelect
+                    value={order.status}
+                    disabled={pendingOrderId === order.id}
+                    className="w-[11.5rem] shrink-0"
+                    onValueChange={(next) => void handleStatusChange(order.id, next)}
+                  />
                 </div>
-                <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between gap-3 text-left text-xs text-muted-foreground"
+                  onClick={() => navigate(`/admin/orders/${order.id}`)}
+                >
                   <span>{formatDateTime(order.submitted_at)}</span>
                   <span className="tabular-nums font-semibold text-foreground">
                     {
@@ -273,9 +308,9 @@ export default function AdminOrdersPage() {
                       }).grandDisplay
                     }
                   </span>
-                </div>
+                </button>
                 <PaymentMethodBadge paymentMethod={order.payment_method} />
-              </button>
+              </div>
             ))}
           </div>
         </AdminSection>
