@@ -229,24 +229,6 @@ export function buildProcessingOrderSummary(
   const participants = resolvedKitParticipants(resolvedKitInput, orders);
   const resolvedContext: KitShareOrderContext = { ...resolvedKitInput, participants };
   const kits = new Map(resolvedKitInput.kits.map((kit) => [kit.id, kit]));
-  const kitProgress = new Map<
-    string,
-    {
-      kitSize: number;
-      completeKits: number;
-      remainderVials: number;
-    }
-  >();
-  for (const kit of resolvedKitInput.kits) {
-    const processingQuantity = kitProcessingQuantity(kit.id, participants, ordersById);
-    const kitSize = asQuantity(kit.kit_size_vials);
-    const split = splitKitProgress(processingQuantity, kitSize);
-    kitProgress.set(kit.id, {
-      kitSize,
-      completeKits: split.completeKits,
-      remainderVials: split.remainderVials,
-    });
-  }
 
   const kitItemsByShare = new Map<string, Tables<"order_items">[]>();
   const regularItems: Tables<"order_items">[] = [];
@@ -261,6 +243,28 @@ export function buildProcessingOrderSummary(
       continue;
     }
     regularItems.push(item);
+  }
+
+  const kitProgress = new Map<
+    string,
+    {
+      kitSize: number;
+      completeKits: number;
+      remainderVials: number;
+    }
+  >();
+  for (const kit of resolvedKitInput.kits) {
+    const fromParticipants = kitProcessingQuantity(kit.id, participants, ordersById);
+    const fromItems = (kitItemsByShare.get(kit.id) ?? []).reduce((sum, item) => sum + asQuantity(item.quantity), 0);
+    // Same kit_share_id: use processing lines even if a participant row is missing from the admin fetch.
+    const processingQuantity = Math.max(fromParticipants, fromItems);
+    const kitSize = asQuantity(kit.kit_size_vials);
+    const split = splitKitProgress(processingQuantity, kitSize);
+    kitProgress.set(kit.id, {
+      kitSize,
+      completeKits: split.completeKits,
+      remainderVials: split.remainderVials,
+    });
   }
 
   const merged = new Map<string, OrderSummaryLine>();

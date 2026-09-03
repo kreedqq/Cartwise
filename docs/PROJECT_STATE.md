@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-03** (live SK10/XA10 5+5 processing kits proven as 1 Kit/s each).
+Last documentation pass: **2026-09-04** (merchant kit vials use processing lines of the same kit_share_id).
+
+**Update 2026-09-04 (merchant kit lines from grouped processing items)**: Bestellzusammenfassung complete-kit math uses `max(participant processing qty, sum of processing order_items already grouped by kit_share_id)`. Same 10er kit 5+5 processing stays `1 Kit/s` even if one participant row is missing from the admin fetch. Person lines stay `5/10`. Oils without a kit link stay plain qty. No migration.
 
 **Update 2026-09-03 (live kit proof)**: Production `cartwise-prod` has one Selank kit `42235edd-5dac-4468-a119-e7eae1dde2dd` and one Semax kit `d3f1c575-ca5d-406c-a169-5ba56dec75f8`. Both have `kit_size_vials = 10`. PepQueen `CW-2026-000030` and Penbuddy `CW-2026-000036` each hold quantity 5 on the **same** `kit_share_id`, both `processing`. Merchant summary is `SK10 | Selank | 1 Kit/s` and `XA10 | Semax | 1 Kit/s`. Page 4 keeps `PepQueen|5/10|Selank` and `Penbuddy|5/10|Selank` (same for Semax). `order_items` has no `kit_share_id`; identity is participant `order_id` + `kit.product_id`. TE300 on `CW-2026-000034` has cart `kit_share_id` null and stays `5`. No aggregation formula change; live replay test added.
 

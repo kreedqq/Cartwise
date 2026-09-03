@@ -2,6 +2,16 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-04 (complete kit from processing lines of the same share)
+
+### Fixed
+
+- Händlerzusammenfassung could stay `5/10 Stück` when two processing lines already shared one `kit_share_id` (5+5) but participant-row summing undercounted. Merchant vials are now `max(participants, grouped processing items)`. Page 4 stays `5/10`.
+
+### Notes
+
+- No migration. Kit identity is still only a real `kit_share` link. Prices, RLS, and oils unchanged.
+
 ## 2026-09-03 (live SK10/XA10 kit proof)
 
 ### Verified

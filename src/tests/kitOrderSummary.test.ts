@@ -810,6 +810,59 @@ describe("kit vial aggregation regressions", () => {
     expect(selankPanel[0]?.participants.map((p) => p.telegramLabel).sort()).toEqual(["Penbuddy", "PepQueen"]);
   });
 
+  it("still shows 1 Kit/s when both processing lines share a kit_share_id but one participant row is missing", () => {
+    const order030 = makeOrder({
+      id: "5539b116-bc33-4c63-9535-3a97cfe84dc4",
+      order_number: "CW-2026-000030",
+      user_id: "f6df0375-5d24-4ad4-b8b2-efcc6fd0b5f2",
+      cart_id: "f8673972-9403-4701-be72-aa3850ba0870",
+      telegram_username_snapshot: "PepQueen",
+    });
+    const order036 = makeOrder({
+      id: "7b02ae6e-25b8-4f7f-999d-5557e0931445",
+      order_number: "CW-2026-000036",
+      user_id: "641e5d33-177a-4b7e-ac31-47e40ffb1cc7",
+      cart_id: "a042b1df-cb53-4f02-9cdc-6461b91a2569",
+      telegram_username_snapshot: "Penbuddy",
+    });
+    const selankId = "4c3de824-f70b-4cc4-8786-4293316d0fc1";
+    const kitSelank = "42235edd-5dac-4468-a119-e7eae1dde2dd";
+    const items = [
+      makeItem({
+        id: "4f6d2b73-e99b-4ed5-afc0-f378ffcb04ce",
+        order_id: order030.id,
+        product_id: selankId,
+        quantity: "5.000" as unknown as number,
+        line_total_usd: 30,
+      }),
+      makeItem({
+        id: "6c8ed1ae-75a9-4f37-9031-96ff70c42a33",
+        order_id: order036.id,
+        product_id: selankId,
+        quantity: "5.000" as unknown as number,
+        line_total_usd: 30,
+      }),
+    ];
+    const context: KitShareOrderContext = {
+      kits: [{ id: kitSelank, product_id: selankId, kit_size_vials: 10 }],
+      participants: [
+        { kit_share_id: kitSelank, user_id: order030.user_id as string, quantity: 5, order_id: order030.id },
+      ],
+      cartLinks: [
+        { cart_id: order030.cart_id as string, kit_share_id: kitSelank, product_id: selankId, quantity: 5 },
+        { cart_id: order036.cart_id as string, kit_share_id: kitSelank, product_id: selankId, quantity: 5 },
+      ],
+    };
+    const summary = buildProcessingOrderSummary([order030, order036], items, [], context);
+    expect(summary.groups[0]?.lines.map((line) => `${line.code}|${line.quantityLabel}`)).toEqual(["SK10|1 Kit/s"]);
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("5/10 Stück");
+    expect(
+      summary.personLines.map((line) => `${line.name}|${line.quantityLabel}|${line.article}`).sort(),
+    ).toEqual(["Penbuddy|5/10|Selank", "PepQueen|5/10|Selank"]);
+    expect(pdfContainsAscii(buildProcessingOrderSummaryPdf(summary, "now"), "1 Kit/s")).toBe(true);
+    expect(pdfContainsAscii(buildProcessingOrderSummaryPdf(summary, "now"), "5/10 Stück")).toBe(false);
+  });
+
   it("TEST oil: an open same-product kit membership does not turn TEST ENANTHATE 5 into a kit", () => {
     const order = makeOrder({ id: "order-34", user_id: "user-oil" });
     const context: KitShareOrderContext = {
