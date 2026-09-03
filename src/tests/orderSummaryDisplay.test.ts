@@ -25,7 +25,11 @@ describe("admin Bestell Zusammenfassung", () => {
     expect(page).toContain("Keine Bestellungen in Bearbeitung");
     expect(page).toContain("disabled={summary.orderCount === 0}");
     expect(page).toContain("if (summary.orderCount === 0) return");
+    expect(page).toContain("downloadProcessingOrderSummaryPdf");
+    expect(page).toContain("useAdminKitOrderContext");
     expect(read("src/lib/orderExport.ts")).toContain("if (summary.orderCount === 0) return");
+    expect(read("src/lib/orderExport.ts")).toContain("downloadPdf");
+    expect(read("src/lib/orderExport.ts")).toContain("buildProcessingOrderSummaryPdf");
     expect(read("src/lib/orderSummary.ts")).toContain("line_total_usd");
     expect(read("src/lib/orderSummary.ts")).not.toContain("1.25");
     expect(read("src/lib/orderSummary.ts")).not.toContain("25 %");
@@ -50,8 +54,8 @@ describe("admin Bestell Zusammenfassung", () => {
   });
 
   it("does not let the customer area load the admin summary or all orders", () => {
-    expect(read("src/pages/Orders.tsx")).not.toMatch(/useAdminOrders|listAllOrders|order-summary/);
-    expect(read("src/pages/OrderDetail.tsx")).not.toMatch(/useAdminOrders|listAllOrders|AdminOrderSummary/);
+    expect(read("src/pages/Orders.tsx")).not.toMatch(/useAdminOrders|listAllOrders|order-summary|useAdminKitOrderContext/);
+    expect(read("src/pages/OrderDetail.tsx")).not.toMatch(/useAdminOrders|listAllOrders|AdminOrderSummary|useAdminKitOrderContext/);
     expect(read("src/pages/admin/AdminOrderSummary.tsx")).not.toContain("useMyOrders");
     const app = read("src/App.tsx");
     expect(app.indexOf("AdminRoute")).toBeLessThan(app.indexOf('path="order-summary"'));

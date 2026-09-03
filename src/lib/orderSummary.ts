@@ -1,3 +1,13 @@
+import {
+  formatCompleteKitQuantityLabel,
+  formatSharedKitQuantityLabel,
+  formatSharedKitShareLabel,
+  isKitComplete,
+  kitProcessingQuantity,
+  resolveKitShareIdForItem,
+  resolvedKitParticipants,
+  type KitShareOrderContext,
+} from "@/lib/kitOrderSummary";
 import { normalizeProductCode, roundCurrency } from "@/lib/money";
 import { SHOP_CATEGORIES, shopCategoryIdFor, type ShopCategoryId } from "@/lib/shopCategories";
 import { formatOrderTelegramSnapshot } from "@/services/orders";
@@ -24,14 +34,19 @@ export interface OrderSummaryLine {
   code: string;
   name: string;
   quantity: number;
+  /** Merchant quantity shown as-is, e.g. `5/10 Stück` or `1 Kit/s`. */
+  quantityLabel: string;
   totalUsd: number;
   categoryId: ShopCategoryId;
+  kitShareId?: string;
 }
 
 export interface OrderSummaryCustomerLine {
   code: string;
   name: string;
   quantity: number;
+  quantityLabel: string;
+  kitShareId?: string;
 }
 
 export interface OrderSummaryCustomer {
@@ -62,6 +77,14 @@ export function isProcessingOrder(order: { status: string }): boolean {
 
 export function formatOrderSummaryCustomerHeading(orderNumber: string, telegramLabel: string): string {
   return `${orderNumber} | ${telegramLabel}`;
+}
+
+export function formatOrderSummaryCustomerPdfRow(
+  orderNumber: string,
+  telegramLabel: string,
+  quantityLabel: string,
+): string {
+  return `${orderNumber} | ${telegramLabel} | ${quantityLabel}`;
 }
 
 function catalogHintForItem(
@@ -97,11 +120,20 @@ function sortLines<T extends { name: string; code: string }>(lines: T[]): T[] {
   });
 }
 
+function emptyKitContext(): KitShareOrderContext {
+  return { kits: [], participants: [] };
+}
+
+function formatPlainQuantityLabel(quantity: number): string {
+  return String(quantity);
+}
+
 /** Merchant buy list from frozen order_items of processing orders only. */
 export function buildProcessingOrderSummary(
   orders: Tables<"orders">[],
   items: Tables<"order_items">[],
   catalog: CatalogCategoryHint[] = [],
+  kitContext: KitShareOrderContext = emptyKitContext(),
 ): ProcessingOrderSummary {
   const processing = orders.filter(isProcessingOrder);
   const processingIds = new Set(processing.map((order) => order.id));
@@ -115,10 +147,37 @@ export function buildProcessingOrderSummary(
     if (code) byCode.set(code, product);
   }
 
+  const ordersById = new Map(orders.map((order) => [order.id, order]));
+  const participants = resolvedKitParticipants(kitContext, orders);
+  const resolvedContext: KitShareOrderContext = { ...kitContext, participants };
+  const kits = new Map(kitContext.kits.map((kit) => [kit.id, kit]));
+  const kitProgress = new Map<string, { processingQuantity: number; kitSize: number; complete: boolean }>();
+  for (const kit of kitContext.kits) {
+    const processingQuantity = kitProcessingQuantity(kit.id, participants, ordersById);
+    kitProgress.set(kit.id, {
+      processingQuantity,
+      kitSize: kit.kit_size_vials,
+      complete: isKitComplete(processingQuantity, kit.kit_size_vials),
+    });
+  }
+
+  const kitItemsByShare = new Map<string, Tables<"order_items">[]>();
+  const regularItems: Tables<"order_items">[] = [];
+  for (const item of processingItems) {
+    const order = ordersById.get(item.order_id);
+    const kitShareId = resolveKitShareIdForItem(item, order, resolvedContext, participants);
+    if (kitShareId && kits.has(kitShareId)) {
+      const list = kitItemsByShare.get(kitShareId) ?? [];
+      list.push(item);
+      kitItemsByShare.set(kitShareId, list);
+      continue;
+    }
+    regularItems.push(item);
+  }
+
   const merged = new Map<string, OrderSummaryLine>();
 
-  for (const item of processingItems) {
-    const key = productMergeKey(item);
+  function lineMeta(item: Tables<"order_items">) {
     const hint = catalogHintForItem(item, byId, byCode);
     const code = (item.product_code_snapshot ?? "").trim() || hint.code?.trim() || "—";
     const name = (item.product_name_snapshot ?? "").trim() || hint.name?.trim() || "Nicht verfügbar";
@@ -127,9 +186,16 @@ export function buildProcessingOrderSummary(
       name,
       code: item.product_code_snapshot,
     });
+    return { hint, code, name, categoryId };
+  }
+
+  for (const item of regularItems) {
+    const key = productMergeKey(item);
+    const { code, name, categoryId } = lineMeta(item);
     const existing = merged.get(key);
     if (existing) {
       existing.quantity += item.quantity;
+      existing.quantityLabel = formatPlainQuantityLabel(existing.quantity);
       existing.totalUsd = roundCurrency(existing.totalUsd + Number(item.line_total_usd));
       continue;
     }
@@ -137,8 +203,47 @@ export function buildProcessingOrderSummary(
       code,
       name,
       quantity: item.quantity,
+      quantityLabel: formatPlainQuantityLabel(item.quantity),
       totalUsd: roundCurrency(Number(item.line_total_usd)),
       categoryId,
+    });
+  }
+
+  for (const [kitShareId, kitItems] of kitItemsByShare) {
+    const kit = kits.get(kitShareId);
+    const progress = kitProgress.get(kitShareId);
+    if (!kit || !progress) continue;
+    const first = kitItems[0];
+    const { code, name, categoryId } = lineMeta(first);
+    const totalUsd = roundCurrency(kitItems.reduce((sum, item) => sum + Number(item.line_total_usd), 0));
+    if (progress.complete) {
+      const key = `kit-complete:${productMergeKey(first)}`;
+      const existing = merged.get(key);
+      if (existing) {
+        existing.quantity += 1;
+        existing.quantityLabel = formatCompleteKitQuantityLabel(existing.quantity);
+        existing.totalUsd = roundCurrency(existing.totalUsd + totalUsd);
+        continue;
+      }
+      merged.set(key, {
+        code,
+        name,
+        quantity: 1,
+        quantityLabel: formatCompleteKitQuantityLabel(1),
+        totalUsd,
+        categoryId,
+        kitShareId,
+      });
+      continue;
+    }
+    merged.set(`kit-share:${kitShareId}`, {
+      code,
+      name,
+      quantity: progress.processingQuantity,
+      quantityLabel: formatSharedKitQuantityLabel(progress.processingQuantity, progress.kitSize),
+      totalUsd,
+      categoryId,
+      kitShareId,
     });
   }
 
@@ -154,15 +259,30 @@ export function buildProcessingOrderSummary(
       const telegramLabel = formatOrderTelegramSnapshot(order);
       const lineMap = new Map<string, OrderSummaryCustomerLine>();
       for (const item of processingItems.filter((row) => row.order_id === order.id)) {
-        const lineKey = productMergeKey(item);
+        const kitShareId = resolveKitShareIdForItem(item, order, resolvedContext, participants);
+        const progress = kitShareId ? kitProgress.get(kitShareId) : undefined;
+        const lineKey = kitShareId ? `kit:${kitShareId}` : productMergeKey(item);
         const code = (item.product_code_snapshot ?? "").trim() || "—";
         const name = (item.product_name_snapshot ?? "").trim() || "Nicht verfügbar";
+        const quantityLabel = progress
+          ? progress.complete
+            ? formatCompleteKitQuantityLabel(1)
+            : formatSharedKitShareLabel(item.quantity, progress.kitSize)
+          : formatPlainQuantityLabel(item.quantity);
         const existing = lineMap.get(lineKey);
-        if (existing) {
+        if (existing && !kitShareId) {
           existing.quantity += item.quantity;
+          existing.quantityLabel = formatPlainQuantityLabel(existing.quantity);
           continue;
         }
-        lineMap.set(lineKey, { code, name, quantity: item.quantity });
+        if (existing) continue;
+        lineMap.set(lineKey, {
+          code,
+          name,
+          quantity: item.quantity,
+          quantityLabel,
+          kitShareId: kitShareId ?? undefined,
+        });
       }
       return {
         orderNumber: order.order_number,

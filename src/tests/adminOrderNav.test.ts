@@ -127,5 +127,6 @@ describe("order authorization stays server-side", () => {
     expect(read("src/lib/orderExport.ts")).not.toMatch(/supabase\.rpc\(/);
     expect(read("src/pages/admin/AdminOrderDetail.tsx")).toContain("printOrderDocument");
     expect(read("src/pages/OrderDetail.tsx")).toContain("printOrderDocument");
+    expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("downloadProcessingOrderSummaryPdf");
   });
 });

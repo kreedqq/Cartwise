@@ -2,7 +2,8 @@ import { formatDateTime, formatMoney, formatQuantity, formatUsd, GRAND_TOTAL_LAB
 import { downloadCsv } from "@/services/csvProducts";
 import { ORDER_STATUS_LABELS } from "@/services/orders";
 import { BRAND_NAME } from "@/lib/constants";
-import type { ProcessingOrderSummary } from "@/lib/orderSummary";
+import { formatOrderSummaryCustomerPdfRow, type ProcessingOrderSummary } from "@/lib/orderSummary";
+import { buildSimplePdf, downloadPdf } from "@/lib/pdfDocument";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 import { formatShippingAddressLines, formatShippingRecipient, formatDeliveryMethodLabel, hasShippingSnapshot } from "@/lib/shippingAddress";
 import type { OrderStatus, Tables } from "@/types/database";
@@ -360,7 +361,7 @@ export function buildProcessingOrderSummaryPrintHtml(
           (line) => `<tr>
         <td>${escapeHtml(line.code)}</td>
         <td>${escapeHtml(line.name)}</td>
-        <td class="num">${escapeHtml(formatQuantity(line.quantity))}</td>
+        <td class="num">${escapeHtml(line.quantityLabel)}</td>
         <td class="num">${escapeHtml(formatUsd(line.totalUsd))}</td>
       </tr>`,
         )
@@ -383,7 +384,10 @@ export function buildProcessingOrderSummaryPrintHtml(
       : summary.customers
           .map((customer) => {
             const lines = customer.lines
-              .map((line) => `<li>${escapeHtml(formatQuantity(line.quantity))} × ${escapeHtml(line.name)}</li>`)
+              .map(
+                (line) =>
+                  `<li>${escapeHtml(formatOrderSummaryCustomerPdfRow(customer.orderNumber, customer.telegramLabel, line.quantityLabel))} · ${escapeHtml(line.code)} ${escapeHtml(line.name)}</li>`,
+              )
               .join("");
             return `<h3>${escapeHtml(customer.heading)}</h3>
     <ul>${lines}</ul>`;
@@ -439,9 +443,68 @@ export function buildProcessingOrderSummaryPrintHtml(
 </html>`;
 }
 
-export function printProcessingOrderSummary(summary: ProcessingOrderSummary, exportedAt: string): void {
-  if (summary.orderCount === 0) return;
-  printHtmlDocument(buildProcessingOrderSummaryPrintHtml(summary, exportedAt));
+export function buildProcessingOrderSummaryPdf(
+  summary: ProcessingOrderSummary,
+  exportedAt: string,
+): Uint8Array {
+  const sections: Array<{ title?: string; lines: string[] }> = [
+    {
+      title: `${BRAND_NAME} — BESTELL ZUSAMMENFASSUNG`,
+      lines: [
+        `Nur Bestellungen mit Status In Bearbeitung`,
+        `Export: ${exportedAt}`,
+      ],
+    },
+  ];
+
+  for (const group of summary.groups) {
+    sections.push({
+      title: group.label.toUpperCase(),
+      lines: [
+        "CODE | ARTIKEL | MENGE | GESAMTPREIS",
+        ...group.lines.map(
+          (line) => `${line.code} | ${line.name} | ${line.quantityLabel} | ${formatUsd(line.totalUsd)}`,
+        ),
+      ],
+    });
+  }
+
+  sections.push({
+    title: "SUMME",
+    lines: [
+      `Gesamtanzahl Produkte: ${summary.productCount}`,
+      `Gesamtmenge: ${formatQuantity(summary.totalQuantity)}`,
+      `Gesamtpreis: ${formatUsd(summary.totalUsd)}`,
+    ],
+  });
+
+  const customerLines =
+    summary.customers.length === 0
+      ? ["Keine Bestellungen in Bearbeitung"]
+      : summary.customers.flatMap((customer) =>
+          customer.lines.map((line) =>
+            formatOrderSummaryCustomerPdfRow(customer.orderNumber, customer.telegramLabel, line.quantityLabel),
+          ),
+        );
+
+  sections.push({
+    title: "BESTELLUNGEN",
+    lines: customerLines,
+  });
+
+  return buildSimplePdf(sections);
+}
+
+export function downloadProcessingOrderSummaryPdf(summary: ProcessingOrderSummary, exportedAt: string): Uint8Array | null {
+  if (summary.orderCount === 0) return null;
+  const bytes = buildProcessingOrderSummaryPdf(summary, exportedAt);
+  downloadPdf("Bestell-Zusammenfassung.pdf", bytes);
+  return bytes;
+}
+
+/** @deprecated use downloadProcessingOrderSummaryPdf — kept as the button entry point. */
+export function printProcessingOrderSummary(summary: ProcessingOrderSummary, exportedAt: string): Uint8Array | null {
+  return downloadProcessingOrderSummaryPdf(summary, exportedAt);
 }
 
 export function toOrderExportDoc(

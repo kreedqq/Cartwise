@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-03** (Bestell Zusammenfassung + workflow statuses).
+Last documentation pass: **2026-09-03** (shared kits in order summary + real PDF download).
+
+**Update 2026-09-03 (shared kits + PDF download)**: Bestell Zusammenfassung still uses only `processing` orders and stored `line_total_usd`. Kit lines are resolved from existing `kit_shares` / `kit_share_participants` (and cart `kit_share_id` when `order_id` is missing). Incomplete processing shares display `5/10 Stück`; a fully processing kit displays `1 Kit/s`. Admin order detail shows Geteiltes Kit participants (Telegram snapshot, then `profiles.username`). Summary PDF is a downloaded `%PDF` file, not `window.print()`. No migration. Order numbers, snapshots, role pricing, RLS, and kit pricing RPCs were not changed.
 
 **Update 2026-09-03 (order summary)**: Admin Bestellungen has tab **Bestell Zusammenfassung**. It aggregates `order_items` from status `processing` only, by `product_code_snapshot`, grouped with existing shop categories. Inbox status dropdown writes through `set_order_status`. Migration `0047` adds `dispatched` / `received` / `shipped` without rewriting existing rows.
 

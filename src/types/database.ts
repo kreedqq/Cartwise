@@ -328,6 +328,8 @@ export interface Database {
           kit_share_id: string;
           user_id: string;
           quantity: number;
+          ordered_at: string | null;
+          order_id: string | null;
           created_at: string;
           updated_at: string;
         };

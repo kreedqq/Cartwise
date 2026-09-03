@@ -2,6 +2,18 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-03 (shared kits in Bestell Zusammenfassung + PDF download)
+
+### Fixed
+
+- Bestell Zusammenfassung no longer shows a shared kit share as a bare quantity (`SK10 | Selank | 5`). It uses the existing kit identity and `kit_size_vials`: `5/10 Stück` until every share has a `processing` order, then `1 Kit/s` (or `2 Kit/s` for two complete kits of the same variant).
+- Admin order detail shows **Geteiltes Kit** with participant Telegram identity, share, and order status. Customers do not see other participants.
+- Summary **Als PDF exportieren** downloads a real PDF file (Blob + object URL). It no longer depends on a print dialog.
+
+### Notes
+
+- No migration. Kit tables, order numbers, `telegram_username_snapshot`, role pricing, quantity tier, oils pack totals, RLS, Username Gate, and account delete are unchanged. Progress counts only status `processing`. Status changes invalidate the existing admin order and kit-context queries.
+
 ## 2026-09-03 (Bestell Zusammenfassung + workflow statuses)
 
 ### Added

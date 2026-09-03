@@ -89,11 +89,11 @@ describe("customer order isolation", () => {
 describe("customer and admin order data sources stay split", () => {
   it("customer pages never call listAllOrders or the admin inbox hook", () => {
     expect(read("src/pages/Orders.tsx")).toContain("useMyOrders");
-    expect(read("src/pages/Orders.tsx")).not.toMatch(/useAdminOrders|listAllOrders/);
+    expect(read("src/pages/Orders.tsx")).not.toMatch(/useAdminOrders|listAllOrders|useAdminKitOrderContext|listAdminKitOrderContext/);
     expect(read("src/pages/OrderDetail.tsx")).toContain("useMyOrder");
-    expect(read("src/pages/OrderDetail.tsx")).not.toMatch(/useAdminOrder|useAdminOrders|listAllOrders/);
+    expect(read("src/pages/OrderDetail.tsx")).not.toMatch(/useAdminOrder|useAdminOrders|listAllOrders|useAdminKitOrderContext/);
     expect(read("src/pages/Dashboard.tsx")).toContain("useMyOrders");
-    expect(read("src/pages/Dashboard.tsx")).not.toMatch(/useAdminOrders|listAllOrders/);
+    expect(read("src/pages/Dashboard.tsx")).not.toMatch(/useAdminOrders|listAllOrders|useAdminKitOrderContext/);
   });
 
   it("admin inbox uses the unscoped admin query", () => {

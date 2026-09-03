@@ -90,6 +90,7 @@ export function useCreateOrder() {
     onSuccess: (_result, { cartId }) => {
       queryClient.invalidateQueries({ queryKey: MY_ORDERS_ROOT });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminKitOrderContext });
       if (user) {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts(user.id) });
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.cartSummaries(user.id) });
@@ -120,6 +121,8 @@ export function useSetOrderStatus(orderId?: string) {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.order(target) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orderStatusHistory(target) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrderItems });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminKitOrderContext });
       queryClient.invalidateQueries({ queryKey: MY_ORDERS_ROOT });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orderAdminNote(target) });
     },
@@ -133,8 +136,9 @@ export function useDeleteOrder() {
     onSuccess: (_void, orderId) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.order(orderId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrderItems });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminKitOrderContext });
       queryClient.invalidateQueries({ queryKey: MY_ORDERS_ROOT });
-      queryClient.invalidateQueries({ queryKey: ["admin-order-items"] });
     },
   });
 }

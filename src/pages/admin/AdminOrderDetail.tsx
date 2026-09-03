@@ -18,9 +18,11 @@ import { OrderStatusSelect } from "@/components/orders/OrderStatusSelect";
 import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { OrderShippingDetails } from "@/components/orders/OrderShippingCard";
+import { SharedKitAdminCard } from "@/components/orders/SharedKitAdminCard";
 import { useAdminOrder, useDeleteOrder, useOrderAdminNote, useOrderStatusHistory, useSetOrderStatus } from "@/hooks/useOrders";
-import { useAdminUserDirectory } from "@/hooks/useAdminOrders";
+import { useAdminKitOrderContext, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
+import { buildSharedKitsForOrder } from "@/lib/kitOrderSummary";
 import { formatDateTime, formatQuantity, formatRate, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { orderRoleSurchargeFromSnapshots } from "@/lib/roleSurcharge";
 import { QUERY_KEYS } from "@/lib/constants";
@@ -37,6 +39,8 @@ export default function AdminOrderDetailPage() {
   const historyQuery = useOrderStatusHistory(orderId);
   const noteQuery = useOrderAdminNote(orderId);
   const directoryQuery = useAdminUserDirectory();
+  const ordersQuery = useAdminOrders();
+  const kitQuery = useAdminKitOrderContext();
   const setStatus = useSetOrderStatus(orderId ?? "");
   const deleteOrderMutation = useDeleteOrder();
   const surchargeQuery = useQuery({
@@ -60,6 +64,10 @@ export default function AdminOrderDetailPage() {
   const order = orderQuery.data;
   const customer = order.user_id ? directoryQuery.data?.get(order.user_id) : undefined;
   const telegramHandle = formatOrderTelegramSnapshot(order);
+  const sharedKits =
+    kitQuery.data && ordersQuery.data
+      ? buildSharedKitsForOrder(order.id, order.items, ordersQuery.data, kitQuery.data)
+      : [];
   const roleSurcharge =
     surchargeQuery.data &&
     order.items.length > 0 &&
@@ -211,6 +219,13 @@ export default function AdminOrderDetailPage() {
           </Table>
         </div>
       </AdminSection>
+
+      {sharedKits.length > 0 &&
+        sharedKits.map((kit) => (
+          <AdminSection key={kit.kitShareId} title="Geteiltes Kit">
+            <SharedKitAdminCard kit={kit} />
+          </AdminSection>
+        ))}
 
       {/* Charges + note */}
       <div className="grid gap-4 lg:grid-cols-2">

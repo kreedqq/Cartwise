@@ -38,6 +38,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 
 # High
 
+- [x] Shared-kit aggregation in Bestell Zusammenfassung (`5/10 Stück` / `1 Kit/s`), admin Geteiltes Kit participants, real PDF download (no migration)
 - [x] Admin Bestell Zusammenfassung for processing orders + six-status dropdown (migration `0047`)
 - [x] Merge Benutzer + Rollen & Preisaufschlag; per-user username-required login gate; admin account delete without destroying historical orders (migration `0046`)
 - [x] Telegram Benutzername as the only public handle; stable cart ordinals; checkout shipping + telegram order snapshots (migration `0042`)

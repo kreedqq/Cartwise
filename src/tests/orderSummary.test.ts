@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { buildProcessingOrderSummaryPrintHtml, printProcessingOrderSummary } from "@/lib/orderExport";
+import {
+  buildProcessingOrderSummaryPdf,
+  buildProcessingOrderSummaryPrintHtml,
+  printProcessingOrderSummary,
+} from "@/lib/orderExport";
 import { buildProcessingOrderSummary, ORDER_SUMMARY_CATEGORY_LABELS } from "@/lib/orderSummary";
 import type { Tables } from "@/types/database";
 
@@ -251,7 +255,7 @@ describe("processing order summary PDF", () => {
     expect(html).toContain("Retatrutide 10 mg");
     expect(html).toContain("Kundenübersicht");
     expect(html).toContain("CN-2026-000034 | PepsiDry");
-    expect(html).toContain("3 × Retatrutide 10 mg");
+    expect(html).toContain("CN-2026-000034 | PepsiDry | 3");
     expect(html).not.toContain("CurrentProfile");
     expect(html).not.toContain("display_name");
     expect(html).not.toContain("1,25");
@@ -262,11 +266,31 @@ describe("processing order summary PDF", () => {
     const open = vi.fn();
     const original = window.open;
     window.open = open as typeof window.open;
+    const createElement = vi.spyOn(document, "createElement");
     try {
-      printProcessingOrderSummary(buildProcessingOrderSummary([], []), "now");
+      const result = printProcessingOrderSummary(buildProcessingOrderSummary([], []), "now");
+      expect(result).toBeNull();
       expect(open).not.toHaveBeenCalled();
+      expect(createElement).not.toHaveBeenCalled();
     } finally {
       window.open = original;
+      createElement.mockRestore();
     }
+  });
+
+  it("creates a downloadable PDF file from processing orders", () => {
+    const summary = buildProcessingOrderSummary(
+      [makeOrder({ telegram_username_snapshot: "PepsiDry" })],
+      [makeItem({ quantity: 3, line_total_usd: 150 })],
+      [{ id: "prod-10", code: "RETA10", name: "Retatrutide 10 mg", category: "PEPTIDES" }],
+    );
+    const bytes = buildProcessingOrderSummaryPdf(summary, "03.09.2026, 10:00");
+    const text = new TextDecoder("latin1").decode(bytes);
+    expect(text.startsWith("%PDF-")).toBe(true);
+    expect(text).toContain("RETA10");
+    expect(text).toContain("CN-2026-000034 | PepsiDry | 3");
+    expect(text).toContain("150,00");
+    expect(text).not.toContain("display_name");
+    expect(text).not.toContain("1.25");
   });
 });
