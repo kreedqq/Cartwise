@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-03** (Bestellzusammenfassung PDF uses the gold Peptix template).
+Last documentation pass: **2026-09-03** (shared-kit summary counts vials by `kit_size_vials`, not as kits).
+
+**Update 2026-09-03 (kit vial count in Bestellzusammenfassung)**: Merchant kit quantity is `floor(processing vials / kit_size_vials)`. A 10er kit split 5/10 + 5/10 (same `kit_share_id`, both `processing`) is `1 Kit/s`, never `5 Kit/s`. Different `kit_share_id` stay separate `5/10 Stück` lines. Remainder (15 vials of size 10) is `1 Kit/s` plus `5/10 Stück`. PDF uses the same `quantityLabel` from `buildProcessingOrderSummary`. No migration. Prices still stored `line_total_usd` only.
 
 **Update 2026-09-03 (gold order-summary PDF)**: Admin PDF export follows `Peptix_Bestell_Zusammenfassung_Vorlage_Gold_FINAL2_ohne_Seite5.pdf`: black page, gold logo/lines, PEPTIDE / INJECTABLE OILS / ORALS / BESTELLUNGEN. Product tables are CODE | ARTIKEL | MENGE | GESAMTPREIS. Page 4 is NAME | MENGE | DOSIS | ARTIKEL from `telegram_username_snapshot` and stored `dosage_vial_snapshot`. Kit merchant lines stay `5/10 Stück` / `1 Kit/s`; page 4 keeps participant shares (`5/10`). No migration. Order numbers, prices, RLS, and auth were not changed.
 

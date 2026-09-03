@@ -61,20 +61,44 @@ export interface SharedKitAdminView {
 
 const NO_ORDER_STATUS_LABEL = "Noch nicht in Bearbeitung";
 
+/** Postgres `numeric` often arrives as `"5.000"`. Never treat that string as kit count. */
+export function asQuantity(value: unknown): number {
+  const amount = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
 export function formatCompleteKitQuantityLabel(kitCount: number): string {
-  return `${kitCount} Kit/s`;
+  return `${asQuantity(kitCount)} Kit/s`;
 }
 
 export function formatSharedKitQuantityLabel(filled: number, kitSize: number): string {
-  return `${filled}/${kitSize} Stück`;
+  return `${asQuantity(filled)}/${asQuantity(kitSize)} Stück`;
 }
 
 export function formatSharedKitShareLabel(quantity: number, kitSize: number): string {
-  return `${quantity}/${kitSize}`;
+  return `${asQuantity(quantity)}/${asQuantity(kitSize)}`;
+}
+
+/**
+ * Complete kits are always floor(vials / kit_size_vials).
+ * 5 vials of a 10er kit is 0 kits + remainder 5, never 5 kits.
+ */
+export function splitKitProgress(
+  processingQuantity: number,
+  kitSize: number,
+): { completeKits: number; remainderVials: number } {
+  const vials = asQuantity(processingQuantity);
+  const size = asQuantity(kitSize);
+  if (vials <= 0) return { completeKits: 0, remainderVials: 0 };
+  if (size <= 0) return { completeKits: 0, remainderVials: vials };
+  return {
+    completeKits: Math.floor(vials / size),
+    remainderVials: vials % size,
+  };
 }
 
 export function isKitComplete(processingQuantity: number, kitSize: number): boolean {
-  return kitSize > 0 && processingQuantity >= kitSize;
+  return asQuantity(kitSize) > 0 && asQuantity(processingQuantity) >= asQuantity(kitSize);
 }
 
 export function kitProcessingQuantity(
@@ -88,7 +112,7 @@ export function kitProcessingQuantity(
     if (!participant.order_id) continue;
     const order = ordersById.get(participant.order_id);
     if (order?.status !== PROCESSING_STATUS) continue;
-    filled += participant.quantity;
+    filled += asQuantity(participant.quantity);
   }
   return filled;
 }
@@ -123,28 +147,62 @@ export function resolvedKitParticipants(
   }));
 }
 
+function participantMatchesProduct(
+  participant: KitShareContextParticipant,
+  item: Pick<Tables<"order_items">, "product_id">,
+  kits: Map<string, KitShareContextKit>,
+): boolean {
+  const kit = kits.get(participant.kit_share_id);
+  return Boolean(item.product_id) && kit?.product_id === item.product_id;
+}
+
+function uniqueKitShareId(matches: KitShareContextParticipant[]): string | null {
+  if (matches.length === 1) return matches[0].kit_share_id;
+  return null;
+}
+
 export function resolveKitShareIdForItem(
   item: Pick<Tables<"order_items">, "order_id" | "product_id" | "quantity">,
-  order: Pick<Tables<"orders">, "id" | "cart_id"> | undefined,
+  order: Pick<Tables<"orders">, "id" | "cart_id" | "user_id"> | undefined,
   context: KitShareOrderContext,
   participants = context.participants,
 ): string | null {
   const kits = kitsById(context);
+  const itemQuantity = asQuantity(item.quantity);
   const forOrder = participants.filter((participant) => participant.order_id === item.order_id);
-  const productMatched = forOrder.filter((participant) => {
-    const kit = kits.get(participant.kit_share_id);
-    return Boolean(item.product_id) && kit?.product_id === item.product_id;
-  });
+  const productMatched = forOrder.filter((participant) => participantMatchesProduct(participant, item, kits));
 
-  if (productMatched.length === 1) return productMatched[0].kit_share_id;
+  const uniqueOnOrder = uniqueKitShareId(productMatched);
+  if (uniqueOnOrder) return uniqueOnOrder;
   if (productMatched.length > 1) {
-    const qtyMatched = productMatched.filter((participant) => participant.quantity === item.quantity);
-    if (qtyMatched.length === 1) return qtyMatched[0].kit_share_id;
+    const qtyMatched = productMatched.filter(
+      (participant) => asQuantity(participant.quantity) === itemQuantity,
+    );
+    const uniqueQty = uniqueKitShareId(qtyMatched);
+    if (uniqueQty) return uniqueQty;
     return null;
   }
 
   if (forOrder.length === 1 && !item.product_id) {
     return forOrder[0].kit_share_id;
+  }
+
+  if (order?.user_id) {
+    const forUser = participants.filter(
+      (participant) =>
+        participant.user_id === order.user_id &&
+        (!participant.order_id || participant.order_id === item.order_id || participant.order_id === order.id),
+    );
+    const userProductMatched = forUser.filter((participant) => participantMatchesProduct(participant, item, kits));
+    const uniqueOnUser = uniqueKitShareId(userProductMatched);
+    if (uniqueOnUser) return uniqueOnUser;
+    if (userProductMatched.length > 1) {
+      const qtyMatched = userProductMatched.filter(
+        (participant) => asQuantity(participant.quantity) === itemQuantity,
+      );
+      const uniqueQty = uniqueKitShareId(qtyMatched);
+      if (uniqueQty) return uniqueQty;
+    }
   }
 
   if (order?.cart_id && context.cartLinks) {

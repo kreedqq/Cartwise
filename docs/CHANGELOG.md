@@ -2,6 +2,16 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-03 (shared-kit vials are not kit count)
+
+### Fixed
+
+- Bestellzusammenfassung treated a shared-kit vial quantity (`5`) as kit count (`5 Kit/s`). Complete kits are now `floor(processing vials / kit_size_vials)` per `kit_share_id`. Same 10er kit 5+5 processing → `1 Kit/s`. Remainder 15 of 10 → `1 Kit/s` plus `5/10 Stück`. Different `kit_share_id` stay separate. PDF MENGE uses the same `quantityLabel`.
+
+### Notes
+
+- No migration. `line_total_usd` only (allocated across complete/remainder lines). Order numbers, role pricing, quantity tier, oils, auth, RLS, and admin Geteiltes Kit participants are unchanged.
+
 ## 2026-09-03 (gold Bestellzusammenfassung PDF template)
 
 ### Changed

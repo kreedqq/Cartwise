@@ -2,7 +2,12 @@ import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { buildSharedKitsForOrder, kitParticipantTelegramLabel } from "@/lib/kitOrderSummary";
+import {
+  asQuantity,
+  buildSharedKitsForOrder,
+  kitParticipantTelegramLabel,
+  splitKitProgress,
+} from "@/lib/kitOrderSummary";
 import { buildProcessingOrderSummaryPdf, printProcessingOrderSummary } from "@/lib/orderSummaryExport";
 import { buildProcessingOrderSummary } from "@/lib/orderSummary";
 import { pdfContainsAscii, pdfStartsWithHeader } from "@/lib/pdfDocument";
@@ -299,6 +304,296 @@ describe("shared kit order summary", () => {
     expect(source).not.toContain("* 1.25");
     const summary = buildProcessingOrderSummary([makeOrder()], [makeItem({ line_total_usd: 30 })], [], selankKitContext());
     expect(summary.groups[0]?.lines[0]?.totalUsd).toBe(30);
+  });
+});
+
+describe("kit vial aggregation regressions", () => {
+  it("counts complete kits as floor(vials / kit_size_vials), never the vial quantity", () => {
+    expect(splitKitProgress(5, 10)).toEqual({ completeKits: 0, remainderVials: 5 });
+    expect(splitKitProgress(10, 10)).toEqual({ completeKits: 1, remainderVials: 0 });
+    expect(splitKitProgress(15, 10)).toEqual({ completeKits: 1, remainderVials: 5 });
+    expect(splitKitProgress(20, 10)).toEqual({ completeKits: 2, remainderVials: 0 });
+    expect(splitKitProgress(10, 20)).toEqual({ completeKits: 0, remainderVials: 10 });
+    expect(splitKitProgress(15, 30)).toEqual({ completeKits: 0, remainderVials: 15 });
+    expect(asQuantity("5.000")).toBe(5);
+    expect(read("src/lib/orderSummary.ts")).not.toContain("formatCompleteKitQuantityLabel(item.quantity)");
+    expect(read("src/lib/orderSummary.ts")).not.toContain("formatCompleteKitQuantityLabel(progress.processingQuantity)");
+  });
+
+  it("TEST 1: 5+5 processing vials of a 10er kit are 1 Kit/s, not 5 or 10 kits", () => {
+    const orders = [
+      makeOrder(),
+      makeOrder({ id: "order-2", order_number: "CN-2026-000035", user_id: "user-raff", telegram_username_snapshot: "Raff" }),
+    ];
+    const items = [makeItem(), makeItem({ id: "item-2", order_id: "order-2", quantity: 5, line_total_usd: 30 })];
+    const summary = buildProcessingOrderSummary(orders, items, [], selankKitContext());
+    expect(summary.groups[0]?.lines).toHaveLength(1);
+    expect(summary.groups[0]?.lines[0]?.quantity).toBe(1);
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("5 Kit/s");
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("10 Kit/s");
+  });
+
+  it("TEST 2: only participant A = 5 processing stays 5/10 Stück", () => {
+    const summary = buildProcessingOrderSummary(
+      [makeOrder()],
+      [makeItem()],
+      [],
+      selankKitContext({
+        participants: [{ kit_share_id: "kit-10", user_id: "user-pepsi", quantity: 5, order_id: "order-1" }],
+      }),
+    );
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Stück");
+  });
+
+  it("TEST 3: A processing and B not processing stays 5/10 Stück", () => {
+    const orders = [
+      makeOrder(),
+      makeOrder({
+        id: "order-2",
+        user_id: "user-raff",
+        status: "pending",
+        telegram_username_snapshot: "Raff",
+      }),
+    ];
+    const summary = buildProcessingOrderSummary(
+      orders,
+      [makeItem(), makeItem({ id: "item-2", order_id: "order-2" })],
+      [],
+      selankKitContext(),
+    );
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Stück");
+  });
+
+  it("TEST 4: both processing becomes 1 Kit/s", () => {
+    const orders = [
+      makeOrder(),
+      makeOrder({ id: "order-2", user_id: "user-raff", telegram_username_snapshot: "Raff" }),
+    ];
+    const summary = buildProcessingOrderSummary(
+      orders,
+      [makeItem(), makeItem({ id: "item-2", order_id: "order-2" })],
+      [],
+      selankKitContext(),
+    );
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+  });
+
+  it("TEST 5: a single processing 10-vial share is 1 Kit/s", () => {
+    const summary = buildProcessingOrderSummary(
+      [makeOrder()],
+      [makeItem({ quantity: 10, line_total_usd: 60 })],
+      [],
+      selankKitContext({
+        participants: [{ kit_share_id: "kit-10", user_id: "user-pepsi", quantity: 10, order_id: "order-1" }],
+      }),
+    );
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+  });
+
+  it("TEST 6: two complete 10er kits are 2 Kit/s", () => {
+    const orders = [makeOrder({ id: "a" }), makeOrder({ id: "b", order_number: "CN-2026-000033" })];
+    const items = [
+      makeItem({ id: "ia", order_id: "a", quantity: 10, line_total_usd: 60 }),
+      makeItem({ id: "ib", order_id: "b", quantity: 10, line_total_usd: 60 }),
+    ];
+    const context: KitShareOrderContext = {
+      kits: [
+        { id: "kit-a", product_id: "prod-selank", kit_size_vials: 10 },
+        { id: "kit-b", product_id: "prod-selank", kit_size_vials: 10 },
+      ],
+      participants: [
+        { kit_share_id: "kit-a", user_id: "user-pepsi", quantity: 10, order_id: "a" },
+        { kit_share_id: "kit-b", user_id: "user-pepsi", quantity: 10, order_id: "b" },
+      ],
+    };
+    expect(buildProcessingOrderSummary(orders, items, [], context).groups[0]?.lines[0]?.quantityLabel).toBe("2 Kit/s");
+  });
+
+  it("TEST 6b: 5+5+5+5 of the same kit identity is 2 Kit/s", () => {
+    const orders = ["a", "b", "c", "d"].map((id, index) =>
+      makeOrder({ id, order_number: `CN-2026-00000${index}`, user_id: `user-${id}` }),
+    );
+    const items = orders.map((order, index) =>
+      makeItem({ id: `item-${index}`, order_id: order.id, quantity: 5, line_total_usd: 30 }),
+    );
+    const context: KitShareOrderContext = {
+      kits: [{ id: "kit-20", product_id: "prod-selank", kit_size_vials: 10 }],
+      participants: orders.map((order) => ({
+        kit_share_id: "kit-20",
+        user_id: order.user_id ?? order.id,
+        quantity: 5,
+        order_id: order.id,
+      })),
+    };
+    const summary = buildProcessingOrderSummary(orders, items, [], context);
+    expect(summary.groups[0]?.lines).toHaveLength(1);
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("2 Kit/s");
+  });
+
+  it("TEST 7: different kit_share_id stay two 5/10 lines", () => {
+    const orders = [
+      makeOrder({ id: "a" }),
+      makeOrder({ id: "b", order_number: "CN-2026-000033", telegram_username_snapshot: "Raff" }),
+    ];
+    const context: KitShareOrderContext = {
+      kits: [
+        { id: "kit-a", product_id: "prod-selank", kit_size_vials: 10 },
+        { id: "kit-b", product_id: "prod-selank", kit_size_vials: 10 },
+      ],
+      participants: [
+        { kit_share_id: "kit-a", user_id: "user-pepsi", quantity: 5, order_id: "a" },
+        { kit_share_id: "kit-b", user_id: "user-raff", quantity: 5, order_id: "b" },
+      ],
+    };
+    const summary = buildProcessingOrderSummary(
+      orders,
+      [makeItem({ id: "ia", order_id: "a" }), makeItem({ id: "ib", order_id: "b" })],
+      [],
+      context,
+    );
+    expect(summary.groups[0]?.lines).toHaveLength(2);
+    expect(summary.groups[0]?.lines.every((line) => line.quantityLabel === "5/10 Stück")).toBe(true);
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("1 Kit/s");
+  });
+
+  it("TEST 8: a normal product without kit identity stays 5+3=8", () => {
+    const orders = [makeOrder({ id: "a" }), makeOrder({ id: "b", order_number: "CN-2026-000033" })];
+    const items = [
+      makeItem({ id: "ia", order_id: "a", quantity: 5, line_total_usd: 50 }),
+      makeItem({ id: "ib", order_id: "b", quantity: 3, line_total_usd: 30 }),
+    ];
+    const summary = buildProcessingOrderSummary(orders, items);
+    expect(summary.groups[0]?.lines).toHaveLength(1);
+    expect(summary.groups[0]?.lines[0]?.quantity).toBe(8);
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("8");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).not.toContain("Kit/s");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).not.toContain("/");
+  });
+
+  it("TEST 9: PDF MENGE uses the same 1 Kit/s label as the web summary", () => {
+    const orders = [
+      makeOrder(),
+      makeOrder({ id: "order-2", order_number: "CN-2026-000035", user_id: "user-raff", telegram_username_snapshot: "Raff" }),
+    ];
+    const items = [makeItem(), makeItem({ id: "item-2", order_id: "order-2", quantity: 5, line_total_usd: 30 })];
+    const summary = buildProcessingOrderSummary(
+      orders,
+      items,
+      [{ id: "prod-selank", code: "SK10", name: "Selank", category: "PEPTIDES" }],
+      selankKitContext(),
+    );
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+    const bytes = buildProcessingOrderSummaryPdf(summary, "now");
+    expect(pdfContainsAscii(bytes, "1 Kit/s")).toBe(true);
+    expect(pdfContainsAscii(bytes, "5 Kit/s")).toBe(false);
+    expect(pdfContainsAscii(bytes, "10 Kit/s")).toBe(false);
+    expect(summary.personLines.map((line) => line.quantityLabel).sort()).toEqual(["5/10", "5/10"]);
+  });
+
+  it("keeps 15 vials of size 10 as 1 Kit/s plus 5/10 Stück", () => {
+    const orders = ["a", "b", "c"].map((id, index) =>
+      makeOrder({ id, order_number: `CN-2026-00000${index}`, user_id: `user-${id}` }),
+    );
+    const items = orders.map((order, index) =>
+      makeItem({ id: `item-${index}`, order_id: order.id, quantity: 5, line_total_usd: 30 }),
+    );
+    const context: KitShareOrderContext = {
+      kits: [{ id: "kit-15", product_id: "prod-selank", kit_size_vials: 10 }],
+      participants: orders.map((order) => ({
+        kit_share_id: "kit-15",
+        user_id: order.user_id ?? order.id,
+        quantity: 5,
+        order_id: order.id,
+      })),
+    };
+    const summary = buildProcessingOrderSummary(orders, items, [], context);
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel).sort()).toEqual(["1 Kit/s", "5/10 Stück"]);
+    expect(summary.groups[0]?.lines.reduce((sum, line) => sum + line.totalUsd, 0)).toBe(90);
+  });
+
+  it("uses kit_size_vials for 10+10 of a 20er kit and 15+15 of a 30er kit", () => {
+    const twenty = buildProcessingOrderSummary(
+      [makeOrder({ id: "a" }), makeOrder({ id: "b", order_number: "CN-2026-000033" })],
+      [
+        makeItem({ id: "ia", order_id: "a", quantity: 10, line_total_usd: 40 }),
+        makeItem({ id: "ib", order_id: "b", quantity: 10, line_total_usd: 40 }),
+      ],
+      [],
+      {
+        kits: [{ id: "kit-20", product_id: "prod-selank", kit_size_vials: 20 }],
+        participants: [
+          { kit_share_id: "kit-20", user_id: "user-pepsi", quantity: 10, order_id: "a" },
+          { kit_share_id: "kit-20", user_id: "user-raff", quantity: 10, order_id: "b" },
+        ],
+      },
+    );
+    expect(twenty.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+
+    const thirty = buildProcessingOrderSummary(
+      [makeOrder({ id: "a" }), makeOrder({ id: "b", order_number: "CN-2026-000033" })],
+      [
+        makeItem({ id: "ia", order_id: "a", quantity: 15, line_total_usd: 45 }),
+        makeItem({ id: "ib", order_id: "b", quantity: 15, line_total_usd: 45 }),
+      ],
+      [],
+      {
+        kits: [{ id: "kit-30", product_id: "prod-selank", kit_size_vials: 30 }],
+        participants: [
+          { kit_share_id: "kit-30", user_id: "user-pepsi", quantity: 15, order_id: "a" },
+          { kit_share_id: "kit-30", user_id: "user-raff", quantity: 15, order_id: "b" },
+        ],
+      },
+    );
+    expect(thirty.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+  });
+
+  it("does not treat Postgres numeric 5.000 as 5 kits, including two kits on one order", () => {
+    const qty = "5.000" as unknown as number;
+    const orders = [
+      makeOrder({ id: "order-30", user_id: "user-a", cart_id: "cart-a" }),
+      makeOrder({ id: "order-36", order_number: "CN-2026-000036", user_id: "user-b", cart_id: "cart-b" }),
+    ];
+    const items = [
+      makeItem({ id: "selank-30", order_id: "order-30", quantity: qty, line_total_usd: 30 }),
+      makeItem({
+        id: "semax-30",
+        order_id: "order-30",
+        product_id: "prod-semax",
+        product_code_snapshot: "XA10",
+        product_name_snapshot: "Semax",
+        quantity: qty,
+        line_total_usd: 27.5,
+      }),
+      makeItem({ id: "selank-36", order_id: "order-36", quantity: qty, line_total_usd: 30 }),
+      makeItem({
+        id: "semax-36",
+        order_id: "order-36",
+        product_id: "prod-semax",
+        product_code_snapshot: "XA10",
+        product_name_snapshot: "Semax",
+        quantity: qty,
+        line_total_usd: 27.5,
+      }),
+    ];
+    const context: KitShareOrderContext = {
+      kits: [
+        { id: "kit-selank", product_id: "prod-selank", kit_size_vials: 10 },
+        { id: "kit-semax", product_id: "prod-semax", kit_size_vials: 10 },
+      ],
+      participants: [
+        { kit_share_id: "kit-selank", user_id: "user-a", quantity: 5, order_id: "order-30" },
+        { kit_share_id: "kit-selank", user_id: "user-b", quantity: 5, order_id: "order-36" },
+        { kit_share_id: "kit-semax", user_id: "user-a", quantity: 5, order_id: "order-30" },
+        { kit_share_id: "kit-semax", user_id: "user-b", quantity: 5, order_id: "order-36" },
+      ],
+    };
+    const summary = buildProcessingOrderSummary(orders, items, [], context);
+    expect(summary.groups[0]?.lines.map((line) => `${line.code} ${line.quantityLabel}`).sort()).toEqual([
+      "SK10 1 Kit/s",
+      "XA10 1 Kit/s",
+    ]);
+    expect(buildProcessingOrderSummary(orders, items, [], undefined).groups.length).toBeGreaterThan(0);
   });
 });
 
