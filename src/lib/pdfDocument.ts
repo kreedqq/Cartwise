@@ -34,7 +34,7 @@ function mapWinAnsi(codePoint: number): number {
   return 0x3f;
 }
 
-function pdfLiteral(text: string): string {
+export function pdfLiteral(text: string): string {
   let out = "(";
   for (const char of text) {
     const mapped = mapWinAnsi(char.codePointAt(0) ?? 63);
@@ -108,14 +108,21 @@ function pageContentStream(lines: PdfLine[]): string {
 
 const encoder = new TextEncoder();
 
-function assemblePdf(objectBodies: string[]): Uint8Array {
-  const chunks: Uint8Array[] = [encoder.encode("%PDF-1.4\n")];
+export function assemblePdf(objectBodies: Array<string | Uint8Array>): Uint8Array {
+  const chunks: Uint8Array[] = [encoder.encode("%PDF-1.4\n%\x80\x80\x80\x80\n")];
   let offset = chunks[0].length;
   const offsets = [0];
 
   for (let i = 0; i < objectBodies.length; i++) {
     offsets.push(offset);
-    const bytes = encoder.encode(`${i + 1} 0 obj\n${objectBodies[i]}\nendobj\n`);
+    const prefix = encoder.encode(`${i + 1} 0 obj\n`);
+    const body = objectBodies[i];
+    const bodyBytes = typeof body === "string" ? encoder.encode(body) : body;
+    const suffix = encoder.encode("\nendobj\n");
+    const bytes = new Uint8Array(prefix.length + bodyBytes.length + suffix.length);
+    bytes.set(prefix, 0);
+    bytes.set(bodyBytes, prefix.length);
+    bytes.set(suffix, prefix.length + bodyBytes.length);
     chunks.push(bytes);
     offset += bytes.length;
   }
@@ -205,4 +212,26 @@ export function pdfStartsWithHeader(bytes: Uint8Array): boolean {
 export function pdfContainsAscii(bytes: Uint8Array, needle: string): boolean {
   const text = new TextDecoder("latin1").decode(bytes);
   return text.includes(needle);
+}
+
+export function jpegImageXObject(jpeg: Uint8Array, width: number, height: number): Uint8Array {
+  const header = encoder.encode(
+    `<< /Type /XObject /Subtype /Image /Width ${width} /Height ${height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`,
+  );
+  const footer = encoder.encode("\nendstream");
+  const out = new Uint8Array(header.length + jpeg.length + footer.length);
+  out.set(header, 0);
+  out.set(jpeg, header.length);
+  out.set(footer, header.length + jpeg.length);
+  return out;
+}
+
+export function bytesFromDataUrl(dataUrl: string): Uint8Array {
+  const marker = "base64,";
+  const index = dataUrl.indexOf(marker);
+  const b64 = index >= 0 ? dataUrl.slice(index + marker.length) : dataUrl;
+  const binary = atob(b64);
+  const out = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
+  return out;
 }

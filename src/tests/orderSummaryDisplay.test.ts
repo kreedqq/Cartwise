@@ -27,9 +27,9 @@ describe("admin Bestell Zusammenfassung", () => {
     expect(page).toContain("if (summary.orderCount === 0) return");
     expect(page).toContain("downloadProcessingOrderSummaryPdf");
     expect(page).toContain("useAdminKitOrderContext");
-    expect(read("src/lib/orderExport.ts")).toContain("if (summary.orderCount === 0) return");
-    expect(read("src/lib/orderExport.ts")).toContain("downloadPdf");
-    expect(read("src/lib/orderExport.ts")).toContain("buildProcessingOrderSummaryPdf");
+    expect(read("src/lib/orderSummaryExport.ts")).toContain("if (summary.orderCount === 0) return");
+    expect(read("src/lib/orderSummaryExport.ts")).toContain("downloadPdf");
+    expect(read("src/lib/orderSummaryExport.ts")).toContain("buildProcessingOrderSummaryPdf");
     expect(read("src/lib/orderSummary.ts")).toContain("line_total_usd");
     expect(read("src/lib/orderSummary.ts")).not.toContain("1.25");
     expect(read("src/lib/orderSummary.ts")).not.toContain("25 %");

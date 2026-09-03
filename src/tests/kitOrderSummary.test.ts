@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { buildSharedKitsForOrder, kitParticipantTelegramLabel } from "@/lib/kitOrderSummary";
-import { buildProcessingOrderSummaryPdf, printProcessingOrderSummary } from "@/lib/orderExport";
+import { buildProcessingOrderSummaryPdf, printProcessingOrderSummary } from "@/lib/orderSummaryExport";
 import { buildProcessingOrderSummary } from "@/lib/orderSummary";
 import { pdfContainsAscii, pdfStartsWithHeader } from "@/lib/pdfDocument";
 import type { KitShareOrderContext } from "@/lib/kitOrderSummary";
@@ -124,6 +124,8 @@ describe("shared kit order summary", () => {
     });
     const summary = buildProcessingOrderSummary(orders, [makeItem()], [], context);
     expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Stück");
+    expect(summary.personLines[0]?.quantityLabel).toBe("5/10");
+    expect(summary.personLines[0]?.name).toBe("PepsiDry");
 
     const pending = buildProcessingOrderSummary(
       [
@@ -158,6 +160,10 @@ describe("shared kit order summary", () => {
     ];
     const summary = buildProcessingOrderSummary(orders, items, [], selankKitContext());
     expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+    expect(summary.personLines.map((line) => `${line.name}|${line.quantityLabel}`).sort()).toEqual([
+      "PepsiDry|5/10",
+      "Raff|5/10",
+    ]);
     expect(summary.groups[0]?.lines[0]?.totalUsd).toBe(60);
     expect(summary.customers.map((customer) => customer.lines[0]?.quantityLabel)).toEqual(["1 Kit/s", "1 Kit/s"]);
   });
@@ -372,9 +378,16 @@ describe("order summary PDF download", () => {
     expect(pdfStartsWithHeader(bytes)).toBe(true);
     expect(pdfContainsAscii(bytes, "SK10")).toBe(true);
     expect(pdfContainsAscii(bytes, "5/10")).toBe(true);
-    expect(pdfContainsAscii(bytes, "CN-2026-000034")).toBe(true);
     expect(pdfContainsAscii(bytes, "PepsiDry")).toBe(true);
     expect(pdfContainsAscii(bytes, "30,00")).toBe(true);
+    expect(pdfContainsAscii(bytes, "PEPTIDE")).toBe(true);
+    expect(pdfContainsAscii(bytes, "INJECTABLE OILS")).toBe(true);
+    expect(pdfContainsAscii(bytes, "ORALS")).toBe(true);
+    expect(pdfContainsAscii(bytes, "BESTELLUNGEN")).toBe(true);
+    expect(pdfContainsAscii(bytes, "CODE")).toBe(true);
+    expect(pdfContainsAscii(bytes, "NAME")).toBe(true);
+    expect(pdfContainsAscii(bytes, "DOSIS")).toBe(true);
+    expect(summary.customers[0]?.orderNumber).toBe("CN-2026-000034");
     expect(new TextDecoder("latin1").decode(bytes)).not.toContain("display_name");
   });
 
@@ -402,10 +415,12 @@ describe("order summary PDF download", () => {
   });
 
   it("disables PDF export when the summary has no processing orders", () => {
-    expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("disabled={summary.orderCount === 0}");
+    expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("Name");
+    expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("Dosis");
+    expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("Wer hat was bestellt und in welcher Menge");
     expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("downloadProcessingOrderSummaryPdf");
-    expect(read("src/lib/orderExport.ts")).toContain('downloadPdf("Bestell-Zusammenfassung.pdf"');
-    expect(read("src/lib/orderExport.ts")).not.toContain("window.print");
+    expect(read("src/lib/orderSummaryExport.ts")).toContain('downloadPdf("Bestell-Zusammenfassung.pdf"');
+    expect(read("src/lib/orderSummaryExport.ts")).not.toContain("window.print");
     const empty = buildProcessingOrderSummary([], [], []);
     expect(empty.orderCount).toBe(0);
     expect(printProcessingOrderSummary(empty, "now")).toBeNull();
@@ -444,8 +459,9 @@ describe("order summary PDF download", () => {
     expect((text.match(/\/Type \/Page/g) ?? []).length).toBeGreaterThan(1);
     expect(text).toContain("SKU0");
     expect(text).toContain("SKU39");
-    expect(text).toContain("CN-2026-000000");
     expect(text).toContain("User39");
+    expect(text).toContain("PEPTIDE");
+    expect(text).toContain("BESTELLUNGEN");
   });
 });
 

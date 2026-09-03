@@ -38,6 +38,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 
 # High
 
+- [x] Bestellzusammenfassung PDF matches the gold Peptix 4-page template (CODE/ARTIKEL/MENGE/GESAMTPREIS + NAME/MENGE/DOSIS/ARTIKEL)
 - [x] Fix kit-share SELECT RLS recursion (HTTP 500 on Bestellzusammenfassung) + group admin users by catalog roles
 - [x] Shared-kit aggregation in Bestell Zusammenfassung (`5/10 Stück` / `1 Kit/s`), admin Geteiltes Kit participants, real PDF download (no migration)
 - [x] Admin Bestell Zusammenfassung for processing orders + six-status dropdown (migration `0047`)

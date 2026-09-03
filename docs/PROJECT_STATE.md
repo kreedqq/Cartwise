@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-03** (kit-share RLS recursion fix + users grouped by catalog roles).
+Last documentation pass: **2026-09-03** (Bestellzusammenfassung PDF uses the gold Peptix template).
+
+**Update 2026-09-03 (gold order-summary PDF)**: Admin PDF export follows `Peptix_Bestell_Zusammenfassung_Vorlage_Gold_FINAL2_ohne_Seite5.pdf`: black page, gold logo/lines, PEPTIDE / INJECTABLE OILS / ORALS / BESTELLUNGEN. Product tables are CODE | ARTIKEL | MENGE | GESAMTPREIS. Page 4 is NAME | MENGE | DOSIS | ARTIKEL from `telegram_username_snapshot` and stored `dosage_vial_snapshot`. Kit merchant lines stay `5/10 Stück` / `1 Kit/s`; page 4 keeps participant shares (`5/10`). No migration. Order numbers, prices, RLS, and auth were not changed.
 
 **Update 2026-09-03 (kit summary 500 + users by role)**: Admin GET on `kit_shares` / `kit_share_participants` returned HTTP 500 because `kit_share_participants_select_same_kit` recursively selected the same table. Migration `0048` / production `20260903111826_fix_kit_share_participants_rls_recursion` adds `user_participates_in_kit_share` (SECURITY DEFINER, same visibility as before). Admin `/admin/users` now renders one table per catalog customer role. Role pricing, Username Gate, and account delete are unchanged.
 

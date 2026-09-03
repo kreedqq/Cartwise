@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminKitOrderContext, useAdminOrderItems, useAdminOrders } from "@/hooks/useAdminOrders";
 import { QUERY_KEYS } from "@/lib/constants";
 import { formatDateTime, formatQuantity, formatUsd } from "@/lib/money";
-import { downloadProcessingOrderSummaryPdf } from "@/lib/orderExport";
+import { downloadProcessingOrderSummaryPdf } from "@/lib/orderSummaryExport";
 import { buildProcessingOrderSummary } from "@/lib/orderSummary";
 import { listAllProducts } from "@/services/products";
 
@@ -106,6 +106,49 @@ export default function AdminOrderSummaryPage() {
               </div>
             </AdminSection>
           ))}
+
+          <AdminSection title="Bestellungen">
+            <p className="px-4 pt-3 text-xs uppercase tracking-wide text-muted-foreground">
+              Wer hat was bestellt und in welcher Menge
+            </p>
+            <div className="flex flex-wrap gap-3 px-4 py-2 text-xs text-muted-foreground">
+              <span>Personen {summary.personCount}</span>
+              <span>Positionen {summary.positionCount}</span>
+              <span>Gesamtmenge {summary.personQuantityTotal}</span>
+            </div>
+            <div className="hidden overflow-x-auto md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="pl-4">Name</TableHead>
+                    <TableHead>Menge</TableHead>
+                    <TableHead>Dosis</TableHead>
+                    <TableHead className="pr-4">Artikel</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {summary.personLines.map((line, index) => (
+                    <TableRow key={`${line.name}-${line.code}-${line.dose}-${line.kitShareId ?? index}`}>
+                      <TableCell className="pl-4 text-sm font-medium">{line.name}</TableCell>
+                      <TableCell className="tabular-nums">{line.quantityLabel}</TableCell>
+                      <TableCell className="text-sm">{line.dose}</TableCell>
+                      <TableCell className="pr-4 text-sm">{line.article}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            <div className="space-y-3 p-3 md:hidden">
+              {summary.personLines.map((line, index) => (
+                <div key={`m-${line.name}-${line.code}-${line.dose}-${line.kitShareId ?? index}`} className="rounded-lg border border-border p-3">
+                  <p className="text-sm font-medium">{line.name}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {line.quantityLabel} · {line.dose} · {line.article}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </AdminSection>
 
           <AdminSection padded>
             <div className="flex flex-wrap items-center justify-between gap-2 text-sm">

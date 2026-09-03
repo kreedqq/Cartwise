@@ -4,7 +4,7 @@ import {
   buildProcessingOrderSummaryPdf,
   buildProcessingOrderSummaryPrintHtml,
   printProcessingOrderSummary,
-} from "@/lib/orderExport";
+} from "@/lib/orderSummaryExport";
 import { buildProcessingOrderSummary, ORDER_SUMMARY_CATEGORY_LABELS } from "@/lib/orderSummary";
 import type { Tables } from "@/types/database";
 
@@ -237,6 +237,61 @@ describe("buildProcessingOrderSummary", () => {
       "CN-2026-000034 | PepsiDry",
     ]);
   });
+
+  it("merges page-4 lines by telegram snapshot and keeps different doses separate", () => {
+    const summary = buildProcessingOrderSummary(
+      [
+        makeOrder({ id: "a", order_number: "CN-2026-000034", telegram_username_snapshot: "Pasi" }),
+        makeOrder({ id: "b", order_number: "CN-2026-000033", telegram_username_snapshot: "Pasi" }),
+      ],
+      [
+        makeItem({
+          order_id: "a",
+          product_code_snapshot: "RETA5",
+          product_name_snapshot: "Retatrutid",
+          dosage_vial_snapshot: "5mg",
+          quantity: 4,
+          line_total_usd: 40,
+        }),
+        makeItem({
+          id: "i2",
+          order_id: "b",
+          product_id: "prod-10",
+          product_code_snapshot: "RETA5",
+          product_name_snapshot: "Retatrutid",
+          dosage_vial_snapshot: "5mg",
+          quantity: 6,
+          line_total_usd: 60,
+        }),
+        makeItem({
+          id: "i3",
+          order_id: "b",
+          product_id: "prod-20",
+          product_code_snapshot: "RETA10",
+          product_name_snapshot: "Retatrutid",
+          dosage_vial_snapshot: "10mg",
+          quantity: 5,
+          line_total_usd: 80,
+        }),
+      ],
+    );
+    expect(summary.personCount).toBe(1);
+    expect(summary.personLines.map((line) => `${line.name}|${line.quantityLabel}|${line.dose}|${line.article}`)).toEqual([
+      "Pasi|5x|10 mg|Retatrutid",
+      "Pasi|10x|5 mg|Retatrutid",
+    ]);
+    expect(summary.customers.map((customer) => customer.orderNumber)).toEqual(["CN-2026-000033", "CN-2026-000034"]);
+  });
+
+  it("uses Nicht verfügbar for a missing snapshot and dose and never live profile names", () => {
+    const summary = buildProcessingOrderSummary(
+      [makeOrder({ telegram_username_snapshot: null })],
+      [makeItem({ dosage_vial_snapshot: null, product_name_snapshot: "Selank" })],
+    );
+    expect(summary.personLines[0]?.name).toBe("Nicht verfügbar");
+    expect(summary.personLines[0]?.dose).toBe("Nicht verfügbar");
+    expect(summary.personLines[0]?.article).toBe("Selank");
+  });
 });
 
 describe("processing order summary PDF", () => {
@@ -253,9 +308,12 @@ describe("processing order summary PDF", () => {
     expect(html).not.toContain(">Peptides<");
     expect(html).toContain("RETA10");
     expect(html).toContain("Retatrutide 10 mg");
-    expect(html).toContain("Kundenübersicht");
-    expect(html).toContain("CN-2026-000034 | PepsiDry");
-    expect(html).toContain("CN-2026-000034 | PepsiDry | 3");
+    expect(html).toContain("BESTELLUNGEN");
+    expect(html).toContain("NAME");
+    expect(html).toContain("DOSIS");
+    expect(html).toContain("PepsiDry");
+    expect(html).toContain("3x");
+    expect(html).toContain("10 mg");
     expect(html).not.toContain("CurrentProfile");
     expect(html).not.toContain("display_name");
     expect(html).not.toContain("1,25");
@@ -287,9 +345,20 @@ describe("processing order summary PDF", () => {
     const bytes = buildProcessingOrderSummaryPdf(summary, "03.09.2026, 10:00");
     const text = new TextDecoder("latin1").decode(bytes);
     expect(text.startsWith("%PDF-")).toBe(true);
+    expect(text).toContain("PEPTIDE");
+    expect(text).toContain("BESTELLUNGEN");
+    expect(text).toContain("CODE");
+    expect(text).toContain("ARTIKEL");
+    expect(text).toContain("MENGE");
+    expect(text).toContain("GESAMTPREIS");
+    expect(text).toContain("NAME");
+    expect(text).toContain("DOSIS");
     expect(text).toContain("RETA10");
-    expect(text).toContain("CN-2026-000034 | PepsiDry | 3");
+    expect(text).toContain("PepsiDry");
+    expect(text).toContain("3x");
+    expect(text).toContain("10 mg");
     expect(text).toContain("150,00");
+    expect(summary.customers[0]?.orderNumber).toBe("CN-2026-000034");
     expect(text).not.toContain("display_name");
     expect(text).not.toContain("1.25");
   });

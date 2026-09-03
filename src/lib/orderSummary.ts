@@ -10,7 +10,12 @@ import {
 } from "@/lib/kitOrderSummary";
 import { normalizeProductCode, roundCurrency } from "@/lib/money";
 import { SHOP_CATEGORIES, shopCategoryIdFor, type ShopCategoryId } from "@/lib/shopCategories";
-import { formatOrderTelegramSnapshot } from "@/services/orders";
+import {
+  formatOralVariantLabel,
+  normalizeStrengthToken,
+  parseVariantColumn,
+} from "@/lib/shop/variantCoverage";
+import { formatOrderTelegramSnapshot, ORDER_TELEGRAM_SNAPSHOT_UNAVAILABLE } from "@/services/orders";
 import type { OrderStatus, Tables } from "@/types/database";
 
 export const PROCESSING_ORDER_STATUS: OrderStatus = "processing";
@@ -28,6 +33,7 @@ export interface CatalogCategoryHint {
   code?: string | null;
   name?: string | null;
   category?: string | null;
+  dosage_vial?: string | null;
 }
 
 export interface OrderSummaryLine {
@@ -56,6 +62,16 @@ export interface OrderSummaryCustomer {
   lines: OrderSummaryCustomerLine[];
 }
 
+export interface OrderSummaryPersonLine {
+  name: string;
+  quantity: number;
+  quantityLabel: string;
+  dose: string;
+  article: string;
+  code: string;
+  kitShareId?: string;
+}
+
 export interface OrderSummaryGroup {
   categoryId: ShopCategoryId;
   label: string;
@@ -69,6 +85,10 @@ export interface ProcessingOrderSummary {
   totalUsd: number;
   groups: OrderSummaryGroup[];
   customers: OrderSummaryCustomer[];
+  personCount: number;
+  positionCount: number;
+  personQuantityTotal: number;
+  personLines: OrderSummaryPersonLine[];
 }
 
 export function isProcessingOrder(order: { status: string }): boolean {
@@ -100,6 +120,7 @@ function catalogHintForItem(
     code: item.product_code_snapshot,
     name: item.product_name_snapshot,
     category: null,
+    dosage_vial: item.dosage_vial_snapshot,
   };
 }
 
@@ -126,6 +147,39 @@ function emptyKitContext(): KitShareOrderContext {
 
 function formatPlainQuantityLabel(quantity: number): string {
   return String(quantity);
+}
+
+function formatPersonQuantityLabel(quantity: number): string {
+  return `${quantity}x`;
+}
+
+const DOSE_UNAVAILABLE = "Nicht verfügbar";
+
+/** Dose from stored variant data only. Never inferred from the article name. */
+export function formatOrderSummaryDose(
+  dosageVial: string | null | undefined,
+  code = "",
+): string {
+  const raw = dosageVial?.trim();
+  if (!raw || raw === "—") return DOSE_UNAVAILABLE;
+  const parsed = parseVariantColumn(raw);
+  if (parsed.vialStrength) return parsed.vialStrength;
+  const oral = formatOralVariantLabel(raw, code);
+  if (oral) {
+    const oralStrength = parseVariantColumn(raw).vialStrength;
+    if (oralStrength) return oralStrength;
+    const pack = raw.match(/^([\d.,]+\s*(?:mg|mcg|µg|ug|iu|ui|ml))\b/i);
+    if (pack) return normalizeStrengthToken(pack[1]);
+  }
+  const stripped = raw.replace(/\s*\/\s*vial.*/i, "").replace(/\s*x\s*\d+\s*vials?.*/i, "").trim();
+  if (/^[\d.,]+\s*(mg|mcg|µg|ug|iu|ui|ml)$/i.test(stripped)) {
+    return normalizeStrengthToken(stripped);
+  }
+  return DOSE_UNAVAILABLE;
+}
+
+function personSortKey(name: string): string {
+  return name === ORDER_TELEGRAM_SNAPSHOT_UNAVAILABLE ? "\uFFFF" : name;
 }
 
 /** Merchant buy list from frozen order_items of processing orders only. */
@@ -293,6 +347,57 @@ export function buildProcessingOrderSummary(
     });
 
   const allLines = groups.flatMap((group) => group.lines);
+  const personMap = new Map<string, OrderSummaryPersonLine>();
+  for (const order of processing) {
+    const telegramLabel = formatOrderTelegramSnapshot(order);
+    const personKey = order.telegram_username_snapshot?.trim()
+      ? telegramLabel.toLocaleLowerCase("de")
+      : `__order:${order.id}`;
+    for (const item of processingItems.filter((row) => row.order_id === order.id)) {
+      const hint = catalogHintForItem(item, byId, byCode);
+      const kitShareId = resolveKitShareIdForItem(item, order, resolvedContext, participants);
+      const progress = kitShareId ? kitProgress.get(kitShareId) : undefined;
+      const dose = formatOrderSummaryDose(item.dosage_vial_snapshot || hint.dosage_vial, item.product_code_snapshot ?? "");
+      const article = (item.product_name_snapshot ?? "").trim() || hint.name?.trim() || "Nicht verfügbar";
+      const code = (item.product_code_snapshot ?? "").trim() || hint.code?.trim() || "—";
+      const mergeKey = kitShareId
+        ? `${personKey}|kit:${kitShareId}`
+        : `${personKey}|${productMergeKey(item)}|${dose}`;
+      const existing = personMap.get(mergeKey);
+      if (existing && !kitShareId) {
+        existing.quantity += item.quantity;
+        existing.quantityLabel = formatPersonQuantityLabel(existing.quantity);
+        continue;
+      }
+      if (existing) continue;
+      personMap.set(mergeKey, {
+        name: telegramLabel,
+        quantity: item.quantity,
+        quantityLabel: progress
+          ? formatSharedKitShareLabel(item.quantity, progress.kitSize)
+          : formatPersonQuantityLabel(item.quantity),
+        dose,
+        article,
+        code,
+        kitShareId: kitShareId ?? undefined,
+      });
+    }
+  }
+  const personLines = [...personMap.values()].sort((a, b) => {
+    const name = personSortKey(a.name).localeCompare(personSortKey(b.name), "de");
+    if (name !== 0) return name;
+    const article = a.article.localeCompare(b.article, "de");
+    if (article !== 0) return article;
+    return a.dose.localeCompare(b.dose, "de");
+  });
+  const personKeys = new Set(
+    processing.map((order) =>
+      order.telegram_username_snapshot?.trim()
+        ? formatOrderTelegramSnapshot(order).toLocaleLowerCase("de")
+        : `__order:${order.id}`,
+    ),
+  );
+
   return {
     orderCount: processing.length,
     productCount: allLines.length,
@@ -300,5 +405,9 @@ export function buildProcessingOrderSummary(
     totalUsd: roundCurrency(allLines.reduce((sum, line) => sum + line.totalUsd, 0)),
     groups,
     customers,
+    personCount: personKeys.size,
+    positionCount: personLines.length,
+    personQuantityTotal: personLines.reduce((sum, line) => sum + line.quantity, 0),
+    personLines,
   };
 }

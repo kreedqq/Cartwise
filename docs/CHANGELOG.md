@@ -2,6 +2,16 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-03 (gold Bestellzusammenfassung PDF template)
+
+### Changed
+
+- Admin „Als PDF exportieren“ uses the existing gold Peptix 4-page template (logo, black ground, gold rules, Helvetica). Pages 1–3: CODE | ARTIKEL | MENGE | GESAMTPREIS. Page 4: NAME | MENGE | DOSIS | ARTIKEL, grouped by `telegram_username_snapshot`. Overflow repeats the header and table chrome.
+
+### Notes
+
+- No migration. Kit identity, `line_total_usd`, order numbers, role pricing, Username Gate, and RLS are unchanged. Complete kits still show `Kit/s` on the product pages; page 4 keeps each participant’s share.
+
 ## 2026-09-03 (kit-share RLS recursion + users grouped by role)
 
 ### Fixed
