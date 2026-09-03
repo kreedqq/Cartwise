@@ -2,6 +2,16 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-03 (kit identity is order/cart link only)
+
+### Fixed
+
+- Injectable oils (and any other catalog row) were kit-formatted when the buyer also sat on an **open** `kit_share` of the same product (`order_id` null). `resolveKitShareIdForItem` no longer matches by user id. TEST ENANTHATE `5` stays `5`. Shared peptide kits still complete via participant `order_id` + `kit.product_id`: 5/10 + 5/10 processing → `1 Kit/s`.
+
+### Notes
+
+- No migration. Status changes also invalidate `admin-order-summary`. RLS, prices, and kit RPCs unchanged.
+
 ## 2026-09-03 (shared-kit vials are not kit count)
 
 ### Fixed

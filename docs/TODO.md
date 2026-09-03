@@ -42,6 +42,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] Fix kit-share SELECT RLS recursion (HTTP 500 on Bestellzusammenfassung) + group admin users by catalog roles
 - [x] Shared-kit aggregation in Bestell Zusammenfassung (`5/10 Stück` / `1 Kit/s`), admin Geteiltes Kit participants, real PDF download (no migration)
 - [x] Shared-kit merchant quantity uses `floor(vials / kit_size_vials)` so 5+5 of a 10er kit is `1 Kit/s`, not `5 Kit/s`
+- [x] Kit formatting only when the order line is linked via participant `order_id` or same-product cart `kit_share_id` (open kit membership is not enough; oils stay plain qty)
 - [x] Admin Bestell Zusammenfassung for processing orders + six-status dropdown (migration `0047`)
 - [x] Merge Benutzer + Rollen & Preisaufschlag; per-user username-required login gate; admin account delete without destroying historical orders (migration `0046`)
 - [x] Telegram Benutzername as the only public handle; stable cart ordinals; checkout shipping + telegram order snapshots (migration `0042`)

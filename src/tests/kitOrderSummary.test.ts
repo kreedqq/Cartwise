@@ -78,6 +78,21 @@ function makeItem(overrides: Partial<Tables<"order_items">> = {}): Tables<"order
   };
 }
 
+function makeOilItem(overrides: Partial<Tables<"order_items">> = {}): Tables<"order_items"> {
+  return makeItem({
+    id: "oil-1",
+    product_id: "prod-te300",
+    product_code_snapshot: "TE300",
+    product_name_snapshot: "TEST ENANTHATE",
+    dosage_vial_snapshot: "300mg/ml",
+    quantity: 5,
+    line_total_usd: 85,
+    ...overrides,
+  });
+}
+
+const oilCatalog = [{ id: "prod-te300", code: "TE300", name: "TEST ENANTHATE", category: "INJECTABLES-OILS" }];
+
 function selankKitContext(overrides: Partial<KitShareOrderContext> = {}): KitShareOrderContext {
   return {
     kits: [{ id: "kit-10", product_id: "prod-selank", kit_size_vials: 10 }],
@@ -595,6 +610,110 @@ describe("kit vial aggregation regressions", () => {
     ]);
     expect(buildProcessingOrderSummary(orders, items, [], undefined).groups.length).toBeGreaterThan(0);
   });
+
+  it("TEST oil: an open same-product kit membership does not turn TEST ENANTHATE 5 into a kit", () => {
+    const order = makeOrder({ id: "order-34", user_id: "user-oil" });
+    const context: KitShareOrderContext = {
+      kits: [{ id: "kit-te300-open", product_id: "prod-te300", kit_size_vials: 10 }],
+      participants: [{ kit_share_id: "kit-te300-open", user_id: "user-oil", quantity: 1, order_id: null }],
+    };
+    const summary = buildProcessingOrderSummary([order], [makeOilItem({ order_id: "order-34" })], oilCatalog, context);
+    const oilLine = summary.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0];
+    expect(oilLine).toMatchObject({ code: "TE300", name: "TEST ENANTHATE", quantity: 5, quantityLabel: "5" });
+    expect(oilLine?.quantityLabel).not.toContain("Kit/s");
+    expect(oilLine?.quantityLabel).not.toContain("/");
+    expect(summary.personLines[0]?.quantityLabel).toBe("5x");
+  });
+
+  it("TEST 1-3: normal peptide and injectable oil quantities stay plain numbers", () => {
+    const peptide = buildProcessingOrderSummary(
+      [makeOrder()],
+      [makeItem({ quantity: 5, line_total_usd: 50 })],
+    );
+    expect(peptide.groups[0]?.lines[0]?.quantityLabel).toBe("5");
+
+    const oilFive = buildProcessingOrderSummary(
+      [makeOrder()],
+      [makeOilItem({ quantity: 5 })],
+      oilCatalog,
+    );
+    expect(oilFive.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("5");
+
+    const oilTen = buildProcessingOrderSummary(
+      [makeOrder()],
+      [makeOilItem({ id: "oil-10", quantity: 10, line_total_usd: 170 })],
+      oilCatalog,
+    );
+    expect(oilTen.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("10");
+  });
+
+  it("TEST 11: two different injectable oils aggregate as themselves", () => {
+    const orders = [makeOrder({ id: "a" }), makeOrder({ id: "b", order_number: "CN-2026-000033" })];
+    const items = [
+      makeOilItem({ id: "te", order_id: "a", quantity: 5, line_total_usd: 85 }),
+      makeOilItem({
+        id: "tren",
+        order_id: "b",
+        product_id: "prod-tren",
+        product_code_snapshot: "R200",
+        product_name_snapshot: "Tren E",
+        quantity: 3,
+        line_total_usd: 90,
+      }),
+    ];
+    const summary = buildProcessingOrderSummary(orders, items, [
+      ...oilCatalog,
+      { id: "prod-tren", code: "R200", name: "Tren E", category: "INJECTABLES-OILS" },
+    ]);
+    const oils = summary.groups.find((group) => group.categoryId === "injectable-oils")?.lines ?? [];
+    expect(oils.map((line) => `${line.code} ${line.quantityLabel}`).sort()).toEqual(["R200 3", "TE300 5"]);
+  });
+
+  it("TEST 12-14: PDF uses the same labels for a complete kit and a normal oil", () => {
+    const orders = [
+      makeOrder({ telegram_username_snapshot: "PepsiDry" }),
+      makeOrder({ id: "order-2", user_id: "user-raff", telegram_username_snapshot: "PepQueen" }),
+      makeOrder({ id: "order-oil", user_id: "user-oil", telegram_username_snapshot: "OilUser", order_number: "CN-2026-000099" }),
+    ];
+    const items = [
+      makeItem(),
+      makeItem({ id: "item-2", order_id: "order-2" }),
+      makeOilItem({ order_id: "order-oil" }),
+    ];
+    const summary = buildProcessingOrderSummary(orders, items, oilCatalog, selankKitContext());
+    expect(summary.groups.find((group) => group.categoryId === "peptides")?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+    expect(summary.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("5");
+    const bytes = buildProcessingOrderSummaryPdf(summary, "now");
+    expect(pdfContainsAscii(bytes, "1 Kit/s")).toBe(true);
+    expect(pdfContainsAscii(bytes, "5 Kit/s")).toBe(false);
+    expect(pdfContainsAscii(bytes, "TE300")).toBe(true);
+    expect(summary.personLines.filter((line) => line.article === "Selank").map((line) => `${line.name}|${line.quantityLabel}|${line.article}`).sort()).toEqual([
+      "PepQueen|5/10|Selank",
+      "PepsiDry|5/10|Selank",
+    ]);
+    expect(summary.personLines.find((line) => line.article === "TEST ENANTHATE")).toMatchObject({
+      name: "OilUser",
+      quantityLabel: "5x",
+      article: "TEST ENANTHATE",
+    });
+  });
+
+  it("does not attach a regular cart line to a kit share of a different product", () => {
+    const order = makeOrder({ cart_id: "cart-mix" });
+    const summary = buildProcessingOrderSummary(
+      [order],
+      [makeOilItem(), makeItem()],
+      oilCatalog,
+      selankKitContext({
+        participants: [{ kit_share_id: "kit-10", user_id: "user-pepsi", quantity: 5, order_id: "order-1" }],
+        cartLinks: [
+          { cart_id: "cart-mix", kit_share_id: "kit-10", product_id: "prod-te300", quantity: 5 },
+        ],
+      }),
+    );
+    expect(summary.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("5");
+    expect(summary.groups.find((group) => group.categoryId === "peptides")?.lines[0]?.quantityLabel).toBe("5/10 Stück");
+  });
 });
 
 describe("admin shared kit participants", () => {
@@ -766,6 +885,9 @@ describe("kit query invalidation and admin isolation", () => {
     expect(hooks).toContain("QUERY_KEYS.adminKitOrderContext");
     expect(hooks).toContain("QUERY_KEYS.adminOrderItems");
     expect(hooks).toContain("QUERY_KEYS.adminOrders");
+    expect(hooks).toContain("QUERY_KEYS.adminOrderSummary");
+    expect(read("src/lib/constants.ts")).toContain('adminOrderSummary: ["admin-order-summary"]');
+    expect(read("src/lib/kitOrderSummary.ts")).not.toContain("const forUser = participants.filter");
   });
 
   it("loads kit context only in admin order surfaces", () => {

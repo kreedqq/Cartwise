@@ -253,10 +253,11 @@ export function buildProcessingOrderSummary(
   for (const item of processingItems) {
     const order = ordersById.get(item.order_id);
     const kitShareId = resolveKitShareIdForItem(item, order, resolvedContext, participants);
-    if (kitShareId && kits.has(kitShareId)) {
-      const list = kitItemsByShare.get(kitShareId) ?? [];
+    const kit = kitShareId ? kits.get(kitShareId) : undefined;
+    if (kit && (!item.product_id || kit.product_id === item.product_id)) {
+      const list = kitItemsByShare.get(kit.id) ?? [];
       list.push(item);
-      kitItemsByShare.set(kitShareId, list);
+      kitItemsByShare.set(kit.id, list);
       continue;
     }
     regularItems.push(item);

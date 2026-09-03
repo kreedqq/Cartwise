@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-03** (shared-kit summary counts vials by `kit_size_vials`, not as kits).
+Last documentation pass: **2026-09-03** (kit identity only from kit_share links; oils stay plain quantities).
+
+**Update 2026-09-03 (kit identity vs injectable oils)**: Bestellzusammenfassung treats an order line as a kit share only when `kit_share_participants.order_id` (or a cart `kit_share_id` of the **same** `product_id`) links it. Being in an open kit of the same SKU is not enough — so TEST ENANTHATE qty 5 stays `5`, not `5/10` / `5 Kit/s`. Shared Selank 5+5 processing of one `kit_share_id` stays `1 Kit/s`. No migration.
 
 **Update 2026-09-03 (kit vial count in Bestellzusammenfassung)**: Merchant kit quantity is `floor(processing vials / kit_size_vials)`. A 10er kit split 5/10 + 5/10 (same `kit_share_id`, both `processing`) is `1 Kit/s`, never `5 Kit/s`. Different `kit_share_id` stay separate `5/10 Stück` lines. Remainder (15 vials of size 10) is `1 Kit/s` plus `5/10 Stück`. PDF uses the same `quantityLabel` from `buildProcessingOrderSummary`. No migration. Prices still stored `line_total_usd` only.
 

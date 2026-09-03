@@ -123,6 +123,7 @@ export function useSetOrderStatus(orderId?: string) {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrderItems });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminKitOrderContext });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrderSummary });
       queryClient.invalidateQueries({ queryKey: MY_ORDERS_ROOT });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orderAdminNote(target) });
     },
@@ -138,6 +139,7 @@ export function useDeleteOrder() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrders });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrderItems });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminKitOrderContext });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminOrderSummary });
       queryClient.invalidateQueries({ queryKey: MY_ORDERS_ROOT });
     },
   });

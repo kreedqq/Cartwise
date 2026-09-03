@@ -157,10 +157,14 @@ function participantMatchesProduct(
 }
 
 function uniqueKitShareId(matches: KitShareContextParticipant[]): string | null {
-  if (matches.length === 1) return matches[0].kit_share_id;
-  return null;
+  if (matches.length !== 1) return null;
+  return matches[0]?.kit_share_id ?? null;
 }
 
+/**
+ * Kit identity is only a real kit_share link for this order line.
+ * Never infer from SKU, name, category, quantity, or "user is in some open kit".
+ */
 export function resolveKitShareIdForItem(
   item: Pick<Tables<"order_items">, "order_id" | "product_id" | "quantity">,
   order: Pick<Tables<"orders">, "id" | "cart_id" | "user_id"> | undefined,
@@ -178,41 +182,19 @@ export function resolveKitShareIdForItem(
     const qtyMatched = productMatched.filter(
       (participant) => asQuantity(participant.quantity) === itemQuantity,
     );
-    const uniqueQty = uniqueKitShareId(qtyMatched);
-    if (uniqueQty) return uniqueQty;
-    return null;
-  }
-
-  if (forOrder.length === 1 && !item.product_id) {
-    return forOrder[0].kit_share_id;
-  }
-
-  if (order?.user_id) {
-    const forUser = participants.filter(
-      (participant) =>
-        participant.user_id === order.user_id &&
-        (!participant.order_id || participant.order_id === item.order_id || participant.order_id === order.id),
-    );
-    const userProductMatched = forUser.filter((participant) => participantMatchesProduct(participant, item, kits));
-    const uniqueOnUser = uniqueKitShareId(userProductMatched);
-    if (uniqueOnUser) return uniqueOnUser;
-    if (userProductMatched.length > 1) {
-      const qtyMatched = userProductMatched.filter(
-        (participant) => asQuantity(participant.quantity) === itemQuantity,
-      );
-      const uniqueQty = uniqueKitShareId(qtyMatched);
-      if (uniqueQty) return uniqueQty;
-    }
+    return uniqueKitShareId(qtyMatched);
   }
 
   if (order?.cart_id && context.cartLinks) {
-    const links = context.cartLinks.filter((link) => link.cart_id === order.cart_id);
-    const linkMatched = links.filter((link) => {
-      if (link.product_id && item.product_id) return link.product_id === item.product_id;
+    const links = context.cartLinks.filter((link) => {
+      if (link.cart_id !== order.cart_id) return false;
       const kit = kits.get(link.kit_share_id);
-      return Boolean(item.product_id) && kit?.product_id === item.product_id;
+      if (!kit) return false;
+      if (item.product_id && kit.product_id !== item.product_id) return false;
+      if (link.product_id && item.product_id && link.product_id !== item.product_id) return false;
+      return Boolean(item.product_id);
     });
-    if (linkMatched.length === 1) return linkMatched[0].kit_share_id;
+    if (links.length === 1) return links[0]?.kit_share_id ?? null;
   }
 
   return null;
