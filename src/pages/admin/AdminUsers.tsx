@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toaster";
 import { useAuth } from "@/context/AuthProvider";
 import { formatDateTime } from "@/lib/money";
-import { telegramHandleLabel } from "@/lib/username";
+import { adminUserTelegramLabel, groupUsersForAdminTables } from "@/lib/adminUserGroups";
 import {
   adminDeleteUser,
   adminSetUsernameRequired,
@@ -145,6 +145,7 @@ export default function AdminUsersPage() {
   const managedRole = managed ? customerRoleFor(managed.id) : null;
   const managedIsAdmin = managed?.roles.includes("admin") ?? false;
   const managedIsSelf = managed?.id === currentUser?.id;
+  const userGroups = groupUsersForAdminTables(users, roles, assignmentByUser, defaultRoleId);
 
   return (
     <div className="space-y-6">
@@ -153,81 +154,89 @@ export default function AdminUsersPage() {
         description="Benutzer verwalten, Kundenrollen zuweisen und Rollenaufschläge konfigurieren."
       />
 
-      <AdminSection title="Benutzer" padded={false}>
-        <div className="hidden overflow-x-auto md:block">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Telegram Benutzername</TableHead>
-                <TableHead>Rolle</TableHead>
-                <TableHead>Aufschlag</TableHead>
-                <TableHead>Registriert</TableHead>
-                <TableHead>Username erforderlich</TableHead>
-                <TableHead className="text-right">Aktionen</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users.map((u) => {
-                const role = customerRoleFor(u.id);
-                return (
-                  <TableRow key={u.id}>
-                    <TableCell className="text-sm font-medium">{telegramHandleLabel(u.username)}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span>{role?.name ?? "—"}</span>
+      {userGroups.map((group) => (
+        <AdminSection key={group.id} title={group.title} padded={false}>
+          {group.users.length === 0 ? (
+            <p className="px-4 py-3 text-sm text-muted-foreground">Keine Benutzer in dieser Rolle.</p>
+          ) : (
+            <>
+              <div className="hidden overflow-x-auto md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Telegram Benutzername</TableHead>
+                      <TableHead>Rolle</TableHead>
+                      <TableHead>Aufschlag</TableHead>
+                      <TableHead>Registriert</TableHead>
+                      <TableHead>Username erforderlich</TableHead>
+                      <TableHead className="text-right">Aktionen</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {group.users.map((u) => {
+                      const role = customerRoleFor(u.id);
+                      return (
+                        <TableRow key={u.id}>
+                          <TableCell className="text-sm font-medium">{adminUserTelegramLabel(u.username)}</TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span>{role?.name ?? "—"}</span>
+                              {u.roles.includes("admin") && <Badge variant="success">Admin</Badge>}
+                            </div>
+                          </TableCell>
+                          <TableCell className="tabular-nums">
+                            {role ? `${Number(role.markup_percent)} %` : "—"}
+                          </TableCell>
+                          <TableCell className="text-xs text-muted-foreground">{formatDateTime(u.createdAt)}</TableCell>
+                          <TableCell>{u.usernameRequiredOnNextLogin ? "Ja" : "Nein"}</TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="outline" size="sm" onClick={() => setManaged(u)}>
+                              Verwalten
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div className="space-y-3 p-3 md:hidden">
+                {group.users.map((u) => {
+                  const role = customerRoleFor(u.id);
+                  return (
+                    <div key={u.id} className="space-y-3 rounded-lg border border-border bg-background p-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium">{adminUserTelegramLabel(u.username)}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {role?.name ?? "—"}
+                            {role ? ` · ${Number(role.markup_percent)} %` : ""}
+                          </p>
+                        </div>
                         {u.roles.includes("admin") && <Badge variant="success">Admin</Badge>}
                       </div>
-                    </TableCell>
-                    <TableCell className="tabular-nums">
-                      {role ? `${Number(role.markup_percent)} %` : "—"}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{formatDateTime(u.createdAt)}</TableCell>
-                    <TableCell>{u.usernameRequiredOnNextLogin ? "Ja" : "Nein"}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => setManaged(u)}>
+                      <dl className="grid grid-cols-1 gap-1 text-xs text-muted-foreground">
+                        <div className="flex justify-between gap-3">
+                          <dt>Registriert</dt>
+                          <dd>{formatDateTime(u.createdAt)}</dd>
+                        </div>
+                        <div className="flex justify-between gap-3">
+                          <dt>Username erforderlich</dt>
+                          <dd>{u.usernameRequiredOnNextLogin ? "Ja" : "Nein"}</dd>
+                        </div>
+                      </dl>
+                      <Button variant="outline" size="sm" className="w-full" onClick={() => setManaged(u)}>
                         Verwalten
                       </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-
-        <div className="space-y-3 p-3 md:hidden">
-          {users.map((u) => {
-            const role = customerRoleFor(u.id);
-            return (
-              <div key={u.id} className="space-y-3 rounded-lg border border-border bg-background p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium">{telegramHandleLabel(u.username)}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {role?.name ?? "—"}
-                      {role ? ` · ${Number(role.markup_percent)} %` : ""}
-                    </p>
-                  </div>
-                  {u.roles.includes("admin") && <Badge variant="success">Admin</Badge>}
-                </div>
-                <dl className="grid grid-cols-1 gap-1 text-xs text-muted-foreground">
-                  <div className="flex justify-between gap-3">
-                    <dt>Registriert</dt>
-                    <dd>{formatDateTime(u.createdAt)}</dd>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <dt>Username erforderlich</dt>
-                    <dd>{u.usernameRequiredOnNextLogin ? "Ja" : "Nein"}</dd>
-                  </div>
-                </dl>
-                <Button variant="outline" size="sm" className="w-full" onClick={() => setManaged(u)}>
-                  Verwalten
-                </Button>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
-      </AdminSection>
+            </>
+          )}
+        </AdminSection>
+      ))}
 
       <AdminSection title="Rollen & Preisaufschlag" description="Katalog der Kundenrollen und ihrer Aufschläge." padded>
         <AdminRoleCatalog />
@@ -246,7 +255,7 @@ export default function AdminUsersPage() {
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Benutzer</h3>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">Telegram Benutzername</p>
-                  <p className="text-sm font-medium">{telegramHandleLabel(managed.username)}</p>
+                  <p className="text-sm font-medium">{adminUserTelegramLabel(managed.username)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">Registriert</p>
@@ -349,8 +358,8 @@ export default function AdminUsersPage() {
         title={adminTarget?.grant ? "Admin-Rolle vergeben?" : "Admin-Rolle entziehen?"}
         description={
           adminTarget?.grant
-            ? `${telegramHandleLabel(adminTarget.user.username)} erhält vollen Zugriff auf Produktverwaltung, Importe und Benutzerrollen.`
-            : `${telegramHandleLabel(adminTarget?.user.username)} verliert den Zugriff auf den Admin-Bereich.`
+            ? `${adminUserTelegramLabel(adminTarget.user.username)} erhält vollen Zugriff auf Produktverwaltung, Importe und Benutzerrollen.`
+            : `${adminUserTelegramLabel(adminTarget?.user.username)} verliert den Zugriff auf den Admin-Bereich.`
         }
         confirmLabel={adminTarget?.grant ? "Admin machen" : "Rolle entziehen"}
         variant={adminTarget?.grant ? "default" : "destructive"}
@@ -367,7 +376,7 @@ export default function AdminUsersPage() {
             <p>Möchtest du diesen Benutzer wirklich dauerhaft entfernen?</p>
             <p>
               Telegram Benutzername:{" "}
-              <span className="font-medium text-foreground">{telegramHandleLabel(deleteTarget?.username)}</span>
+              <span className="font-medium text-foreground">{adminUserTelegramLabel(deleteTarget?.username)}</span>
             </p>
             <p>
               Der bestehende Account wird gelöscht. Der Benutzer muss sich anschließend neu registrieren. Historische

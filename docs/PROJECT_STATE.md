@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-03** (shared kits in order summary + real PDF download).
+Last documentation pass: **2026-09-03** (kit-share RLS recursion fix + users grouped by catalog roles).
+
+**Update 2026-09-03 (kit summary 500 + users by role)**: Admin GET on `kit_shares` / `kit_share_participants` returned HTTP 500 because `kit_share_participants_select_same_kit` recursively selected the same table. Migration `0048` / production `20260903111826_fix_kit_share_participants_rls_recursion` adds `user_participates_in_kit_share` (SECURITY DEFINER, same visibility as before). Admin `/admin/users` now renders one table per catalog customer role. Role pricing, Username Gate, and account delete are unchanged.
 
 **Update 2026-09-03 (shared kits + PDF download)**: Bestell Zusammenfassung still uses only `processing` orders and stored `line_total_usd`. Kit lines are resolved from existing `kit_shares` / `kit_share_participants` (and cart `kit_share_id` when `order_id` is missing). Incomplete processing shares display `5/10 Stück`; a fully processing kit displays `1 Kit/s`. Admin order detail shows Geteiltes Kit participants (Telegram snapshot, then `profiles.username`). Summary PDF is a downloaded `%PDF` file, not `window.print()`. No migration. Order numbers, snapshots, role pricing, RLS, and kit pricing RPCs were not changed.
 

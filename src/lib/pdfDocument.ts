@@ -82,7 +82,7 @@ function paginate(lines: PdfLine[]): PdfLine[][] {
   const pages: PdfLine[][] = [[]];
   let y = PAGE_HEIGHT - MARGIN;
   for (const line of lines) {
-    const height = line.size + 4;
+    const height = line.size + 6;
     if (y - height < MARGIN) {
       pages.push([]);
       y = PAGE_HEIGHT - MARGIN;
@@ -95,18 +95,12 @@ function paginate(lines: PdfLine[]): PdfLine[][] {
 
 function pageContentStream(lines: PdfLine[]): string {
   const ops = ["BT"];
-  let first = true;
   let y = PAGE_HEIGHT - MARGIN;
   for (const line of lines) {
     ops.push(`/${line.bold ? "F2" : "F1"} ${line.size} Tf`);
-    if (first) {
-      ops.push(`${MARGIN} ${y} Td`);
-      first = false;
-    } else {
-      ops.push(`0 ${-(line.size + 4)} Td`);
-    }
+    ops.push(`1 0 0 1 ${MARGIN} ${y} Tm`);
     ops.push(`${pdfLiteral(line.text)} Tj`);
-    y -= line.size + 4;
+    y -= line.size + 6;
   }
   ops.push("ET");
   return ops.join("\n");
@@ -153,7 +147,7 @@ export function buildSimplePdf(sections: Array<{ title?: string; lines: string[]
   for (const section of sections) {
     if (section.title) lines.push({ text: section.title, size: 13, bold: true });
     for (const line of section.lines) {
-      for (const wrapped of wrapText(line, 92)) {
+      for (const wrapped of wrapText(line, 85)) {
         lines.push({ text: wrapped, size: 10, bold: false });
       }
     }

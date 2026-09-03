@@ -211,6 +211,30 @@ describe("shared kit order summary", () => {
     expect(summary.groups[0]?.lines.every((line) => line.quantityLabel === "5/10 Stück")).toBe(true);
   });
 
+  it("keeps a partial kit and a complete kit of the same SKU as two lines", () => {
+    const orders = [
+      makeOrder({ id: "partial-a" }),
+      makeOrder({ id: "complete-b", order_number: "CN-2026-000033" }),
+    ];
+    const items = [
+      makeItem({ id: "ia", order_id: "partial-a", quantity: 5, line_total_usd: 30 }),
+      makeItem({ id: "ib", order_id: "complete-b", quantity: 10, line_total_usd: 60 }),
+    ];
+    const context: KitShareOrderContext = {
+      kits: [
+        { id: "kit-partial", product_id: "prod-selank", kit_size_vials: 10 },
+        { id: "kit-complete", product_id: "prod-selank", kit_size_vials: 10 },
+      ],
+      participants: [
+        { kit_share_id: "kit-partial", user_id: "user-pepsi", quantity: 5, order_id: "partial-a" },
+        { kit_share_id: "kit-complete", user_id: "user-pepsi", quantity: 10, order_id: "complete-b" },
+      ],
+    };
+    const summary = buildProcessingOrderSummary(orders, items, [], context);
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel).sort()).toEqual(["1 Kit/s", "5/10 Stück"]);
+    expect(summary.groups[0]?.lines.reduce((sum, line) => sum + line.totalUsd, 0)).toBe(90);
+  });
+
   it("keeps different kit sizes and product variants separate", () => {
     const orders = [makeOrder({ id: "a" }), makeOrder({ id: "b", order_number: "CN-2026-000033" })];
     const items = [
@@ -376,6 +400,53 @@ describe("order summary PDF download", () => {
     expect(bytes && pdfStartsWithHeader(bytes)).toBe(true);
     expect(clicks).toEqual(["Bestell-Zusammenfassung.pdf"]);
   });
+
+  it("disables PDF export when the summary has no processing orders", () => {
+    expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("disabled={summary.orderCount === 0}");
+    expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("downloadProcessingOrderSummaryPdf");
+    expect(read("src/lib/orderExport.ts")).toContain('downloadPdf("Bestell-Zusammenfassung.pdf"');
+    expect(read("src/lib/orderExport.ts")).not.toContain("window.print");
+    const empty = buildProcessingOrderSummary([], [], []);
+    expect(empty.orderCount).toBe(0);
+    expect(printProcessingOrderSummary(empty, "now")).toBeNull();
+  });
+
+  it("splits a long merchant list across PDF pages without dropping SKUs", () => {
+    const orders = Array.from({ length: 40 }, (_, index) =>
+      makeOrder({
+        id: `order-${index}`,
+        order_number: `CN-2026-${String(index).padStart(6, "0")}`,
+        telegram_username_snapshot: `User${index}`,
+      }),
+    );
+    const items = orders.map((order, index) =>
+      makeItem({
+        id: `item-${index}`,
+        order_id: order.id,
+        product_id: `prod-${index}`,
+        product_code_snapshot: `SKU${index}`,
+        product_name_snapshot: `Artikel mit sehr langem Namen Nummer ${index}`,
+        quantity: 1,
+        line_total_usd: 10,
+      }),
+    );
+    const bytes = buildProcessingOrderSummaryPdf(
+      buildProcessingOrderSummary(orders, items, items.map((item) => ({
+        id: item.product_id,
+        code: item.product_code_snapshot,
+        name: item.product_name_snapshot,
+        category: "PEPTIDES",
+      }))),
+      "now",
+    );
+    const text = new TextDecoder("latin1").decode(bytes);
+    expect(pdfStartsWithHeader(bytes)).toBe(true);
+    expect((text.match(/\/Type \/Page/g) ?? []).length).toBeGreaterThan(1);
+    expect(text).toContain("SKU0");
+    expect(text).toContain("SKU39");
+    expect(text).toContain("CN-2026-000000");
+    expect(text).toContain("User39");
+  });
 });
 
 describe("kit query invalidation and admin isolation", () => {
@@ -392,7 +463,16 @@ describe("kit query invalidation and admin isolation", () => {
     expect(read("src/pages/Orders.tsx")).not.toContain("useAdminKitOrderContext");
     expect(read("src/pages/OrderDetail.tsx")).not.toContain("useAdminKitOrderContext");
     expect(read("src/services/kitOrderContext.ts")).toContain('from("kit_shares")');
+    expect(read("src/services/kitOrderContext.ts")).toContain("kit_size_vials");
+    expect(read("src/services/kitOrderContext.ts")).toContain("order_id");
     expect(read("src/services/kitOrderContext.ts")).toContain("username");
     expect(read("src/services/kitOrderContext.ts")).not.toContain("display_name");
+    const rlsFix = read("supabase/migrations/0048_fix_kit_share_participants_rls_recursion.sql");
+    expect(rlsFix).toContain("user_participates_in_kit_share");
+    expect(rlsFix).toContain("security definer");
+    expect(rlsFix).toContain("infinite recursion");
+    expect(rlsFix).toContain("kit_share_participants_select_same_kit");
+    expect(rlsFix).not.toContain("drop policy if exists \"kit_shares_select_admin\"");
+    expect(rlsFix).not.toContain("drop policy if exists \"kit_share_participants_select_admin\"");
   });
 });

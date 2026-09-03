@@ -43,6 +43,7 @@ describe("admin users and roles merge", () => {
     expect(page).toContain("Telegram Benutzername beim nächsten Login erforderlich");
     expect(page).toContain("AdminRoleCatalog");
     expect(page).toContain("assignCustomerRole");
+    expect(page).toContain("groupUsersForAdminTables");
     expect(page).not.toContain("Interner Name");
     expect(page).not.toContain("displayName");
   });

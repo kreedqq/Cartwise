@@ -2,6 +2,20 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-03 (kit-share RLS recursion + users grouped by role)
+
+### Fixed
+
+- Admin Bestellzusammenfassung HTTP 500 on `kit_shares` / `kit_share_participants`. Cause was infinite RLS recursion in `kit_share_participants_select_same_kit`, not missing columns. Helper `user_participates_in_kit_share` keeps the same membership check without recursive RLS. Admin SELECT policies unchanged.
+
+### Changed
+
+- `/admin/users` lists users in one table per catalog customer role (dynamic). New roles from the existing role catalog appear automatically. Admins are grouped separately. Username Gate, delete, and role markup stay on the same page.
+
+### Notes
+
+- Migration `0048_fix_kit_share_participants_rls_recursion.sql` (production `20260903111826`). No RLS loosening. Order numbers, snapshots, kit pricing, quantity tier, and auth were not changed.
+
 ## 2026-09-03 (shared kits in Bestell Zusammenfassung + PDF download)
 
 ### Fixed
