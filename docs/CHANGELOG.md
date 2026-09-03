@@ -2,6 +2,16 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-04 (BESTELLUNGEN complete kit is 1 Kit/s)
+
+### Fixed
+
+- BESTELLUNGEN / PDF page 4 always showed each complete-kit participant as `5/10`. A full `kit_share_id` now renders as one `1 Kit/s` row (names joined). Open shares stay `5/10`.
+
+### Notes
+
+- No migration. Product tables, customer assignment, and Geteiltes Kit are unchanged. Oils without a kit link stay plain qty.
+
 ## 2026-09-04 (complete kit from processing lines of the same share)
 
 ### Fixed

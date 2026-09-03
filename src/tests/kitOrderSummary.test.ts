@@ -181,8 +181,7 @@ describe("shared kit order summary", () => {
     const summary = buildProcessingOrderSummary(orders, items, [], selankKitContext());
     expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
     expect(summary.personLines.map((line) => `${line.name}|${line.quantityLabel}`).sort()).toEqual([
-      "PepsiDry|5/10",
-      "Raff|5/10",
+      "PepsiDry, Raff|1 Kit/s",
     ]);
     expect(summary.groups[0]?.lines[0]?.totalUsd).toBe(60);
     expect(summary.customers.map((customer) => customer.lines[0]?.quantityLabel)).toEqual(["1 Kit/s", "1 Kit/s"]);
@@ -503,7 +502,7 @@ describe("kit vial aggregation regressions", () => {
     expect(pdfContainsAscii(bytes, "1 Kit/s")).toBe(true);
     expect(pdfContainsAscii(bytes, "5 Kit/s")).toBe(false);
     expect(pdfContainsAscii(bytes, "10 Kit/s")).toBe(false);
-    expect(summary.personLines.map((line) => line.quantityLabel).sort()).toEqual(["5/10", "5/10"]);
+    expect(summary.personLines.map((line) => `${line.name}|${line.quantityLabel}`)).toEqual(["PepsiDry, Raff|1 Kit/s"]);
   });
 
   it("keeps 15 vials of size 10 as 1 Kit/s plus 5/10 Stück", () => {
@@ -774,10 +773,8 @@ describe("kit vial aggregation regressions", () => {
         .map((line) => `${line.name}|${line.quantityLabel}|${line.article}`)
         .sort(),
     ).toEqual([
-      "Penbuddy|5/10|Selank",
-      "Penbuddy|5/10|Semax",
-      "PepQueen|5/10|Selank",
-      "PepQueen|5/10|Semax",
+      "Penbuddy, PepQueen|1 Kit/s|Selank",
+      "Penbuddy, PepQueen|1 Kit/s|Semax",
     ]);
     const pdf = buildProcessingOrderSummaryPdf(bothProcessing, "now");
     expect(pdfContainsAscii(pdf, "1 Kit/s")).toBe(true);
@@ -801,6 +798,12 @@ describe("kit vial aggregation regressions", () => {
         ?.lines.filter((line) => line.code === "SK10" || line.code === "XA10")
         .map((line) => line.quantityLabel),
     ).toEqual(["5/10 Stück", "5/10 Stück"]);
+    expect(
+      only030.personLines
+        .filter((line) => line.article === "Selank" || line.article === "Semax")
+        .map((line) => `${line.name}|${line.quantityLabel}|${line.article}`)
+        .sort(),
+    ).toEqual(["PepQueen|5/10|Selank", "PepQueen|5/10|Semax"]);
 
     const selankPanel = buildSharedKitsForOrder(order036.id, items.filter((item) => item.order_id === order036.id), [order030, order036], context);
     expect(selankPanel.map((view) => `${view.productCode}|${view.progressLabel}|${view.complete}`).sort()).toEqual([
@@ -858,7 +861,7 @@ describe("kit vial aggregation regressions", () => {
     expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("5/10 Stück");
     expect(
       summary.personLines.map((line) => `${line.name}|${line.quantityLabel}|${line.article}`).sort(),
-    ).toEqual(["Penbuddy|5/10|Selank", "PepQueen|5/10|Selank"]);
+    ).toEqual(["Penbuddy, PepQueen|1 Kit/s|Selank"]);
     expect(pdfContainsAscii(buildProcessingOrderSummaryPdf(summary, "now"), "1 Kit/s")).toBe(true);
     expect(pdfContainsAscii(buildProcessingOrderSummaryPdf(summary, "now"), "5/10 Stück")).toBe(false);
   });
@@ -940,8 +943,7 @@ describe("kit vial aggregation regressions", () => {
     expect(pdfContainsAscii(bytes, "5 Kit/s")).toBe(false);
     expect(pdfContainsAscii(bytes, "TE300")).toBe(true);
     expect(summary.personLines.filter((line) => line.article === "Selank").map((line) => `${line.name}|${line.quantityLabel}|${line.article}`).sort()).toEqual([
-      "PepQueen|5/10|Selank",
-      "PepsiDry|5/10|Selank",
+      "PepQueen, PepsiDry|1 Kit/s|Selank",
     ]);
     expect(summary.personLines.find((line) => line.article === "TEST ENANTHATE")).toMatchObject({
       name: "OilUser",

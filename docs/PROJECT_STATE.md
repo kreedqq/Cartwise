@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-04** (merchant kit vials use processing lines of the same kit_share_id).
+Last documentation pass: **2026-09-04** (BESTELLUNGEN shows 1 Kit/s for a complete shared kit).
+
+**Update 2026-09-04 (BESTELLUNGEN complete kit)**: `personLines` (Admin BESTELLUNGEN + PDF page 4) used to always print each share as `5/10`. A fully processing kit (`kit_share_id`, remainder 0) is now one row: joined Telegram snapshots + `1 Kit/s`. Incomplete kits stay `5/10` per person. `customers` and Geteiltes Kit still list each participant. Same `quantityLabel` for web and PDF. No migration.
 
 **Update 2026-09-04 (merchant kit lines from grouped processing items)**: Bestellzusammenfassung complete-kit math uses `max(participant processing qty, sum of processing order_items already grouped by kit_share_id)`. Same 10er kit 5+5 processing stays `1 Kit/s` even if one participant row is missing from the admin fetch. Person lines stay `5/10`. Oils without a kit link stay plain qty. No migration.
 

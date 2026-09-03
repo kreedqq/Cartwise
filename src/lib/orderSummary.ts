@@ -205,6 +205,21 @@ function personSortKey(name: string): string {
   return name === ORDER_TELEGRAM_SNAPSHOT_UNAVAILABLE ? "\uFFFF" : name;
 }
 
+function mergePersonNames(current: string, next: string): string {
+  const names = new Set(
+    current
+      .split(", ")
+      .map((name) => name.trim())
+      .filter(Boolean),
+  );
+  if (next.trim()) names.add(next.trim());
+  return [...names].sort((a, b) => personSortKey(a).localeCompare(personSortKey(b), "de")).join(", ");
+}
+
+function isKitFullyComplete(progress: { completeKits: number; remainderVials: number } | undefined): boolean {
+  return Boolean(progress && progress.completeKits > 0 && progress.remainderVials === 0);
+}
+
 /** Merchant buy list from frozen order_items of processing orders only. */
 export function buildProcessingOrderSummary(
   orders: Tables<"orders">[],
@@ -375,7 +390,7 @@ export function buildProcessingOrderSummary(
         const code = (item.product_code_snapshot ?? "").trim() || "—";
         const name = (item.product_name_snapshot ?? "").trim() || "Nicht verfügbar";
         const quantity = asQuantity(item.quantity);
-        const kitFullyComplete = Boolean(progress && progress.completeKits > 0 && progress.remainderVials === 0);
+        const kitFullyComplete = isKitFullyComplete(progress);
         const quantityLabel = progress
           ? kitFullyComplete
             ? formatCompleteKitQuantityLabel(1)
@@ -415,11 +430,14 @@ export function buildProcessingOrderSummary(
       const hint = catalogHintForItem(item, byId, byCode);
       const kitShareId = resolveKitShareIdForItem(item, order, resolvedContext, participants);
       const progress = kitShareId ? kitProgress.get(kitShareId) : undefined;
+      const kitFullyComplete = isKitFullyComplete(progress);
       const dose = formatOrderSummaryDose(item.dosage_vial_snapshot || hint.dosage_vial, item.product_code_snapshot ?? "");
       const article = (item.product_name_snapshot ?? "").trim() || hint.name?.trim() || "Nicht verfügbar";
       const code = (item.product_code_snapshot ?? "").trim() || hint.code?.trim() || "—";
       const mergeKey = kitShareId
-        ? `${personKey}|kit:${kitShareId}`
+        ? kitFullyComplete
+          ? `kit-complete:${kitShareId}`
+          : `${personKey}|kit:${kitShareId}`
         : `${personKey}|${productMergeKey(item)}|${dose}`;
       const existing = personMap.get(mergeKey);
       const quantity = asQuantity(item.quantity);
@@ -428,12 +446,18 @@ export function buildProcessingOrderSummary(
         existing.quantityLabel = formatPersonQuantityLabel(existing.quantity);
         continue;
       }
+      if (existing && kitFullyComplete) {
+        existing.name = mergePersonNames(existing.name, telegramLabel);
+        continue;
+      }
       if (existing) continue;
       personMap.set(mergeKey, {
         name: telegramLabel,
-        quantity,
+        quantity: kitFullyComplete && progress ? progress.completeKits : quantity,
         quantityLabel: progress
-          ? formatSharedKitShareLabel(quantity, progress.kitSize)
+          ? kitFullyComplete
+            ? formatCompleteKitQuantityLabel(progress.completeKits)
+            : formatSharedKitShareLabel(quantity, progress.kitSize)
           : formatPersonQuantityLabel(quantity),
         dose,
         article,
