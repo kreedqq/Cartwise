@@ -39,6 +39,8 @@ export const QUERY_KEYS = {
   favorites: ["favorites"] as const,
   orderTemplates: ["order-templates"] as const,
   orderAdminNote: (id: string) => ["orders", id, "admin-note"] as const,
+  orderKitSizes: (id: string) => ["orders", id, "kit-sizes"] as const,
+  orderProgress: (id: string) => ["orders", id, "progress"] as const,
   researchDualRead: ["research-dual-read"] as const,
   publicLexicon: ["public-lexicon"] as const,
   adminResearchDashboard: ["admin-research-dashboard"] as const,

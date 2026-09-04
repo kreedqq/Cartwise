@@ -312,4 +312,31 @@ describe("order CSV / PDF snapshot source", () => {
     const html = buildOrderPrintHtml(toOrderExportDoc(makeOrder(), [makeItem()]));
     expect(html).not.toContain("Rollenaufschlag");
   });
+
+  it("uses the same quantity labels in PDF as on the website", () => {
+    const peptide = toOrderExportDoc(
+      makeOrder(),
+      [makeItem({ product_code_snapshot: "SK10", product_name_snapshot: "Selank", quantity: 5 })],
+      undefined,
+      null,
+      { kitSizes: new Map([["prod-1", 10]]) },
+    );
+    expect(peptide.items[0]?.quantityLabel).toBe("5/10 Kit");
+    expect(buildOrderPrintHtml(peptide)).toContain("5/10 Kit");
+
+    const oil = toOrderExportDoc(
+      makeOrder(),
+      [makeItem({ product_id: "oil-1", product_code_snapshot: "TE300", product_name_snapshot: "TEST ENANTHATE", quantity: 5 })],
+    );
+    expect(oil.items[0]?.quantityLabel).toBe("5 Vials");
+    expect(oil.items[0]?.quantityLabel).not.toContain("Kit");
+    expect(buildOrderPrintHtml(oil)).toContain("5 Vials");
+
+    const oral = toOrderExportDoc(
+      makeOrder(),
+      [makeItem({ product_id: "oral-1", product_code_snapshot: "OXO50", product_name_snapshot: "ANADROL", quantity: 5 })],
+    );
+    expect(oral.items[0]?.quantityLabel).toBe("5 Packungen");
+    expect(buildOrderPrintHtml(oral)).toContain("5 Packungen");
+  });
 });

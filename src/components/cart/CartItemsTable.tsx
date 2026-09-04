@@ -24,6 +24,7 @@ import { useCartItemRow } from "@/hooks/useCartItemRow";
 import { formatDateTime, formatEur, formatRate, formatUsd } from "@/lib/money";
 import {
   cartItemDisplayName,
+  cartItemQuantityLabel,
   cartItemVariantSubtitle,
   isKitShareCartItem,
 } from "@/lib/shop/cartDisplay";
@@ -140,6 +141,7 @@ function CartItemRowDesktop({
         />
         {row.quantityError && <p className="mt-1 text-[11px] text-destructive">{row.quantityError}</p>}
         <SaveStatusIndicator status={row.quantityStatus} className="mt-1 justify-end" />
+        <p className="mt-1 text-[11px] text-muted-foreground">{cartItemQuantityLabel(item)}</p>
       </TableCell>
       <TableCell className="text-right tabular-nums text-sm">
         {formatUsd(item.unit_price_usd_snapshot)}

@@ -1,9 +1,19 @@
 import {
+  asQuantity,
+  formatCompleteKitCount,
+  formatKitSizeLabel,
+  formatPartialKitQuantity,
+  resolveProductCategoryId,
+} from "@/lib/quantityFormat";
+import type { ShopCategoryId } from "@/lib/shopCategories";
+import {
   formatOrderTelegramSnapshot,
   ORDER_STATUS_LABELS,
   ORDER_TELEGRAM_SNAPSHOT_UNAVAILABLE,
 } from "@/services/orders";
 import type { OrderStatus, Tables } from "@/types/database";
+
+export { asQuantity } from "@/lib/quantityFormat";
 
 /** Same key as PROCESSING_ORDER_STATUS in orderSummary.ts. Kept local to avoid a cycle. */
 const PROCESSING_STATUS = "processing";
@@ -53,6 +63,8 @@ export interface SharedKitAdminView {
   productName: string;
   productCode: string;
   kitSize: number;
+  kitSizeLabel: string;
+  categoryId: ShopCategoryId;
   processingQuantity: number;
   complete: boolean;
   progressLabel: string;
@@ -61,22 +73,41 @@ export interface SharedKitAdminView {
 
 const NO_ORDER_STATUS_LABEL = "Noch nicht in Bearbeitung";
 
-/** Postgres `numeric` often arrives as `"5.000"`. Never treat that string as kit count. */
-export function asQuantity(value: unknown): number {
-  const amount = typeof value === "number" ? value : Number(value);
-  return Number.isFinite(amount) ? amount : 0;
+export function formatCompleteKitQuantityLabel(
+  kitCount: number,
+  categoryId: ShopCategoryId = "peptides",
+  kitSize = 0,
+): string {
+  return formatCompleteKitCount(kitCount, categoryId, kitSize);
 }
 
-export function formatCompleteKitQuantityLabel(kitCount: number): string {
-  return `${asQuantity(kitCount)} Kit/s`;
+export function formatSharedKitQuantityLabel(
+  filled: number,
+  kitSize: number,
+  categoryId: ShopCategoryId = "peptides",
+): string {
+  return formatPartialKitQuantity(filled, kitSize, categoryId);
 }
 
-export function formatSharedKitQuantityLabel(filled: number, kitSize: number): string {
-  return `${asQuantity(filled)}/${asQuantity(kitSize)} Stück`;
+export function formatSharedKitShareLabel(
+  quantity: number,
+  kitSize: number,
+  categoryId: ShopCategoryId = "peptides",
+): string {
+  return formatPartialKitQuantity(quantity, kitSize, categoryId);
 }
 
-export function formatSharedKitShareLabel(quantity: number, kitSize: number): string {
-  return `${asQuantity(quantity)}/${asQuantity(kitSize)}`;
+export function kitSizeForOrderItem(
+  item: Pick<Tables<"order_items">, "order_id" | "product_id" | "quantity">,
+  order: Pick<Tables<"orders">, "id" | "cart_id" | "user_id"> | undefined,
+  context: KitShareOrderContext,
+  participants = context.participants,
+): number | null {
+  const kitShareId = resolveKitShareIdForItem(item, order, context, participants);
+  if (!kitShareId) return null;
+  const kit = context.kits.find((row) => row.id === kitShareId);
+  const size = asQuantity(kit?.kit_size_vials);
+  return size > 0 ? size : null;
 }
 
 /**
@@ -259,6 +290,10 @@ export function buildSharedKitsForOrder(
     const orderItem = items.find(
       (item) => resolveKitShareIdForItem(item, currentOrder, { ...context, participants }, participants) === kitShareId,
     );
+    const categoryId = resolveProductCategoryId({
+      name: orderItem?.product_name_snapshot,
+      code: orderItem?.product_code_snapshot,
+    });
 
     const participantViews: SharedKitParticipantView[] = members
       .map((member) => {
@@ -272,7 +307,7 @@ export function buildSharedKitsForOrder(
           }),
           quantity: member.quantity,
           kitSize: kit.kit_size_vials,
-          shareLabel: formatSharedKitShareLabel(member.quantity, kit.kit_size_vials),
+          shareLabel: formatSharedKitShareLabel(member.quantity, kit.kit_size_vials, categoryId),
           statusKey: status.statusKey,
           statusLabel: status.statusLabel,
           isCurrentOrder: member.order_id === orderId,
@@ -289,6 +324,8 @@ export function buildSharedKitsForOrder(
       productName: orderItem?.product_name_snapshot?.trim() || "Nicht verfügbar",
       productCode: orderItem?.product_code_snapshot?.trim() || "—",
       kitSize: kit.kit_size_vials,
+      kitSizeLabel: formatKitSizeLabel(kit.kit_size_vials, categoryId),
+      categoryId,
       processingQuantity,
       complete,
       progressLabel: complete

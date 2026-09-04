@@ -17,6 +17,7 @@ import { useCartItemRow } from "@/hooks/useCartItemRow";
 import { formatDateTime, formatEur, formatUsd } from "@/lib/money";
 import {
   cartItemDisplayName,
+  cartItemQuantityLabel,
   cartItemVariantSubtitle,
   isKitShareCartItem,
 } from "@/lib/shop/cartDisplay";
@@ -125,6 +126,7 @@ function CartItemCardMobile({
               inputMode="decimal"
               className="h-9 text-right tabular-nums"
             />
+            <p className="text-[11px] text-muted-foreground">{cartItemQuantityLabel(item)}</p>
           </div>
         </div>
         {row.quantityError && <p className="text-xs text-destructive">{row.quantityError}</p>}

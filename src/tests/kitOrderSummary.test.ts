@@ -106,7 +106,7 @@ function selankKitContext(overrides: Partial<KitShareOrderContext> = {}): KitSha
 }
 
 describe("shared kit order summary", () => {
-  it("shows a processing share as 5/10 Stück and does not guess from the SKU", () => {
+  it("shows a processing share as 5/10 Kit and does not guess from the SKU", () => {
     const orders = [
       makeOrder(),
       makeOrder({
@@ -126,11 +126,11 @@ describe("shared kit order summary", () => {
     expect(summary.groups[0]?.lines[0]).toMatchObject({
       code: "SK10",
       name: "Selank",
-      quantityLabel: "5/10 Stück",
+      quantityLabel: "5/10 Kit",
       totalUsd: 30,
     });
     expect(summary.customers.map((customer) => `${customer.heading} | ${customer.lines[0]?.quantityLabel}`)).toEqual([
-      "CN-2026-000034 | PepsiDry | 5/10",
+      "CN-2026-000034 | PepsiDry | 5/10 Kit",
     ]);
   });
 
@@ -143,8 +143,8 @@ describe("shared kit order summary", () => {
       ],
     });
     const summary = buildProcessingOrderSummary(orders, [makeItem()], [], context);
-    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Stück");
-    expect(summary.personLines[0]?.quantityLabel).toBe("5/10");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Kit");
+    expect(summary.personLines[0]?.quantityLabel).toBe("5/10 Kit");
     expect(summary.personLines[0]?.name).toBe("PepsiDry");
 
     const pending = buildProcessingOrderSummary(
@@ -161,10 +161,10 @@ describe("shared kit order summary", () => {
       [],
       selankKitContext(),
     );
-    expect(pending.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Stück");
+    expect(pending.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Kit");
   });
 
-  it("shows 1 Kit/s when both shares are In Bearbeitung", () => {
+  it("shows 1 Kit when both shares are In Bearbeitung", () => {
     const orders = [
       makeOrder(),
       makeOrder({
@@ -179,15 +179,15 @@ describe("shared kit order summary", () => {
       makeItem({ id: "item-2", order_id: "order-2", quantity: 5, line_total_usd: 30 }),
     ];
     const summary = buildProcessingOrderSummary(orders, items, [], selankKitContext());
-    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit");
     expect(summary.personLines.map((line) => `${line.name}|${line.quantityLabel}`).sort()).toEqual([
-      "PepsiDry, Raff|1 Kit/s",
+      "PepsiDry + Raff|1 Kit",
     ]);
     expect(summary.groups[0]?.lines[0]?.totalUsd).toBe(60);
-    expect(summary.customers.map((customer) => customer.lines[0]?.quantityLabel)).toEqual(["1 Kit/s", "1 Kit/s"]);
+    expect(summary.customers.map((customer) => customer.lines[0]?.quantityLabel)).toEqual(["5/10 Kit", "5/10 Kit"]);
   });
 
-  it("shows 2 Kit/s for two complete kits of the same variant", () => {
+  it("shows 2 Kits for two complete kits of the same variant", () => {
     const orders = [
       makeOrder({ id: "a" }),
       makeOrder({ id: "b", order_number: "CN-2026-000033" }),
@@ -208,7 +208,7 @@ describe("shared kit order summary", () => {
     };
     const summary = buildProcessingOrderSummary(orders, items, [], context);
     expect(summary.groups[0]?.lines).toHaveLength(1);
-    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("2 Kit/s");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("2 Kits");
     expect(summary.groups[0]?.lines[0]?.totalUsd).toBe(600);
   });
 
@@ -233,7 +233,7 @@ describe("shared kit order summary", () => {
     };
     const summary = buildProcessingOrderSummary(orders, items, [], context);
     expect(summary.groups[0]?.lines).toHaveLength(2);
-    expect(summary.groups[0]?.lines.every((line) => line.quantityLabel === "5/10 Stück")).toBe(true);
+    expect(summary.groups[0]?.lines.every((line) => line.quantityLabel === "5/10 Kit")).toBe(true);
   });
 
   it("keeps a partial kit and a complete kit of the same SKU as two lines", () => {
@@ -256,7 +256,7 @@ describe("shared kit order summary", () => {
       ],
     };
     const summary = buildProcessingOrderSummary(orders, items, [], context);
-    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel).sort()).toEqual(["1 Kit/s", "5/10 Stück"]);
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel).sort()).toEqual(["1 Kit", "5/10 Kit"]);
     expect(summary.groups[0]?.lines.reduce((sum, line) => sum + line.totalUsd, 0)).toBe(90);
   });
 
@@ -286,8 +286,8 @@ describe("shared kit order summary", () => {
     };
     const summary = buildProcessingOrderSummary(orders, items, [], context);
     expect(summary.groups[0]?.lines.map((line) => `${line.code} ${line.quantityLabel}`)).toEqual([
-      "SK10 5/10 Stück",
-      "SK20 10/20 Stück",
+      "SK10 5/10 Kit",
+      "SK20 10/20 Kit",
     ]);
   });
 
@@ -302,14 +302,14 @@ describe("shared kit order summary", () => {
     });
     const items = [makeItem(), makeItem({ id: "item-2", order_id: "order-2" })];
     const before = buildProcessingOrderSummary([pepsi, raffPending], items, [], selankKitContext());
-    expect(before.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Stück");
+    expect(before.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Kit");
     const after = buildProcessingOrderSummary(
       [pepsi, { ...raffPending, status: "processing" }],
       items,
       [],
       selankKitContext(),
     );
-    expect(after.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+    expect(after.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit");
   });
 
   it("uses stored line_total_usd and never a 25 percent formula", () => {
@@ -334,7 +334,7 @@ describe("kit vial aggregation regressions", () => {
     expect(read("src/lib/orderSummary.ts")).not.toContain("formatCompleteKitQuantityLabel(progress.processingQuantity)");
   });
 
-  it("TEST 1: 5+5 processing vials of a 10er kit are 1 Kit/s, not 5 or 10 kits", () => {
+  it("TEST 1: 5+5 processing vials of a 10er kit are 1 Kit, not 5 or 10 kits", () => {
     const orders = [
       makeOrder(),
       makeOrder({ id: "order-2", order_number: "CN-2026-000035", user_id: "user-raff", telegram_username_snapshot: "Raff" }),
@@ -343,12 +343,12 @@ describe("kit vial aggregation regressions", () => {
     const summary = buildProcessingOrderSummary(orders, items, [], selankKitContext());
     expect(summary.groups[0]?.lines).toHaveLength(1);
     expect(summary.groups[0]?.lines[0]?.quantity).toBe(1);
-    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
-    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("5 Kit/s");
-    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("10 Kit/s");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit");
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("5 Kits");
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("10 Kits");
   });
 
-  it("TEST 2: only participant A = 5 processing stays 5/10 Stück", () => {
+  it("TEST 2: only participant A = 5 processing stays 5/10 Kit", () => {
     const summary = buildProcessingOrderSummary(
       [makeOrder()],
       [makeItem()],
@@ -357,10 +357,10 @@ describe("kit vial aggregation regressions", () => {
         participants: [{ kit_share_id: "kit-10", user_id: "user-pepsi", quantity: 5, order_id: "order-1" }],
       }),
     );
-    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Stück");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Kit");
   });
 
-  it("TEST 3: A processing and B not processing stays 5/10 Stück", () => {
+  it("TEST 3: A processing and B not processing stays 5/10 Kit", () => {
     const orders = [
       makeOrder(),
       makeOrder({
@@ -376,10 +376,10 @@ describe("kit vial aggregation regressions", () => {
       [],
       selankKitContext(),
     );
-    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Stück");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("5/10 Kit");
   });
 
-  it("TEST 4: both processing becomes 1 Kit/s", () => {
+  it("TEST 4: both processing becomes 1 Kit", () => {
     const orders = [
       makeOrder(),
       makeOrder({ id: "order-2", user_id: "user-raff", telegram_username_snapshot: "Raff" }),
@@ -390,10 +390,10 @@ describe("kit vial aggregation regressions", () => {
       [],
       selankKitContext(),
     );
-    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit");
   });
 
-  it("TEST 5: a single processing 10-vial share is 1 Kit/s", () => {
+  it("TEST 5: a single processing 10-vial share is 1 Kit", () => {
     const summary = buildProcessingOrderSummary(
       [makeOrder()],
       [makeItem({ quantity: 10, line_total_usd: 60 })],
@@ -402,10 +402,10 @@ describe("kit vial aggregation regressions", () => {
         participants: [{ kit_share_id: "kit-10", user_id: "user-pepsi", quantity: 10, order_id: "order-1" }],
       }),
     );
-    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit");
   });
 
-  it("TEST 6: two complete 10er kits are 2 Kit/s", () => {
+  it("TEST 6: two complete 10er kits are 2 Kits", () => {
     const orders = [makeOrder({ id: "a" }), makeOrder({ id: "b", order_number: "CN-2026-000033" })];
     const items = [
       makeItem({ id: "ia", order_id: "a", quantity: 10, line_total_usd: 60 }),
@@ -421,10 +421,10 @@ describe("kit vial aggregation regressions", () => {
         { kit_share_id: "kit-b", user_id: "user-pepsi", quantity: 10, order_id: "b" },
       ],
     };
-    expect(buildProcessingOrderSummary(orders, items, [], context).groups[0]?.lines[0]?.quantityLabel).toBe("2 Kit/s");
+    expect(buildProcessingOrderSummary(orders, items, [], context).groups[0]?.lines[0]?.quantityLabel).toBe("2 Kits");
   });
 
-  it("TEST 6b: 5+5+5+5 of the same kit identity is 2 Kit/s", () => {
+  it("TEST 6b: 5+5+5+5 of the same kit identity is 2 Kits", () => {
     const orders = ["a", "b", "c", "d"].map((id, index) =>
       makeOrder({ id, order_number: `CN-2026-00000${index}`, user_id: `user-${id}` }),
     );
@@ -442,7 +442,7 @@ describe("kit vial aggregation regressions", () => {
     };
     const summary = buildProcessingOrderSummary(orders, items, [], context);
     expect(summary.groups[0]?.lines).toHaveLength(1);
-    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("2 Kit/s");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("2 Kits");
   });
 
   it("TEST 7: different kit_share_id stay two 5/10 lines", () => {
@@ -467,8 +467,8 @@ describe("kit vial aggregation regressions", () => {
       context,
     );
     expect(summary.groups[0]?.lines).toHaveLength(2);
-    expect(summary.groups[0]?.lines.every((line) => line.quantityLabel === "5/10 Stück")).toBe(true);
-    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("1 Kit/s");
+    expect(summary.groups[0]?.lines.every((line) => line.quantityLabel === "5/10 Kit")).toBe(true);
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("1 Kit");
   });
 
   it("TEST 8: a normal product without kit identity stays 5+3=8", () => {
@@ -480,12 +480,12 @@ describe("kit vial aggregation regressions", () => {
     const summary = buildProcessingOrderSummary(orders, items);
     expect(summary.groups[0]?.lines).toHaveLength(1);
     expect(summary.groups[0]?.lines[0]?.quantity).toBe(8);
-    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("8");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("8 Kits");
     expect(summary.groups[0]?.lines[0]?.quantityLabel).not.toContain("Kit/s");
     expect(summary.groups[0]?.lines[0]?.quantityLabel).not.toContain("/");
   });
 
-  it("TEST 9: PDF MENGE uses the same 1 Kit/s label as the web summary", () => {
+  it("TEST 9: PDF MENGE uses the same 1 Kit label as the web summary", () => {
     const orders = [
       makeOrder(),
       makeOrder({ id: "order-2", order_number: "CN-2026-000035", user_id: "user-raff", telegram_username_snapshot: "Raff" }),
@@ -497,15 +497,15 @@ describe("kit vial aggregation regressions", () => {
       [{ id: "prod-selank", code: "SK10", name: "Selank", category: "PEPTIDES" }],
       selankKitContext(),
     );
-    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+    expect(summary.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit");
     const bytes = buildProcessingOrderSummaryPdf(summary, "now");
-    expect(pdfContainsAscii(bytes, "1 Kit/s")).toBe(true);
-    expect(pdfContainsAscii(bytes, "5 Kit/s")).toBe(false);
-    expect(pdfContainsAscii(bytes, "10 Kit/s")).toBe(false);
-    expect(summary.personLines.map((line) => `${line.name}|${line.quantityLabel}`)).toEqual(["PepsiDry, Raff|1 Kit/s"]);
+    expect(pdfContainsAscii(bytes, "1 Kit")).toBe(true);
+    expect(pdfContainsAscii(bytes, "5 Kits")).toBe(false);
+    expect(pdfContainsAscii(bytes, "10 Kits")).toBe(false);
+    expect(summary.personLines.map((line) => `${line.name}|${line.quantityLabel}`)).toEqual(["PepsiDry + Raff|1 Kit"]);
   });
 
-  it("keeps 15 vials of size 10 as 1 Kit/s plus 5/10 Stück", () => {
+  it("keeps 15 vials of size 10 as 1 Kit plus 5/10 Kit", () => {
     const orders = ["a", "b", "c"].map((id, index) =>
       makeOrder({ id, order_number: `CN-2026-00000${index}`, user_id: `user-${id}` }),
     );
@@ -522,7 +522,7 @@ describe("kit vial aggregation regressions", () => {
       })),
     };
     const summary = buildProcessingOrderSummary(orders, items, [], context);
-    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel).sort()).toEqual(["1 Kit/s", "5/10 Stück"]);
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel).sort()).toEqual(["1 Kit", "5/10 Kit"]);
     expect(summary.groups[0]?.lines.reduce((sum, line) => sum + line.totalUsd, 0)).toBe(90);
   });
 
@@ -542,7 +542,7 @@ describe("kit vial aggregation regressions", () => {
         ],
       },
     );
-    expect(twenty.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+    expect(twenty.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit");
 
     const thirty = buildProcessingOrderSummary(
       [makeOrder({ id: "a" }), makeOrder({ id: "b", order_number: "CN-2026-000033" })],
@@ -559,7 +559,7 @@ describe("kit vial aggregation regressions", () => {
         ],
       },
     );
-    expect(thirty.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit/s");
+    expect(thirty.groups[0]?.lines[0]?.quantityLabel).toBe("1 Kit");
   });
 
   it("does not treat Postgres numeric 5.000 as 5 kits, including two kits on one order", () => {
@@ -604,13 +604,13 @@ describe("kit vial aggregation regressions", () => {
     };
     const summary = buildProcessingOrderSummary(orders, items, [], context);
     expect(summary.groups[0]?.lines.map((line) => `${line.code} ${line.quantityLabel}`).sort()).toEqual([
-      "SK10 1 Kit/s",
-      "XA10 1 Kit/s",
+      "SK10 1 Kit",
+      "XA10 1 Kit",
     ]);
     expect(buildProcessingOrderSummary(orders, items, [], undefined).groups.length).toBeGreaterThan(0);
   });
 
-  it("LIVE 2026-09-03: Selank+Semax 5/10+5/10 on the same kit_share_id become 1 Kit/s each; TE300 stays 5", () => {
+  it("LIVE 2026-09-03: Selank+Semax 5/10+5/10 on the same kit_share_id become 1 Kit each; TE300 stays 5", () => {
     const order030 = makeOrder({
       id: "5539b116-bc33-4c63-9535-3a97cfe84dc4",
       order_number: "CW-2026-000030",
@@ -749,23 +749,23 @@ describe("kit vial aggregation regressions", () => {
       .find((group) => group.categoryId === "peptides")
       ?.lines.map((line) => `${line.code}|${line.quantityLabel}`)
       .sort();
-    expect(peptideLabels).toEqual(["2S10|1", "KP10|1", "NXA30|1", "SK10|1 Kit/s", "XA10|1 Kit/s"]);
-    expect(peptideLabels).not.toContain("SK10|5/10 Stück");
-    expect(peptideLabels).not.toContain("XA10|5/10 Stück");
-    expect(peptideLabels?.some((label) => label.includes("5 Kit/s"))).toBe(false);
+    expect(peptideLabels).toEqual(["2S10|1 Kit", "KP10|1 Kit", "NXA30|1 Kit", "SK10|1 Kit", "XA10|1 Kit"]);
+    expect(peptideLabels).not.toContain("SK10|5/10 Kit");
+    expect(peptideLabels).not.toContain("XA10|5/10 Kit");
+    expect(peptideLabels?.some((label) => label.includes("5 Kits"))).toBe(false);
     expect(bothProcessing.groups.find((group) => group.categoryId === "peptides")?.lines.find((line) => line.code === "SK10")).toMatchObject({
       name: "Selank",
       quantity: 1,
-      quantityLabel: "1 Kit/s",
+      quantityLabel: "1 Kit",
     });
     expect(bothProcessing.groups.find((group) => group.categoryId === "peptides")?.lines.find((line) => line.code === "XA10")).toMatchObject({
       name: "Semax",
       quantity: 1,
-      quantityLabel: "1 Kit/s",
+      quantityLabel: "1 Kit",
     });
     expect(bothProcessing.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]).toMatchObject({
       code: "TE300",
-      quantityLabel: "5",
+      quantityLabel: "5 Vials",
     });
     expect(
       bothProcessing.personLines
@@ -773,13 +773,13 @@ describe("kit vial aggregation regressions", () => {
         .map((line) => `${line.name}|${line.quantityLabel}|${line.article}`)
         .sort(),
     ).toEqual([
-      "Penbuddy, PepQueen|1 Kit/s|Selank",
-      "Penbuddy, PepQueen|1 Kit/s|Semax",
+      "Penbuddy + PepQueen|1 Kit|Selank",
+      "Penbuddy + PepQueen|1 Kit|Semax",
     ]);
     const pdf = buildProcessingOrderSummaryPdf(bothProcessing, "now");
-    expect(pdfContainsAscii(pdf, "1 Kit/s")).toBe(true);
-    expect(pdfContainsAscii(pdf, "5 Kit/s")).toBe(false);
-    expect(pdfContainsAscii(pdf, "5/10 Stück")).toBe(false);
+    expect(pdfContainsAscii(pdf, "1 Kit")).toBe(true);
+    expect(pdfContainsAscii(pdf, "5 Kits")).toBe(false);
+    expect(pdfContainsAscii(pdf, "5/10 Kit")).toBe(false);
     expect(pdfContainsAscii(pdf, "SK10")).toBe(true);
     expect(pdfContainsAscii(pdf, "XA10")).toBe(true);
     expect(pdfContainsAscii(pdf, "TE300")).toBe(true);
@@ -797,13 +797,13 @@ describe("kit vial aggregation regressions", () => {
         .find((group) => group.categoryId === "peptides")
         ?.lines.filter((line) => line.code === "SK10" || line.code === "XA10")
         .map((line) => line.quantityLabel),
-    ).toEqual(["5/10 Stück", "5/10 Stück"]);
+    ).toEqual(["5/10 Kit", "5/10 Kit"]);
     expect(
       only030.personLines
         .filter((line) => line.article === "Selank" || line.article === "Semax")
         .map((line) => `${line.name}|${line.quantityLabel}|${line.article}`)
         .sort(),
-    ).toEqual(["PepQueen|5/10|Selank", "PepQueen|5/10|Semax"]);
+    ).toEqual(["PepQueen|5/10 Kit|Selank", "PepQueen|5/10 Kit|Semax"]);
 
     const selankPanel = buildSharedKitsForOrder(order036.id, items.filter((item) => item.order_id === order036.id), [order030, order036], context);
     expect(selankPanel.map((view) => `${view.productCode}|${view.progressLabel}|${view.complete}`).sort()).toEqual([
@@ -813,7 +813,7 @@ describe("kit vial aggregation regressions", () => {
     expect(selankPanel[0]?.participants.map((p) => p.telegramLabel).sort()).toEqual(["Penbuddy", "PepQueen"]);
   });
 
-  it("still shows 1 Kit/s when both processing lines share a kit_share_id but one participant row is missing", () => {
+  it("still shows 1 Kit when both processing lines share a kit_share_id but one participant row is missing", () => {
     const order030 = makeOrder({
       id: "5539b116-bc33-4c63-9535-3a97cfe84dc4",
       order_number: "CW-2026-000030",
@@ -857,13 +857,13 @@ describe("kit vial aggregation regressions", () => {
       ],
     };
     const summary = buildProcessingOrderSummary([order030, order036], items, [], context);
-    expect(summary.groups[0]?.lines.map((line) => `${line.code}|${line.quantityLabel}`)).toEqual(["SK10|1 Kit/s"]);
-    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("5/10 Stück");
+    expect(summary.groups[0]?.lines.map((line) => `${line.code}|${line.quantityLabel}`)).toEqual(["SK10|1 Kit"]);
+    expect(summary.groups[0]?.lines.map((line) => line.quantityLabel)).not.toContain("5/10 Kit");
     expect(
       summary.personLines.map((line) => `${line.name}|${line.quantityLabel}|${line.article}`).sort(),
-    ).toEqual(["Penbuddy, PepQueen|1 Kit/s|Selank"]);
-    expect(pdfContainsAscii(buildProcessingOrderSummaryPdf(summary, "now"), "1 Kit/s")).toBe(true);
-    expect(pdfContainsAscii(buildProcessingOrderSummaryPdf(summary, "now"), "5/10 Stück")).toBe(false);
+    ).toEqual(["Penbuddy + PepQueen|1 Kit|Selank"]);
+    expect(pdfContainsAscii(buildProcessingOrderSummaryPdf(summary, "now"), "1 Kit")).toBe(true);
+    expect(pdfContainsAscii(buildProcessingOrderSummaryPdf(summary, "now"), "5/10 Kit")).toBe(false);
   });
 
   it("TEST oil: an open same-product kit membership does not turn TEST ENANTHATE 5 into a kit", () => {
@@ -874,32 +874,32 @@ describe("kit vial aggregation regressions", () => {
     };
     const summary = buildProcessingOrderSummary([order], [makeOilItem({ order_id: "order-34" })], oilCatalog, context);
     const oilLine = summary.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0];
-    expect(oilLine).toMatchObject({ code: "TE300", name: "TEST ENANTHATE", quantity: 5, quantityLabel: "5" });
-    expect(oilLine?.quantityLabel).not.toContain("Kit/s");
+    expect(oilLine).toMatchObject({ code: "TE300", name: "TEST ENANTHATE", quantity: 5, quantityLabel: "5 Vials" });
+    expect(oilLine?.quantityLabel).not.toContain("Kit");
     expect(oilLine?.quantityLabel).not.toContain("/");
-    expect(summary.personLines[0]?.quantityLabel).toBe("5x");
+    expect(summary.personLines[0]?.quantityLabel).toBe("5 Vials");
   });
 
-  it("TEST 1-3: normal peptide and injectable oil quantities stay plain numbers", () => {
+  it("TEST 1-3: peptide and injectable oil quantities use category units", () => {
     const peptide = buildProcessingOrderSummary(
       [makeOrder()],
       [makeItem({ quantity: 5, line_total_usd: 50 })],
     );
-    expect(peptide.groups[0]?.lines[0]?.quantityLabel).toBe("5");
+    expect(peptide.groups[0]?.lines[0]?.quantityLabel).toBe("5 Kits");
 
     const oilFive = buildProcessingOrderSummary(
       [makeOrder()],
       [makeOilItem({ quantity: 5 })],
       oilCatalog,
     );
-    expect(oilFive.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("5");
+    expect(oilFive.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("5 Vials");
 
     const oilTen = buildProcessingOrderSummary(
       [makeOrder()],
       [makeOilItem({ id: "oil-10", quantity: 10, line_total_usd: 170 })],
       oilCatalog,
     );
-    expect(oilTen.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("10");
+    expect(oilTen.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("10 Vials");
   });
 
   it("TEST 11: two different injectable oils aggregate as themselves", () => {
@@ -921,7 +921,7 @@ describe("kit vial aggregation regressions", () => {
       { id: "prod-tren", code: "R200", name: "Tren E", category: "INJECTABLES-OILS" },
     ]);
     const oils = summary.groups.find((group) => group.categoryId === "injectable-oils")?.lines ?? [];
-    expect(oils.map((line) => `${line.code} ${line.quantityLabel}`).sort()).toEqual(["R200 3", "TE300 5"]);
+    expect(oils.map((line) => `${line.code} ${line.quantityLabel}`).sort()).toEqual(["R200 3 Vials", "TE300 5 Vials"]);
   });
 
   it("TEST 12-14: PDF uses the same labels for a complete kit and a normal oil", () => {
@@ -936,18 +936,18 @@ describe("kit vial aggregation regressions", () => {
       makeOilItem({ order_id: "order-oil" }),
     ];
     const summary = buildProcessingOrderSummary(orders, items, oilCatalog, selankKitContext());
-    expect(summary.groups.find((group) => group.categoryId === "peptides")?.lines[0]?.quantityLabel).toBe("1 Kit/s");
-    expect(summary.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("5");
+    expect(summary.groups.find((group) => group.categoryId === "peptides")?.lines[0]?.quantityLabel).toBe("1 Kit");
+    expect(summary.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("5 Vials");
     const bytes = buildProcessingOrderSummaryPdf(summary, "now");
-    expect(pdfContainsAscii(bytes, "1 Kit/s")).toBe(true);
-    expect(pdfContainsAscii(bytes, "5 Kit/s")).toBe(false);
+    expect(pdfContainsAscii(bytes, "1 Kit")).toBe(true);
+    expect(pdfContainsAscii(bytes, "5 Kits")).toBe(false);
     expect(pdfContainsAscii(bytes, "TE300")).toBe(true);
     expect(summary.personLines.filter((line) => line.article === "Selank").map((line) => `${line.name}|${line.quantityLabel}|${line.article}`).sort()).toEqual([
-      "PepQueen, PepsiDry|1 Kit/s|Selank",
+      "PepQueen + PepsiDry|1 Kit|Selank",
     ]);
     expect(summary.personLines.find((line) => line.article === "TEST ENANTHATE")).toMatchObject({
       name: "OilUser",
-      quantityLabel: "5x",
+      quantityLabel: "5 Vials",
       article: "TEST ENANTHATE",
     });
   });
@@ -965,8 +965,8 @@ describe("kit vial aggregation regressions", () => {
         ],
       }),
     );
-    expect(summary.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("5");
-    expect(summary.groups.find((group) => group.categoryId === "peptides")?.lines[0]?.quantityLabel).toBe("5/10 Stück");
+    expect(summary.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0]?.quantityLabel).toBe("5 Vials");
+    expect(summary.groups.find((group) => group.categoryId === "peptides")?.lines[0]?.quantityLabel).toBe("5/10 Kit");
   });
 });
 
@@ -988,8 +988,8 @@ describe("admin shared kit participants", () => {
     expect(views[0]?.progressLabel).toBe("5/10 bestellt");
     expect(views[0]?.complete).toBe(false);
     expect(views[0]?.participants.map((participant) => `${participant.telegramLabel}|${participant.shareLabel}|${participant.statusLabel}|${participant.isCurrentOrder}`)).toEqual([
-      "PepsiDry|5/10|In Bearbeitung|true",
-      "Raff|5/10|Eingegangen|false",
+      "PepsiDry|5/10 Kit|In Bearbeitung|true",
+      "Raff|5/10 Kit|Eingegangen|false",
     ]);
   });
 

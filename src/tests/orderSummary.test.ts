@@ -276,9 +276,11 @@ describe("buildProcessingOrderSummary", () => {
       ],
     );
     expect(summary.personCount).toBe(1);
-    expect(summary.personLines.map((line) => `${line.name}|${line.quantityLabel}|${line.dose}|${line.article}`)).toEqual([
-      "Pasi|5x|10 mg|Retatrutid",
-      "Pasi|10x|5 mg|Retatrutid",
+    expect(
+      summary.personLines.map((line) => `${line.name}|${line.quantityLabel}|${line.dose}|${line.article}`),
+    ).toEqual([
+      "Pasi|5 Kits|10 mg|Retatrutid",
+      "Pasi|10 Kits|5 mg|Retatrutid",
     ]);
     expect(summary.customers.map((customer) => customer.orderNumber)).toEqual(["CN-2026-000033", "CN-2026-000034"]);
   });
@@ -312,7 +314,7 @@ describe("processing order summary PDF", () => {
     expect(html).toContain("NAME");
     expect(html).toContain("DOSIS");
     expect(html).toContain("PepsiDry");
-    expect(html).toContain("3x");
+    expect(html).toContain("3 Kits");
     expect(html).toContain("10 mg");
     expect(html).not.toContain("CurrentProfile");
     expect(html).not.toContain("display_name");

@@ -1,8 +1,9 @@
-import { formatDateTime, formatMoney, formatQuantity, formatUsd, GRAND_TOTAL_LABEL, SHIPPING_LABEL_CHINA, SHIPPING_LABEL_GERMANY, summarizeOrderCharges } from "@/lib/money";
+import { formatDateTime, formatMoney, formatUsd, GRAND_TOTAL_LABEL, SHIPPING_LABEL_CHINA, SHIPPING_LABEL_GERMANY, summarizeOrderCharges } from "@/lib/money";
 import { downloadCsv } from "@/services/csvProducts";
 import { ORDER_STATUS_LABELS } from "@/services/orders";
 import { BRAND_NAME } from "@/lib/constants";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
+import { formatOrderItemQuantity } from "@/lib/quantityFormat";
 import { formatShippingAddressLines, formatShippingRecipient, formatDeliveryMethodLabel, hasShippingSnapshot } from "@/lib/shippingAddress";
 import type { OrderStatus, Tables } from "@/types/database";
 
@@ -11,6 +12,7 @@ export interface OrderExportLine {
   product_name_snapshot: string;
   dosage_vial_snapshot: string | null;
   quantity: number;
+  quantityLabel: string;
   applied_price_tier: "normal" | "bulk";
   unit_price_usd_snapshot: number;
   line_total_usd: number;
@@ -77,7 +79,7 @@ export function buildOrderCsv(doc: OrderExportDoc): string {
       item.product_code_snapshot,
       item.product_name_snapshot,
       cartItemVariantSubtitle(item) ?? item.dosage_vial_snapshot ?? "",
-      formatQuantity(item.quantity),
+      item.quantityLabel,
       item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normalpreis",
       item.unit_price_usd_snapshot,
       item.line_total_usd,
@@ -208,7 +210,11 @@ export function buildAdminOrderItemsCsv(
       row.telegramUsername ?? "",
       row.productCode,
       row.productName,
-      formatQuantity(row.quantity),
+      formatOrderItemQuantity({
+        quantity: row.quantity,
+        product_name_snapshot: row.productName,
+        product_code_snapshot: row.productCode,
+      }),
       row.unitPriceUsd,
       row.lineTotalUsd,
       row.deliveryMethodLabel ?? "",
@@ -247,7 +253,7 @@ export function buildOrderPrintHtml(doc: OrderExportDoc): string {
           const variant = cartItemVariantSubtitle(item);
           return variant ? `<br><span class="muted">${escapeHtml(variant)}</span>` : "";
         })()}</td>
-        <td class="num">${escapeHtml(formatQuantity(item.quantity))}</td>
+        <td class="num">${escapeHtml(item.quantityLabel)}</td>
         <td class="num">${escapeHtml(formatUsd(item.unit_price_usd_snapshot))}</td>
         <td class="num">${escapeHtml(formatUsd(item.line_total_usd))}</td>
       </tr>`,
@@ -353,11 +359,12 @@ export function toOrderExportDoc(
   items: Tables<"order_items">[],
   customer?: { displayName: string; email: string | null },
   roleSurcharge?: { catalogSubtotalUsd: number; surchargeUsd: number } | null,
-  options?: { audience?: "admin" | "customer" },
+  options?: { audience?: "admin" | "customer"; kitSizes?: Map<string, number> },
 ): OrderExportDoc {
   const telegramUsername = order.telegram_username_snapshot?.trim() || undefined;
   const audience = options?.audience ?? "customer";
   const surchargeUnavailable = audience === "admin" && !roleSurcharge;
+  const kitSizes = options?.kitSizes;
   return {
     order_number: order.order_number,
     status: order.status,
@@ -379,6 +386,12 @@ export function toOrderExportDoc(
     catalogSubtotalUsd: roleSurcharge?.catalogSubtotalUsd ?? null,
     roleSurchargeUsd: roleSurcharge?.surchargeUsd ?? null,
     roleSurchargeUnavailable: surchargeUnavailable,
-    items,
+    items: items.map((item) => ({
+      ...item,
+      quantityLabel: formatOrderItemQuantity(
+        item,
+        item.product_id ? kitSizes?.get(item.product_id) ?? null : null,
+      ),
+    })),
   };
 }

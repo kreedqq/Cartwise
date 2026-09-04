@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, FileDown, Printer, RefreshCw, Star } from "lucide-react";
 
@@ -10,6 +11,9 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
+import { OrderProgressTracker } from "@/components/orders/OrderProgressTracker";
+import { useOrderProgress } from "@/hooks/useOrderProgress";
+import { resolveOrderProgress } from "@/lib/orderProgress";
 import { useMyOrder, useMyOrderStatusHistory } from "@/hooks/useOrders";
 import { useShopCart } from "@/hooks/useShopCart";
 import { useOrderTemplateMutations } from "@/hooks/useOrderTemplates";
@@ -17,7 +21,10 @@ import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { OrderShippingCard } from "@/components/orders/OrderShippingCard";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
-import { formatDateTime, formatEur, formatQuantity, formatUsd, summarizeOrderCharges } from "@/lib/money";
+import { formatDateTime, formatEur, formatUsd, summarizeOrderCharges } from "@/lib/money";
+import { formatOrderItemQuantity } from "@/lib/quantityFormat";
+import { listKitSizesForOrder } from "@/services/kitOrderContext";
+import { QUERY_KEYS } from "@/lib/constants";
 import { PAYMENT_METHOD_LABELS, isPaymentMethod } from "@/lib/shop/paymentMethod";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 import { ORDER_STATUS_LABELS, formatOrderTelegramSnapshot, orderItemsToBulkLines } from "@/services/orders";
@@ -28,6 +35,12 @@ export default function OrderDetailPage() {
   const navigate = useNavigate();
   const orderQuery = useMyOrder(orderId);
   const historyQuery = useMyOrderStatusHistory(orderId);
+  const kitSizesQuery = useQuery({
+    queryKey: QUERY_KEYS.orderKitSizes(orderId ?? ""),
+    queryFn: () => listKitSizesForOrder(orderId as string),
+    enabled: Boolean(orderId),
+  });
+  const progressQuery = useOrderProgress(orderId);
   const rateQuery = useExchangeRate();
   const { addManyToActiveCart } = useShopCart();
   const templates = useOrderTemplateMutations();
@@ -43,6 +56,13 @@ export default function OrderDetailPage() {
   }
 
   const order = orderQuery.data;
+  const kitSizes = kitSizesQuery.data;
+
+  function itemKitSize(item: (typeof order.items)[number]) {
+    return item.product_id ? kitSizes?.get(item.product_id) ?? null : null;
+  }
+
+  const exportDoc = toOrderExportDoc(order, order.items, undefined, null, { audience: "customer", kitSizes });
 
   async function handleReorder() {
     setReordering(true);
@@ -99,14 +119,18 @@ export default function OrderDetailPage() {
         <OrderStatusBadge status={order.status} />
       </div>
 
+      <OrderProgressTracker
+        progress={resolveOrderProgress(order.status, progressQuery.data, order.submitted_at)}
+      />
+
       <div className="flex flex-wrap gap-2">
         <Button variant="outline" size="sm" onClick={handleReorder} loading={reordering}>
           <RefreshCw /> Erneut bestellen
         </Button>
-        <Button variant="outline" size="sm" onClick={() => printOrderDocument(toOrderExportDoc(order, order.items))}>
+        <Button variant="outline" size="sm" onClick={() => printOrderDocument(exportDoc)}>
           <Printer /> Als PDF
         </Button>
-        <Button variant="outline" size="sm" onClick={() => downloadOrderCsv(toOrderExportDoc(order, order.items))}>
+        <Button variant="outline" size="sm" onClick={() => downloadOrderCsv(exportDoc)}>
           <FileDown /> CSV
         </Button>
       </div>
@@ -135,7 +159,9 @@ export default function OrderDetailPage() {
                       <p className="text-xs text-muted-foreground">{cartItemVariantSubtitle(item)}</p>
                     )}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">{formatQuantity(item.quantity)}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {formatOrderItemQuantity(item, itemKitSize(item))}
+                  </TableCell>
                   <TableCell className="hidden sm:table-cell text-xs">
                     {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normalpreis"}
                   </TableCell>

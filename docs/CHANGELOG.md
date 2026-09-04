@@ -2,6 +2,23 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-04 (global quantity labels + Bestellfortschritt)
+
+### Added
+
+- Central quantity domain `src/lib/quantityFormat.ts` used by shop, cart, checkout, orders, admin, kits, and PDF.
+- Admin-controlled visual order progress (`order_progress`, RPC `upsert_order_progress`) with a customer tracker. Distinct from the existing `orders.status` workflow dropdown.
+
+### Changed
+
+- Peptide / reconstitution water quantities: `1 Kit`, `2 Kits`, `5/10 Kit`; a filled 10er kit is `1 Kit`.
+- Injectable oils without a kit link: `5 Vials`. Orals: `Packung` / `Packungen`.
+- Complete shared kits in BESTELLUNGEN / PDF page 4: one row with names joined by ` + ` and `1 Kit`. Participants and Geteiltes Kit still show each share.
+
+### Notes
+
+- Migration `0049_order_progress.sql`. Customers SELECT only their own order; writes are admin-only (`has_role` + SECURITY DEFINER). Existing orders stay valid without a progress row.
+
 ## 2026-09-04 (BESTELLUNGEN complete kit is 1 Kit/s)
 
 ### Fixed

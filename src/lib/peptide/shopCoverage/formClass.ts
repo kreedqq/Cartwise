@@ -86,6 +86,7 @@ const ORAL_SLUGS = new Set([
   "stanozolol-oral",
   "oxandrolone",
   "yk11",
+  "slu-pp-332",
   "methylstenbolone",
 ]);
 
@@ -138,6 +139,16 @@ export function isOpaqueCatalogName(name: string): boolean {
 
 export function isExactCatalogName(name: string): boolean {
   return catalogNamesForSlug(familySlugForCatalogName(name)).length > 0;
+}
+
+export function isInjectableOilCatalogName(name: string): boolean {
+  if (isReconstitutionWaterName(name)) return false;
+  const slug = familySlugForCatalogName(name);
+  return OIL_SLUGS.has(slug) || OIL_BLEND_SLUGS.has(slug);
+}
+
+export function isOralCatalogName(name: string): boolean {
+  return ORAL_SLUGS.has(familySlugForCatalogName(name));
 }
 
 export function coverageCategoryForName(name: string): ShopCoverageCategory {

@@ -6,7 +6,7 @@ export function SharedKitAdminCard({ kit }: { kit: SharedKitAdminView }) {
     <div className="space-y-3 px-4 py-4">
       <div>
         <p className="text-sm font-semibold">{kit.productName}</p>
-        <p className="text-xs text-muted-foreground">Kit Größe: {kit.kitSize} Stück</p>
+        <p className="text-xs text-muted-foreground">Kit Größe: {kit.kitSizeLabel}</p>
       </div>
       <div className="space-y-2">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Teilnehmer</p>

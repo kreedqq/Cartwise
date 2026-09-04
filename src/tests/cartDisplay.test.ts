@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   cartItemDisplayName,
+  cartItemQuantityLabel,
   cartItemVariantSubtitle,
   isKitShareCartItem,
 } from "@/lib/shop/cartDisplay";
@@ -17,8 +18,8 @@ describe("cartDisplay", () => {
     });
 
     expect(subtitle).toContain("Kit Anteil");
-    expect(subtitle).toContain("7 Vials");
-    expect(subtitle).toContain("Gemeinsames 10-Vial-Kit");
+    expect(subtitle).toContain("7/10 Kit");
+    expect(subtitle).toContain("Gemeinsames 10er Kit");
     expect(isKitShareCartItem({
       product_name_snapshot: "Retatrutide",
       product_code_snapshot: "20RT",
@@ -45,6 +46,46 @@ describe("cartDisplay", () => {
         kit_share_id: null,
       }),
     ).toBe(false);
+  });
+
+  it("formats cart quantities from the shared quantity domain", () => {
+    expect(
+      cartItemQuantityLabel({
+        product_name_snapshot: "Selank",
+        product_code_snapshot: "SK10",
+        quantity: 2,
+      }),
+    ).toBe("2 Kits");
+    expect(
+      cartItemQuantityLabel({
+        product_name_snapshot: "TEST ENANTHATE",
+        product_code_snapshot: "TE300",
+        quantity: 5,
+      }),
+    ).toBe("5 Vials");
+    expect(
+      cartItemQuantityLabel({
+        product_name_snapshot: "ANADROL",
+        product_code_snapshot: "OXO50",
+        quantity: 5,
+      }),
+    ).toBe("5 Packungen");
+    expect(
+      cartItemQuantityLabel({
+        product_name_snapshot: "BAC Water",
+        product_code_snapshot: "BA10",
+        quantity: 1,
+      }),
+    ).toBe("1 Kit");
+    expect(
+      cartItemQuantityLabel({
+        product_name_snapshot: "Selank",
+        product_code_snapshot: "SK10",
+        quantity: 5,
+        kit_share_id: "kit-1",
+        note: "Gemeinsames 10-Vial-Kit",
+      }),
+    ).toBe("5/10 Kit");
   });
 
   it("normalizes product display names", () => {

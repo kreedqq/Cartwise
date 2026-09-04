@@ -19,11 +19,13 @@ import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { OrderShippingDetails } from "@/components/orders/OrderShippingCard";
 import { SharedKitAdminCard } from "@/components/orders/SharedKitAdminCard";
+import { AdminOrderProgressEditor } from "@/components/orders/AdminOrderProgressEditor";
 import { useAdminOrder, useDeleteOrder, useOrderAdminNote, useOrderStatusHistory, useSetOrderStatus } from "@/hooks/useOrders";
 import { useAdminKitOrderContext, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
-import { buildSharedKitsForOrder } from "@/lib/kitOrderSummary";
+import { buildSharedKitsForOrder, kitSizeForOrderItem } from "@/lib/kitOrderSummary";
 import { formatDateTime, formatQuantity, formatRate, formatUsd, summarizeOrderCharges } from "@/lib/money";
+import { formatOrderItemQuantity } from "@/lib/quantityFormat";
 import { orderRoleSurchargeFromSnapshots } from "@/lib/roleSurcharge";
 import { QUERY_KEYS } from "@/lib/constants";
 import { canPermanentlyDeleteOrder, formatOrderTelegramSnapshot, ORDER_STATUS_LABELS } from "@/services/orders";
@@ -68,6 +70,15 @@ export default function AdminOrderDetailPage() {
     kitQuery.data && ordersQuery.data
       ? buildSharedKitsForOrder(order.id, order.items, ordersQuery.data, kitQuery.data)
       : [];
+  const kitSizes = (() => {
+    const map = new Map<string, number>();
+    if (!kitQuery.data) return map;
+    for (const item of order.items) {
+      const size = kitSizeForOrderItem(item, order, kitQuery.data);
+      if (size && item.product_id) map.set(item.product_id, size);
+    }
+    return map;
+  })();
   const roleSurcharge =
     surchargeQuery.data &&
     order.items.length > 0 &&
@@ -82,7 +93,7 @@ export default function AdminOrderDetailPage() {
       email: customer?.email ?? null,
     },
     roleSurcharge,
-    { audience: "admin" },
+    { audience: "admin", kitSizes },
   );
 
   async function applyStatus(status: OrderStatus) {
@@ -192,7 +203,10 @@ export default function AdminOrderDetailPage() {
                     )}
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-sm">
-                    {formatQuantity(item.quantity)}
+                    {formatOrderItemQuantity(
+                      item,
+                      kitQuery.data ? kitSizeForOrderItem(item, order, kitQuery.data) : null,
+                    )}
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-sm">
                     {formatUsd(item.normal_price_usd_snapshot)}
@@ -226,6 +240,15 @@ export default function AdminOrderDetailPage() {
             <SharedKitAdminCard kit={kit} />
           </AdminSection>
         ))}
+
+      <AdminSection title="Bestellfortschritt">
+        <AdminOrderProgressEditor
+          key={order.id}
+          orderId={order.id}
+          orderStatus={order.status}
+          submittedAt={order.submitted_at}
+        />
+      </AdminSection>
 
       {/* Charges + note */}
       <div className="grid gap-4 lg:grid-cols-2">

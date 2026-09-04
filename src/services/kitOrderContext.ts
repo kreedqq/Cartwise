@@ -88,3 +88,31 @@ export async function listAdminKitOrderContext(): Promise<KitShareOrderContext> 
 
   return { kits, participants, cartLinks, usernamesByUserId };
 }
+
+/**
+ * Kit sizes for items on one order. Uses participant rows with this order_id only.
+ * Does not return other customers' names or shares.
+ */
+export async function listKitSizesForOrder(orderId: string): Promise<Map<string, number>> {
+  const { data: parts, error: partsError } = await supabase
+    .from("kit_share_participants")
+    .select("kit_share_id")
+    .eq("order_id", orderId);
+  if (partsError) throw partsError;
+
+  const kitIds = [...new Set((parts ?? []).map((row) => row.kit_share_id).filter(Boolean))];
+  if (kitIds.length === 0) return new Map();
+
+  const { data: kits, error: kitsError } = await supabase
+    .from("kit_shares")
+    .select("id, product_id, kit_size_vials")
+    .in("id", kitIds);
+  if (kitsError) throw kitsError;
+
+  const sizes = new Map<string, number>();
+  for (const kit of kits ?? []) {
+    const size = readNumber(asRecord(kit) ?? {}, "kit_size_vials");
+    if (kit.product_id && size > 0) sizes.set(kit.product_id, size);
+  }
+  return sizes;
+}

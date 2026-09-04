@@ -24,7 +24,7 @@ import { useCreateKitRequest } from "@/hooks/useKitRequests";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { isValidCreatorQuantity } from "@/lib/kitRequests";
 import { groupAndSortShopProducts } from "@/lib/shop/display";
-import { KIT_SIZE_OPTIONS, formatKitQuantity, kitQuantityUnitLabel } from "@/lib/shop/kitUnits";
+import { KIT_SIZE_OPTIONS, formatKitQuantity, formatKitSizeOption, kitCategoryIdFor } from "@/lib/shop/kitUnits";
 import { formatProductVariant, kitShareableVariants } from "@/lib/shop/variantCoverage";
 import type { Tables } from "@/types/database";
 
@@ -54,7 +54,7 @@ export function CreateKitRequestDialog({ open, onOpenChange }: CreateKitRequestD
     [selectedGroup],
   );
   const selectedProduct = variants.find((v) => v.id === productId) as Tables<"products"> | undefined;
-  const unit = kitQuantityUnitLabel(selectedProduct ?? { category: "PEPTIDES" });
+  const categoryId = kitCategoryIdFor(selectedProduct ?? { category: "PEPTIDES" });
   const maxCreatorQty = Math.max(1, kitSize - 1);
   const creatorQuantity = Math.min(myQuantity, maxCreatorQty);
 
@@ -164,7 +164,7 @@ export function CreateKitRequestDialog({ open, onOpenChange }: CreateKitRequestD
                 <SelectContent>
                   {KIT_SIZE_OPTIONS.map((size) => (
                     <SelectItem key={size} value={String(size)}>
-                      {formatKitQuantity(size, unit)}
+                      {formatKitSizeOption(size, categoryId)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -179,7 +179,7 @@ export function CreateKitRequestDialog({ open, onOpenChange }: CreateKitRequestD
                 <SelectContent>
                   {Array.from({ length: maxCreatorQty }, (_, i) => i + 1).map((qty) => (
                     <SelectItem key={qty} value={String(qty)}>
-                      {formatKitQuantity(qty, unit)}
+                      {formatKitQuantity(qty, categoryId, kitSize)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -188,7 +188,7 @@ export function CreateKitRequestDialog({ open, onOpenChange }: CreateKitRequestD
           </div>
 
           <p className="text-sm text-muted-foreground">
-            Gesucht: {formatKitQuantity(kitSize - creatorQuantity, unit)}
+            Gesucht: {formatKitQuantity(kitSize - creatorQuantity, categoryId, kitSize)}
           </p>
 
           <div className="space-y-2">

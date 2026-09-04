@@ -9,6 +9,7 @@ import {
   splitKitProgress,
   type KitShareOrderContext,
 } from "@/lib/kitOrderSummary";
+import { formatCatalogQuantity } from "@/lib/quantityFormat";
 import { normalizeProductCode, roundCurrency } from "@/lib/money";
 import { SHOP_CATEGORIES, shopCategoryIdFor, type ShopCategoryId } from "@/lib/shopCategories";
 import {
@@ -41,7 +42,7 @@ export interface OrderSummaryLine {
   code: string;
   name: string;
   quantity: number;
-  /** Merchant quantity shown as-is, e.g. `5/10 Stück` or `1 Kit/s`. */
+  /** Merchant quantity shown as-is, e.g. `5/10 Kit` or `1 Kit`. */
   quantityLabel: string;
   totalUsd: number;
   categoryId: ShopCategoryId;
@@ -153,8 +154,8 @@ function resolveKitContext(kitContext?: KitShareOrderContext | null): KitShareOr
   return kitContext;
 }
 
-function formatPlainQuantityLabel(quantity: number): string {
-  return String(asQuantity(quantity));
+function formatPlainQuantityLabel(quantity: number, categoryId: ShopCategoryId): string {
+  return formatCatalogQuantity(quantity, categoryId);
 }
 
 function allocateStoredKitTotals(
@@ -172,8 +173,8 @@ function allocateStoredKitTotals(
   return { completeUsd, remainderUsd: roundCurrency(totalUsd - completeUsd) };
 }
 
-function formatPersonQuantityLabel(quantity: number): string {
-  return `${asQuantity(quantity)}x`;
+function formatPersonQuantityLabel(quantity: number, categoryId: ShopCategoryId): string {
+  return formatCatalogQuantity(quantity, categoryId);
 }
 
 const DOSE_UNAVAILABLE = "Nicht verfügbar";
@@ -208,12 +209,12 @@ function personSortKey(name: string): string {
 function mergePersonNames(current: string, next: string): string {
   const names = new Set(
     current
-      .split(", ")
+      .split(/\s*\+\s*|,\s*/)
       .map((name) => name.trim())
       .filter(Boolean),
   );
   if (next.trim()) names.add(next.trim());
-  return [...names].sort((a, b) => personSortKey(a).localeCompare(personSortKey(b), "de")).join(", ");
+  return [...names].sort((a, b) => personSortKey(a).localeCompare(personSortKey(b), "de")).join(" + ");
 }
 
 function isKitFullyComplete(progress: { completeKits: number; remainderVials: number } | undefined): boolean {
@@ -303,7 +304,7 @@ export function buildProcessingOrderSummary(
     const existing = merged.get(key);
     if (existing) {
       existing.quantity += quantity;
-      existing.quantityLabel = formatPlainQuantityLabel(existing.quantity);
+      existing.quantityLabel = formatPlainQuantityLabel(existing.quantity, existing.categoryId);
       existing.totalUsd = roundCurrency(existing.totalUsd + Number(item.line_total_usd));
       continue;
     }
@@ -311,7 +312,7 @@ export function buildProcessingOrderSummary(
       code,
       name,
       quantity,
-      quantityLabel: formatPlainQuantityLabel(quantity),
+      quantityLabel: formatPlainQuantityLabel(quantity, categoryId),
       totalUsd: roundCurrency(Number(item.line_total_usd)),
       categoryId,
     });
@@ -322,6 +323,7 @@ export function buildProcessingOrderSummary(
     completeKits: number,
     completeUsd: number,
     kitShareId: string,
+    kitSize: number,
   ) {
     if (completeKits <= 0) return;
     const { code, name, categoryId } = lineMeta(first);
@@ -329,7 +331,7 @@ export function buildProcessingOrderSummary(
     const existing = merged.get(key);
     if (existing) {
       existing.quantity += completeKits;
-      existing.quantityLabel = formatCompleteKitQuantityLabel(existing.quantity);
+      existing.quantityLabel = formatCompleteKitQuantityLabel(existing.quantity, existing.categoryId, kitSize);
       existing.totalUsd = roundCurrency(existing.totalUsd + completeUsd);
       return;
     }
@@ -337,7 +339,7 @@ export function buildProcessingOrderSummary(
       code,
       name,
       quantity: completeKits,
-      quantityLabel: formatCompleteKitQuantityLabel(completeKits),
+      quantityLabel: formatCompleteKitQuantityLabel(completeKits, categoryId, kitSize),
       totalUsd: completeUsd,
       categoryId,
       kitShareId,
@@ -358,13 +360,13 @@ export function buildProcessingOrderSummary(
       remainderVials,
       progress.kitSize,
     );
-    addCompleteKits(first, completeKits, completeUsd, kitShareId);
+    addCompleteKits(first, completeKits, completeUsd, kitShareId, progress.kitSize);
     if (remainderVials > 0) {
       merged.set(`kit-share:${kitShareId}`, {
         code,
         name,
         quantity: remainderVials,
-        quantityLabel: formatSharedKitQuantityLabel(remainderVials, progress.kitSize),
+        quantityLabel: formatSharedKitQuantityLabel(remainderVials, progress.kitSize, categoryId),
         totalUsd: remainderUsd,
         categoryId,
         kitShareId,
@@ -390,16 +392,14 @@ export function buildProcessingOrderSummary(
         const code = (item.product_code_snapshot ?? "").trim() || "—";
         const name = (item.product_name_snapshot ?? "").trim() || "Nicht verfügbar";
         const quantity = asQuantity(item.quantity);
-        const kitFullyComplete = isKitFullyComplete(progress);
+        const { categoryId } = lineMeta(item);
         const quantityLabel = progress
-          ? kitFullyComplete
-            ? formatCompleteKitQuantityLabel(1)
-            : formatSharedKitShareLabel(quantity, progress.kitSize)
-          : formatPlainQuantityLabel(quantity);
+          ? formatSharedKitShareLabel(quantity, progress.kitSize, categoryId)
+          : formatPlainQuantityLabel(quantity, categoryId);
         const existing = lineMap.get(lineKey);
         if (existing && !kitShareId) {
           existing.quantity += quantity;
-          existing.quantityLabel = formatPlainQuantityLabel(existing.quantity);
+          existing.quantityLabel = formatPlainQuantityLabel(existing.quantity, categoryId);
           continue;
         }
         if (existing) continue;
@@ -441,9 +441,10 @@ export function buildProcessingOrderSummary(
         : `${personKey}|${productMergeKey(item)}|${dose}`;
       const existing = personMap.get(mergeKey);
       const quantity = asQuantity(item.quantity);
+      const { categoryId } = lineMeta(item);
       if (existing && !kitShareId) {
         existing.quantity += quantity;
-        existing.quantityLabel = formatPersonQuantityLabel(existing.quantity);
+        existing.quantityLabel = formatPersonQuantityLabel(existing.quantity, categoryId);
         continue;
       }
       if (existing && kitFullyComplete) {
@@ -456,9 +457,9 @@ export function buildProcessingOrderSummary(
         quantity: kitFullyComplete && progress ? progress.completeKits : quantity,
         quantityLabel: progress
           ? kitFullyComplete
-            ? formatCompleteKitQuantityLabel(progress.completeKits)
-            : formatSharedKitShareLabel(quantity, progress.kitSize)
-          : formatPersonQuantityLabel(quantity),
+            ? formatCompleteKitQuantityLabel(progress.completeKits, categoryId, progress.kitSize)
+            : formatSharedKitShareLabel(quantity, progress.kitSize, categoryId)
+          : formatPersonQuantityLabel(quantity, categoryId),
         dose,
         article,
         code,

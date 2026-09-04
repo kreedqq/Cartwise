@@ -45,6 +45,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] BESTELLUNGEN / PDF page 4 show a complete shared kit as one `1 Kit/s` row; `5/10` only for incomplete shares
 - [x] Merchant complete-kit count uses processing `order_items` grouped by `kit_share_id` (not only participant rows) so 5+5 of one share is `1 Kit/s`
 - [x] Live production proof: SK10 kit `42235edd-…` and XA10 kit `d3f1c575-…`, PepQueen 030 + Penbuddy 036, 5+5 processing → merchant `1 Kit/s` each (replay test; no formula change)
+- [x] Global quantity labels via `quantityFormat` (Kit / Vials / Packungen) plus admin-controlled Bestellfortschritt (`0049`)
 - [x] Kit formatting only when the order line is linked via participant `order_id` or same-product cart `kit_share_id` (open kit membership is not enough; oils stay plain qty)
 - [x] Admin Bestell Zusammenfassung for processing orders + six-status dropdown (migration `0047`)
 - [x] Merge Benutzer + Rollen & Preisaufschlag; per-user username-required login gate; admin account delete without destroying historical orders (migration `0046`)

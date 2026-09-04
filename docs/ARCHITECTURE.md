@@ -64,7 +64,7 @@ Defined in `supabase/migrations/` (0001–0031 in Git; **live `cartwise-prod` is
 
 **Cart:** `carts`, `cart_items` (version/optimistic lock, `price_tier` bulk/normal). View `cart_summaries`.
 
-**Orders:** `orders` (telegram username + Lieferart + address snapshots from checkout; `0042`/`0045`), `order_items`, `order_status_history`, `order_admin_notes`. Status workflow (`0047`): pending, processing, dispatched, received, shipped, completed; historical confirmed/cancelled remain valid. Shipping cost fields (China/DE) from 0020+. `create_order` validates payment, Lieferart, and the matching address fields server-side. Admin Bestell Zusammenfassung aggregates processing `order_items` by SKU.
+**Orders:** `orders` (telegram username + Lieferart + address snapshots from checkout; `0042`/`0045`), `order_items`, `order_status_history`, `order_admin_notes`. Status workflow (`0047`): pending, processing, dispatched, received, shipped, completed; historical confirmed/cancelled remain valid. Visual delivery progress is `order_progress` (`0049`): one row per order (`status_key`, `progress_percent`, `comment`); customers read only their own order; upserts go through admin-only `upsert_order_progress`. Shipping cost fields (China/DE) from 0020+. `create_order` validates payment, Lieferart, and the matching address fields server-side. Admin Bestell Zusammenfassung aggregates processing `order_items` by SKU. Quantity labels for shop, cart, orders, and PDF come from `src/lib/quantityFormat.ts` (Kit/Kits, Vial/Vials, Packung/Packungen; kit fractions only with a real `kit_share` identity).
 
 **Customers:** `customer_roles`, `user_customer_roles`.
 

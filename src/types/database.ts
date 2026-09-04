@@ -429,6 +429,26 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["order_admin_notes"]["Row"]>;
         Relationships: never[];
       };
+      order_progress: {
+        Row: {
+          order_id: string;
+          status_key: string;
+          progress_percent: number;
+          comment: string | null;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          order_id: string;
+          status_key: string;
+          progress_percent: number;
+          comment?: string | null;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["order_progress"]["Row"]>;
+        Relationships: never[];
+      };
       order_templates: {
         Row: {
           id: string;
@@ -1283,6 +1303,15 @@ export interface Database {
       set_order_status: {
         Args: { _order_id: string; _status: OrderStatus; _admin_note: string | null };
         Returns: Database["public"]["Tables"]["orders"]["Row"];
+      };
+      upsert_order_progress: {
+        Args: {
+          _order_id: string;
+          _status_key: string;
+          _progress_percent: number;
+          _comment: string | null;
+        };
+        Returns: Database["public"]["Tables"]["order_progress"]["Row"];
       };
       list_shop_products: { Args: Record<string, never>; Returns: Database["public"]["Tables"]["products"]["Row"][] };
       get_shop_product_by_code: {

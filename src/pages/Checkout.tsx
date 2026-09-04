@@ -34,7 +34,7 @@ import {
   type DeliveryMethod,
 } from "@/lib/shippingAddress";
 import { toast } from "@/components/ui/toaster";
-import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
+import { cartItemDisplayName, cartItemQuantityLabel, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 
 export default function CheckoutPage() {
   const { cartId } = useParams<{ cartId: string }>();
@@ -222,7 +222,7 @@ export default function CheckoutPage() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">{item.quantity}</TableCell>
+                      <TableCell className="text-right tabular-nums">{cartItemQuantityLabel(item)}</TableCell>
                       <TableCell className="text-right tabular-nums">{formatUsd(item.unit_price_usd_snapshot)}</TableCell>
                       <TableCell className="hidden sm:table-cell">
                         <Badge variant={item.applied_price_tier === "bulk" ? "default" : "secondary"}>

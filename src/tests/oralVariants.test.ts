@@ -162,7 +162,7 @@ describe("oral variant in cart and kit share display", () => {
       dosage_vial_snapshot: "5mg x 100tablets",
     });
     expect(subtitle).toContain("5 mg × 100 Tabletten");
-    expect(subtitle).toContain("6 Stück");
+    expect(subtitle).toContain("6/10 Packung");
     expect(subtitle).toContain("Kit Anteil");
   });
 

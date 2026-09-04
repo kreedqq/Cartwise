@@ -3,7 +3,7 @@ import {
   kitRequestProgressPercent,
   kitRequestStatusLabel,
 } from "@/lib/kitRequests";
-import { formatKitQuantity, kitQuantityUnitLabelForCategory } from "@/lib/shop/kitUnits";
+import { formatKitQuantity } from "@/lib/shop/kitUnits";
 import type { ShopCategoryId } from "@/lib/shopCategories";
 import { isShopCategoryId } from "@/lib/shopCategories";
 import { Badge } from "@/components/ui/badge";
@@ -19,11 +19,8 @@ function statusVariant(status: KitRequestCard["status"]): "default" | "success" 
   return "secondary";
 }
 
-function categoryUnit(category: string): "Vials" | "Stück" {
-  if (isShopCategoryId(category)) {
-    return kitQuantityUnitLabelForCategory(category as ShopCategoryId);
-  }
-  return "Vials";
+function requestCategoryId(category: string): ShopCategoryId {
+  return isShopCategoryId(category) ? category : "peptides";
 }
 
 function formatCreatedAt(value: string): string {
@@ -50,7 +47,7 @@ export function KitRequestCardView({
   onRetryCart,
   joining,
 }: KitRequestCardViewProps) {
-  const unit = categoryUnit(request.category);
+  const categoryId = requestCategoryId(request.category);
   const percent = kitRequestProgressPercent(request.allocatedTotal, request.kitSizeVials);
   const canJoin =
     request.status === "open" && !request.isCreator && !request.isParticipant && request.remainingVials > 0;
@@ -76,7 +73,7 @@ export function KitRequestCardView({
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2 text-sm">
             <span className="font-medium">
-              {formatKitQuantity(request.allocatedTotal, unit)} / {request.kitSizeVials}
+              {formatKitQuantity(request.allocatedTotal, categoryId, request.kitSizeVials)}
             </span>
             <span className="text-muted-foreground">{percent} %</span>
           </div>
@@ -91,22 +88,22 @@ export function KitRequestCardView({
             />
           </div>
           <p className="text-sm text-muted-foreground">
-            {request.creatorQuantity} von {request.kitSizeVials} {unit} bereits vom Ersteller
+            {request.creatorQuantity} von {request.kitSizeVials} bereits vom Ersteller
           </p>
           {request.status === "open" ? (
-            <p className="text-sm">Noch {formatKitQuantity(request.remainingVials, unit)}</p>
+            <p className="text-sm">Noch {formatKitQuantity(request.remainingVials, categoryId, request.kitSizeVials)}</p>
           ) : null}
         </div>
 
         {request.myUnitPriceUsd != null ? (
-          <p className="text-base font-semibold">{formatUsd(request.myUnitPriceUsd)} / {unit === "Stück" ? "Stück" : "Vial"}</p>
+          <p className="text-base font-semibold">{formatUsd(request.myUnitPriceUsd)} / Anteil</p>
         ) : null}
 
         {request.isParticipant && !request.isCreator ? (
           <p className="text-sm text-primary">
-            Du bist mit {formatKitQuantity(request.myQuantity, unit)} dabei.
+            Du bist mit {formatKitQuantity(request.myQuantity, categoryId, request.kitSizeVials)} dabei.
             {request.status === "open" && request.remainingVials > 0
-              ? ` Es werden noch ${formatKitQuantity(request.remainingVials, unit)} benötigt.`
+              ? ` Es werden noch ${formatKitQuantity(request.remainingVials, categoryId, request.kitSizeVials)} benötigt.`
               : null}
             {request.status === "full" ? " Kit vollständig." : null}
           </p>

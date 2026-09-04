@@ -32,8 +32,9 @@ import {
 } from "@/lib/shop/kitShare";
 import {
   formatKitQuantity,
+  formatKitSizeOption,
   KIT_SIZE_OPTIONS,
-  kitQuantityUnitLabel,
+  kitCategoryIdFor,
 } from "@/lib/shop/kitUnits";
 import {
   kitShareableVariants,
@@ -111,7 +112,7 @@ export function KitShareDialog({
   );
   const product = shareableVariants.find((variant) => variant.id === selectedVariantId) ?? null;
   const hasMultipleShareableVariants = shareableVariants.length > 1;
-  const unitLabel = product ? kitQuantityUnitLabel(product) : "Vials";
+  const categoryId = product ? kitCategoryIdFor(product) : "peptides";
 
   const [selectedKitSize, setSelectedKitSize] = React.useState(String(KIT_SIZE_OPTIONS[0]));
   const kitSize = Number(selectedKitSize) || KIT_SIZE_OPTIONS[0];
@@ -422,7 +423,7 @@ export function KitShareDialog({
               <p className="text-xs text-muted-foreground">Kitgröße</p>
               {kitView ? (
                 <p className="font-medium">
-                  {activeKitSize} {unitLabel}
+                  {formatKitSizeOption(activeKitSize, categoryId)}
                 </p>
               ) : (
                 <Select value={selectedKitSize} onValueChange={setSelectedKitSize} disabled={busy || variantMissing}>
@@ -432,7 +433,7 @@ export function KitShareDialog({
                   <SelectContent>
                     {KIT_SIZE_OPTIONS.map((size) => (
                       <SelectItem key={size} value={String(size)}>
-                        {size} {unitLabel}
+                        {formatKitSizeOption(size, categoryId)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -461,7 +462,7 @@ export function KitShareDialog({
                 <SelectContent>
                   {quantityOptions.map((qty) => (
                     <SelectItem key={qty} value={String(qty)}>
-                      {formatKitQuantity(qty, unitLabel)}
+                      {formatKitQuantity(qty, categoryId, activeKitSize)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -489,7 +490,7 @@ export function KitShareDialog({
                   <SelectContent>
                     {quantityOptions.map((qty) => (
                       <SelectItem key={qty} value={String(qty)}>
-                        {formatKitQuantity(qty, unitLabel)}
+                        {formatKitQuantity(qty, categoryId, activeKitSize)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -569,7 +570,7 @@ export function KitShareDialog({
                       )}
                     </span>
                     <div className="flex items-center gap-1.5">
-                      <span>{formatKitQuantity(p.quantity, unitLabel)}</span>
+                      <span>{formatKitQuantity(p.quantity, categoryId, activeKitSize)}</span>
                       {isCreator &&
                         !p.isSelf &&
                         p.userId &&
@@ -594,13 +595,13 @@ export function KitShareDialog({
                 ))}
                 <div className="border-t border-border pt-2">
                   <p>
-                    Gesamt: {kitView.allocatedTotal} / {kitView.kitSizeVials} {unitLabel}
+                    Gesamt: {formatKitQuantity(kitView.allocatedTotal, categoryId, kitView.kitSizeVials)}
                   </p>
                   {kitView.status === "full" ? (
                     <p className="font-medium text-success">Kit vollständig · Warenkörbe synchronisiert</p>
                   ) : (
                     <p className="text-muted-foreground">
-                      Noch {kitView.remainingVials} {unitLabel} verfügbar
+                      Noch {formatKitQuantity(kitView.remainingVials, categoryId, kitView.kitSizeVials)} verfügbar
                     </p>
                   )}
                 </div>
@@ -640,7 +641,7 @@ export function KitShareDialog({
                 </div>
               ))}
               <p className={editValidation?.ok === false ? "text-destructive" : "text-muted-foreground"}>
-                Gesamt: {editTotal} / {activeKitSize} {unitLabel}
+                Gesamt: {formatKitQuantity(editTotal, categoryId, activeKitSize)}
               </p>
               {editValidation?.ok === false && (
                 <p className="text-sm text-destructive">

@@ -22,7 +22,7 @@ import { toast } from "@/components/ui/toaster";
 import { useJoinKitRequest } from "@/hooks/useKitRequests";
 import { remainingQuantityOptions } from "@/lib/kitRequests";
 import { formatUsd } from "@/lib/money";
-import { formatKitQuantity, kitQuantityUnitLabelForCategory } from "@/lib/shop/kitUnits";
+import { formatKitQuantity } from "@/lib/shop/kitUnits";
 import { isShopCategoryId, type ShopCategoryId } from "@/lib/shopCategories";
 import { previewKitRequestJoin, type KitRequestCard } from "@/services/kitRequests";
 
@@ -52,9 +52,7 @@ function JoinKitRequestDialogBody({
   const [previewUnit, setPreviewUnit] = React.useState<number | null>(null);
   const [previewLoading, setPreviewLoading] = React.useState(false);
 
-  const unit = isShopCategoryId(request.category)
-    ? kitQuantityUnitLabelForCategory(request.category as ShopCategoryId)
-    : "Vials";
+  const categoryId: ShopCategoryId = isShopCategoryId(request.category) ? request.category : "peptides";
 
   async function handlePrepareConfirm() {
     setPreviewLoading(true);
@@ -76,7 +74,7 @@ function JoinKitRequestDialogBody({
       if (result.status === "full" && result.cartSynced) {
         toast.success("Das Kit ist vollständig. Die Artikel wurden deinem Warenkorb hinzugefügt.");
       } else {
-        toast.success(`Du hast ${formatKitQuantity(result.myQuantity, unit)} reserviert.`);
+        toast.success(`Du hast ${formatKitQuantity(result.myQuantity, categoryId, request.kitSizeVials)} reserviert.`);
       }
       setConfirmOpen(false);
       onOpenChange(false);
@@ -101,14 +99,14 @@ function JoinKitRequestDialogBody({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <p className="text-sm">Noch {formatKitQuantity(request.remainingVials, unit)} offen.</p>
+            <p className="text-sm">Noch {formatKitQuantity(request.remainingVials, categoryId, request.kitSizeVials)} offen.</p>
             {request.myUnitPriceUsd != null ? (
               <p className="text-sm font-medium">
-                Kit-Preis: {formatUsd(request.myUnitPriceUsd)} / {unit === "Stück" ? "Stück" : "Vial"}
+                Kit-Preis: {formatUsd(request.myUnitPriceUsd)} / Anteil
               </p>
             ) : null}
             <div className="space-y-2">
-              <Label htmlFor="join-qty">Wie viele {unit} möchtest du?</Label>
+              <Label htmlFor="join-qty">Wie viel möchtest du übernehmen?</Label>
               <Select value={String(quantity)} onValueChange={(value) => setQuantity(Number(value))}>
                 <SelectTrigger id="join-qty" className="w-full">
                   <SelectValue />
@@ -116,7 +114,7 @@ function JoinKitRequestDialogBody({
                 <SelectContent>
                   {options.map((qty) => (
                     <SelectItem key={qty} value={String(qty)}>
-                      {formatKitQuantity(qty, unit)}
+                      {formatKitQuantity(qty, categoryId, request.kitSizeVials)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -151,11 +149,9 @@ function JoinKitRequestDialogBody({
               <span className="font-medium">{request.productName}</span>
               <span className="block text-muted-foreground">{request.variantLabel}</span>
             </p>
-            <p>Du möchtest: {formatKitQuantity(quantity, unit)}</p>
+            <p>Du möchtest: {formatKitQuantity(quantity, categoryId, request.kitSizeVials)}</p>
             {previewUnit != null ? (
-              <p>
-                {formatUsd(previewUnit)} / {unit === "Stück" ? "Stück" : "Vial"}
-              </p>
+              <p>{formatUsd(previewUnit)} / Anteil</p>
             ) : null}
             {previewPrice != null ? <p className="font-semibold">Gesamt: {formatUsd(previewPrice)}</p> : null}
           </div>

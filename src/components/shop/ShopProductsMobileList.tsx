@@ -15,6 +15,7 @@ import {
 import { KitShareButton, KitShareDialog } from "@/components/shop/KitShareDialog";
 import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
 import { convertUsdToEur, formatEur, formatQuantity, formatUsd, hasBulkTier } from "@/lib/money";
+import { formatCatalogQuantity } from "@/lib/quantityFormat";
 import { shopPriceColumnLabels } from "@/lib/shop/priceLabels";
 import type { ShopCategoryId } from "@/lib/shopCategories";
 import { shopCategoryIdFor } from "@/lib/shopCategories";
@@ -191,13 +192,13 @@ function ShopProductGroupCard({
 
         <div className="flex items-center gap-2">
           <Select value={row.quantity} onValueChange={row.setQuantity}>
-            <SelectTrigger className="h-10 w-[96px] shrink-0" aria-label="Menge wählen">
+            <SelectTrigger className="h-10 min-w-[9.5rem] w-[9.5rem] shrink-0" aria-label="Menge wählen">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {SHOP_QUANTITY_OPTIONS.map((qty) => (
                 <SelectItem key={qty} value={String(qty)}>
-                  {formatQuantity(qty)}
+                  {formatCatalogQuantity(qty, shopCategoryIdFor(product))}
                 </SelectItem>
               ))}
             </SelectContent>
