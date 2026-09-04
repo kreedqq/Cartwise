@@ -6,6 +6,7 @@ import {
   clampProgressPercent,
   defaultOrderProgress,
   isOrderProgressStatusKey,
+  ORDER_PROGRESS_TEMPLATES,
   resolveOrderProgress,
 } from "@/lib/orderProgress";
 
@@ -18,25 +19,58 @@ describe("orderProgress", () => {
     expect(defaultOrderProgress("completed").progressPercent).toBe(100);
     expect(defaultOrderProgress("cancelled").progressPercent).toBe(0);
     expect(defaultOrderProgress("cancelled").statusLabel).toBe("Storniert");
+    expect(defaultOrderProgress("cancelled").isCancelled).toBe(true);
   });
 
-  it("uses stored admin values when present", () => {
+  it("uses stored admin title and description independently of status_key", () => {
     const view = resolveOrderProgress("processing", {
-      status_key: "out_for_delivery",
-      progress_percent: 60,
-      comment: "Ihre Lieferung erfolgt heute zwischen 13:05 bis 14:35 Uhr",
+      status_key: "processing",
+      progress_percent: 32,
+      title: "Ihre Bestellung wird vorbereitet",
+      comment: "Wir prüfen aktuell Ihre Bestellung und bereiten die nächsten Schritte vor.",
       updated_at: "2026-09-04T10:00:00.000Z",
     });
-    expect(view.statusKey).toBe("out_for_delivery");
-    expect(view.statusLabel).toBe("In Zustellung");
-    expect(view.progressPercent).toBe(60);
-    expect(view.comment).toContain("13:05");
+    expect(view.statusKey).toBe("processing");
+    expect(view.statusLabel).toBe("Ihre Bestellung wird vorbereitet");
+    expect(view.progressPercent).toBe(32);
+    expect(view.comment).toContain("prüfen aktuell");
     expect(view.isCustom).toBe(true);
+    expect(view.isCancelled).toBe(false);
+  });
+
+  it("allows any percent from 0 through 100", () => {
+    for (const percent of [0, 1, 45, 99, 100]) {
+      expect(
+        resolveOrderProgress("processing", {
+          status_key: "submitted",
+          progress_percent: percent,
+          title: "Frei",
+          comment: "Frei beschreibbar",
+          updated_at: "2026-09-04T10:00:00.000Z",
+        }).progressPercent,
+      ).toBe(percent);
+    }
+    expect(clampProgressPercent(-4)).toBe(0);
+    expect(clampProgressPercent(140)).toBe(100);
+    expect(clampProgressPercent(7)).toBe(7);
+    expect(clampProgressPercent(61)).toBe(61);
+  });
+
+  it("does not let a cancelled order look like it is still moving", () => {
+    const view = resolveOrderProgress("cancelled", {
+      status_key: "shipped",
+      progress_percent: 75,
+      title: "Bestellung wurde versendet",
+      comment: "Ihre Bestellung wurde versendet.",
+      updated_at: "2026-09-04T10:00:00.000Z",
+    });
+    expect(view.statusLabel).toBe("Storniert");
+    expect(view.isCancelled).toBe(true);
+    expect(view.comment).toBe("Ihre Bestellung wurde versendet.");
+    expect(view.progressPercent).toBe(75);
   });
 
   it("clamps percent and rejects unknown keys", () => {
-    expect(clampProgressPercent(-4)).toBe(0);
-    expect(clampProgressPercent(140)).toBe(100);
     expect(isOrderProgressStatusKey("shipped")).toBe(true);
     expect(isOrderProgressStatusKey("pending")).toBe(false);
     const fallback = resolveOrderProgress("processing", {
@@ -47,14 +81,23 @@ describe("orderProgress", () => {
     });
     expect(fallback.statusKey).toBe("processing");
   });
+
+  it("keeps templates as optional fillers with free labels", () => {
+    expect(ORDER_PROGRESS_TEMPLATES.map((item) => item.title)).toEqual([
+      "Bestellung eingegangen",
+      "Bestellung wird bearbeitet",
+      "Bestellung wurde übermittelt",
+      "Versand wird vorbereitet",
+      "Bestellung wurde versendet",
+      "Bestellung ist unterwegs",
+      "Bestellung angekommen",
+    ]);
+  });
 });
 
 describe("order progress SQL", () => {
   it("keeps customer reads own-order-only and admin writes behind has_role", () => {
-    const sql = readFileSync(
-      resolve(process.cwd(), "supabase/migrations/0049_order_progress.sql"),
-      "utf8",
-    );
+    const sql = readFileSync(resolve(process.cwd(), "supabase/migrations/0049_order_progress.sql"), "utf8");
     expect(sql).toMatch(/create table public\.order_progress/);
     expect(sql).toMatch(/enable row level security/);
     expect(sql).toMatch(/order_progress_select_own_or_admin/);
@@ -66,6 +109,17 @@ describe("order progress SQL", () => {
     expect(sql).not.toMatch(/create policy "order_progress_update_own"/);
     expect(sql).toMatch(/revoke all on function public\.upsert_order_progress/);
   });
+
+  it("adds a free title column without rewriting existing progress rows", () => {
+    const sql = readFileSync(
+      resolve(process.cwd(), "supabase/migrations/0050_order_tracking_and_progress_title.sql"),
+      "utf8",
+    );
+    expect(sql).toMatch(/add column if not exists title text/);
+    expect(sql).toMatch(/_title text default null/);
+    expect(sql).not.toMatch(/update public\.order_progress/);
+    expect(sql).not.toMatch(/delete from public\.order_progress/);
+  });
 });
 
 describe("order progress UI wiring", () => {
@@ -73,18 +127,28 @@ describe("order progress UI wiring", () => {
     const admin = readFileSync(resolve(process.cwd(), "src/pages/admin/AdminOrderDetail.tsx"), "utf8");
     const customer = readFileSync(resolve(process.cwd(), "src/pages/OrderDetail.tsx"), "utf8");
     const editor = readFileSync(resolve(process.cwd(), "src/components/orders/AdminOrderProgressEditor.tsx"), "utf8");
+    const form = readFileSync(resolve(process.cwd(), "src/components/orders/OrderProgressForm.tsx"), "utf8");
     const service = readFileSync(resolve(process.cwd(), "src/services/orderProgress.ts"), "utf8");
+    const tracker = readFileSync(resolve(process.cwd(), "src/components/orders/OrderProgressTracker.tsx"), "utf8");
     expect(admin).toContain("Bestellfortschritt");
     expect(admin).toContain("AdminOrderProgressEditor");
     expect(admin).toContain("OrderStatusSelect");
     expect(customer).toContain("OrderProgressTracker");
+    expect(customer).toContain("OrderTrackingCard");
     expect(customer).not.toContain("useUpsertOrderProgress");
     expect(customer).not.toContain("upsertOrderProgress");
-    expect(editor).toContain("Vorschau");
-    expect(editor).toContain("Speichern");
+    expect(editor).toContain("OrderProgressLivePreview");
+    expect(editor).toContain("Fortschritt speichern");
+    expect(form).toContain("Live-Vorschau");
+    expect(form).toContain("Vorlage verwenden");
+    expect(form).toContain("Überschrift");
+    expect(form).toContain("Beschreibung");
     expect(service).toContain('rpc("upsert_order_progress"');
+    expect(service).toContain("_title");
     expect(service).not.toMatch(/\.from\("order_progress"\)\.insert/);
     expect(service).not.toMatch(/\.from\("order_progress"\)\.update/);
     expect(service).not.toMatch(/\.from\("order_progress"\)\.upsert/);
+    expect(tracker).toContain("max-w-[50rem]");
+    expect(tracker).not.toContain("50vw");
   });
 });

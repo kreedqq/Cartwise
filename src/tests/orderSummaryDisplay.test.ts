@@ -12,7 +12,9 @@ describe("admin Bestell Zusammenfassung", () => {
     expect(nav).toContain('label: "Bestell Zusammenfassung"');
     expect(nav).toContain('to: "/admin/order-summary"');
     expect(nav).toContain("Eingegangene Bestellungen");
-    expect(nav.indexOf('label: "Versand"')).toBeLessThan(nav.indexOf('label: "Bestell Zusammenfassung"'));
+    expect(nav.indexOf('label: "Bestell Zusammenfassung"')).toBeLessThan(nav.indexOf('label: "Versand"'));
+    expect(nav).toContain('label: "Versandkosten"');
+    expect(nav).toContain('to: "/admin/shipping-costs"');
     expect(read("src/App.tsx")).toContain('path="order-summary"');
     expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("Bestell Zusammenfassung");
     expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("Als PDF exportieren");

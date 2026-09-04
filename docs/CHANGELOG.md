@@ -2,6 +2,26 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-04 (admin Versandzentrale)
+
+### Added
+
+- Admin hub **Versand** at `/admin/shipping` with stats, search, tracking filter, and per-order manage view (`/admin/shipping/:orderId`).
+- Free customer-facing progress title plus 0–100% slider, live preview, and optional templates.
+- Persistent shipment tracking on `orders` (carrier, number, URL) and a customer tracking card.
+- First-assignment tracking email via Edge Function `send-tracking-email` (Resend secret; idempotent `tracking_notification_sent_at`).
+- Dedicated **Bestellung stornieren** confirmation that writes existing `cancelled` status (orders are not deleted).
+
+### Changed
+
+- Previous Versand tab (China/DE costs) is now **Versandkosten** at `/admin/shipping-costs`.
+- Customer Bestellfortschritt card is constrained with `max-w-[50rem]`.
+- Progress heading is stored `title`, not a fixed `status_key` label.
+
+### Notes
+
+- Migration `0050_order_tracking_and_progress_title.sql`. No kit aggregation change. Cancelled orders stay out of processing summary because it still uses `status === "processing"` only.
+
 ## 2026-09-04 (runtime check + recovery backup)
 
 ### Notes

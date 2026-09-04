@@ -8,7 +8,7 @@ export interface OrderWithItems extends Tables<"orders"> {
 }
 
 export const CUSTOMER_ORDER_COLUMNS =
-  "id, order_number, user_id, cart_id, status, note, payment_method, telegram_username_snapshot, shipping_delivery_method, shipping_first_name, shipping_last_name, shipping_street, shipping_house_number, shipping_address_extra, shipping_packstation_number, shipping_post_number, shipping_postal_code, shipping_city, shipping_country, total_usd, total_eur, exchange_rate, submitted_at, created_at, updated_at, china_shipping_amount, china_shipping_currency, de_shipping_amount, de_shipping_currency";
+  "id, order_number, user_id, cart_id, status, note, payment_method, telegram_username_snapshot, shipping_delivery_method, shipping_first_name, shipping_last_name, shipping_street, shipping_house_number, shipping_address_extra, shipping_packstation_number, shipping_post_number, shipping_postal_code, shipping_city, shipping_country, total_usd, total_eur, exchange_rate, submitted_at, created_at, updated_at, china_shipping_amount, china_shipping_currency, de_shipping_amount, de_shipping_currency, tracking_number, tracking_carrier, tracking_url, tracking_assigned_at, tracking_assigned_by, tracking_notification_sent_at";
 
 async function requireCurrentUserId(): Promise<string> {
   const { data, error } = await supabase.auth.getUser();

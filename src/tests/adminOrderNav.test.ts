@@ -59,6 +59,7 @@ describe("hub admin navigation", () => {
         "/admin/users",
         "/admin/surcharges",
         "/admin/shipping",
+        "/admin/shipping-costs",
         "/admin/order-summary",
         "/admin/audit-log",
         "/admin/research",
@@ -71,8 +72,9 @@ describe("hub admin navigation", () => {
     const orders = ADMIN_NAV_GROUPS.find((group) => group.id === "orders");
     expect(orders?.items.map((item) => item.label)).toEqual([
       "Eingegangene Bestellungen",
-      "Versand",
       "Bestell Zusammenfassung",
+      "Versand",
+      "Versandkosten",
     ]);
     const products = ADMIN_NAV_GROUPS.find((group) => group.id === "products");
     expect(products?.items.map((item) => item.label)).toEqual(["Produktkatalog", "Import", "Import-Verlauf"]);
@@ -105,6 +107,8 @@ describe("hub admin navigation", () => {
       'path="roles"',
       'path="surcharges"',
       'path="shipping"',
+      'path="shipping/:orderId"',
+      'path="shipping-costs"',
       'path="order-summary"',
       'path="products"',
       'path="pdf-import"',

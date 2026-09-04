@@ -293,6 +293,12 @@ export interface Database {
           china_shipping_currency: ShippingCurrency | null;
           de_shipping_amount: number | null;
           de_shipping_currency: ShippingCurrency | null;
+          tracking_number: string | null;
+          tracking_carrier: string | null;
+          tracking_url: string | null;
+          tracking_assigned_at: string | null;
+          tracking_assigned_by: string | null;
+          tracking_notification_sent_at: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["orders"]["Row"]> & {
           user_id: string;
@@ -435,6 +441,7 @@ export interface Database {
           status_key: string;
           progress_percent: number;
           comment: string | null;
+          title: string | null;
           updated_at: string;
           updated_by: string | null;
         };
@@ -443,6 +450,7 @@ export interface Database {
           status_key: string;
           progress_percent: number;
           comment?: string | null;
+          title?: string | null;
           updated_at?: string;
           updated_by?: string | null;
         };
@@ -1310,8 +1318,22 @@ export interface Database {
           _status_key: string;
           _progress_percent: number;
           _comment: string | null;
+          _title?: string | null;
         };
         Returns: Database["public"]["Tables"]["order_progress"]["Row"];
+      };
+      upsert_order_tracking: {
+        Args: {
+          _order_id: string;
+          _tracking_number: string | null;
+          _tracking_carrier: string | null;
+          _tracking_url: string | null;
+        };
+        Returns: Database["public"]["Tables"]["orders"]["Row"];
+      };
+      mark_order_tracking_notified: {
+        Args: { _order_id: string };
+        Returns: Database["public"]["Tables"]["orders"]["Row"];
       };
       list_shop_products: { Args: Record<string, never>; Returns: Database["public"]["Tables"]["products"]["Row"][] };
       get_shop_product_by_code: {

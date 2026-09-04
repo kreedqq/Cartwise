@@ -12,6 +12,7 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { OrderProgressTracker } from "@/components/orders/OrderProgressTracker";
+import { OrderTrackingCard } from "@/components/orders/OrderTrackingCard";
 import { useOrderProgress } from "@/hooks/useOrderProgress";
 import { resolveOrderProgress } from "@/lib/orderProgress";
 import { useMyOrder, useMyOrderStatusHistory } from "@/hooks/useOrders";
@@ -119,9 +120,12 @@ export default function OrderDetailPage() {
         <OrderStatusBadge status={order.status} />
       </div>
 
-      <OrderProgressTracker
-        progress={resolveOrderProgress(order.status, progressQuery.data, order.submitted_at)}
-      />
+      <div className="space-y-4">
+        <OrderProgressTracker
+          progress={resolveOrderProgress(order.status, progressQuery.data, order.submitted_at)}
+        />
+        <OrderTrackingCard tracking={order} />
+      </div>
 
       <div className="flex flex-wrap gap-2">
         <Button variant="outline" size="sm" onClick={handleReorder} loading={reordering}>

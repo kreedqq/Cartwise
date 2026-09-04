@@ -20,6 +20,8 @@ import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { OrderShippingDetails } from "@/components/orders/OrderShippingCard";
 import { SharedKitAdminCard } from "@/components/orders/SharedKitAdminCard";
 import { AdminOrderProgressEditor } from "@/components/orders/AdminOrderProgressEditor";
+import { CancelOrderDialog } from "@/components/orders/CancelOrderDialog";
+import { OrderTrackingCard } from "@/components/orders/OrderTrackingCard";
 import { useAdminOrder, useDeleteOrder, useOrderAdminNote, useOrderStatusHistory, useSetOrderStatus } from "@/hooks/useOrders";
 import { useAdminKitOrderContext, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
@@ -53,6 +55,7 @@ export default function AdminOrderDetailPage() {
 
   const [adminNoteDraft, setAdminNoteDraft] = React.useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [cancelOpen, setCancelOpen] = React.useState(false);
   const adminNote = adminNoteDraft ?? noteQuery.data ?? "";
 
   if (orderQuery.isLoading) return <FullScreenSpinner label="Bestellung wird geladen …" />;
@@ -116,6 +119,20 @@ export default function AdminOrderDetailPage() {
     }
   }
 
+  async function handleCancel(reason: string | null) {
+    try {
+      await setStatus.mutateAsync({
+        status: "cancelled",
+        adminNote: reason ? `Stornierung: ${reason}` : "Bestellung storniert.",
+      });
+      setCancelOpen(false);
+      toast.success(`Bestellung ${order.order_number} wurde storniert.`);
+    } catch (error) {
+      console.error("Bestellung stornieren fehlgeschlagen:", error);
+      toast.error(error instanceof Error ? error.message : "Bestellung konnte nicht storniert werden.");
+    }
+  }
+
   async function handleDelete() {
     try {
       await deleteOrderMutation.mutateAsync(order.id);
@@ -161,6 +178,11 @@ export default function AdminOrderDetailPage() {
               disabled={setStatus.isPending}
               onValueChange={(status) => void applyStatus(status)}
             />
+            {order.status !== "cancelled" && (
+              <Button variant="destructive" size="sm" onClick={() => setCancelOpen(true)}>
+                Bestellung stornieren
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={() => printOrderDocument(exportDoc)}>
               <Printer className="h-3.5 w-3.5" /> PDF
             </Button>
@@ -250,6 +272,12 @@ export default function AdminOrderDetailPage() {
         />
       </AdminSection>
 
+      {order.tracking_number ? (
+        <AdminSection title="Sendungsverfolgung" padded>
+          <OrderTrackingCard tracking={order} compact={false} />
+        </AdminSection>
+      ) : null}
+
       {/* Charges + note */}
       <div className="grid gap-4 lg:grid-cols-2">
         <AdminSection title="Lieferung" padded>
@@ -321,6 +349,13 @@ export default function AdminOrderDetailPage() {
         </div>
       </AdminSection>
 
+      <CancelOrderDialog
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
+        orderNumber={order.order_number}
+        loading={setStatus.isPending}
+        onConfirm={handleCancel}
+      />
       <ConfirmDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}

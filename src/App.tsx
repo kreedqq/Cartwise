@@ -41,6 +41,8 @@ const AdminOrderSummaryPage = lazy(() => import("@/pages/admin/AdminOrderSummary
 const AdminRolesPage = lazy(() => import("@/pages/admin/AdminRoles"));
 const AdminRoleSurchargesPage = lazy(() => import("@/pages/admin/AdminRoleSurcharges"));
 const AdminShippingPage = lazy(() => import("@/pages/admin/AdminShipping"));
+const AdminShipmentCenterPage = lazy(() => import("@/pages/admin/AdminShipmentCenter"));
+const AdminShipmentManagePage = lazy(() => import("@/pages/admin/AdminShipmentManage"));
 const AdminResearchPage = lazy(() => import("@/pages/admin/AdminResearch"));
 const PeptideHubPage = lazy(() => import("@/pages/peptide/PeptideHub"));
 const PeptideCalculatorPage = lazy(() => import("@/pages/peptide/PeptideCalculator"));
@@ -131,7 +133,9 @@ export default function App() {
                     <Route path="order-summary" element={<AdminOrderSummaryPage />} />
                     <Route path="roles" element={<AdminRolesPage />} />
                     <Route path="surcharges" element={<AdminRoleSurchargesPage />} />
-                    <Route path="shipping" element={<AdminShippingPage />} />
+                    <Route path="shipping" element={<AdminShipmentCenterPage />} />
+                    <Route path="shipping/:orderId" element={<AdminShipmentManagePage />} />
+                    <Route path="shipping-costs" element={<AdminShippingPage />} />
                     <Route path="products" element={<AdminProductsPage />} />
                     <Route path="pdf-import" element={<AdminPdfImportPage />} />
                     <Route path="import-history" element={<AdminImportHistoryPage />} />

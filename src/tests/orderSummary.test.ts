@@ -6,6 +6,7 @@ import {
   printProcessingOrderSummary,
 } from "@/lib/orderSummaryExport";
 import { buildProcessingOrderSummary, ORDER_SUMMARY_CATEGORY_LABELS } from "@/lib/orderSummary";
+import { EMPTY_ORDER_TRACKING } from "@/lib/tracking";
 import type { Tables } from "@/types/database";
 
 function makeOrder(overrides: Partial<Tables<"orders">> = {}): Tables<"orders"> {
@@ -40,6 +41,7 @@ function makeOrder(overrides: Partial<Tables<"orders">> = {}): Tables<"orders"> 
     china_shipping_currency: null,
     de_shipping_amount: null,
     de_shipping_currency: null,
+    ...EMPTY_ORDER_TRACKING,
     ...overrides,
   };
 }

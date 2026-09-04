@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-04** (order-summary runtime check + recovery backup).
+Last documentation pass: **2026-09-04** (admin Versandzentrale + tracking).
+
+**Update 2026-09-04 (Versandzentrale)**: Existing Versandkosten stay at `/admin/shipping-costs`. New admin hub `/admin/shipping` manages order progress (free title, description, 0–100%), tracking, and cancel via existing `cancelled` status. `order_progress.title` plus `orders.tracking_*` (migration `0050`). Tracking email is Edge Function `send-tracking-email` (Resend secret, once per order via `tracking_notification_sent_at`). Shared-kit merchant aggregation is unchanged and still uses processing orders only.
 
 **Update 2026-09-04 (Bestellzusammenfassung runtime + recovery pack)**: Live `/admin/order-summary` on `https://peptix.app` was opened with an admin session. It showed **0 processing orders** because PepQueen `CW-2026-000030` and Penbuddy `CW-2026-000036` are both `dispatched` (all 10 production orders are). Production chunk `AdminOrderSummary-D1tzB2dC.js` already contains `kit-complete:${kitShareId}` personLines merge and PDF `BESTELLUNGEN` reads `personLines.quantityLabel`. No second formatter, no status rewrite, no migration. Recovery docs: `docs/RECOVERY.md`, `docs/SETUP_NEW_MACHINE.md`, `docs/AUTH_PROVIDERS.md`, `docs/PRODUCTION_SCHEMA.md`. Source zip is outside Git under `Documents\PEPTIX-BACKUPS\`.
 
@@ -105,7 +107,7 @@ Sidebar: Übersicht `/dashboard`, Shop `/shop`, **Kit Gesuche** `/kit-gesuche`, 
 
 Mobile: same set plus Favorites in `MAIN_NAV_ITEMS`; peptide label **Lexikon & Rechner**; Kit Gesuche short label **Kits** on the bottom bar.
 
-Admin nav (five hubs, in-page tabs): Übersicht `/admin`; Bestellungen → Eingegangene Bestellungen `/admin/orders`, Versand `/admin/shipping`; Produkte → Produktkatalog / Import / Import-Verlauf; Benutzer & Rollen → Benutzer & Rollen `/admin/users`, Rollenaufschläge `/admin/surcharges`, Audit-Log `/admin/audit-log`; Inhalte → Research. `/admin/roles` still exists and redirects to `/admin/users`.
+Admin nav (five hubs, in-page tabs): Übersicht `/admin`; Bestellungen → Eingegangene Bestellungen `/admin/orders`, Bestell Zusammenfassung `/admin/order-summary`, Versand `/admin/shipping`, Versandkosten `/admin/shipping-costs`; Produkte → Produktkatalog / Import / Import-Verlauf; Benutzer & Rollen → Benutzer & Rollen `/admin/users`, Rollenaufschläge `/admin/surcharges`, Audit-Log `/admin/audit-log`; Inhalte → Research. `/admin/roles` still exists and redirects to `/admin/users`.
 
 ### Routes (`src/App.tsx`)
 
@@ -113,7 +115,7 @@ Public: `/login`, `/auth/callback`, `/register`, `/forgot-password`, `/reset-pas
 
 Protected: `/username-required`, `/shop`, `/kit-gesuche`, `/favorites`, `/dashboard`, `/carts/:cartId`, `/carts/:cartId/checkout`, `/orders`, `/orders/:orderId`, `/profile`, `/peptide`, `/peptide/rechner`, `/peptide/lexikon`, `/peptide/lexikon/:slug`.
 
-Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/roles`, `/admin/surcharges`, `/admin/shipping`, `/admin/products`, `/admin/pdf-import`, `/admin/import-history`, `/admin/users`, `/admin/audit-log`, `/admin/research`.
+Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/order-summary`, `/admin/roles`, `/admin/surcharges`, `/admin/shipping`, `/admin/shipping/:orderId`, `/admin/shipping-costs`, `/admin/products`, `/admin/pdf-import`, `/admin/import-history`, `/admin/users`, `/admin/audit-log`, `/admin/research`.
 
 `/` → `/dashboard`. Unknown → `NotFound`.
 
@@ -180,7 +182,7 @@ Migrations `0001`–`0031` under `supabase/migrations/` (Git). Types: `src/types
 
 Shop tables unchanged. Research identity (0024): `substances`, `substance_aliases`, `substance_components`, `product_substances`. Research science (0025): `research_runs`, `research_run_sources`, `sources`, `source_substances`, `studies`, `study_substances`, `study_sources`. Research claims (0026): `claims`, `claim_sources`, `evidence_assessments`. Research regulatory/review (0027): `regulatory_records`, `regulatory_history`, `review_actions`. **0028** replaces evidence SELECT (admin all; non-admin approved assessments only). **0029** explicit product mappings + unmap MT1/KL80. **0030** source/study review_status + Batch 03 intake. **0031** durable run columns, `research_connector_health`, `community_reports` (empty). Public lexicon (local + production) reads Postgres with exclusive file fallback. Fixes: `docs/RESEARCH_PRODUCTION_FIXES.md`. `docs/RESEARCH_FINAL_OPERATIONS_QA.md`.
 
-Edge functions in repo: `get-exchange-rate`, `set-user-role`.
+Edge functions in repo: `get-exchange-rate`, `set-user-role`, `send-tracking-email`.
 
 ### Environment variables (names only)
 
@@ -198,6 +200,9 @@ Not in the frontend; optional for later server-side research (names only):
 
 - `PUBMED_API_KEY` — optional (NCBI E-utilities works without; higher limits with key)
 - Reddit official API credentials — **not configured**; connector stays unavailable
+- `RESEND_API_KEY` — Supabase Edge Function secret for tracking emails (never `VITE_*`)
+- `RESEND_FROM` — optional From header for tracking emails
+- `SITE_URL` — optional public site origin for the email logo (`https://peptix.app`)
 
 ### Tests / quality (last local run 2026-08-29, Block 3)
 

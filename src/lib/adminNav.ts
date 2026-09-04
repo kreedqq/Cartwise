@@ -31,8 +31,9 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       pathname.startsWith("/admin/order-summary"),
     items: [
       { to: "/admin/orders", label: "Eingegangene Bestellungen", matchPrefix: true },
-      { to: "/admin/shipping", label: "Versand" },
       { to: "/admin/order-summary", label: "Bestell Zusammenfassung" },
+      { to: "/admin/shipping", label: "Versand", matchPrefix: true },
+      { to: "/admin/shipping-costs", label: "Versandkosten" },
     ],
   },
   {

@@ -12,6 +12,7 @@ import {
 import { buildProcessingOrderSummaryPdf, printProcessingOrderSummary } from "@/lib/orderSummaryExport";
 import { buildProcessingOrderSummary } from "@/lib/orderSummary";
 import { pdfContainsAscii, pdfStartsWithHeader } from "@/lib/pdfDocument";
+import { EMPTY_ORDER_TRACKING } from "@/lib/tracking";
 import type { KitShareOrderContext } from "@/lib/kitOrderSummary";
 import type { Tables } from "@/types/database";
 
@@ -51,6 +52,7 @@ function makeOrder(overrides: Partial<Tables<"orders">> = {}): Tables<"orders"> 
     china_shipping_currency: null,
     de_shipping_amount: null,
     de_shipping_currency: null,
+    ...EMPTY_ORDER_TRACKING,
     ...overrides,
   };
 }
@@ -1329,6 +1331,35 @@ describe("live Penbuddy/PepQueen kit replay (production identities, status overr
       .sort();
     expect(pepQueenShares).toEqual(["SK10|5/10 Kit", "XA10|5/10 Kit"]);
     expect(penbuddyShares).toEqual(["SK10|5/10 Kit", "XA10|5/10 Kit"]);
+    const kitPanel = buildSharedKitsForOrder(
+      penbuddy.id,
+      items.filter((item) => item.order_id === penbuddy.id),
+      [pepQueen, penbuddy],
+      context,
+    );
+    expect(
+      kitPanel.flatMap((kit) => kit.participants.map((row) => `${kit.productCode}|${row.telegramLabel}|${row.shareLabel}`)).sort(),
+    ).toEqual([
+      "SK10|Penbuddy|5/10 Kit",
+      "SK10|PepQueen|5/10 Kit",
+      "XA10|Penbuddy|5/10 Kit",
+      "XA10|PepQueen|5/10 Kit",
+    ]);
+  });
+
+  it("cancelled kit participant does not complete merchant aggregation; remaining share stays 5/10 Kit", () => {
+    const { pepQueen, penbuddy, pepsi, items, catalog, context } = livePenbuddyPepQueenReplay("cancelled", "processing");
+    const summary = buildProcessingOrderSummary([pepQueen, penbuddy, pepsi], items, catalog, context);
+    const peptides = summary.groups.find((group) => group.categoryId === "peptides")?.lines ?? [];
+    expect(peptides.map((line) => `${line.code}|${line.quantityLabel}`).sort()).toEqual(["SK10|5/10 Kit", "XA10|5/10 Kit"]);
+    expect(peptides.map((line) => line.quantityLabel)).not.toContain("1 Kit");
+    expect(summary.customers.find((customer) => customer.orderNumber === "CW-2026-000030")).toBeUndefined();
+    expect(
+      summary.personLines
+        .filter((line) => line.article === "Selank" || line.article === "Semax")
+        .map((line) => `${line.name}|${line.quantityLabel}|${line.article}`)
+        .sort(),
+    ).toEqual(["Penbuddy|5/10 Kit|Selank", "Penbuddy|5/10 Kit|Semax"]);
     const kitPanel = buildSharedKitsForOrder(
       penbuddy.id,
       items.filter((item) => item.order_id === penbuddy.id),

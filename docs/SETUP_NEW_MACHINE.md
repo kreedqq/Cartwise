@@ -46,6 +46,9 @@ There are **no other `VITE_` variables** in `src/`. Do not invent `VITE_SUPABASE
 | BotFather bot token | Telegram bot settings. Not used by the SPA directly. |
 | Vercel / GitHub tokens | Deployment. |
 | Exchange-rate or other Edge Function secrets | Supabase Edge Function secrets. |
+| `RESEND_API_KEY` | Tracking-Benachrichtigungen (`send-tracking-email`). Never `VITE_*`. |
+| `RESEND_FROM` | Optional From-Header for tracking emails. |
+| `SITE_URL` | Optional public origin for the PEPTIX logo in emails. |
 
 `.env.example` keeps empty placeholders only.
 

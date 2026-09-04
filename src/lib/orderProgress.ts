@@ -71,6 +71,67 @@ export const ORDER_PROGRESS_STATUS_OPTIONS: readonly OrderProgressStatusOption[]
   },
 ] as const;
 
+/** Comfort templates only. Admins can change every field afterwards. */
+export interface OrderProgressTemplate {
+  id: string;
+  statusKey: OrderProgressStatusKey;
+  title: string;
+  description: string;
+  percent: number;
+}
+
+export const ORDER_PROGRESS_TEMPLATES: readonly OrderProgressTemplate[] = [
+  {
+    id: "received",
+    statusKey: "received",
+    title: "Bestellung eingegangen",
+    description: "Ihre Bestellung ist eingegangen und wird als Nächstes geprüft.",
+    percent: 12,
+  },
+  {
+    id: "processing",
+    statusKey: "processing",
+    title: "Bestellung wird bearbeitet",
+    description: "Wir prüfen aktuell Ihre Bestellung und bereiten die nächsten Schritte vor.",
+    percent: 28,
+  },
+  {
+    id: "submitted",
+    statusKey: "submitted",
+    title: "Bestellung wurde übermittelt",
+    description: "Ihre Bestellung wurde erfolgreich übermittelt und wird nun weiterbearbeitet.",
+    percent: 45,
+  },
+  {
+    id: "preparing_shipment",
+    statusKey: "preparing_shipment",
+    title: "Versand wird vorbereitet",
+    description: "Ihre Bestellung wird für den Versand vorbereitet.",
+    percent: 62,
+  },
+  {
+    id: "shipped",
+    statusKey: "shipped",
+    title: "Bestellung wurde versendet",
+    description: "Ihre Bestellung wurde versendet und kann ab sofort verfolgt werden.",
+    percent: 75,
+  },
+  {
+    id: "out_for_delivery",
+    statusKey: "out_for_delivery",
+    title: "Bestellung ist unterwegs",
+    description: "Ihre Bestellung ist unterwegs und befindet sich in der Zustellung.",
+    percent: 88,
+  },
+  {
+    id: "arrived",
+    statusKey: "arrived",
+    title: "Bestellung angekommen",
+    description: "Ihre Bestellung ist angekommen.",
+    percent: 96,
+  },
+] as const;
+
 export interface OrderProgressView {
   statusKey: OrderProgressStatusKey;
   statusLabel: string;
@@ -78,6 +139,15 @@ export interface OrderProgressView {
   comment: string;
   updatedAt: string | null;
   isCustom: boolean;
+  isCancelled: boolean;
+}
+
+export interface StoredOrderProgress {
+  status_key: string;
+  progress_percent: number;
+  comment: string | null;
+  title?: string | null;
+  updated_at: string;
 }
 
 export function isOrderProgressStatusKey(value: string | null | undefined): value is OrderProgressStatusKey {
@@ -116,29 +186,51 @@ export function defaultOrderProgress(orderStatus: OrderStatus, submittedAt?: str
     comment: cancelled ? "Diese Bestellung wurde storniert." : option.defaultComment,
     updatedAt: submittedAt ?? null,
     isCustom: false,
+    isCancelled: cancelled,
   };
 }
 
 export function resolveOrderProgress(
   orderStatus: OrderStatus,
-  stored: {
-    status_key: string;
-    progress_percent: number;
-    comment: string | null;
-    updated_at: string;
-  } | null | undefined,
+  stored: StoredOrderProgress | null | undefined,
   submittedAt?: string | null,
 ): OrderProgressView {
   const fallback = defaultOrderProgress(orderStatus, submittedAt);
+  const cancelled = orderStatus === "cancelled";
   if (!stored) return fallback;
   const key = isOrderProgressStatusKey(stored.status_key) ? stored.status_key : fallback.statusKey;
   const option = orderProgressOption(key);
+  const title = stored.title?.trim() || option.label;
+  const comment = stored.comment?.trim() || option.defaultComment;
   return {
     statusKey: key,
-    statusLabel: option.label,
+    statusLabel: cancelled ? "Storniert" : title,
     progressPercent: clampProgressPercent(stored.progress_percent),
-    comment: stored.comment?.trim() || option.defaultComment,
+    comment: cancelled ? stored.comment?.trim() || "Diese Bestellung wurde storniert." : comment,
     updatedAt: stored.updated_at,
     isCustom: true,
+    isCancelled: cancelled,
+  };
+}
+
+export function orderProgressPreviewFromDraft(
+  draft: {
+    statusKey: OrderProgressStatusKey;
+    title: string;
+    description: string;
+    percent: string | number;
+  },
+  extras: Pick<OrderProgressView, "updatedAt" | "isCancelled">,
+): OrderProgressView {
+  return {
+    statusKey: draft.statusKey,
+    statusLabel: extras.isCancelled ? "Storniert" : draft.title.trim() || "Bestellfortschritt",
+    progressPercent: clampProgressPercent(draft.percent),
+    comment: extras.isCancelled
+      ? draft.description.trim() || "Diese Bestellung wurde storniert."
+      : draft.description.trim(),
+    updatedAt: extras.updatedAt,
+    isCustom: true,
+    isCancelled: extras.isCancelled,
   };
 }

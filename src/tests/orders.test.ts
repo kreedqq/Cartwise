@@ -11,6 +11,7 @@ import {
   orderItemsToBulkLines,
   orderTelegramUsername,
 } from "@/services/orders";
+import { EMPTY_ORDER_TRACKING } from "@/lib/tracking";
 import type { Tables } from "@/types/database";
 
 function makeOrder(overrides: Partial<Tables<"orders">> = {}): Tables<"orders"> {
@@ -45,6 +46,7 @@ function makeOrder(overrides: Partial<Tables<"orders">> = {}): Tables<"orders"> 
     china_shipping_currency: null,
     de_shipping_amount: null,
     de_shipping_currency: null,
+    ...EMPTY_ORDER_TRACKING,
     ...overrides,
   };
 }
@@ -179,6 +181,12 @@ describe("customer order columns", () => {
         "telegram_username_snapshot",
         "total_eur",
         "total_usd",
+        "tracking_assigned_at",
+        "tracking_assigned_by",
+        "tracking_carrier",
+        "tracking_notification_sent_at",
+        "tracking_number",
+        "tracking_url",
         "updated_at",
         "user_id",
       ].sort(),
