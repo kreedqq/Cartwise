@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import {
   asQuantity,
   buildSharedKitsForOrder,
+  formatCompleteKitQuantityLabel,
   kitParticipantTelegramLabel,
   splitKitProgress,
 } from "@/lib/kitOrderSummary";
@@ -103,6 +104,114 @@ function selankKitContext(overrides: Partial<KitShareOrderContext> = {}): KitSha
     usernamesByUserId: { "user-pepsi": "PepsiDry", "user-raff": "Raff" },
     ...overrides,
   };
+}
+
+/** Production kit identities. Replay only — tests never write live order status. */
+const LIVE_SELANK_ID = "4c3de824-f70b-4cc4-8786-4293316d0fc1";
+const LIVE_SEMAX_ID = "ffc0afc4-d984-41c0-96f4-b3c441e8ac2b";
+const LIVE_TE300_ID = "a1ebe3d9-9c6e-4e1c-9146-0365f6ca2a61";
+const LIVE_KIT_SELANK = "42235edd-5dac-4468-a119-e7eae1dde2dd";
+const LIVE_KIT_SEMAX = "d3f1c575-ca5d-406c-a169-5ba56dec75f8";
+const LIVE_QTY = "5.000" as unknown as number;
+
+function livePenbuddyPepQueenReplay(
+  pepQueenStatus: Tables<"orders">["status"] = "processing",
+  penbuddyStatus: Tables<"orders">["status"] = "processing",
+) {
+  const pepQueen = makeOrder({
+    id: "5539b116-bc33-4c63-9535-3a97cfe84dc4",
+    order_number: "CW-2026-000030",
+    user_id: "f6df0375-5d24-4ad4-b8b2-efcc6fd0b5f2",
+    cart_id: "f8673972-9403-4701-be72-aa3850ba0870",
+    telegram_username_snapshot: "PepQueen",
+    status: pepQueenStatus,
+  });
+  const penbuddy = makeOrder({
+    id: "7b02ae6e-25b8-4f7f-999d-5557e0931445",
+    order_number: "CW-2026-000036",
+    user_id: "641e5d33-177a-4b7e-ac31-47e40ffb1cc7",
+    cart_id: "a042b1df-cb53-4f02-9cdc-6461b91a2569",
+    telegram_username_snapshot: "Penbuddy",
+    status: penbuddyStatus,
+  });
+  const pepsi = makeOrder({
+    id: "224ff4ce-38ae-41b8-8b0c-a68ba7cc5e07",
+    order_number: "CW-2026-000034",
+    user_id: "f0dc82df-7f75-4838-86c6-1e7161c7fa7b",
+    cart_id: "6a2c7296-6ee2-4154-be76-0c840b7657b7",
+    telegram_username_snapshot: "PepsiDry",
+    status: "processing",
+  });
+  const items = [
+    makeItem({
+      id: "4f6d2b73-e99b-4ed5-afc0-f378ffcb04ce",
+      order_id: pepQueen.id,
+      product_id: LIVE_SELANK_ID,
+      dosage_vial_snapshot: "10mg/vial x10vials",
+      quantity: LIVE_QTY,
+      line_total_usd: 30,
+    }),
+    makeItem({
+      id: "38392aca-3602-42b7-814c-b33d17adb580",
+      order_id: pepQueen.id,
+      product_id: LIVE_SEMAX_ID,
+      product_code_snapshot: "XA10",
+      product_name_snapshot: "Semax",
+      dosage_vial_snapshot: "10mg/vial x10vials",
+      quantity: LIVE_QTY,
+      line_total_usd: 27.5,
+    }),
+    makeItem({
+      id: "6c8ed1ae-75a9-4f37-9031-96ff70c42a33",
+      order_id: penbuddy.id,
+      product_id: LIVE_SELANK_ID,
+      dosage_vial_snapshot: "10mg/vial x10vials",
+      quantity: LIVE_QTY,
+      line_total_usd: 30,
+    }),
+    makeItem({
+      id: "7bed61da-06b1-4538-b21c-a84ab4465e80",
+      order_id: penbuddy.id,
+      product_id: LIVE_SEMAX_ID,
+      product_code_snapshot: "XA10",
+      product_name_snapshot: "Semax",
+      dosage_vial_snapshot: "10mg/vial x10vials",
+      quantity: LIVE_QTY,
+      line_total_usd: 27.5,
+    }),
+    makeOilItem({
+      id: "98133866-e21c-4c11-ae0a-43bbc89f609b",
+      order_id: pepsi.id,
+      product_id: LIVE_TE300_ID,
+      dosage_vial_snapshot: "300mg",
+      quantity: LIVE_QTY,
+      line_total_usd: 85,
+    }),
+  ];
+  const catalog = [
+    { id: LIVE_SELANK_ID, code: "SK10", name: "Selank", category: "PEPTIDES", dosage_vial: "10mg/vial x10vials" },
+    { id: LIVE_SEMAX_ID, code: "XA10", name: "Semax", category: "PEPTIDES", dosage_vial: "10mg/vial x10vials" },
+    { id: LIVE_TE300_ID, code: "TE300", name: "TEST ENANTHATE", category: "INJECTABLES-OILS", dosage_vial: "300mg" },
+  ];
+  const context: KitShareOrderContext = {
+    kits: [
+      { id: LIVE_KIT_SELANK, product_id: LIVE_SELANK_ID, kit_size_vials: 10 },
+      { id: LIVE_KIT_SEMAX, product_id: LIVE_SEMAX_ID, kit_size_vials: 10 },
+    ],
+    participants: [
+      { kit_share_id: LIVE_KIT_SELANK, user_id: pepQueen.user_id as string, quantity: 5, order_id: pepQueen.id },
+      { kit_share_id: LIVE_KIT_SELANK, user_id: penbuddy.user_id as string, quantity: 5, order_id: penbuddy.id },
+      { kit_share_id: LIVE_KIT_SEMAX, user_id: pepQueen.user_id as string, quantity: 5, order_id: pepQueen.id },
+      { kit_share_id: LIVE_KIT_SEMAX, user_id: penbuddy.user_id as string, quantity: 5, order_id: penbuddy.id },
+    ],
+    cartLinks: [
+      { cart_id: pepQueen.cart_id as string, kit_share_id: LIVE_KIT_SELANK, product_id: LIVE_SELANK_ID, quantity: 5 },
+      { cart_id: pepQueen.cart_id as string, kit_share_id: LIVE_KIT_SEMAX, product_id: LIVE_SEMAX_ID, quantity: 5 },
+      { cart_id: penbuddy.cart_id as string, kit_share_id: LIVE_KIT_SELANK, product_id: LIVE_SELANK_ID, quantity: 5 },
+      { cart_id: penbuddy.cart_id as string, kit_share_id: LIVE_KIT_SEMAX, product_id: LIVE_SEMAX_ID, quantity: 5 },
+    ],
+  };
+  return { pepQueen, penbuddy, pepsi, items, catalog, context };
 }
 
 describe("shared kit order summary", () => {
@@ -1161,5 +1270,176 @@ describe("kit query invalidation and admin isolation", () => {
     expect(rlsFix).toContain("kit_share_participants_select_same_kit");
     expect(rlsFix).not.toContain("drop policy if exists \"kit_shares_select_admin\"");
     expect(rlsFix).not.toContain("drop policy if exists \"kit_share_participants_select_admin\"");
+  });
+
+  it("BESTELLUNGEN and PDF reuse personLines.quantityLabel and never reformat customers or order items", () => {
+    const page = read("src/pages/admin/AdminOrderSummary.tsx");
+    expect(page).toContain("summary.personLines.map");
+    expect(page).toContain("{line.quantityLabel}");
+    expect(page).not.toContain("summary.customers");
+    expect(page).not.toContain("formatSharedKitShareLabel");
+    expect(page).not.toContain("formatOrderItemQuantity");
+    expect(page).not.toContain("formatCatalogQuantity");
+    const pdf = read("src/lib/pdf/peptixOrderSummaryPdf.ts");
+    expect(pdf).toContain("summary.personLines");
+    expect(pdf).toContain("line.quantityLabel");
+    expect(pdf).not.toContain("summary.customers");
+    expect(pdf).not.toContain("formatSharedKitShareLabel");
+    expect(pdf).not.toContain("formatOrderItemQuantity");
+    const html = read("src/lib/orderSummaryExport.ts");
+    expect(html).toContain("summary.personLines");
+    expect(html).toContain("line.quantityLabel");
+    expect(html).not.toContain("summary.customers");
+  });
+});
+
+describe("live Penbuddy/PepQueen kit replay (production identities, status overridden in test only)", () => {
+  it("5 + 5 vials of kit_size_vials 10 is exactly 1 complete kit", () => {
+    const vials = asQuantity(LIVE_QTY) + asQuantity(LIVE_QTY);
+    expect(vials).toBe(10);
+    expect(splitKitProgress(vials, 10)).toEqual({ completeKits: 1, remainderVials: 0 });
+    expect(formatCompleteKitQuantityLabel(1, "peptides", 10)).toBe("1 Kit");
+  });
+
+  it("same kit_share_id, both processing: merchant groups and BESTELLUNGEN are 1 Kit, participants stay 5/10 Kit", () => {
+    const { pepQueen, penbuddy, pepsi, items, catalog, context } = livePenbuddyPepQueenReplay();
+    const summary = buildProcessingOrderSummary([pepQueen, penbuddy, pepsi], items, catalog, context);
+    const peptides = summary.groups.find((group) => group.categoryId === "peptides")?.lines ?? [];
+    expect(peptides.map((line) => `${line.code}|${line.quantityLabel}`).sort()).toEqual(["SK10|1 Kit", "XA10|1 Kit"]);
+    expect(peptides.map((line) => line.quantityLabel)).not.toContain("5/10 Kit");
+    expect(peptides.map((line) => line.quantityLabel)).not.toContain("5 Kits");
+    expect(peptides.map((line) => line.quantityLabel)).not.toContain("10 Stück");
+    expect(peptides.find((line) => line.code === "SK10")).toMatchObject({ quantity: 1, quantityLabel: "1 Kit" });
+    expect(peptides.find((line) => line.code === "XA10")).toMatchObject({ quantity: 1, quantityLabel: "1 Kit" });
+    expect(
+      summary.personLines
+        .filter((line) => line.article === "Selank" || line.article === "Semax")
+        .map((line) => `${line.name}|${line.quantityLabel}|${line.article}`)
+        .sort(),
+    ).toEqual(["Penbuddy + PepQueen|1 Kit|Selank", "Penbuddy + PepQueen|1 Kit|Semax"]);
+    expect(summary.personLines.filter((line) => line.article === "Selank")).toHaveLength(1);
+    expect(summary.personLines.filter((line) => line.article === "Semax")).toHaveLength(1);
+    const pepQueenShares = summary.customers
+      .find((customer) => customer.orderNumber === "CW-2026-000030")
+      ?.lines.map((line) => `${line.code}|${line.quantityLabel}`)
+      .sort();
+    const penbuddyShares = summary.customers
+      .find((customer) => customer.orderNumber === "CW-2026-000036")
+      ?.lines.map((line) => `${line.code}|${line.quantityLabel}`)
+      .sort();
+    expect(pepQueenShares).toEqual(["SK10|5/10 Kit", "XA10|5/10 Kit"]);
+    expect(penbuddyShares).toEqual(["SK10|5/10 Kit", "XA10|5/10 Kit"]);
+    const kitPanel = buildSharedKitsForOrder(
+      penbuddy.id,
+      items.filter((item) => item.order_id === penbuddy.id),
+      [pepQueen, penbuddy],
+      context,
+    );
+    expect(
+      kitPanel.flatMap((kit) => kit.participants.map((row) => `${kit.productCode}|${row.telegramLabel}|${row.shareLabel}`)).sort(),
+    ).toEqual([
+      "SK10|Penbuddy|5/10 Kit",
+      "SK10|PepQueen|5/10 Kit",
+      "XA10|Penbuddy|5/10 Kit",
+      "XA10|PepQueen|5/10 Kit",
+    ]);
+  });
+
+  it("PDF BESTELLUNGEN uses the same 1 Kit merchant aggregation, not participant 5/10 Kit rows", () => {
+    const { pepQueen, penbuddy, pepsi, items, catalog, context } = livePenbuddyPepQueenReplay();
+    const summary = buildProcessingOrderSummary([pepQueen, penbuddy, pepsi], items, catalog, context);
+    const bytes = buildProcessingOrderSummaryPdf(summary, "now");
+    expect(pdfContainsAscii(bytes, "1 Kit")).toBe(true);
+    expect(pdfContainsAscii(bytes, "5/10 Kit")).toBe(false);
+    expect(pdfContainsAscii(bytes, "5 Kits")).toBe(false);
+    expect(pdfContainsAscii(bytes, "10 St")).toBe(false);
+    expect(pdfContainsAscii(bytes, "SK10")).toBe(true);
+    expect(pdfContainsAscii(bytes, "XA10")).toBe(true);
+    expect(pdfContainsAscii(bytes, "Penbuddy")).toBe(true);
+    expect(pdfContainsAscii(bytes, "PepQueen")).toBe(true);
+    expect(summary.personLines.find((line) => line.article === "Selank")?.quantityLabel).toBe(
+      summary.groups.find((group) => group.categoryId === "peptides")?.lines.find((line) => line.code === "SK10")
+        ?.quantityLabel,
+    );
+  });
+
+  it("two different kit_share_id with 5/10 each stay two 5/10 Kit lines", () => {
+    const { pepQueen, penbuddy, items, catalog, context } = livePenbuddyPepQueenReplay();
+    const otherSelank = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+    const otherSemax = "ffffffff-0000-1111-2222-333333333333";
+    const splitContext: KitShareOrderContext = {
+      ...context,
+      kits: [
+        { id: LIVE_KIT_SELANK, product_id: LIVE_SELANK_ID, kit_size_vials: 10 },
+        { id: otherSelank, product_id: LIVE_SELANK_ID, kit_size_vials: 10 },
+        { id: LIVE_KIT_SEMAX, product_id: LIVE_SEMAX_ID, kit_size_vials: 10 },
+        { id: otherSemax, product_id: LIVE_SEMAX_ID, kit_size_vials: 10 },
+      ],
+      participants: [
+        { kit_share_id: LIVE_KIT_SELANK, user_id: pepQueen.user_id as string, quantity: 5, order_id: pepQueen.id },
+        { kit_share_id: otherSelank, user_id: penbuddy.user_id as string, quantity: 5, order_id: penbuddy.id },
+        { kit_share_id: LIVE_KIT_SEMAX, user_id: pepQueen.user_id as string, quantity: 5, order_id: pepQueen.id },
+        { kit_share_id: otherSemax, user_id: penbuddy.user_id as string, quantity: 5, order_id: penbuddy.id },
+      ],
+      cartLinks: [
+        { cart_id: pepQueen.cart_id as string, kit_share_id: LIVE_KIT_SELANK, product_id: LIVE_SELANK_ID, quantity: 5 },
+        { cart_id: pepQueen.cart_id as string, kit_share_id: LIVE_KIT_SEMAX, product_id: LIVE_SEMAX_ID, quantity: 5 },
+        { cart_id: penbuddy.cart_id as string, kit_share_id: otherSelank, product_id: LIVE_SELANK_ID, quantity: 5 },
+        { cart_id: penbuddy.cart_id as string, kit_share_id: otherSemax, product_id: LIVE_SEMAX_ID, quantity: 5 },
+      ],
+    };
+    const kitItems = items.filter((item) => item.product_id === LIVE_SELANK_ID || item.product_id === LIVE_SEMAX_ID);
+    const summary = buildProcessingOrderSummary([pepQueen, penbuddy], kitItems, catalog, splitContext);
+    const peptides = summary.groups.find((group) => group.categoryId === "peptides")?.lines ?? [];
+    expect(peptides.map((line) => `${line.code}|${line.quantityLabel}`).sort()).toEqual([
+      "SK10|5/10 Kit",
+      "SK10|5/10 Kit",
+      "XA10|5/10 Kit",
+      "XA10|5/10 Kit",
+    ]);
+    expect(peptides.map((line) => line.quantityLabel)).not.toContain("1 Kit");
+    expect(
+      summary.personLines
+        .filter((line) => line.article === "Selank" || line.article === "Semax")
+        .map((line) => `${line.name}|${line.quantityLabel}|${line.article}`)
+        .sort(),
+    ).toEqual([
+      "Penbuddy|5/10 Kit|Selank",
+      "Penbuddy|5/10 Kit|Semax",
+      "PepQueen|5/10 Kit|Selank",
+      "PepQueen|5/10 Kit|Semax",
+    ]);
+  });
+
+  it("normal injectable oil qty 5 without kit link stays 5 Vials", () => {
+    const { pepQueen, penbuddy, pepsi, items, catalog, context } = livePenbuddyPepQueenReplay();
+    const summary = buildProcessingOrderSummary([pepQueen, penbuddy, pepsi], items, catalog, context);
+    const oil = summary.groups.find((group) => group.categoryId === "injectable-oils")?.lines[0];
+    expect(oil).toMatchObject({ code: "TE300", quantity: 5, quantityLabel: "5 Vials" });
+    expect(oil?.quantityLabel).not.toContain("Kit");
+    expect(summary.personLines.find((line) => line.article === "TEST ENANTHATE")?.quantityLabel).toBe("5 Vials");
+  });
+
+  it("only one of the two orders processing stays 5/10 Kit", () => {
+    const { pepQueen, penbuddy, items, catalog, context } = livePenbuddyPepQueenReplay("processing", "dispatched");
+    const kitItems = items.filter((item) => item.product_id === LIVE_SELANK_ID || item.product_id === LIVE_SEMAX_ID);
+    const summary = buildProcessingOrderSummary([pepQueen, penbuddy], kitItems, catalog, context);
+    const peptides = summary.groups.find((group) => group.categoryId === "peptides")?.lines ?? [];
+    expect(peptides.map((line) => `${line.code}|${line.quantityLabel}`).sort()).toEqual(["SK10|5/10 Kit", "XA10|5/10 Kit"]);
+    expect(
+      summary.personLines.map((line) => `${line.name}|${line.quantityLabel}|${line.article}`).sort(),
+    ).toEqual(["PepQueen|5/10 Kit|Selank", "PepQueen|5/10 Kit|Semax"]);
+    expect(summary.customers[0]?.lines.map((line) => line.quantityLabel).sort()).toEqual(["5/10 Kit", "5/10 Kit"]);
+  });
+
+  it("both processing after a dispatched live snapshot is overridden only in the test: 1 Kit", () => {
+    const { pepQueen, penbuddy, items, catalog, context } = livePenbuddyPepQueenReplay("processing", "processing");
+    const kitItems = items.filter((item) => item.product_id === LIVE_SELANK_ID || item.product_id === LIVE_SEMAX_ID);
+    const summary = buildProcessingOrderSummary([pepQueen, penbuddy], kitItems, catalog, context);
+    expect(summary.groups.find((group) => group.categoryId === "peptides")?.lines.map((line) => line.quantityLabel)).toEqual([
+      "1 Kit",
+      "1 Kit",
+    ]);
+    expect(summary.personLines.map((line) => line.quantityLabel).sort()).toEqual(["1 Kit", "1 Kit"]);
   });
 });
