@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-04** (global quantity labels + admin order progress).
+Last documentation pass: **2026-09-04** (order-summary runtime check + recovery backup).
+
+**Update 2026-09-04 (Bestellzusammenfassung runtime + recovery pack)**: Live `/admin/order-summary` on `https://peptix.app` was opened with an admin session. It showed **0 processing orders** because PepQueen `CW-2026-000030` and Penbuddy `CW-2026-000036` are both `dispatched` (all 10 production orders are). Production chunk `AdminOrderSummary-D1tzB2dC.js` already contains `kit-complete:${kitShareId}` personLines merge and PDF `BESTELLUNGEN` reads `personLines.quantityLabel`. No second formatter, no status rewrite, no migration. Recovery docs: `docs/RECOVERY.md`, `docs/SETUP_NEW_MACHINE.md`, `docs/AUTH_PROVIDERS.md`, `docs/PRODUCTION_SCHEMA.md`. Source zip is outside Git under `Documents\PEPTIX-BACKUPS\`.
 
 **Update 2026-09-04 (quantity domain + Bestellfortschritt)**: Product quantities use one formatter in `src/lib/quantityFormat.ts`. Peptides and reconstitution water: `1 Kit` / `2 Kits`; real kit shares: `5/10 Kit`; `10/10` → `1 Kit`; `25` of size 10 → `2 Kits + 5/10 Kit`. Oils without a kit link: `5 Vials` (never Kit). Orals: `1 Packung` / `5 Packungen`. Shared kits still identify only via `kit_share_participants.order_id` (or same-product cart `kit_share_id`). Merchant BESTELLUNGEN merges a complete processing kit as `Penbuddy + PepQueen | 1 Kit`; individual orders and Geteiltes Kit keep `5/10 Kit`. PDF uses the same `quantityLabel`. Visual delivery progress is separate from `orders.status`: table `order_progress` (migration `0049`), admin editor on the order, customer tracker on Meine Bestellung. Historical orders without a row use workflow defaults. No change to prices, roles, quantity tier, auth, payment, order numbers, snapshots, kit join/leave, or RLS of existing tables.
 

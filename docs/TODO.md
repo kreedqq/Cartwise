@@ -36,6 +36,8 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] Stabilize password-login session redirect and OAuth callback double-exchange; document Production Site URL `https://peptix.app` (manual dashboard if CLI cannot set it)
 - [x] Shop selling prices only via shop RPCs (not lexicon)
 
+- [x] 2026-09-04 recovery documentation + source zip (no secrets) — `docs/RECOVERY.md`; live order-summary confirmed empty because all orders `dispatched`; personLines merge already in production JS
+
 # High
 
 - [x] Bestellzusammenfassung PDF matches the gold Peptix 4-page template (CODE/ARTIKEL/MENGE/GESAMTPREIS + NAME/MENGE/DOSIS/ARTIKEL)

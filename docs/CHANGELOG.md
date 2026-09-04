@@ -2,6 +2,13 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-04 (runtime check + recovery backup)
+
+### Notes
+
+- Production `/admin/order-summary` verified empty while all orders are `dispatched`. Deployed JS already merges a full processing kit in BESTELLUNGEN as `Name + Name | 1 Kit`. Live statuses were not changed.
+- Recovery pack: `docs/RECOVERY.md`, `docs/SETUP_NEW_MACHINE.md`, `docs/AUTH_PROVIDERS.md`, `docs/PRODUCTION_SCHEMA.md`. Source zip (no secrets, no customer data) under `Documents\PEPTIX-BACKUPS\` — see `docs/BACKUP_MANIFEST.md`.
+
 ## 2026-09-04 (global quantity labels + Bestellfortschritt)
 
 ### Added

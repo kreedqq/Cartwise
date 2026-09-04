@@ -14,7 +14,7 @@ Browser (Peptix SPA)
        ├─ Dual-read: `legacy` files only; `postgres` exclusive public; `dual` compare-only, never mixed
        ├─ Admin Dual Read copy: Postgres primary + exclusive fallback
        ├─ Admin Research (Phase 8): Postgres primary (`review_actions` append-only)
-       ├─ Production SPA: `https://cartwise-zeta.vercel.app` (`dpl_6pYjonptAdnDXzUMfxPffF2LVks5`); hardening build not deployed
+       ├─ Production SPA: `https://peptix.app` (Vercel project `cartwise`; GitHub `kreedqq/Cartwise` `main`)
        ├─ Phase 12 post-cutover audit: PRODUCTION_POST_CUTOVER_PASS_WITH_LIMITATIONS
        ├─ Node scripts (official APIs) → cache → compile (not called from the browser)
        ├─ Batch 03 scan cache: `src/research/cache/fetched/batch03/` (imported as review-required on prod; not auto-approved)
@@ -27,7 +27,9 @@ Browser (Peptix SPA)
 - Production dump 2026-08-29-1130: `Documents\PEPTIX-BACKUPS\PEPTIX-PRODUCTION-FINAL-2026-08-29-1130.sql`
 ```
 
-Hosting: `vercel.json` SPA rewrites; GitHub Pages workflow can set `VITE_BASE_PATH`.
+Hosting: Vercel (`vercel.json` `npm run build`, output `dist`, SPA rewrite except `/assets/`). Recovery: `docs/RECOVERY.md`. Env names only: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. GitHub Pages workflow can still set `VITE_BASE_PATH` but production is `peptix.app`.
+
+**Admin Bestellzusammenfassung:** `AdminOrderSummary` calls `buildProcessingOrderSummary` (processing orders only) with `useAdminKitOrderContext`. Händler `groups` and BESTELLUNGEN `personLines` share `kitProgress` per real `kit_share_id`. PDF (`peptixOrderSummaryPdf.ts`) prints the same `quantityLabel`. Individual Geteiltes Kit stays per-share (`5/10 Kit`). Quantity words: `src/lib/quantityFormat.ts`.
 
 ## Frontend layout
 
