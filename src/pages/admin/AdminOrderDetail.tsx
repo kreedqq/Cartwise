@@ -19,11 +19,14 @@ import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { OrderShippingDetails } from "@/components/orders/OrderShippingCard";
 import { SharedKitAdminCard } from "@/components/orders/SharedKitAdminCard";
-import { AdminOrderProgressEditor } from "@/components/orders/AdminOrderProgressEditor";
+import { AdminOrderTrackingForm } from "@/components/orders/AdminOrderTrackingForm";
 import { CancelOrderDialog } from "@/components/orders/CancelOrderDialog";
-import { OrderTrackingCard } from "@/components/orders/OrderTrackingCard";
+import { OrderProgressTracker } from "@/components/orders/OrderProgressTracker";
+import { ShippingProgressSelect } from "@/components/orders/ShippingProgressSelect";
 import { useAdminOrder, useDeleteOrder, useOrderAdminNote, useOrderStatusHistory, useSetOrderStatus } from "@/hooks/useOrders";
 import { useAdminKitOrderContext, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
+import { useOrderProgress } from "@/hooks/useOrderProgress";
+import { resolveOrderProgress } from "@/lib/orderProgress";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
 import { buildSharedKitsForOrder, kitSizeForOrderItem } from "@/lib/kitOrderSummary";
 import { formatDateTime, formatQuantity, formatRate, formatUsd, summarizeOrderCharges } from "@/lib/money";
@@ -45,6 +48,7 @@ export default function AdminOrderDetailPage() {
   const directoryQuery = useAdminUserDirectory();
   const ordersQuery = useAdminOrders();
   const kitQuery = useAdminKitOrderContext();
+  const progressQuery = useOrderProgress(orderId);
   const setStatus = useSetOrderStatus(orderId ?? "");
   const deleteOrderMutation = useDeleteOrder();
   const surchargeQuery = useQuery({
@@ -149,7 +153,7 @@ export default function AdminOrderDetailPage() {
     <div className="space-y-5">
       {/* Back + breadcrumb */}
       <Button variant="ghost" size="sm" className="-ml-2 text-muted-foreground" onClick={() => navigate("/admin/orders")}>
-        <ArrowLeft className="h-3.5 w-3.5" /> Eingegangene Bestellungen
+        <ArrowLeft className="h-3.5 w-3.5" /> Übersicht
       </Button>
 
       {/* Order header card */}
@@ -263,20 +267,27 @@ export default function AdminOrderDetailPage() {
           </AdminSection>
         ))}
 
-      <AdminSection title="Bestellfortschritt">
-        <AdminOrderProgressEditor
-          key={order.id}
-          orderId={order.id}
-          orderStatus={order.status}
-          submittedAt={order.submitted_at}
-        />
+      <AdminSection title="Bestellfortschritt" padded>
+        <div className="grid gap-4 lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)]">
+          <div className="space-y-2">
+            <ShippingProgressSelect
+              orderId={order.id}
+              storedStatusKey={progressQuery.data?.status_key}
+              disabled={order.status === "cancelled"}
+            />
+            <p className="text-xs text-muted-foreground">
+              Steuert nur die Kundenanzeige. Der interne Bestellstatus bleibt getrennt.
+            </p>
+          </div>
+          <OrderProgressTracker
+            progress={resolveOrderProgress(order.status, progressQuery.data, order.submitted_at)}
+          />
+        </div>
       </AdminSection>
 
-      {order.tracking_number ? (
-        <AdminSection title="Sendungsverfolgung" padded>
-          <OrderTrackingCard tracking={order} compact={false} />
-        </AdminSection>
-      ) : null}
+      <AdminSection title="Sendungsverfolgung" padded>
+        <AdminOrderTrackingForm order={order} />
+      </AdminSection>
 
       {/* Charges + note */}
       <div className="grid gap-4 lg:grid-cols-2">

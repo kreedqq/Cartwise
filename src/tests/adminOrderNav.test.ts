@@ -18,10 +18,10 @@ describe("customer and admin order navigation", () => {
     expect(read("src/pages/Orders.tsx")).toContain("Meine Bestellungen");
   });
 
-  it("keeps the admin inbox on /admin/orders with the Eingegangene Bestellungen tab", () => {
-    expect(read("src/lib/adminNav.ts")).toContain("Eingegangene Bestellungen");
-    expect(read("src/pages/admin/AdminOrders.tsx")).toContain("Eingegangene Bestellungen");
-    expect(read("src/pages/admin/AdminOrderDetail.tsx")).toContain("Eingegangene Bestellungen");
+  it("keeps the admin inbox on /admin/orders with the Übersicht tab", () => {
+    expect(read("src/lib/adminNav.ts")).toContain('label: "Übersicht"');
+    expect(read("src/pages/admin/AdminOrders.tsx")).toContain('title="Übersicht"');
+    expect(read("src/pages/admin/AdminOrderDetail.tsx")).toContain("Übersicht");
     expect(read("src/App.tsx")).toContain('path="orders"');
     expect(read("src/App.tsx")).toContain('path="/orders"');
   });
@@ -58,7 +58,6 @@ describe("hub admin navigation", () => {
         "/admin/import-history",
         "/admin/users",
         "/admin/surcharges",
-        "/admin/shipping",
         "/admin/shipping-costs",
         "/admin/order-summary",
         "/admin/audit-log",
@@ -71,11 +70,12 @@ describe("hub admin navigation", () => {
   it("groups Bestellungen, Produkte, Benutzer & Rollen, and Inhalte as in-page tabs", () => {
     const orders = ADMIN_NAV_GROUPS.find((group) => group.id === "orders");
     expect(orders?.items.map((item) => item.label)).toEqual([
-      "Eingegangene Bestellungen",
+      "Übersicht",
       "Bestell Zusammenfassung",
-      "Versand",
       "Versandkosten",
     ]);
+    expect(orders?.items.map((item) => item.label)).not.toContain("Versand");
+    expect(orders?.items.map((item) => item.label)).not.toContain("Eingegangene Bestellungen");
     const products = ADMIN_NAV_GROUPS.find((group) => group.id === "products");
     expect(products?.items.map((item) => item.label)).toEqual(["Produktkatalog", "Import", "Import-Verlauf"]);
     const users = ADMIN_NAV_GROUPS.find((group) => group.id === "users");
@@ -120,6 +120,10 @@ describe("hub admin navigation", () => {
       expect(app).toContain(path);
     }
     expect(app).toContain("AdminRoute");
+    expect(app).toContain('Navigate to="/admin/orders"');
+    expect(app).toContain("RedirectAdminShippingOrder");
+    expect(app).not.toContain("AdminShipmentCenterPage");
+    expect(app).not.toContain("AdminShipmentManagePage");
   });
 });
 

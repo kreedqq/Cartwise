@@ -2,6 +2,17 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-05 (Bestellverwaltung zusammengeführt)
+
+### Changed
+
+- Bestellungen tabs are now Übersicht, Bestell Zusammenfassung, and Versandkosten. The separate Versand tab is gone.
+- Customer progress dropdown and shipment tracking live on `/admin/orders` and `/admin/orders/:id`. Legacy `/admin/shipping` URLs redirect there.
+
+### Notes
+
+- No migration. `orders.status`, Resend, kits, and Versandkosten are unchanged.
+
 ## 2026-09-05 (Versandfortschritt als 7 feste Status)
 
 ### Changed

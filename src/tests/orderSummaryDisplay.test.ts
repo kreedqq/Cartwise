@@ -7,12 +7,14 @@ function read(path: string): string {
 }
 
 describe("admin Bestell Zusammenfassung", () => {
-  it("adds the Bestell Zusammenfassung tab next to Eingegangene Bestellungen", () => {
+  it("adds the Bestell Zusammenfassung tab next to Übersicht", () => {
     const nav = read("src/lib/adminNav.ts");
     expect(nav).toContain('label: "Bestell Zusammenfassung"');
     expect(nav).toContain('to: "/admin/order-summary"');
-    expect(nav).toContain("Eingegangene Bestellungen");
-    expect(nav.indexOf('label: "Bestell Zusammenfassung"')).toBeLessThan(nav.indexOf('label: "Versand"'));
+    expect(nav).toContain('label: "Übersicht"');
+    expect(nav).not.toContain('label: "Versand"');
+    expect(nav.indexOf('label: "Übersicht"')).toBeLessThan(nav.indexOf('label: "Bestell Zusammenfassung"'));
+    expect(nav.indexOf('label: "Bestell Zusammenfassung"')).toBeLessThan(nav.indexOf('label: "Versandkosten"'));
     expect(nav).toContain('label: "Versandkosten"');
     expect(nav).toContain('to: "/admin/shipping-costs"');
     expect(read("src/App.tsx")).toContain('path="order-summary"');

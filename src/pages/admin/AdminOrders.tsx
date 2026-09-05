@@ -13,9 +13,12 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OrderStatusSelect } from "@/components/orders/OrderStatusSelect";
 import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
+import { ShippingProgressSelect } from "@/components/orders/ShippingProgressSelect";
 import { toast } from "@/components/ui/toaster";
 import { useAdminOrderItems, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
+import { useAdminOrderProgressMap } from "@/hooks/useOrderProgress";
 import { useSetOrderStatus } from "@/hooks/useOrders";
+import { resolveOrderProgress } from "@/lib/orderProgress";
 import { buildAdminOrderItemsCsv, downloadOrdersListCsv } from "@/lib/orderExport";
 import { formatDateTime, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { formatDeliveryMethodLabel } from "@/lib/shippingAddress";
@@ -45,6 +48,7 @@ export default function AdminOrdersPage() {
   const navigate = useNavigate();
   const ordersQuery = useAdminOrders();
   const itemsQuery = useAdminOrderItems();
+  const progressQuery = useAdminOrderProgressMap();
   const directoryQuery = useAdminUserDirectory();
   const setStatusMutation = useSetOrderStatus();
   const [search, setSearch] = React.useState("");
@@ -140,7 +144,7 @@ export default function AdminOrdersPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        title="Eingegangene Bestellungen"
+        title="Übersicht"
         description={`${filtered.length} ${filtered.length === 1 ? "Bestellung" : "Bestellungen"}${hasFilters ? " gefunden" : " gesamt"}`}
         actions={
           <Button variant="outline" size="sm" onClick={handleExport} disabled={filtered.length === 0}>
@@ -213,6 +217,7 @@ export default function AdminOrdersPage() {
                   <TableHead>Telegram Benutzername</TableHead>
                   <TableHead>Datum</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Fortschritt</TableHead>
                   <TableHead>Zahlung</TableHead>
                   <TableHead className="pr-4 text-right">Gesamt</TableHead>
                 </TableRow>
@@ -237,6 +242,25 @@ export default function AdminOrdersPage() {
                         disabled={pendingOrderId === order.id}
                         onValueChange={(next) => void handleStatusChange(order.id, next)}
                       />
+                    </TableCell>
+                    <TableCell onClick={(event) => event.stopPropagation()}>
+                      <div className="min-w-[10rem] max-w-[14rem] space-y-1.5">
+                        <ShippingProgressSelect
+                          orderId={order.id}
+                          storedStatusKey={progressQuery.data?.get(order.id)?.status_key}
+                          disabled={order.status === "cancelled"}
+                        />
+                        <p className="text-[11px] tabular-nums text-muted-foreground">
+                          {
+                            resolveOrderProgress(
+                              order.status,
+                              progressQuery.data?.get(order.id),
+                              order.submitted_at,
+                            ).progressPercent
+                          }{" "}
+                          %
+                        </p>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <PaymentMethodBadge paymentMethod={order.payment_method} />
@@ -288,6 +312,20 @@ export default function AdminOrdersPage() {
                     className="w-[11.5rem] shrink-0"
                     onValueChange={(next) => void handleStatusChange(order.id, next)}
                   />
+                </div>
+                <div className="min-w-0 space-y-1.5">
+                  <ShippingProgressSelect
+                    orderId={order.id}
+                    storedStatusKey={progressQuery.data?.get(order.id)?.status_key}
+                    disabled={order.status === "cancelled"}
+                  />
+                  <p className="text-[11px] tabular-nums text-muted-foreground">
+                    {
+                      resolveOrderProgress(order.status, progressQuery.data?.get(order.id), order.submitted_at)
+                        .progressPercent
+                    }{" "}
+                    %
+                  </p>
                 </div>
                 <button
                   type="button"

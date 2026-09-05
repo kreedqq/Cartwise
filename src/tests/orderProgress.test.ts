@@ -178,8 +178,11 @@ describe("order progress UI wiring", () => {
     const service = readFileSync(resolve(process.cwd(), "src/services/orderProgress.ts"), "utf8");
     const tracker = readFileSync(resolve(process.cwd(), "src/components/orders/OrderProgressTracker.tsx"), "utf8");
     expect(admin).toContain("Bestellfortschritt");
-    expect(admin).toContain("AdminOrderProgressEditor");
+    expect(admin).toContain("ShippingProgressSelect");
+    expect(admin).not.toContain("AdminOrderProgressEditor");
+    expect(admin).not.toContain("OrderProgressFormFields");
     expect(admin).toContain("OrderStatusSelect");
+    expect(admin).toContain("AdminOrderTrackingForm");
     expect(customer).toContain("OrderProgressTracker");
     expect(customer).toContain("OrderTrackingCard");
     expect(customer).not.toContain("useUpsertOrderProgress");
@@ -199,23 +202,23 @@ describe("order progress UI wiring", () => {
     expect(tracker).not.toContain("50vw");
   });
 
-  it("moves shipping progress control to the hub dropdown and keeps tracking on manage", () => {
-    const hub = readFileSync(resolve(process.cwd(), "src/pages/admin/AdminShipmentCenter.tsx"), "utf8");
-    const manage = readFileSync(resolve(process.cwd(), "src/pages/admin/AdminShipmentManage.tsx"), "utf8");
+  it("keeps the seven shipping statuses on the order overview and detail", () => {
+    const overview = readFileSync(resolve(process.cwd(), "src/pages/admin/AdminOrders.tsx"), "utf8");
+    const detail = readFileSync(resolve(process.cwd(), "src/pages/admin/AdminOrderDetail.tsx"), "utf8");
     const select = readFileSync(resolve(process.cwd(), "src/components/orders/ShippingProgressSelect.tsx"), "utf8");
-    expect(hub).toContain("ShippingProgressSelect");
-    expect(hub).toContain("Verwalten");
-    expect(hub).not.toContain("set_order_status");
-    expect(hub).not.toContain("useSetOrderStatus");
+    const tracking = readFileSync(resolve(process.cwd(), "src/components/orders/AdminOrderTrackingForm.tsx"), "utf8");
+    expect(overview).toContain("ShippingProgressSelect");
+    expect(overview).toContain("OrderStatusSelect");
+    expect(detail).toContain("ShippingProgressSelect");
+    expect(detail).toContain("AdminOrderTrackingForm");
+    expect(detail).toContain("Bestellung stornieren");
     expect(select).toContain("SHIPPING_PROGRESS_STATUSES");
     expect(select).toContain("shippingProgressWritePayload");
     expect(select).toContain("useUpsertOrderProgress");
-    expect(manage).toContain("Sendungsverfolgung");
-    expect(manage).toContain("useSaveOrderTracking");
-    expect(manage).toContain("Test-E-Mail an mich");
-    expect(manage).not.toContain("OrderProgressFormFields");
-    expect(manage).not.toContain("Vorlage verwenden");
-    expect(manage).not.toContain("Fortschritt speichern");
-    expect(manage).not.toContain('type="range"');
+    expect(tracking).toContain("useSaveOrderTracking");
+    expect(tracking).toContain("Test-E-Mail an mich");
+    expect(detail).not.toContain("OrderProgressFormFields");
+    expect(detail).not.toContain("Vorlage verwenden");
+    expect(detail).not.toContain('type="range"');
   });
 });

@@ -2,9 +2,11 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-04** (admin Versandzentrale + tracking).
+Last documentation pass: **2026-09-05** (admin order hub consolidation).
 
-**Update 2026-09-05 (Versandfortschritt Dropdown)**: `/admin/shipping` now sets customer progress with seven fixed statuses (title + description + percent) via existing `upsert_order_progress`. No slider or free texts on `/admin/shipping/:orderId`. `orders.status`, tracking, kits, and RLS unchanged. No migration.
+**Update 2026-09-05 (Bestellverwaltung zusammengeführt)**: Bestellungen tabs are Übersicht `/admin/orders`, Bestell Zusammenfassung, Versandkosten. Separate Versand tab removed. Progress dropdown and tracking live on Übersicht / `/admin/orders/:id`. Legacy `/admin/shipping` and `/admin/shipping/:orderId` redirect there. `orders.status`, kits, Resend, and RLS unchanged. No migration.
+
+**Update 2026-09-05 (Versandfortschritt Dropdown)**: Customer progress uses seven fixed statuses (title + description + percent) via existing `upsert_order_progress`. `orders.status`, tracking, kits, and RLS unchanged. No migration.
 
 **Update 2026-09-04 (Versandzentrale)**: Existing Versandkosten stay at `/admin/shipping-costs`. New admin hub `/admin/shipping` manages order progress, tracking, and cancel via existing `cancelled` status. `order_progress.title` plus `orders.tracking_*` (migration `0050`). Tracking email is Edge Function `send-tracking-email` (Resend secret, once per order via `tracking_notification_sent_at`). Shared-kit merchant aggregation is unchanged and still uses processing orders only.
 
@@ -109,7 +111,7 @@ Sidebar: Übersicht `/dashboard`, Shop `/shop`, **Kit Gesuche** `/kit-gesuche`, 
 
 Mobile: same set plus Favorites in `MAIN_NAV_ITEMS`; peptide label **Lexikon & Rechner**; Kit Gesuche short label **Kits** on the bottom bar.
 
-Admin nav (five hubs, in-page tabs): Übersicht `/admin`; Bestellungen → Eingegangene Bestellungen `/admin/orders`, Bestell Zusammenfassung `/admin/order-summary`, Versand `/admin/shipping`, Versandkosten `/admin/shipping-costs`; Produkte → Produktkatalog / Import / Import-Verlauf; Benutzer & Rollen → Benutzer & Rollen `/admin/users`, Rollenaufschläge `/admin/surcharges`, Audit-Log `/admin/audit-log`; Inhalte → Research. `/admin/roles` still exists and redirects to `/admin/users`.
+Admin nav (five hubs, in-page tabs): Übersicht `/admin`; Bestellungen → Übersicht `/admin/orders`, Bestell Zusammenfassung `/admin/order-summary`, Versandkosten `/admin/shipping-costs`; Produkte → Produktkatalog / Import / Import-Verlauf; Benutzer & Rollen → Benutzer & Rollen `/admin/users`, Rollenaufschläge `/admin/surcharges`, Audit-Log `/admin/audit-log`; Inhalte → Research. `/admin/roles` still exists and redirects to `/admin/users`. `/admin/shipping` redirects to `/admin/orders`.
 
 ### Routes (`src/App.tsx`)
 
