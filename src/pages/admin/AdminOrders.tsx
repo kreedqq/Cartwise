@@ -11,13 +11,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { OrderStatusSelect } from "@/components/orders/OrderStatusSelect";
 import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { ShippingProgressSelect } from "@/components/orders/ShippingProgressSelect";
-import { toast } from "@/components/ui/toaster";
 import { useAdminOrderItems, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
 import { useAdminOrderProgressMap } from "@/hooks/useOrderProgress";
-import { useSetOrderStatus } from "@/hooks/useOrders";
 import { resolveOrderProgress } from "@/lib/orderProgress";
 import { buildAdminOrderItemsCsv, downloadOrdersListCsv } from "@/lib/orderExport";
 import { formatDateTime, formatUsd, summarizeOrderCharges } from "@/lib/money";
@@ -50,11 +47,9 @@ export default function AdminOrdersPage() {
   const itemsQuery = useAdminOrderItems();
   const progressQuery = useAdminOrderProgressMap();
   const directoryQuery = useAdminUserDirectory();
-  const setStatusMutation = useSetOrderStatus();
   const [search, setSearch] = React.useState("");
   const [status, setStatus] = React.useState<"all" | OrderStatus>("all");
   const [payment, setPayment] = React.useState("all");
-  const [pendingOrderId, setPendingOrderId] = React.useState<string | null>(null);
 
   const filtered = React.useMemo(() => {
     const orders = ordersQuery.data ?? [];
@@ -81,19 +76,6 @@ export default function AdminOrdersPage() {
       );
     });
   }, [ordersQuery.data, itemsQuery.data, directoryQuery.data, search, status, payment]);
-
-  async function handleStatusChange(orderId: string, nextStatus: OrderStatus) {
-    setPendingOrderId(orderId);
-    try {
-      await setStatusMutation.mutateAsync({ orderId, status: nextStatus });
-      toast.success(`Status: ${ORDER_STATUS_LABELS[nextStatus]}`);
-    } catch (error) {
-      console.error("Bestellstatus ändern fehlgeschlagen:", error);
-      toast.error(error instanceof Error ? error.message : "Status konnte nicht geändert werden.");
-    } finally {
-      setPendingOrderId(null);
-    }
-  }
 
   function handleExport() {
     const items = itemsQuery.data ?? [];
@@ -217,7 +199,6 @@ export default function AdminOrdersPage() {
                   <TableHead>Telegram Benutzername</TableHead>
                   <TableHead>Datum</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Fortschritt</TableHead>
                   <TableHead>Zahlung</TableHead>
                   <TableHead className="pr-4 text-right">Gesamt</TableHead>
                 </TableRow>
@@ -235,13 +216,6 @@ export default function AdminOrdersPage() {
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                       {formatDateTime(order.submitted_at)}
-                    </TableCell>
-                    <TableCell onClick={(event) => event.stopPropagation()}>
-                      <OrderStatusSelect
-                        value={order.status}
-                        disabled={pendingOrderId === order.id}
-                        onValueChange={(next) => void handleStatusChange(order.id, next)}
-                      />
                     </TableCell>
                     <TableCell onClick={(event) => event.stopPropagation()}>
                       <div className="min-w-[10rem] max-w-[14rem] space-y-1.5">
@@ -306,12 +280,6 @@ export default function AdminOrdersPage() {
                       Telegram: {formatOrderTelegramSnapshot(order)}
                     </p>
                   </button>
-                  <OrderStatusSelect
-                    value={order.status}
-                    disabled={pendingOrderId === order.id}
-                    className="w-[11.5rem] shrink-0"
-                    onValueChange={(next) => void handleStatusChange(order.id, next)}
-                  />
                 </div>
                 <div className="min-w-0 space-y-1.5">
                   <ShippingProgressSelect

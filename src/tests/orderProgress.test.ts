@@ -208,8 +208,12 @@ describe("order progress UI wiring", () => {
     const select = readFileSync(resolve(process.cwd(), "src/components/orders/ShippingProgressSelect.tsx"), "utf8");
     const tracking = readFileSync(resolve(process.cwd(), "src/components/orders/AdminOrderTrackingForm.tsx"), "utf8");
     expect(overview).toContain("ShippingProgressSelect");
-    expect(overview).toContain("OrderStatusSelect");
+    expect(overview).not.toContain("OrderStatusSelect");
+    expect(overview).not.toContain("useSetOrderStatus");
+    expect(overview).toContain("<TableHead>Status</TableHead>");
+    expect(overview).not.toContain("<TableHead>Fortschritt</TableHead>");
     expect(detail).toContain("ShippingProgressSelect");
+    expect(detail).toContain("OrderStatusSelect");
     expect(detail).toContain("AdminOrderTrackingForm");
     expect(detail).toContain("Bestellung stornieren");
     expect(select).toContain("SHIPPING_PROGRESS_STATUSES");

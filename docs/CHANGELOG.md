@@ -2,6 +2,16 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-05 (Übersicht: eine Statusspalte)
+
+### Changed
+
+- `/admin/orders` list shows one Status column: the existing `ShippingProgressSelect` / `order_progress` value (including percent). The internal `orders.status` dropdown is no longer visible in the list (desktop or mobile).
+
+### Notes
+
+- No migration. Detail page still has `OrderStatusSelect`. `orders.status`, tracking, PDFs, CSV, and RLS are unchanged.
+
 ## 2026-09-05 (Bestellverwaltung zusammengeführt)
 
 ### Changed

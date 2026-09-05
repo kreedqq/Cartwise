@@ -44,10 +44,12 @@ describe("admin Bestell Zusammenfassung", () => {
     expect(read("src/lib/orderSummary.ts")).not.toContain("from(\"profiles\")");
   });
 
-  it("keeps the inbox order number and adds a status dropdown", () => {
+  it("keeps the inbox order number and shows shipping progress as the list status", () => {
     const inbox = read("src/pages/admin/AdminOrders.tsx");
     expect(inbox).toContain("{order.order_number}");
-    expect(inbox).toContain("OrderStatusSelect");
+    expect(inbox).toContain("ShippingProgressSelect");
+    expect(inbox).not.toContain("OrderStatusSelect");
+    expect(inbox).not.toContain("useSetOrderStatus");
     expect(inbox).toContain("ADMIN_WORKFLOW_STATUSES");
     expect(read("src/services/orders.ts")).toContain("Bestellung abgesendet");
     expect(inbox).not.toContain("profiles.username");

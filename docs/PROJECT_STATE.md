@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-05** (admin order hub consolidation).
+Last documentation pass: **2026-09-05** (admin orders list: one Status column).
+
+**Update 2026-09-05 (Übersicht eine Statusspalte)**: `/admin/orders` list Status column is `ShippingProgressSelect` / `order_progress` only. Internal `orders.status` stays on the detail page and in the filter. No migration.
 
 **Update 2026-09-05 (Bestellverwaltung zusammengeführt)**: Bestellungen tabs are Übersicht `/admin/orders`, Bestell Zusammenfassung, Versandkosten. Separate Versand tab removed. Progress dropdown and tracking live on Übersicht / `/admin/orders/:id`. Legacy `/admin/shipping` and `/admin/shipping/:orderId` redirect there. `orders.status`, kits, Resend, and RLS unchanged. No migration.
 
