@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ShippingProgressSelect } from "@/components/orders/ShippingProgressSelect";
 import { useAdminOrders } from "@/hooks/useAdminOrders";
 import { useAdminOrderProgressMap } from "@/hooks/useOrderProgress";
 import { resolveOrderProgress } from "@/lib/orderProgress";
@@ -192,8 +193,13 @@ export default function AdminShipmentCenterPage() {
                         <OrderStatusBadge status={order.status} />
                       </td>
                       <td className="px-4 py-3">
-                        <div className="min-w-[8rem] max-w-[12rem]">
-                          <div className="mb-1 flex items-center justify-between text-[11px] text-muted-foreground">
+                        <div className="min-w-[10rem] max-w-[14rem] space-y-1.5">
+                          <ShippingProgressSelect
+                            orderId={order.id}
+                            storedStatusKey={progressQuery.data?.get(order.id)?.status_key}
+                            disabled={order.status === "cancelled"}
+                          />
+                          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                             <span className="truncate pr-2">{progress.statusLabel}</span>
                             <span className="font-mono tabular-nums text-primary">{progress.progressPercent} %</span>
                           </div>
@@ -246,9 +252,14 @@ export default function AdminShipmentCenterPage() {
                     </div>
                     <OrderStatusBadge status={order.status} />
                   </div>
-                  <div>
-                    <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{progress.statusLabel}</span>
+                  <div className="min-w-0 space-y-1.5">
+                    <ShippingProgressSelect
+                      orderId={order.id}
+                      storedStatusKey={progressQuery.data?.get(order.id)?.status_key}
+                      disabled={order.status === "cancelled"}
+                    />
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span className="min-w-0 truncate pr-2">{progress.statusLabel}</span>
                       <span className="font-mono tabular-nums text-primary">{progress.progressPercent} %</span>
                     </div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-secondary">

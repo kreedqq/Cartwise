@@ -6,8 +6,11 @@ import {
   clampProgressPercent,
   defaultOrderProgress,
   isOrderProgressStatusKey,
+  isShippingProgressStatusKey,
   ORDER_PROGRESS_TEMPLATES,
   resolveOrderProgress,
+  SHIPPING_PROGRESS_STATUSES,
+  shippingProgressWritePayload,
 } from "@/lib/orderProgress";
 
 describe("orderProgress", () => {
@@ -22,15 +25,15 @@ describe("orderProgress", () => {
     expect(defaultOrderProgress("cancelled").isCancelled).toBe(true);
   });
 
-  it("uses stored admin title and description independently of status_key", () => {
+  it("keeps stored title and percent for legacy keys outside the shipping dropdown", () => {
     const view = resolveOrderProgress("processing", {
-      status_key: "processing",
+      status_key: "received",
       progress_percent: 32,
       title: "Ihre Bestellung wird vorbereitet",
       comment: "Wir prüfen aktuell Ihre Bestellung und bereiten die nächsten Schritte vor.",
       updated_at: "2026-09-04T10:00:00.000Z",
     });
-    expect(view.statusKey).toBe("processing");
+    expect(view.statusKey).toBe("received");
     expect(view.statusLabel).toBe("Ihre Bestellung wird vorbereitet");
     expect(view.progressPercent).toBe(32);
     expect(view.comment).toContain("prüfen aktuell");
@@ -38,11 +41,11 @@ describe("orderProgress", () => {
     expect(view.isCancelled).toBe(false);
   });
 
-  it("allows any percent from 0 through 100", () => {
+  it("allows any percent from 0 through 100 on legacy stored rows", () => {
     for (const percent of [0, 1, 45, 99, 100]) {
       expect(
         resolveOrderProgress("processing", {
-          status_key: "submitted",
+          status_key: "received",
           progress_percent: percent,
           title: "Frei",
           comment: "Frei beschreibbar",
@@ -54,6 +57,50 @@ describe("orderProgress", () => {
     expect(clampProgressPercent(140)).toBe(100);
     expect(clampProgressPercent(7)).toBe(7);
     expect(clampProgressPercent(61)).toBe(61);
+  });
+
+  it("maps the seven shipping statuses to fixed title, description, and percent", () => {
+    expect(SHIPPING_PROGRESS_STATUSES).toHaveLength(7);
+    expect(SHIPPING_PROGRESS_STATUSES.map((status) => status.title)).toEqual([
+      "Bestellung wird bearbeitet",
+      "Beim Händler bestellt",
+      "Aus China versendet",
+      "In Deutschland eingetroffen",
+      "Für den Versand vorbereitet",
+      "Bestellung ist unterwegs",
+      "Bestellung abgeschlossen",
+    ]);
+    expect(SHIPPING_PROGRESS_STATUSES.map((status) => status.progressPercent)).toEqual([10, 25, 50, 65, 80, 90, 100]);
+    expect(isShippingProgressStatusKey("received")).toBe(false);
+    expect(isShippingProgressStatusKey("ordered_from_merchant")).toBe(false);
+
+    for (const status of SHIPPING_PROGRESS_STATUSES) {
+      const payload = shippingProgressWritePayload(status.key);
+      expect(payload).toEqual({
+        statusKey: status.key,
+        progressPercent: status.progressPercent,
+        title: status.title,
+        comment: status.description,
+      });
+      const view = resolveOrderProgress("processing", {
+        status_key: status.key,
+        progress_percent: 3,
+        title: "veralteter Titel",
+        comment: "veraltete Beschreibung",
+        updated_at: "2026-09-04T10:00:00.000Z",
+      });
+      expect(view.statusLabel).toBe(status.title);
+      expect(view.comment).toBe(status.description);
+      expect(view.progressPercent).toBe(status.progressPercent);
+    }
+  });
+
+  it("does not write orders.status when building a shipping progress payload", () => {
+    const payload = shippingProgressWritePayload("shipped");
+    expect(payload).not.toHaveProperty("status");
+    expect(JSON.stringify(payload)).not.toContain("dispatched");
+    expect(payload.statusKey).toBe("shipped");
+    expect(payload.progressPercent).toBe(50);
   });
 
   it("does not let a cancelled order look like it is still moving", () => {
@@ -150,5 +197,25 @@ describe("order progress UI wiring", () => {
     expect(service).not.toMatch(/\.from\("order_progress"\)\.upsert/);
     expect(tracker).toContain("max-w-[50rem]");
     expect(tracker).not.toContain("50vw");
+  });
+
+  it("moves shipping progress control to the hub dropdown and keeps tracking on manage", () => {
+    const hub = readFileSync(resolve(process.cwd(), "src/pages/admin/AdminShipmentCenter.tsx"), "utf8");
+    const manage = readFileSync(resolve(process.cwd(), "src/pages/admin/AdminShipmentManage.tsx"), "utf8");
+    const select = readFileSync(resolve(process.cwd(), "src/components/orders/ShippingProgressSelect.tsx"), "utf8");
+    expect(hub).toContain("ShippingProgressSelect");
+    expect(hub).toContain("Verwalten");
+    expect(hub).not.toContain("set_order_status");
+    expect(hub).not.toContain("useSetOrderStatus");
+    expect(select).toContain("SHIPPING_PROGRESS_STATUSES");
+    expect(select).toContain("shippingProgressWritePayload");
+    expect(select).toContain("useUpsertOrderProgress");
+    expect(manage).toContain("Sendungsverfolgung");
+    expect(manage).toContain("useSaveOrderTracking");
+    expect(manage).toContain("Test-E-Mail an mich");
+    expect(manage).not.toContain("OrderProgressFormFields");
+    expect(manage).not.toContain("Vorlage verwenden");
+    expect(manage).not.toContain("Fortschritt speichern");
+    expect(manage).not.toContain('type="range"');
   });
 });

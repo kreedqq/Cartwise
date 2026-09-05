@@ -4,7 +4,9 @@
 
 Last documentation pass: **2026-09-04** (admin Versandzentrale + tracking).
 
-**Update 2026-09-04 (Versandzentrale)**: Existing Versandkosten stay at `/admin/shipping-costs`. New admin hub `/admin/shipping` manages order progress (free title, description, 0–100%), tracking, and cancel via existing `cancelled` status. `order_progress.title` plus `orders.tracking_*` (migration `0050`). Tracking email is Edge Function `send-tracking-email` (Resend secret, once per order via `tracking_notification_sent_at`). Shared-kit merchant aggregation is unchanged and still uses processing orders only.
+**Update 2026-09-05 (Versandfortschritt Dropdown)**: `/admin/shipping` now sets customer progress with seven fixed statuses (title + description + percent) via existing `upsert_order_progress`. No slider or free texts on `/admin/shipping/:orderId`. `orders.status`, tracking, kits, and RLS unchanged. No migration.
+
+**Update 2026-09-04 (Versandzentrale)**: Existing Versandkosten stay at `/admin/shipping-costs`. New admin hub `/admin/shipping` manages order progress, tracking, and cancel via existing `cancelled` status. `order_progress.title` plus `orders.tracking_*` (migration `0050`). Tracking email is Edge Function `send-tracking-email` (Resend secret, once per order via `tracking_notification_sent_at`). Shared-kit merchant aggregation is unchanged and still uses processing orders only.
 
 **Update 2026-09-04 (Bestellzusammenfassung runtime + recovery pack)**: Live `/admin/order-summary` on `https://peptix.app` was opened with an admin session. It showed **0 processing orders** because PepQueen `CW-2026-000030` and Penbuddy `CW-2026-000036` are both `dispatched` (all 10 production orders are). Production chunk `AdminOrderSummary-D1tzB2dC.js` already contains `kit-complete:${kitShareId}` personLines merge and PDF `BESTELLUNGEN` reads `personLines.quantityLabel`. No second formatter, no status rewrite, no migration. Recovery docs: `docs/RECOVERY.md`, `docs/SETUP_NEW_MACHINE.md`, `docs/AUTH_PROVIDERS.md`, `docs/PRODUCTION_SCHEMA.md`. Source zip is outside Git under `Documents\PEPTIX-BACKUPS\`.
 

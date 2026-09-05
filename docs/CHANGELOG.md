@@ -2,6 +2,17 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-05 (Versandfortschritt als 7 feste Status)
+
+### Changed
+
+- `/admin/shipping` sets customer progress via a 7-status dropdown. Title, description, and percent come from one mapping in `orderProgress.ts` and still write through `upsert_order_progress`. `orders.status` is unchanged.
+- `/admin/shipping/:orderId` no longer has the free title/description/slider editor. Tracking, test email, and cancel stay on that page.
+
+### Notes
+
+- No migration. Existing `order_progress.status_key` values are reused (`processing`, `submitted`, `shipped`, `arrived`, `preparing_shipment`, `out_for_delivery`, `completed`). Legacy `received` rows stay readable.
+
 ## 2026-09-04 (admin Versandzentrale)
 
 ### Added

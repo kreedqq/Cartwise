@@ -8,11 +8,6 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { CancelOrderDialog } from "@/components/orders/CancelOrderDialog";
-import {
-  OrderProgressFormFields,
-  OrderProgressLivePreview,
-  type OrderProgressDraft,
-} from "@/components/orders/OrderProgressForm";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { OrderTrackingCard } from "@/components/orders/OrderTrackingCard";
 import { Button } from "@/components/ui/button";
@@ -22,10 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/components/ui/toaster";
 import { useAdminUserDirectory } from "@/hooks/useAdminOrders";
 import { useAdminOrder, useSetOrderStatus } from "@/hooks/useOrders";
-import { useOrderProgress, useUpsertOrderProgress } from "@/hooks/useOrderProgress";
 import { useSaveOrderTracking, useTestTrackingEmail } from "@/hooks/useOrderTracking";
 import { formatDateTime } from "@/lib/money";
-import { clampProgressPercent, resolveOrderProgress } from "@/lib/orderProgress";
 import { formatShippingListDate } from "@/lib/shippingHub";
 import {
   TRACKING_CARRIER_OPTIONS,
@@ -39,40 +32,17 @@ import {
 } from "@/lib/tracking";
 import { formatOrderTelegramSnapshot, ORDER_STATUS_LABELS } from "@/services/orders";
 
-function progressDraftsEqual(a: OrderProgressDraft, b: OrderProgressDraft): boolean {
-  return (
-    a.statusKey === b.statusKey &&
-    a.title === b.title &&
-    a.description === b.description &&
-    clampProgressPercent(a.percent) === clampProgressPercent(b.percent)
-  );
-}
-
 export default function AdminShipmentManagePage() {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
   const orderQuery = useAdminOrder(orderId);
-  const progressQuery = useOrderProgress(orderId);
   const directoryQuery = useAdminUserDirectory();
-  const saveProgress = useUpsertOrderProgress(orderId ?? "");
   const saveTracking = useSaveOrderTracking(orderId ?? "");
   const testEmail = useTestTrackingEmail(orderId ?? "");
   const setStatus = useSetOrderStatus(orderId ?? "");
 
   const order = orderQuery.data;
-  const resolved = order
-    ? resolveOrderProgress(order.status, progressQuery.data, order.submitted_at)
-    : null;
-  const savedProgress: OrderProgressDraft | null = resolved
-    ? {
-        statusKey: resolved.statusKey,
-        title: progressQuery.data?.title?.trim() || (resolved.isCancelled ? "" : resolved.statusLabel),
-        description: resolved.isCancelled ? progressQuery.data?.comment?.trim() || "" : resolved.comment,
-        percent: String(resolved.progressPercent),
-      }
-    : null;
 
-  const [progressDraft, setProgressDraft] = React.useState<OrderProgressDraft | null>(null);
   const [trackingDraft, setTrackingDraft] = React.useState<{
     carrier: TrackingCarrierKey;
     trackingNumber: string;
@@ -90,8 +60,6 @@ export default function AdminShipmentManagePage() {
     trackingDraft?.urlTouched ??
     Boolean(savedUrl && savedUrl !== (buildCarrierTrackingUrl(savedCarrier, savedNumber) ?? ""));
   const trackingUrl = trackingDraft?.trackingUrl ?? savedUrl;
-  const currentProgress = progressDraft ?? savedProgress;
-  const progressDirty = Boolean(savedProgress && progressDraft && !progressDraftsEqual(progressDraft, savedProgress));
   const resolvedUrl = urlTouched
     ? trackingUrl.trim()
     : resolveTrackingUrl({ carrier, trackingNumber, customUrl: trackingUrl }) ?? "";
@@ -99,7 +67,7 @@ export default function AdminShipmentManagePage() {
     normalizeTrackingNumber(trackingNumber) !== normalizeTrackingNumber(savedNumber) ||
     carrier !== savedCarrier ||
     (resolvedUrl || "") !== (savedUrl || "");
-  const dirty = progressDirty || trackingDirty;
+  const dirty = trackingDirty;
 
   React.useEffect(() => {
     if (!dirty) return;
@@ -116,15 +84,11 @@ export default function AdminShipmentManagePage() {
   if (orderQuery.isError) {
     return <ErrorState message="Bestellung konnte nicht geladen werden." onRetry={() => orderQuery.refetch()} />;
   }
-  if (!order || !currentProgress || !resolved) return <EmptyState title="Bestellung nicht gefunden" />;
+  if (!order) return <EmptyState title="Bestellung nicht gefunden" />;
 
   const customer = order.user_id ? directoryQuery.data?.get(order.user_id) : undefined;
   const assignedBy = order.tracking_assigned_by ? directoryQuery.data?.get(order.tracking_assigned_by) : undefined;
   const cancelled = order.status === "cancelled";
-
-  function updateProgress(patch: Partial<OrderProgressDraft>) {
-    setProgressDraft({ ...currentProgress!, ...patch });
-  }
 
   function updateTracking(
     patch: Partial<{
@@ -153,22 +117,6 @@ export default function AdminShipmentManagePage() {
 
   function handleNumberChange(value: string) {
     updateTracking({ trackingNumber: value });
-  }
-
-  async function handleSaveProgress() {
-    try {
-      await saveProgress.mutateAsync({
-        statusKey: currentProgress!.statusKey,
-        progressPercent: clampProgressPercent(currentProgress!.percent),
-        comment: currentProgress!.description.trim() || null,
-        title: currentProgress!.title.trim() || null,
-      });
-      setProgressDraft(null);
-      toast.success("Bestellfortschritt gespeichert.");
-    } catch (error) {
-      console.error("Bestellfortschritt speichern fehlgeschlagen:", error);
-      toast.error(error instanceof Error ? error.message : "Fortschritt konnte nicht gespeichert werden.");
-    }
   }
 
   async function handleSaveTracking() {
@@ -244,7 +192,7 @@ export default function AdminShipmentManagePage() {
 
       <AdminPageHeader
         title="Bestellung verwalten"
-        description="Bestellfortschritt, Sendungsverfolgung und Stornierung an einem Ort."
+        description="Sendungsverfolgung und Stornierung an einem Ort. Den Kundenfortschritt steuerst du in der Versandübersicht."
         actions={
           <Button variant="outline" size="sm" onClick={() => navigate(`/admin/orders/${order.id}`)}>
             Zur Bestelldetailseite
@@ -275,17 +223,9 @@ export default function AdminShipmentManagePage() {
               <OrderStatusBadge status={order.status} />
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              Interner Status: {ORDER_STATUS_LABELS[order.status]}. Die Kundenanzeige kommt aus den frei
-              editierbaren Fortschrittstexten.
+              Interner Status: {ORDER_STATUS_LABELS[order.status]}. Der Kundenfortschritt wird in der
+              Versandübersicht gesetzt und bleibt davon getrennt.
             </p>
-          </AdminSection>
-
-          <AdminSection title="Bestellfortschritt" padded>
-            <OrderProgressFormFields
-              draft={currentProgress}
-              onChange={updateProgress}
-              disabled={saveProgress.isPending}
-            />
           </AdminSection>
 
           <AdminSection title="Sendungsverfolgung" padded>
@@ -354,9 +294,6 @@ export default function AdminShipmentManagePage() {
 
           <AdminSection title="Aktionen" padded>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Button onClick={() => void handleSaveProgress()} loading={saveProgress.isPending} disabled={!progressDirty}>
-                Fortschritt speichern
-              </Button>
               <Button
                 onClick={() => void handleSaveTracking()}
                 loading={saveTracking.isPending}
@@ -384,11 +321,6 @@ export default function AdminShipmentManagePage() {
         </div>
 
         <div className="space-y-4 xl:sticky xl:top-6 xl:self-start">
-          <OrderProgressLivePreview
-            draft={currentProgress}
-            updatedAt={resolved.updatedAt}
-            isCancelled={cancelled}
-          />
           <OrderTrackingCard
             tracking={{
               tracking_number: normalizeTrackingNumber(trackingNumber) ?? order.tracking_number,

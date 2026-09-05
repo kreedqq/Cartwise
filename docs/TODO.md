@@ -37,6 +37,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] Shop selling prices only via shop RPCs (not lexicon)
 
 - [x] 2026-09-04 admin Versandzentrale (`/admin/shipping`), Versandkosten moved to `/admin/shipping-costs`, tracking + cancel + free progress texts (migration `0050`)
+- [x] 2026-09-05 Versandübersicht: 7 feste Kundenfortschritt-Status per Dropdown; manuelle Fortschrittsfelder aus Verwalten entfernt; keine Migration
 
 # High
 

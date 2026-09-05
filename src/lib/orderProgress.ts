@@ -80,6 +80,88 @@ export interface OrderProgressTemplate {
   percent: number;
 }
 
+/**
+ * Customer-facing shipping progress. Keys stay within the existing
+ * order_progress.status_key check so upsert_order_progress needs no migration.
+ * This is not orders.status.
+ */
+export interface ShippingProgressStatus {
+  key: OrderProgressStatusKey;
+  title: string;
+  description: string;
+  progressPercent: number;
+}
+
+export const SHIPPING_PROGRESS_STATUSES: readonly ShippingProgressStatus[] = [
+  {
+    key: "processing",
+    title: "Bestellung wird bearbeitet",
+    description: "Die Bestellung wird geprüft und für die weitere Abwicklung vorbereitet.",
+    progressPercent: 10,
+  },
+  {
+    key: "submitted",
+    title: "Beim Händler bestellt",
+    description: "Die Bestellung wurde an unseren Händler übermittelt und wird dort bearbeitet.",
+    progressPercent: 25,
+  },
+  {
+    key: "shipped",
+    title: "Aus China versendet",
+    description: "Die Bestellung wurde versendet und befindet sich auf dem Weg nach Deutschland.",
+    progressPercent: 50,
+  },
+  {
+    key: "arrived",
+    title: "In Deutschland eingetroffen",
+    description: "Die Bestellung ist in Deutschland angekommen und wird für den Weitertransport vorbereitet.",
+    progressPercent: 65,
+  },
+  {
+    key: "preparing_shipment",
+    title: "Für den Versand vorbereitet",
+    description: "Die Bestellung wird verpackt und für den Versand vorbereitet.",
+    progressPercent: 80,
+  },
+  {
+    key: "out_for_delivery",
+    title: "Bestellung ist unterwegs",
+    description: "Die Bestellung wurde versendet und befindet sich auf dem Weg zur angegebenen Versandadresse.",
+    progressPercent: 90,
+  },
+  {
+    key: "completed",
+    title: "Bestellung abgeschlossen",
+    description: "Die Bestellung wurde erfolgreich zugestellt und ist damit abgeschlossen.",
+    progressPercent: 100,
+  },
+] as const;
+
+export type ShippingProgressStatusKey = (typeof SHIPPING_PROGRESS_STATUSES)[number]["key"];
+
+export function isShippingProgressStatusKey(value: string | null | undefined): value is ShippingProgressStatusKey {
+  return Boolean(value && SHIPPING_PROGRESS_STATUSES.some((status) => status.key === value));
+}
+
+export function shippingProgressStatus(key: ShippingProgressStatusKey): ShippingProgressStatus {
+  return SHIPPING_PROGRESS_STATUSES.find((status) => status.key === key) ?? SHIPPING_PROGRESS_STATUSES[0];
+}
+
+export function shippingProgressWritePayload(key: ShippingProgressStatusKey): {
+  statusKey: ShippingProgressStatusKey;
+  progressPercent: number;
+  title: string;
+  comment: string;
+} {
+  const status = shippingProgressStatus(key);
+  return {
+    statusKey: status.key,
+    progressPercent: status.progressPercent,
+    title: status.title,
+    comment: status.description,
+  };
+}
+
 export const ORDER_PROGRESS_TEMPLATES: readonly OrderProgressTemplate[] = [
   {
     id: "received",
@@ -198,6 +280,18 @@ export function resolveOrderProgress(
   const fallback = defaultOrderProgress(orderStatus, submittedAt);
   const cancelled = orderStatus === "cancelled";
   if (!stored) return fallback;
+  if (!cancelled && isShippingProgressStatusKey(stored.status_key)) {
+    const shipping = shippingProgressStatus(stored.status_key);
+    return {
+      statusKey: shipping.key,
+      statusLabel: shipping.title,
+      progressPercent: shipping.progressPercent,
+      comment: shipping.description,
+      updatedAt: stored.updated_at,
+      isCustom: true,
+      isCancelled: false,
+    };
+  }
   const key = isOrderProgressStatusKey(stored.status_key) ? stored.status_key : fallback.statusKey;
   const option = orderProgressOption(key);
   const title = stored.title?.trim() || option.label;
