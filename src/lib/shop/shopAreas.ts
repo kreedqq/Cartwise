@@ -14,7 +14,7 @@ export const RETAIL_KIT_UNIT_DIVISOR = 10;
 export const DEFAULT_SHOP_AREA: ShopAreaKey = "shop";
 
 export const SHOP_AREA_PATHS: Record<ShopAreaKey, string> = {
-  shop: "/shop",
+  shop: "/shop/retail",  // Hub is now /shop
   group_buy_1: "/shop/group-buy-1",
   group_buy_2: "/shop/group-buy-2",
 };

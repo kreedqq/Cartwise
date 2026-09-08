@@ -26,7 +26,12 @@ import {
   variantLabelForProduct,
   type ShopProductGroup,
 } from "@/lib/shop/display";
-import { shopProductTitle, showsStandaloneVariantLabel } from "@/lib/shop/variantCoverage";
+import {
+  formatRetailVariantLabel,
+  retailShopProductTitle,
+  shopProductTitle,
+  showsStandaloneVariantLabel,
+} from "@/lib/shop/variantCoverage";
 import { listKitShareMembers } from "@/services/kitShareMembers";
 import type { Tables } from "@/types/database";
 
@@ -129,7 +134,10 @@ function ShopProductGroupCard({
       ? Math.max(0, (product.bulk_price_min_quantity as number) - qtyNum)
       : null;
   const isFavorite = favoriteProductIds.has(product.id);
-  const title = shopProductTitle(group.displayName, product, row.hasMultipleVariants);
+  const isRetail = saleMode === "retail_unit";
+  const title = isRetail
+    ? retailShopProductTitle(group.displayName, product, row.hasMultipleVariants)
+    : shopProductTitle(group.displayName, product, row.hasMultipleVariants);
 
   return (
     <Card>
@@ -167,13 +175,15 @@ function ShopProductGroupCard({
                 <SelectContent>
                   {group.variants.map((variant) => (
                     <SelectItem key={variant.id} value={variant.id}>
-                      {variantLabelForProduct(variant)}
+                      {isRetail ? formatRetailVariantLabel(variant) : variantLabelForProduct(variant)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             ) : showsStandaloneVariantLabel(product, false) ? (
-              <p className="mt-1 text-xs text-muted-foreground">{variantLabelForProduct(product)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {isRetail ? formatRetailVariantLabel(product) : variantLabelForProduct(product)}
+              </p>
             ) : null}
             {showKitShare && (
             <div className="mt-2">

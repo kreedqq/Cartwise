@@ -25,6 +25,7 @@ const ORAL = { price_usd: 20 };
 describe("shop area domain", () => {
   it("maps paths to the three areas and keeps shop as default", () => {
     expect(shopAreaFromPath("/shop")).toBe("shop");
+    expect(shopAreaFromPath("/shop/retail")).toBe("shop");
     expect(shopAreaFromPath("/shop?cat=peptides")).toBe("shop");
     expect(shopAreaFromPath("/shop/group-buy-1")).toBe("group_buy_1");
     expect(shopAreaFromPath("/shop/group-buy-2")).toBe("group_buy_2");
@@ -41,7 +42,7 @@ describe("shop area domain", () => {
     expect(formatCatalogQuantity(1, "peptides")).toBe("1 Kit");
   });
 
-  it("hides unauthorized areas from nav instead of disabling them", () => {
+  it("buildCustomerNavItems returns a single Shop entry and no Favoriten", () => {
     const kunde: MyShopArea[] = [
       { key: "shop", name: "Shop", pricing_profile: "retail", sort_order: 10, path: "/shop" },
     ];
@@ -56,21 +57,23 @@ describe("shop area domain", () => {
       "Shop",
       "Lexikon & Rechner",
       "Meine Bestellungen",
-      "Favoriten",
       "Profil",
     ]);
+    // No Favoriten in simplified nav
+    expect(kundeItems.some((item) => item.label === "Favoriten")).toBe(false);
+    // No kit-gesuche or group-buy in nav
     expect(kundeItems.some((item) => item.to === "/kit-gesuche")).toBe(false);
     expect(kundeItems.some((item) => item.to.includes("group-buy"))).toBe(false);
+    // Shop points to /shop (hub)
+    expect(kundeItems.find((item) => item.label === "Shop")?.to).toBe("/shop");
 
+    // Nav is the same regardless of which areas the user has access to (single Shop entry)
     const gbItems = buildCustomerNavItems(groupBuy);
     expect(gbItems.map((item) => item.to)).toEqual([
       "/dashboard",
       "/shop",
-      "/shop/group-buy-1",
-      "/shop/group-buy-2",
       "/peptide",
       "/orders",
-      "/favorites",
       "/profile",
     ]);
     expect(gbItems.some((item) => item.to === "/kit-gesuche")).toBe(false);
@@ -164,5 +167,23 @@ describe("shop area product config SQL", () => {
 
   it("does not backfill historical orders", () => {
     expect(sql).not.toMatch(/update public\.orders set shop_area/);
+  });
+});
+
+describe("global role markup SQL (migration 0053)", () => {
+  const sql = read("supabase/migrations/0053_global_role_markup.sql");
+
+  it("replaces markup_percent_for_area with a global lookup", () => {
+    expect(sql).toContain("markup_percent_for_area");
+    expect(sql).toContain("markup_percent_for(_user_id)");
+    expect(sql).toMatch(/security definer/);
+    expect(sql).toMatch(/revoke all on function/);
+  });
+
+  it("does not drop any tables or alter permanent data", () => {
+    expect(sql).not.toMatch(/drop table/i);
+    expect(sql).not.toMatch(/delete from/i);
+    expect(sql).not.toMatch(/truncate/i);
+    expect(sql).not.toMatch(/alter table/i);
   });
 });

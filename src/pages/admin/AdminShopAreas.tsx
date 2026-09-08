@@ -35,12 +35,10 @@ import { listAllProducts } from "@/services/products";
 import {
   deleteAdminShopAreaDocument,
   deleteAdminShopAreaProductPrice,
-  deleteAdminShopAreaRoleMarkup,
   getAdminShopAreaDocument,
   listAdminShopAreaProductPrices,
   listAdminShopAreaProducts,
   listAdminShopAreaRoleAccess,
-  listAdminShopAreaRoleMarkups,
   listAdminShopAreas,
   setAdminShopAreaProductActive,
   setAdminShopAreaRoles,
@@ -48,7 +46,6 @@ import {
   updateAdminShopArea,
   uploadAdminShopAreaDocument,
   upsertAdminShopAreaProductPrice,
-  upsertAdminShopAreaRoleMarkup,
 } from "@/services/shopAreas";
 import type { Tables } from "@/types/database";
 
@@ -57,7 +54,7 @@ const PROFILE_LABELS: Record<ShopPricingProfile, string> = {
   group_buy: "Group Buy",
 };
 
-type AreaTab = "allgemein" | "produkte" | "dokument" | "preise" | "rollenpreise";
+type AreaTab = "allgemein" | "produkte" | "dokument" | "preise";
 
 export default function AdminShopAreasPage() {
   const queryClient = useQueryClient();
@@ -118,7 +115,6 @@ export default function AdminShopAreasPage() {
             <TabsTrigger value="produkte">Produkte</TabsTrigger>
             <TabsTrigger value="dokument">Produktdokument</TabsTrigger>
             <TabsTrigger value="preise">Preise</TabsTrigger>
-            <TabsTrigger value="rollenpreise">Rollenpreise</TabsTrigger>
           </TabsList>
 
           <TabsContent value="allgemein">
@@ -169,14 +165,6 @@ export default function AdminShopAreasPage() {
               <Skeleton className="h-64 w-full" />
             ) : (
               <AreaPricesPanel areaKey={areaKey} products={products} profile={lockedProfile} onChanged={invalidate} />
-            )}
-          </TabsContent>
-
-          <TabsContent value="rollenpreise">
-            {productsQuery.isLoading || rolesQuery.isLoading ? (
-              <Skeleton className="h-64 w-full" />
-            ) : (
-              <AreaRolePricesPanel areaKey={areaKey} products={products} roles={roles} onChanged={invalidate} />
             )}
           </TabsContent>
         </Tabs>
@@ -258,7 +246,7 @@ function ShopAreaGeneralCard({
           <CardTitle className="text-base">{SHOP_AREA_LABELS[areaKey]}</CardTitle>
           <Badge variant={localActive ? "secondary" : "outline"}>{localActive ? "Aktiv" : "Deaktiviert"}</Badge>
         </div>
-        <CardDescription>Preismodell: {PROFILE_LABELS[profile]} (fest fÃ¼r diesen Bereich)</CardDescription>
+        <CardDescription>Preismodell: {PROFILE_LABELS[profile]} (fest für diesen Bereich)</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
@@ -272,7 +260,7 @@ function ShopAreaGeneralCard({
           </Label>
         </div>
         <div className="space-y-2">
-          <Label>Sichtbar fÃ¼r</Label>
+          <Label>Sichtbar für</Label>
           {roles.map((role) => (
             <div key={role.id} className="flex items-center gap-2">
               <Checkbox
@@ -352,7 +340,7 @@ function AreaProductsPanel({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Produkt suchen â€¦" />
+        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Produkt suchen …" />
         {overlayQuery.isLoading && <Skeleton className="h-48 w-full" />}
         <div className="overflow-x-auto">
           <Table>
@@ -372,7 +360,7 @@ function AreaProductsPanel({
                       <p className="font-medium">{product.name}</p>
                       <p className="text-xs text-muted-foreground">
                         {product.code}
-                        {product.dosage_vial ? ` Â· ${product.dosage_vial}` : ""}
+                        {product.dosage_vial ? ` · ${product.dosage_vial}` : ""}
                       </p>
                     </TableCell>
                     <TableCell>
@@ -411,7 +399,7 @@ function AreaDocumentPanel({ areaKey }: { areaKey: ShopAreaKey }) {
   async function onFile(file: File | undefined) {
     if (!file) return;
     if (file.size > MAX_PDF_SIZE_BYTES) {
-      toast.error("Datei ist grÃ¶ÃŸer als 10 MB.");
+      toast.error("Datei ist größer als 10 MB.");
       return;
     }
     if (!detectImportSourceKind(file.name)) {
@@ -439,7 +427,7 @@ function AreaDocumentPanel({ areaKey }: { areaKey: ShopAreaKey }) {
       const url = await signedAdminShopAreaDocumentUrl(path);
       window.open(url, "_blank", "noopener,noreferrer");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Dokument konnte nicht geÃ¶ffnet werden.");
+      toast.error(error instanceof Error ? error.message : "Dokument konnte nicht geöffnet werden.");
     }
   }
 
@@ -461,7 +449,7 @@ function AreaDocumentPanel({ areaKey }: { areaKey: ShopAreaKey }) {
       <CardHeader>
         <CardTitle className="text-base">Produktdokument {SHOP_AREA_LABELS[areaKey]}</CardTitle>
         <CardDescription>
-          Nur fÃ¼r diesen Bereich. Ein Dokument fÃ¼r Group Buy 1 Ã¤ndert Group Buy 2 und den Shop nicht.
+          Nur für diesen Bereich. Ein Dokument für Group Buy 1 ändert Group Buy 2 und den Shop nicht.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -543,13 +531,13 @@ function AreaPricesPanel({
       <CardHeader>
         <CardTitle className="text-base">Preise in {SHOP_AREA_LABELS[areaKey]}</CardTitle>
         <CardDescription>
-          Leere Felder Ã¼bernehmen den zentralen Katalogpreis. Shop zeigt den resultierenden Einzelpreis, Group Buy die
+          Leere Felder übernehmen den zentralen Katalogpreis. Shop zeigt den resultierenden Einzelpreis, Group Buy die
           Kit-/Staffellogik.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="space-y-2">
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Produkt suchen â€¦" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Produkt suchen …" />
           <div className="max-h-80 overflow-y-auto rounded-lg border border-border">
             {filtered.map((product) => (
               <button
@@ -562,7 +550,7 @@ function AreaPricesPanel({
               >
                 <span className="font-medium">{product.name}</span>
                 <span className="text-xs text-muted-foreground">
-                  {product.code} Â· Katalog {formatUsd(product.price_usd)}
+                  {product.code} · Katalog {formatUsd(product.price_usd)}
                 </span>
               </button>
             ))}
@@ -653,10 +641,10 @@ function AreaPriceEditor({
       setPriceUsd("");
       setBulkUsd("");
       setBulkMin("");
-      toast.success("Katalogpreis Ã¼bernommen.");
+      toast.success("Katalogpreis übernommen.");
       await onSaved();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Preis konnte nicht zurÃ¼ckgesetzt werden.");
+      toast.error(error instanceof Error ? error.message : "Preis konnte nicht zurückgesetzt werden.");
     } finally {
       setSaving(false);
     }
@@ -666,7 +654,7 @@ function AreaPriceEditor({
     <div className="space-y-3">
       <p className="text-sm font-medium">{product.name}</p>
       <p className="text-xs text-muted-foreground">
-        Katalog {formatUsd(product.price_usd)} Â· Bereichseinheit {formatUsd(kitUnit)}
+        Katalog {formatUsd(product.price_usd)} · Bereichseinheit {formatUsd(kitUnit)}
       </p>
       <div className="space-y-1">
         <Label htmlFor="area-price">Basispreis USD</Label>
@@ -695,153 +683,12 @@ function AreaPriceEditor({
           Speichern
         </Button>
         <Button type="button" variant="outline" disabled={saving} onClick={() => void resetToCatalog()}>
-          Katalog Ã¼bernehmen
+          Katalog übernehmen
         </Button>
       </div>
     </div>
   );
 }
-
-function AreaRolePricesPanel({
-  areaKey,
-  products,
-  roles,
-  onChanged,
-}: {
-  areaKey: ShopAreaKey;
-  products: Tables<"products">[];
-  roles: Tables<"customer_roles">[];
-  onChanged: () => Promise<void>;
-}) {
-  const markupsQuery = useQuery({
-    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("role-markups"),
-    queryFn: () => listAdminShopAreaRoleMarkups(areaKey),
-  });
-  const [search, setSearch] = React.useState("");
-  const [selectedId, setSelectedId] = React.useState<string>(products[0]?.id ?? "");
-
-  const filtered = React.useMemo(() => {
-    const term = search.trim().toLowerCase();
-    return products.filter((product) => {
-      if (!term) return true;
-      return `${product.code} ${product.name}`.toLowerCase().includes(term);
-    });
-  }, [products, search]);
-
-  const selected = products.find((product) => product.id === selectedId) ?? filtered[0] ?? null;
-  const selectedMarkups = (markupsQuery.data ?? []).filter((row) => row.product_id === selected?.id);
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Rollenpreise in {SHOP_AREA_LABELS[areaKey]}</CardTitle>
-        <CardDescription>
-          Markup in Prozent pro Produkt und Rolle. Leer = zentraler Rollenaufschlag (z. B. 25 %). Genau einmal Ã¼ber
-          apply_role_markup.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <div className="space-y-2">
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Produkt suchen â€¦" />
-          <div className="max-h-80 overflow-y-auto rounded-lg border border-border">
-            {filtered.map((product) => (
-              <button
-                key={product.id}
-                type="button"
-                className={`flex w-full flex-col items-start border-b border-border px-3 py-2 text-left text-sm last:border-b-0 ${
-                  selected?.id === product.id ? "bg-secondary" : "hover:bg-secondary/50"
-                }`}
-                onClick={() => setSelectedId(product.id)}
-              >
-                <span className="font-medium">{product.name}</span>
-                <span className="text-xs text-muted-foreground">{product.code}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-        {selected && (
-          <AreaRoleMarkupEditor
-            key={`${areaKey}-${selected.id}-${selectedMarkups.map((row) => `${row.role_id}:${row.markup_percent}`).join("|")}`}
-            areaKey={areaKey}
-            product={selected}
-            roles={roles}
-            overrides={selectedMarkups}
-            onSaved={async () => {
-              await markupsQuery.refetch();
-              await onChanged();
-            }}
-          />
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function AreaRoleMarkupEditor({
-  areaKey,
-  product,
-  roles,
-  overrides,
-  onSaved,
-}: {
-  areaKey: ShopAreaKey;
-  product: Tables<"products">;
-  roles: Tables<"customer_roles">[];
-  overrides: Tables<"shop_area_product_role_markups">[];
-  onSaved: () => Promise<void>;
-}) {
-  const initial = React.useMemo(() => {
-    const map = new Map(overrides.map((row) => [row.role_id, row.markup_percent]));
-    const next: Record<string, string> = {};
-    for (const role of roles) {
-      const override = map.get(role.id);
-      next[role.id] = override != null ? String(override) : "";
-    }
-    return next;
-  }, [overrides, roles]);
-  const [drafts, setDrafts] = React.useState(initial);
-  const [saving, setSaving] = React.useState(false);
-
-  async function save() {
-    setSaving(true);
-    try {
-      for (const role of roles) {
-        const parsed = parseOptionalNumber(drafts[role.id] ?? "");
-        if (parsed == null) {
-          await deleteAdminShopAreaRoleMarkup(areaKey, product.id, role.id);
-        } else {
-          await upsertAdminShopAreaRoleMarkup(areaKey, product.id, role.id, parsed);
-        }
-      }
-      toast.success("Rollenpreise gespeichert.");
-      await onSaved();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Rollenpreise konnten nicht gespeichert werden.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <div className="space-y-3">
-      <p className="text-sm font-medium">{product.name}</p>
-      {roles.map((role) => (
-        <div key={role.id} className="space-y-1">
-          <Label htmlFor={`markup-${role.id}`}>
-            {role.name} (Standard {role.markup_percent} %)
-          </Label>
-          <Input
-            id={`markup-${role.id}`}
-            inputMode="decimal"
-            value={drafts[role.id] ?? ""}
-            onChange={(e) => setDrafts((current) => ({ ...current, [role.id]: e.target.value }))}
-            placeholder={String(role.markup_percent)}
-          />
-        </div>
-      ))}
-      <Button type="button" loading={saving} onClick={() => void save()}>
-        Speichern
-      </Button>
-    </div>
-  );
-}
+// AreaRolePricesPanel and AreaRoleMarkupEditor removed in migration 0053.
+// Role markup is now global-only via markup_percent_for().
+// The shop_area_product_role_markups table is retained for future use.

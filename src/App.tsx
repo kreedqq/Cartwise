@@ -19,9 +19,10 @@ import ResetPasswordPage from "@/pages/ResetPassword";
 import DashboardPage from "@/pages/Dashboard";
 import CartDetailPage from "@/pages/CartDetail";
 import CheckoutPage from "@/pages/Checkout";
-import ShopPage from "@/pages/Shop";
+import ShopHubPage from "@/pages/ShopHub";
+import ShopRetailPage from "@/pages/ShopRetail";
+import GroupBuyPage from "@/pages/GroupBuy";
 import KitRequestsPage from "@/pages/KitRequests";
-import FavoritesPage from "@/pages/Favorites";
 import OrdersPage from "@/pages/Orders";
 import OrderDetailPage from "@/pages/OrderDetail";
 import ProfilePage from "@/pages/Profile";
@@ -80,11 +81,11 @@ export default function App() {
               <Route path="/username-required" element={<UsernameRequiredPage />} />
               <Route element={<UsernameGate />}>
               <Route element={<AppShell />}>
-                <Route path="/shop" element={<ShopPage />} />
-                <Route path="/shop/group-buy-1" element={<KitRequestsPage />} />
-                <Route path="/shop/group-buy-2" element={<KitRequestsPage />} />
+                <Route path="/shop" element={<ShopHubPage />} />
+                <Route path="/shop/retail" element={<ShopRetailPage />} />
+                <Route path="/shop/group-buy-1" element={<GroupBuyPage />} />
+                <Route path="/shop/group-buy-2" element={<GroupBuyPage />} />
                 <Route path="/kit-gesuche" element={<KitRequestsPage />} />
-                <Route path="/favorites" element={<FavoritesPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/carts/:cartId" element={<CartDetailPage />} />
                 <Route path="/carts/:cartId/checkout" element={<CheckoutPage />} />

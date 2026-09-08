@@ -254,3 +254,30 @@ export function showsStandaloneVariantLabel(
   if (hasMultipleVariants) return false;
   return isOralCustomerLabel(formatVialVariant(product));
 }
+
+/**
+ * Retail-only variant label: shows only the strength (e.g. "5 mg"), not "10x 5 mg Vials".
+ * Used in /shop/retail where products are sold as individual units.
+ */
+export function formatRetailVariantLabel(
+  product: { code: string; dosage_vial?: string | null; name: string },
+): string {
+  const oral = formatOralVariantLabel(rawVariantSource(product), product.code);
+  if (oral) return oral;
+  const strength = normalizedVialStrength(product);
+  return strength ?? "Standard";
+}
+
+/**
+ * Retail product title: "Name 5 mg" instead of "Name 10x 5 mg Vials".
+ */
+export function retailShopProductTitle(
+  displayName: string,
+  product: { code: string; dosage_vial?: string | null; name: string },
+  hasMultipleVariants: boolean,
+): string {
+  if (hasMultipleVariants) return displayName;
+  const variantLabel = formatRetailVariantLabel(product);
+  if (isOralCustomerLabel(variantLabel)) return displayName;
+  return variantLabel !== "Standard" ? `${displayName} ${variantLabel}` : displayName;
+}
