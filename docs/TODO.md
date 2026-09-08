@@ -40,6 +40,7 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] 2026-09-05 Versandübersicht: 7 feste Kundenfortschritt-Status per Dropdown; manuelle Fortschrittsfelder aus Verwalten entfernt; keine Migration
 - [x] 2026-09-05 Bestellungen-Tabs: Übersicht + Fortschritt/Tracking in Bestelldetail; Versand-Tab entfernt; `/admin/shipping` leitet um
 - [x] 2026-09-05 Übersicht-Liste: eine Statusspalte (`order_progress`); interner `orders.status` nur noch im Bestelldetail sichtbar
+- [x] 2026-09-08 Shop-Bereiche + Group Buy (code + `0051` lokal; nicht auf Production angewendet)
 
 # High
 

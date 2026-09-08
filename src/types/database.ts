@@ -125,6 +125,7 @@ export interface Database {
           status: CartStatus;
           note: string | null;
           is_active_cart: boolean;
+          shop_area: string;
           deleted_at: string | null;
           version: number;
           created_at: string;
@@ -299,6 +300,7 @@ export interface Database {
           tracking_assigned_at: string | null;
           tracking_assigned_by: string | null;
           tracking_notification_sent_at: string | null;
+          shop_area: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["orders"]["Row"]> & {
           user_id: string;
@@ -513,6 +515,34 @@ export interface Database {
         };
         Insert: Database["public"]["Tables"]["user_customer_roles"]["Row"];
         Update: Partial<Database["public"]["Tables"]["user_customer_roles"]["Row"]>;
+        Relationships: never[];
+      };
+      shop_areas: {
+        Row: {
+          key: string;
+          name: string;
+          is_active: boolean;
+          pricing_profile: string;
+          retail_price_factor: number;
+          kit_unit_divisor: number;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["shop_areas"]["Row"]> & {
+          key: string;
+          name: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["shop_areas"]["Row"]>;
+        Relationships: never[];
+      };
+      shop_area_role_access: {
+        Row: {
+          shop_area_key: string;
+          role_id: string;
+        };
+        Insert: Database["public"]["Tables"]["shop_area_role_access"]["Row"];
+        Update: Partial<Database["public"]["Tables"]["shop_area_role_access"]["Row"]>;
         Relationships: never[];
       };
       substances: {
@@ -1336,8 +1366,26 @@ export interface Database {
         Returns: Database["public"]["Tables"]["orders"]["Row"];
       };
       list_shop_products: { Args: Record<string, never>; Returns: Database["public"]["Tables"]["products"]["Row"][] };
+      list_shop_products_for_area: {
+        Args: { _shop_area: string };
+        Returns: Database["public"]["Tables"]["products"]["Row"][];
+      };
+      list_my_shop_areas: {
+        Args: Record<string, never>;
+        Returns: {
+          key: string;
+          name: string;
+          pricing_profile: string;
+          sort_order: number;
+          path: string;
+        }[];
+      };
+      ensure_shop_area_cart: {
+        Args: { _shop_area: string };
+        Returns: Database["public"]["Tables"]["carts"]["Row"];
+      };
       get_shop_product_by_code: {
-        Args: { _code: string };
+        Args: { _code: string; _shop_area?: string };
         Returns: Database["public"]["Tables"]["products"]["Row"] | null;
       };
       get_my_customer_role_name: { Args: Record<string, never>; Returns: string | null };

@@ -17,6 +17,7 @@ import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
 import { convertUsdToEur, formatEur, formatQuantity, formatUsd, hasBulkTier } from "@/lib/money";
 import { formatCatalogQuantity } from "@/lib/quantityFormat";
 import { shopPriceColumnLabels } from "@/lib/shop/priceLabels";
+import { isRetailPricing, type ShopPricingProfile } from "@/lib/shop/shopAreas";
 import type { ShopCategoryId } from "@/lib/shopCategories";
 import { shopCategoryIdFor } from "@/lib/shopCategories";
 import {
@@ -34,13 +35,23 @@ interface ShopProductsMobileListProps {
   rate: number | null;
   favoriteProductIds: Set<string>;
   categoryId?: ShopCategoryId;
+  pricingProfile?: ShopPricingProfile;
 }
 
-export function ShopProductsMobileList({ products, rate, favoriteProductIds, categoryId }: ShopProductsMobileListProps) {
+export function ShopProductsMobileList({
+  products,
+  rate,
+  favoriteProductIds,
+  categoryId,
+  pricingProfile = "group_buy",
+}: ShopProductsMobileListProps) {
   const groups = groupAndSortShopProducts(products);
   const priceLabels = shopPriceColumnLabels(
     categoryId ?? shopCategoryIdFor(products[0] ?? { category: null, name: "", code: "" }),
+    pricingProfile,
   );
+  const saleMode = isRetailPricing(pricingProfile) ? "retail_unit" : "catalog";
+  const showKitShare = !isRetailPricing(pricingProfile);
   const [kitShareContext, setKitShareContext] = React.useState<{
     group: ShopProductGroup;
     initialProductId: string;
@@ -62,6 +73,8 @@ export function ShopProductsMobileList({ products, rate, favoriteProductIds, cat
             rate={rate}
             favoriteProductIds={favoriteProductIds}
             priceLabels={priceLabels}
+            saleMode={saleMode}
+            showKitShare={showKitShare}
             onKitShare={({ group, initialProductId }) => setKitShareContext({ group, initialProductId })}
           />
         ))}
@@ -89,12 +102,16 @@ function ShopProductGroupCard({
   rate,
   favoriteProductIds,
   priceLabels,
+  saleMode,
+  showKitShare,
   onKitShare,
 }: {
   group: ShopProductGroup;
   rate: number | null;
   favoriteProductIds: Set<string>;
   priceLabels: ReturnType<typeof shopPriceColumnLabels>;
+  saleMode: "catalog" | "retail_unit";
+  showKitShare: boolean;
   onKitShare: (context: { group: ShopProductGroup; initialProductId: string }) => void;
 }) {
   const row = useShopProductGroupRow(group, rate, favoriteProductIds);
@@ -154,6 +171,7 @@ function ShopProductGroupCard({
             ) : showsStandaloneVariantLabel(product, false) ? (
               <p className="mt-1 text-xs text-muted-foreground">{variantLabelForProduct(product)}</p>
             ) : null}
+            {showKitShare && (
             <div className="mt-2">
               <KitShareButton
                 group={group}
@@ -161,6 +179,7 @@ function ShopProductGroupCard({
                 onClick={() => onKitShare({ group, initialProductId: row.selectedProductId })}
               />
             </div>
+            )}
           </div>
         </div>
 
@@ -198,7 +217,7 @@ function ShopProductGroupCard({
             <SelectContent>
               {SHOP_QUANTITY_OPTIONS.map((qty) => (
                 <SelectItem key={qty} value={String(qty)}>
-                  {formatCatalogQuantity(qty, shopCategoryIdFor(product))}
+                  {formatCatalogQuantity(qty, shopCategoryIdFor(product), saleMode)}
                 </SelectItem>
               ))}
             </SelectContent>

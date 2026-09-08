@@ -43,6 +43,7 @@ function makeOrder(overrides: Partial<Tables<"orders">> = {}): Tables<"orders"> 
     de_shipping_currency: null,
     ...EMPTY_ORDER_TRACKING,
     ...overrides,
+    shop_area: overrides.shop_area ?? null,
   };
 }
 

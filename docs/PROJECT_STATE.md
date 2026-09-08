@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-05** (admin orders list: one Status column).
+Last documentation pass: **2026-09-08** (shop areas + Group Buy; committed locally; not deployed; `0051` not on production).
+
+**Update 2026-09-08 (Shop-Bereiche + Group Buy)**: One product catalog, three areas (`shop` retail, `group_buy_1` / `group_buy_2` existing kit/tier math). Access via existing `customer_roles` + `shop_area_role_access`. Pricing: area formula then existing `apply_role_markup` once. Carts are per area; orders snapshot `shop_area` (NULL = legacy). Kits never enter retail carts. Migration `0051` is additive and **not** applied to `cartwise-prod`. Contradiction vs spec §20: production is one role per user, not a union/priority engine.
 
 **Update 2026-09-05 (Übersicht eine Statusspalte)**: `/admin/orders` list Status column is `ShippingProgressSelect` / `order_progress` only. Internal `orders.status` stays on the detail page and in the filter. No migration.
 

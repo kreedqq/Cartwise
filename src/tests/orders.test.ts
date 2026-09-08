@@ -48,6 +48,7 @@ function makeOrder(overrides: Partial<Tables<"orders">> = {}): Tables<"orders"> 
     de_shipping_currency: null,
     ...EMPTY_ORDER_TRACKING,
     ...overrides,
+    shop_area: overrides.shop_area ?? null,
   };
 }
 
@@ -176,6 +177,7 @@ describe("customer order columns", () => {
         "shipping_post_number",
         "shipping_postal_code",
         "shipping_street",
+        "shop_area",
         "status",
         "submitted_at",
         "telegram_username_snapshot",

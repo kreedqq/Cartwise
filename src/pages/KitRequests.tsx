@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Navigate } from "react-router-dom";
 import { Layers, Plus } from "lucide-react";
 
 import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitRequestDialog";
@@ -7,6 +8,7 @@ import { KitRequestCardView } from "@/components/kit-requests/KitRequestCard";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
+import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,7 +32,9 @@ import {
   useSyncKitRequestCarts,
   type OpenKitRequestFilters,
 } from "@/hooks/useKitRequests";
+import { useFirstGroupBuyArea } from "@/hooks/useMyShopAreas";
 import { useShopProducts } from "@/hooks/useShopProducts";
+import type { ShopAreaKey } from "@/lib/shop/shopAreas";
 import {
   kitRequestStatusLabel,
   type KitRequestSort,
@@ -43,7 +47,19 @@ import type { KitRequestCard } from "@/services/kitRequests";
 const PAGE_SIZE = 20;
 
 export default function KitRequestsPage() {
-  const productsQuery = useShopProducts();
+  const groupBuyQuery = useFirstGroupBuyArea();
+
+  if (groupBuyQuery.isLoading) return <FullScreenSpinner label="Kit Gesuche werden geladen …" />;
+  if (groupBuyQuery.isError) {
+    return <ErrorState message="Shop-Bereiche konnten nicht geladen werden." onRetry={() => groupBuyQuery.refetch()} />;
+  }
+  if (!groupBuyQuery.area) return <Navigate to="/403" replace />;
+
+  return <KitRequestsContent shopArea={groupBuyQuery.area.key} />;
+}
+
+function KitRequestsContent({ shopArea }: { shopArea: ShopAreaKey }) {
+  const productsQuery = useShopProducts(shopArea);
 
   const [tab, setTab] = React.useState("open");
   const [search, setSearch] = React.useState("");

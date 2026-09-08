@@ -1,4 +1,5 @@
 import type { ShopCategoryId } from "@/lib/shopCategories";
+import type { ShopPricingProfile } from "@/lib/shop/shopAreas";
 
 export interface ShopPriceColumnLabels {
   unitPrice: string;
@@ -27,8 +28,32 @@ const UNIT_PRICE_LABELS: ShopPriceColumnLabels = {
   usesKitPricing: false,
 };
 
-/** Category-aware shop column labels for peptides/water vs oils/orals. */
-export function shopPriceColumnLabels(categoryId: ShopCategoryId): ShopPriceColumnLabels {
+const RETAIL_VIAL_LABELS: ShopPriceColumnLabels = {
+  unitPrice: "Preis / Vial",
+  bulkPrice: "Preis ab 10 Vials",
+  bulkActive: "Preis ab 10 Vials aktiv",
+  bulkRemaining: (remaining) => `Noch ${remaining} bis Preis ab 10 Vials`,
+  noBulk: "Kein Mengenpreis",
+  usesKitPricing: false,
+};
+
+const RETAIL_PACK_LABELS: ShopPriceColumnLabels = {
+  unitPrice: "Preis / Packung",
+  bulkPrice: "Preis ab 10 Packungen",
+  bulkActive: "Preis ab 10 Packungen aktiv",
+  bulkRemaining: (remaining) => `Noch ${remaining} bis Preis ab 10 Packungen`,
+  noBulk: "Kein Mengenpreis",
+  usesKitPricing: false,
+};
+
+/** Category-aware shop column labels. Default profile is group_buy (existing kit/tier copy). */
+export function shopPriceColumnLabels(
+  categoryId: ShopCategoryId,
+  profile: ShopPricingProfile = "group_buy",
+): ShopPriceColumnLabels {
+  if (profile === "retail") {
+    return categoryId === "orals" ? RETAIL_PACK_LABELS : RETAIL_VIAL_LABELS;
+  }
   if (categoryId === "peptides" || categoryId === "reconstitution-water") {
     return KIT_PRICE_LABELS;
   }

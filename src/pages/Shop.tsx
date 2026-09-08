@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useSearchParams } from "react-router-dom";
+import { Navigate, Link, useLocation, useSearchParams } from "react-router-dom";
 import { ArrowLeft, PackageSearch, Search } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -7,18 +7,27 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
+import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ShopProductsTable } from "@/components/shop/ShopProductsTable";
 import { ShopProductsMobileList } from "@/components/shop/ShopProductsMobileList";
 import { ShopCategoryHub } from "@/components/shop/ShopCategoryHub";
 import { PageHeader } from "@/components/common/PageHeader";
+import { ShopAreaProvider } from "@/context/ShopAreaContext";
+import { useMyShopAreas } from "@/hooks/useMyShopAreas";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { hasBulkTier } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { productMatchesShopSearch } from "@/lib/shop/display";
+import {
+  DEFAULT_SHOP_AREA,
+  isRetailPricing,
+  shopAreaFromPath,
+  type ShopAreaKey,
+} from "@/lib/shop/shopAreas";
 import {
   countProductsByShopCategory,
   isShopCategoryId,
@@ -29,11 +38,48 @@ import {
 } from "@/lib/shopCategories";
 
 export default function ShopPage() {
-  const productsQuery = useShopProducts();
+  const location = useLocation();
+  const shopArea = shopAreaFromPath(location.pathname);
+  const areasQuery = useMyShopAreas();
+  const allowed = areasQuery.data?.some((area) => area.key === shopArea) ?? false;
+  const currentArea = areasQuery.data?.find((area) => area.key === shopArea);
+  const pricingProfile = currentArea?.pricing_profile ?? (shopArea === DEFAULT_SHOP_AREA ? "retail" : "group_buy");
+
+  if (areasQuery.isLoading) return <FullScreenSpinner label="Shop wird geladen …" />;
+  if (areasQuery.isError) {
+    return <ErrorState message="Shop-Bereiche konnten nicht geladen werden." onRetry={() => areasQuery.refetch()} />;
+  }
+  if (!allowed) return <Navigate to="/403" replace />;
+
+  return (
+    <ShopAreaProvider shopArea={shopArea} pricingProfile={pricingProfile}>
+      <ShopCatalog
+        shopArea={shopArea}
+        areaName={currentArea?.name ?? "Shop"}
+        pricingProfile={pricingProfile}
+        allowedAreas={areasQuery.data ?? []}
+      />
+    </ShopAreaProvider>
+  );
+}
+
+function ShopCatalog({
+  shopArea,
+  areaName,
+  pricingProfile,
+  allowedAreas,
+}: {
+  shopArea: ShopAreaKey;
+  areaName: string;
+  pricingProfile: "retail" | "group_buy";
+  allowedAreas: { key: ShopAreaKey; name: string; path: string }[];
+}) {
+  const productsQuery = useShopProducts(shopArea);
   const favoritesQuery = useFavorites();
   const rateQuery = useExchangeRate();
   const [params, setParams] = useSearchParams();
   const selected = isShopCategoryId(params.get("cat")) ? (params.get("cat") as ShopCategoryId) : null;
+  const retail = isRetailPricing(pricingProfile);
 
   const [search, setSearch] = React.useState("");
   const [bulkOnly, setBulkOnly] = React.useState(false);
@@ -62,14 +108,35 @@ export default function ShopPage() {
     setParams({ cat: id });
   }
 
+  const areaTabs =
+    allowedAreas.length > 1 ? (
+      <div className="flex flex-wrap gap-2">
+        {allowedAreas.map((area) => (
+          <Button
+            key={area.key}
+            variant={area.key === shopArea ? "default" : "secondary"}
+            size="sm"
+            asChild
+          >
+            <Link to={area.path}>{area.name}</Link>
+          </Button>
+        ))}
+      </div>
+    ) : null;
+
   if (!selected) {
     return (
       <div className="space-y-10">
         <PageHeader
-          eyebrow="Shop"
+          eyebrow={areaName}
           title="Katalog"
-          description="Wähle eine Kategorie. BAC Water und AA Water liegen unter Reconstitution Water."
+          description={
+            retail
+              ? "Einzelverkauf. Peptide und Water als Vials, Oils und Orals in der bestehenden Einheit."
+              : "Group Buy mit bestehender Kit- und Mengenpreis-Logik. BAC Water und AA Water liegen unter Reconstitution Water."
+          }
         />
+        {areaTabs}
         {productsQuery.isLoading && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -90,7 +157,7 @@ export default function ShopPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Shop"
+        eyebrow={areaName}
         title={active.label}
         description={`${filtered.length} Artikel · Variante und Menge wählen, dann in den Warenkorb legen.`}
         actions={
@@ -100,6 +167,8 @@ export default function ShopPage() {
           </Button>
         }
       />
+
+      {areaTabs}
 
       <div className="flex flex-wrap gap-2">
         {SHOP_CATEGORIES.map((category) => (
@@ -165,6 +234,7 @@ export default function ShopPage() {
               rate={rateQuery.data?.rate ?? null}
               favoriteProductIds={favoriteProductIds}
               categoryId={selected}
+              pricingProfile={pricingProfile}
             />
           </div>
           <div className="lg:hidden">
@@ -173,6 +243,7 @@ export default function ShopPage() {
               rate={rateQuery.data?.rate ?? null}
               favoriteProductIds={favoriteProductIds}
               categoryId={selected}
+              pricingProfile={pricingProfile}
             />
           </div>
         </>

@@ -11,12 +11,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { toast } from "@/components/ui/toaster";
-import { deleteCustomerRole, listCustomerRoles, upsertCustomerRole } from "@/services/customerRoles";
+import { listCustomerRoles, upsertCustomerRole, deleteCustomerRole } from "@/services/customerRoles";
+import { listAdminShopAreaRoleAccess, setAdminRoleShopAreas } from "@/services/shopAreas";
+import { QUERY_KEYS } from "@/lib/constants";
+import { SHOP_AREA_KEYS, SHOP_AREA_LABELS, isShopAreaKey, type ShopAreaKey } from "@/lib/shop/shopAreas";
 
 /** Existing customer-role catalog + markup percent configuration. Engine unchanged. */
 export function AdminRoleCatalog() {
   const queryClient = useQueryClient();
   const rolesQuery = useQuery({ queryKey: ["customer-roles"], queryFn: listCustomerRoles });
+  const accessQuery = useQuery({ queryKey: [...QUERY_KEYS.adminShopAreas, "access"], queryFn: listAdminShopAreaRoleAccess });
 
   const [name, setName] = React.useState("");
   const [markup, setMarkup] = React.useState("25");
@@ -170,6 +174,67 @@ export function AdminRoleCatalog() {
         variant="destructive"
         onConfirm={handleDelete}
       />
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Shop-Bereiche je Rolle</CardTitle>
+          <CardDescription>
+            Bestehende Rollen bleiben die Quelle. Hier wird nur festgelegt, welche Shop-Bereiche sichtbar sind.
+            Pricing Profile liegt am Bereich, nicht als zweiter Aufschlag.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Rolle</TableHead>
+                {SHOP_AREA_KEYS.map((key) => (
+                  <TableHead key={key}>{SHOP_AREA_LABELS[key]}</TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {roles.map((role) => (
+                <TableRow key={`access-${role.id}`}>
+                  <TableCell className="font-medium">{role.name}</TableCell>
+                  {SHOP_AREA_KEYS.map((key) => {
+                    const checked = (accessQuery.data ?? []).some(
+                      (row) => row.role_id === role.id && row.shop_area_key === key,
+                    );
+                    return (
+                      <TableCell key={key}>
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={(value) => {
+                            void (async () => {
+                              const current = (accessQuery.data ?? [])
+                                .filter((row) => row.role_id === role.id)
+                                .map((row) => row.shop_area_key)
+                                .filter(isShopAreaKey);
+                              const next: ShopAreaKey[] = value === true
+                                ? Array.from(new Set([...current, key]))
+                                : current.filter((area) => area !== key);
+                              try {
+                                await setAdminRoleShopAreas(role.id, next);
+                                await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreas });
+                                await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myShopAreas });
+                              } catch (error) {
+                                console.error("Shop-Bereich Zugriff speichern fehlgeschlagen:", error);
+                                toast.error("Zugriff konnte nicht gespeichert werden.");
+                              }
+                            })();
+                          }}
+                          aria-label={`${role.name}: ${SHOP_AREA_LABELS[key]}`}
+                        />
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

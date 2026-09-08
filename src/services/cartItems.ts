@@ -7,7 +7,9 @@ import {
   CLEARED_PRICE_COLUMNS,
   type SnapshotSourceProduct,
 } from "@/lib/snapshot";
+import { DEFAULT_SHOP_AREA, isShopAreaKey, type ShopAreaKey } from "@/lib/shop/shopAreas";
 import { resolveProductByCode, resolveProductsByCodes } from "@/services/products";
+import { getCart } from "@/services/carts";
 import type { Database, Tables } from "@/types/database";
 
 export async function listCartItems(cartId: string): Promise<Tables<"cart_items">[]> {
@@ -23,6 +25,16 @@ export async function listCartItems(cartId: string): Promise<Tables<"cart_items"
   return data ?? [];
 }
 
+async function shopAreaForCart(cartId: string): Promise<ShopAreaKey> {
+  const cart = await getCart(cartId);
+  return isShopAreaKey(cart?.shop_area) ? cart.shop_area : DEFAULT_SHOP_AREA;
+}
+
+async function syncCartPrices(cartId: string) {
+  const { error } = await supabase.rpc("sync_cart_selling_prices", { _cart_id: cartId });
+  if (error) throw error;
+}
+
 /**
  * Adds a new line item: resolves the product code against the catalog and,
  * if found, writes an immediate price snapshot (see docs/KONZEPT.md §5).
@@ -36,7 +48,8 @@ export async function addCartItem(
   nextPosition: number,
   currentRate: number | null,
 ): Promise<Tables<"cart_items">> {
-  const resolution = await resolveProductByCode(productCodeInput);
+  const shopArea = await shopAreaForCart(cartId);
+  const resolution = await resolveProductByCode(productCodeInput, shopArea);
 
   const base = {
     cart_id: cartId,
@@ -71,7 +84,10 @@ export async function addCartItem(
     .select()
     .single();
   if (error) throw error;
-  return data;
+  await syncCartPrices(cartId);
+  const { data: synced, error: reloadError } = await supabase.from("cart_items").select("*").eq("id", data.id).single();
+  if (reloadError) throw reloadError;
+  return synced;
 }
 
 /** Re-resolves the product code for an existing row (e.g. after the user edits the code inline). */
@@ -80,7 +96,8 @@ export async function reresolveCartItemCode(
   newCode: string,
   currentRate: number | null,
 ): Promise<Tables<"cart_items">> {
-  const resolution = await resolveProductByCode(newCode);
+  const shopArea = await shopAreaForCart(item.cart_id);
+  const resolution = await resolveProductByCode(newCode, shopArea);
   const patch: Partial<Tables<"cart_items">> = { product_code_input: newCode };
 
   if (resolution.status === "not_found") {
@@ -202,7 +219,11 @@ export async function addCartItemsBulk(
 ): Promise<Tables<"cart_items">[]> {
   if (lines.length === 0) return [];
 
-  const productMap = await resolveProductsByCodes(lines.map((l) => l.code));
+  const shopArea = await shopAreaForCart(cartId);
+  const productMap = await resolveProductsByCodes(
+    lines.map((l) => l.code),
+    shopArea,
+  );
 
   const rows: Database["public"]["Tables"]["cart_items"]["Insert"][] = lines.map((line, index) => {
     const product = productMap.get(line.code);
@@ -229,7 +250,15 @@ export async function addCartItemsBulk(
 
   const { data, error } = await supabase.from("cart_items").insert(rows).select();
   if (error) throw error;
-  return data ?? [];
+  await syncCartPrices(cartId);
+  const { data: synced, error: reloadError } = await supabase
+    .from("cart_items")
+    .select("*")
+    .eq("cart_id", cartId)
+    .order("position", { ascending: true });
+  if (reloadError) throw reloadError;
+  const insertedIds = new Set((data ?? []).map((row) => row.id));
+  return (synced ?? []).filter((row) => insertedIds.has(row.id));
 }
 
 /**

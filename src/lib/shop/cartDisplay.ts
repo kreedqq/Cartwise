@@ -1,5 +1,6 @@
-import { formatProductQuantity, formatKitSizeLabel, resolveProductCategoryId } from "@/lib/quantityFormat";
+import { formatProductQuantity, formatKitSizeLabel, resolveProductCategoryId, type QuantitySaleMode } from "@/lib/quantityFormat";
 import { normalizeShopDisplayName } from "@/lib/shop/display";
+import { saleModeForShopArea } from "@/lib/shop/shopAreas";
 import { formatProductVariant } from "@/lib/shop/variantCoverage";
 
 export interface CartLineDisplayInput {
@@ -9,6 +10,7 @@ export interface CartLineDisplayInput {
   kit_share_id?: string | null;
   note?: string | null;
   dosage_vial_snapshot?: string | null;
+  shop_area?: string | null;
 }
 
 function productMeta(item: CartLineDisplayInput) {
@@ -32,7 +34,11 @@ export function cartItemDisplayName(item: CartLineDisplayInput): string {
   return normalizeShopDisplayName(name);
 }
 
-export function cartItemQuantityLabel(item: CartLineDisplayInput, kitSize?: number | null): string {
+export function cartItemQuantityLabel(
+  item: CartLineDisplayInput,
+  kitSize?: number | null,
+  saleMode?: QuantitySaleMode,
+): string {
   const categoryId = resolveProductCategoryId({
     name: item.product_name_snapshot,
     code: item.product_code_snapshot,
@@ -43,6 +49,7 @@ export function cartItemQuantityLabel(item: CartLineDisplayInput, kitSize?: numb
     quantity: item.quantity,
     categoryId,
     kitSize: resolvedKitSize,
+    saleMode: saleMode ?? saleModeForShopArea(item.shop_area),
   });
 }
 

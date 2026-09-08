@@ -11,9 +11,9 @@ function read(path: string): string {
 describe("customer and admin order navigation", () => {
   it("labels the customer area Meine Bestellungen", () => {
     expect(read("src/lib/navigation.ts")).toContain('label: "Meine Bestellungen"');
-    expect(read("src/components/layout/Sidebar.tsx")).toContain("Meine Bestellungen");
-    expect(read("src/components/layout/MobileNavDrawer.tsx")).toContain("Meine Bestellungen");
-    expect(read("src/components/layout/MobileNav.tsx")).toContain("Meine Bestellungen");
+    expect(read("src/components/layout/Sidebar.tsx")).toContain("useCustomerNavItems");
+    expect(read("src/components/layout/MobileNavDrawer.tsx")).toContain("useCustomerNavItems");
+    expect(read("src/components/layout/MobileNav.tsx")).toContain("useCustomerNavItems");
     expect(read("src/pages/Dashboard.tsx")).toContain("Meine Bestellungen");
     expect(read("src/pages/Orders.tsx")).toContain("Meine Bestellungen");
   });
@@ -54,6 +54,7 @@ describe("hub admin navigation", () => {
         "/admin",
         "/admin/orders",
         "/admin/products",
+        "/admin/shop-areas",
         "/admin/pdf-import",
         "/admin/import-history",
         "/admin/users",
@@ -77,7 +78,12 @@ describe("hub admin navigation", () => {
     expect(orders?.items.map((item) => item.label)).not.toContain("Versand");
     expect(orders?.items.map((item) => item.label)).not.toContain("Eingegangene Bestellungen");
     const products = ADMIN_NAV_GROUPS.find((group) => group.id === "products");
-    expect(products?.items.map((item) => item.label)).toEqual(["Produktkatalog", "Import", "Import-Verlauf"]);
+    expect(products?.items.map((item) => item.label)).toEqual([
+      "Produktkatalog",
+      "Shop-Bereiche",
+      "Import",
+      "Import-Verlauf",
+    ]);
     const users = ADMIN_NAV_GROUPS.find((group) => group.id === "users");
     expect(users?.items.map((item) => item.label)).toEqual([
       "Benutzer & Rollen",
@@ -111,6 +117,7 @@ describe("hub admin navigation", () => {
       'path="shipping-costs"',
       'path="order-summary"',
       'path="products"',
+      'path="shop-areas"',
       'path="pdf-import"',
       'path="import-history"',
       'path="users"',

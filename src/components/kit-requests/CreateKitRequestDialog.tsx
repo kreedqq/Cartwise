@@ -21,6 +21,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toaster";
 import { useCreateKitRequest } from "@/hooks/useKitRequests";
+import { useFirstGroupBuyArea } from "@/hooks/useMyShopAreas";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { isValidCreatorQuantity } from "@/lib/kitRequests";
 import { groupAndSortShopProducts } from "@/lib/shop/display";
@@ -34,7 +35,8 @@ interface CreateKitRequestDialogProps {
 }
 
 export function CreateKitRequestDialog({ open, onOpenChange }: CreateKitRequestDialogProps) {
-  const productsQuery = useShopProducts();
+  const groupBuyQuery = useFirstGroupBuyArea();
+  const productsQuery = useShopProducts(groupBuyQuery.area?.key ?? "group_buy_1");
   const createMutation = useCreateKitRequest();
   const groups = React.useMemo(
     () => groupAndSortShopProducts(productsQuery.data ?? []),

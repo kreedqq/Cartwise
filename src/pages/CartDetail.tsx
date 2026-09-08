@@ -94,6 +94,7 @@ export default function CartDetailPage() {
                   currentRate={rate?.rate ?? null}
                   nextPosition={nextPosition}
                   readOnly={cart.status === "ordered"}
+                  shopArea={cart.shop_area}
                 />
               </div>
               <div className="lg:hidden">
@@ -103,6 +104,7 @@ export default function CartDetailPage() {
                   currentRate={rate?.rate ?? null}
                   nextPosition={nextPosition}
                   readOnly={cart.status === "ordered"}
+                  shopArea={cart.shop_area}
                 />
               </div>
             </>

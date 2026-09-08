@@ -24,6 +24,7 @@ import { OrderShippingCard } from "@/components/orders/OrderShippingCard";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
 import { formatDateTime, formatEur, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { formatOrderItemQuantity } from "@/lib/quantityFormat";
+import { DEFAULT_SHOP_AREA, formatShopAreaLabel, isShopAreaKey, saleModeForShopArea } from "@/lib/shop/shopAreas";
 import { listKitSizesForOrder } from "@/services/kitOrderContext";
 import { QUERY_KEYS } from "@/lib/constants";
 import { PAYMENT_METHOD_LABELS, isPaymentMethod } from "@/lib/shop/paymentMethod";
@@ -43,7 +44,8 @@ export default function OrderDetailPage() {
   });
   const progressQuery = useOrderProgress(orderId);
   const rateQuery = useExchangeRate();
-  const { addManyToActiveCart } = useShopCart();
+  const reorderArea = isShopAreaKey(orderQuery.data?.shop_area) ? orderQuery.data.shop_area : DEFAULT_SHOP_AREA;
+  const { addManyToActiveCart } = useShopCart(reorderArea);
   const templates = useOrderTemplateMutations();
   const [templateName, setTemplateName] = React.useState("");
   const [reordering, setReordering] = React.useState(false);
@@ -164,7 +166,7 @@ export default function OrderDetailPage() {
                     )}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {formatOrderItemQuantity(item, itemKitSize(item))}
+                    {formatOrderItemQuantity(item, itemKitSize(item), saleModeForShopArea(order.shop_area))}
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-xs">
                     {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normalpreis"}
@@ -218,6 +220,12 @@ export default function OrderDetailPage() {
                 {isPaymentMethod(order.payment_method) ? PAYMENT_METHOD_LABELS[order.payment_method] : "—"}
               </span>
             </div>
+            {order.shop_area && (
+              <div className="mt-2 flex justify-between gap-3">
+                <span>Shop-Bereich</span>
+                <span className="font-medium">{formatShopAreaLabel(order.shop_area)}</span>
+              </div>
+            )}
             {order.note && (
               <p className="border-t border-border pt-2 text-muted-foreground">
                 Notiz: {order.note}

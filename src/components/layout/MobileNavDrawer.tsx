@@ -1,24 +1,16 @@
 import { NavLink } from "react-router-dom";
-import { BookOpen, ClipboardList, Layers, LayoutGrid, ShieldCheck, ShoppingBag, UserCircle, X } from "lucide-react";
+import { ShieldCheck, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthProvider";
 import { useNavShell } from "@/context/NavShellProvider";
-import { PEPTIDE_NAV_LABEL } from "@/lib/navigation";
-
-const navItems = [
-  { to: "/dashboard", label: "Übersicht", icon: LayoutGrid },
-  { to: "/shop", label: "Shop", icon: ShoppingBag },
-  { to: "/kit-gesuche", label: "Kit Gesuche", icon: Layers },
-  { to: "/peptide", label: PEPTIDE_NAV_LABEL, icon: BookOpen },
-  { to: "/orders", label: "Meine Bestellungen", icon: ClipboardList },
-  { to: "/profile", label: "Profil", icon: UserCircle },
-];
+import { useCustomerNavItems } from "@/hooks/useCustomerNavItems";
 
 export function MobileNavDrawer() {
   const { isAdmin } = useAuth();
   const { mobileNavOpen, closeMobileNav } = useNavShell();
+  const { items } = useCustomerNavItems();
 
   if (!mobileNavOpen) return null;
 
@@ -37,10 +29,11 @@ export function MobileNavDrawer() {
           </Button>
         </div>
         <nav className="flex-1 space-y-0.5 px-3 py-2">
-          {navItems.map((item) => (
+          {items.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.end}
               onClick={closeMobileNav}
               className={({ isActive }) =>
                 cn(

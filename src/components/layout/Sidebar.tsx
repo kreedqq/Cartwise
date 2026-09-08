@@ -1,24 +1,16 @@
 import { NavLink } from "react-router-dom";
-import { BookOpen, ClipboardList, Layers, LayoutGrid, ShieldCheck, ShoppingBag, UserCircle } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthProvider";
 import { BrandMark } from "@/components/layout/BrandMark";
 import { useNavShell } from "@/context/NavShellProvider";
-import { PEPTIDE_NAV_LABEL } from "@/lib/navigation";
-
-const navItems = [
-  { to: "/dashboard", label: "Übersicht", icon: LayoutGrid },
-  { to: "/shop", label: "Shop", icon: ShoppingBag },
-  { to: "/kit-gesuche", label: "Kit Gesuche", icon: Layers },
-  { to: "/peptide", label: PEPTIDE_NAV_LABEL, icon: BookOpen },
-  { to: "/orders", label: "Meine Bestellungen", icon: ClipboardList },
-  { to: "/profile", label: "Profil", icon: UserCircle },
-];
+import { useCustomerNavItems } from "@/hooks/useCustomerNavItems";
 
 export function Sidebar() {
   const { isAdmin } = useAuth();
   const { sidebarCollapsed } = useNavShell();
+  const { items } = useCustomerNavItems();
 
   return (
     <aside
@@ -32,10 +24,11 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-0.5 px-3 py-4">
-        {navItems.map((item) => (
+        {items.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
+            end={item.end}
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium tracking-wide transition-colors",

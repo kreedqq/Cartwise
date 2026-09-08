@@ -4,6 +4,7 @@ import { ORDER_STATUS_LABELS } from "@/services/orders";
 import { BRAND_NAME } from "@/lib/constants";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 import { formatOrderItemQuantity } from "@/lib/quantityFormat";
+import { saleModeForShopArea } from "@/lib/shop/shopAreas";
 import { formatShippingAddressLines, formatShippingRecipient, formatDeliveryMethodLabel, hasShippingSnapshot } from "@/lib/shippingAddress";
 import type { OrderStatus, Tables } from "@/types/database";
 
@@ -391,6 +392,7 @@ export function toOrderExportDoc(
       quantityLabel: formatOrderItemQuantity(
         item,
         item.product_id ? kitSizes?.get(item.product_id) ?? null : null,
+        saleModeForShopArea(order.shop_area),
       ),
     })),
   };

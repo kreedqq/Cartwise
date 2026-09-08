@@ -26,6 +26,7 @@ import {
   formatOrderTelegramSnapshot,
   orderTelegramUsername,
 } from "@/services/orders";
+import { formatShopAreaLabel, SHOP_AREA_KEYS } from "@/lib/shop/shopAreas";
 import type { OrderStatus } from "@/types/database";
 
 const STATUS_FILTERS: Array<{ value: "all" | OrderStatus; label: string }> = [
@@ -33,6 +34,12 @@ const STATUS_FILTERS: Array<{ value: "all" | OrderStatus; label: string }> = [
   ...ADMIN_WORKFLOW_STATUSES.map((value) => ({ value, label: ORDER_STATUS_LABELS[value] })),
   { value: "confirmed", label: ORDER_STATUS_LABELS.confirmed },
   { value: "cancelled", label: ORDER_STATUS_LABELS.cancelled },
+];
+
+const SHOP_AREA_FILTERS: Array<{ value: string; label: string }> = [
+  { value: "all", label: "Alle Bereiche" },
+  ...SHOP_AREA_KEYS.map((key) => ({ value: key, label: formatShopAreaLabel(key) })),
+  { value: "legacy", label: "Nicht angegeben" },
 ];
 
 const PAYMENT_FILTERS: Array<{ value: string; label: string }> = [
@@ -50,6 +57,7 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = React.useState("");
   const [status, setStatus] = React.useState<"all" | OrderStatus>("all");
   const [payment, setPayment] = React.useState("all");
+  const [shopArea, setShopArea] = React.useState("all");
 
   const filtered = React.useMemo(() => {
     const orders = ordersQuery.data ?? [];
@@ -63,6 +71,10 @@ export default function AdminOrdersPage() {
         if (payment === "none" && order.payment_method != null) return false;
         if (payment !== "none" && order.payment_method !== payment) return false;
       }
+      if (shopArea !== "all") {
+        if (shopArea === "legacy" && order.shop_area != null) return false;
+        if (shopArea !== "legacy" && order.shop_area !== shopArea) return false;
+      }
       if (!term) return true;
       const customer = order.user_id ? directory?.get(order.user_id) : undefined;
       const customerHay = `${orderTelegramUsername(order) ?? ""} ${customer?.email ?? ""}`.toLowerCase();
@@ -75,7 +87,7 @@ export default function AdminOrdersPage() {
             item.product_name_snapshot.toLowerCase().includes(term)),
       );
     });
-  }, [ordersQuery.data, itemsQuery.data, directoryQuery.data, search, status, payment]);
+  }, [ordersQuery.data, itemsQuery.data, directoryQuery.data, search, status, payment, shopArea]);
 
   function handleExport() {
     const items = itemsQuery.data ?? [];
@@ -121,7 +133,7 @@ export default function AdminOrdersPage() {
     );
   }
 
-  const hasFilters = search.trim() !== "" || status !== "all" || payment !== "all";
+  const hasFilters = search.trim() !== "" || status !== "all" || payment !== "all" || shopArea !== "all";
 
   return (
     <div className="space-y-4">
@@ -170,6 +182,18 @@ export default function AdminOrdersPage() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={shopArea} onValueChange={setShopArea}>
+          <SelectTrigger className="w-full flex-1 text-sm sm:w-44 sm:flex-none">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SHOP_AREA_FILTERS.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* States */}
@@ -210,7 +234,10 @@ export default function AdminOrdersPage() {
                     className="cursor-pointer"
                     onClick={() => navigate(`/admin/orders/${order.id}`)}
                   >
-                    <TableCell className="pl-4 font-mono text-xs font-semibold">{order.order_number}</TableCell>
+                    <TableCell className="pl-4">
+                      <p className="font-mono text-xs font-semibold">{order.order_number}</p>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">{formatShopAreaLabel(order.shop_area)}</p>
+                    </TableCell>
                     <TableCell className="text-sm font-medium">
                       {formatOrderTelegramSnapshot(order)}
                     </TableCell>
@@ -279,6 +306,7 @@ export default function AdminOrdersPage() {
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       Telegram: {formatOrderTelegramSnapshot(order)}
                     </p>
+                    <p className="text-[11px] text-muted-foreground">{formatShopAreaLabel(order.shop_area)}</p>
                   </button>
                 </div>
                 <div className="min-w-0 space-y-1.5">

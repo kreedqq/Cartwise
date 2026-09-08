@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { normalizeProductCode } from "@/lib/money";
+import { DEFAULT_SHOP_AREA, type ShopAreaKey } from "@/lib/shop/shopAreas";
+import { listShopProductsForArea } from "@/services/shopAreas";
 import type { Tables } from "@/types/database";
 
 export interface ProductResolution {
@@ -12,9 +14,15 @@ export interface ProductResolution {
  * throws for a "not found" - that is a normal, expected outcome the caller
  * renders inline, not an error.
  */
-export async function resolveProductByCode(rawCode: string): Promise<ProductResolution> {
+export async function resolveProductByCode(
+  rawCode: string,
+  shopArea: ShopAreaKey = DEFAULT_SHOP_AREA,
+): Promise<ProductResolution> {
   const code = normalizeProductCode(rawCode);
-  const { data, error } = await supabase.rpc("get_shop_product_by_code", { _code: code });
+  const { data, error } = await supabase.rpc("get_shop_product_by_code", {
+    _code: code,
+    _shop_area: shopArea,
+  });
   if (error) throw error;
   if (!data || !data.id) return { status: "not_found", product: null };
   if (!data.is_active) return { status: "inactive", product: data };
@@ -22,11 +30,14 @@ export async function resolveProductByCode(rawCode: string): Promise<ProductReso
 }
 
 /** Batch-resolve many codes at once (used by the paste-import flow). */
-export async function resolveProductsByCodes(rawCodes: string[]): Promise<Map<string, Tables<"products">>> {
+export async function resolveProductsByCodes(
+  rawCodes: string[],
+  shopArea: ShopAreaKey = DEFAULT_SHOP_AREA,
+): Promise<Map<string, Tables<"products">>> {
   const codes = Array.from(new Set(rawCodes.map(normalizeProductCode))).filter(Boolean);
   if (codes.length === 0) return new Map();
 
-  const products = await listShopProducts();
+  const products = await listShopProductsForArea(shopArea);
   const map = new Map<string, Tables<"products">>();
   for (const product of products) {
     if (codes.includes(product.code)) map.set(product.code, product);

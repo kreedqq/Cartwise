@@ -9,7 +9,8 @@ import {
   splitKitProgress,
   type KitShareOrderContext,
 } from "@/lib/kitOrderSummary";
-import { formatCatalogQuantity } from "@/lib/quantityFormat";
+import { formatCatalogQuantity, type QuantitySaleMode } from "@/lib/quantityFormat";
+import { saleModeForShopArea } from "@/lib/shop/shopAreas";
 import { normalizeProductCode, roundCurrency } from "@/lib/money";
 import { SHOP_CATEGORIES, shopCategoryIdFor, type ShopCategoryId } from "@/lib/shopCategories";
 import {
@@ -154,8 +155,12 @@ function resolveKitContext(kitContext?: KitShareOrderContext | null): KitShareOr
   return kitContext;
 }
 
-function formatPlainQuantityLabel(quantity: number, categoryId: ShopCategoryId): string {
-  return formatCatalogQuantity(quantity, categoryId);
+function formatPlainQuantityLabel(
+  quantity: number,
+  categoryId: ShopCategoryId,
+  saleMode: QuantitySaleMode = "catalog",
+): string {
+  return formatCatalogQuantity(quantity, categoryId, saleMode);
 }
 
 function allocateStoredKitTotals(
@@ -173,8 +178,12 @@ function allocateStoredKitTotals(
   return { completeUsd, remainderUsd: roundCurrency(totalUsd - completeUsd) };
 }
 
-function formatPersonQuantityLabel(quantity: number, categoryId: ShopCategoryId): string {
-  return formatCatalogQuantity(quantity, categoryId);
+function formatPersonQuantityLabel(
+  quantity: number,
+  categoryId: ShopCategoryId,
+  saleMode: QuantitySaleMode = "catalog",
+): string {
+  return formatCatalogQuantity(quantity, categoryId, saleMode);
 }
 
 const DOSE_UNAVAILABLE = "Nicht verfügbar";
@@ -301,10 +310,11 @@ export function buildProcessingOrderSummary(
     const key = productMergeKey(item);
     const { code, name, categoryId } = lineMeta(item);
     const quantity = asQuantity(item.quantity);
+    const saleMode = saleModeForShopArea(ordersById.get(item.order_id)?.shop_area);
     const existing = merged.get(key);
     if (existing) {
       existing.quantity += quantity;
-      existing.quantityLabel = formatPlainQuantityLabel(existing.quantity, existing.categoryId);
+      existing.quantityLabel = formatPlainQuantityLabel(existing.quantity, existing.categoryId, saleMode);
       existing.totalUsd = roundCurrency(existing.totalUsd + Number(item.line_total_usd));
       continue;
     }
@@ -312,7 +322,7 @@ export function buildProcessingOrderSummary(
       code,
       name,
       quantity,
-      quantityLabel: formatPlainQuantityLabel(quantity, categoryId),
+      quantityLabel: formatPlainQuantityLabel(quantity, categoryId, saleMode),
       totalUsd: roundCurrency(Number(item.line_total_usd)),
       categoryId,
     });
@@ -393,13 +403,14 @@ export function buildProcessingOrderSummary(
         const name = (item.product_name_snapshot ?? "").trim() || "Nicht verfügbar";
         const quantity = asQuantity(item.quantity);
         const { categoryId } = lineMeta(item);
+        const saleMode = saleModeForShopArea(order.shop_area);
         const quantityLabel = progress
           ? formatSharedKitShareLabel(quantity, progress.kitSize, categoryId)
-          : formatPlainQuantityLabel(quantity, categoryId);
+          : formatPlainQuantityLabel(quantity, categoryId, saleMode);
         const existing = lineMap.get(lineKey);
         if (existing && !kitShareId) {
           existing.quantity += quantity;
-          existing.quantityLabel = formatPlainQuantityLabel(existing.quantity, categoryId);
+          existing.quantityLabel = formatPlainQuantityLabel(existing.quantity, categoryId, saleMode);
           continue;
         }
         if (existing) continue;
@@ -442,9 +453,10 @@ export function buildProcessingOrderSummary(
       const existing = personMap.get(mergeKey);
       const quantity = asQuantity(item.quantity);
       const { categoryId } = lineMeta(item);
+      const saleMode = saleModeForShopArea(order.shop_area);
       if (existing && !kitShareId) {
         existing.quantity += quantity;
-        existing.quantityLabel = formatPersonQuantityLabel(existing.quantity, categoryId);
+        existing.quantityLabel = formatPersonQuantityLabel(existing.quantity, categoryId, saleMode);
         continue;
       }
       if (existing && kitFullyComplete) {
@@ -459,7 +471,7 @@ export function buildProcessingOrderSummary(
           ? kitFullyComplete
             ? formatCompleteKitQuantityLabel(progress.completeKits, categoryId, progress.kitSize)
             : formatSharedKitShareLabel(quantity, progress.kitSize, categoryId)
-          : formatPersonQuantityLabel(quantity, categoryId),
+          : formatPersonQuantityLabel(quantity, categoryId, saleMode),
         dose,
         article,
         code,

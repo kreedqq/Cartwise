@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { useMyOrders } from "@/hooks/useOrders";
 import { formatDateTime, summarizeOrderCharges } from "@/lib/money";
+import { formatShopAreaLabel } from "@/lib/shop/shopAreas";
 import { PageHeader } from "@/components/common/PageHeader";
 import { OrderIdentity } from "@/components/orders/OrderIdentity";
 
@@ -57,7 +58,10 @@ export default function OrdersPage() {
                     orderNumber={order.order_number}
                     telegramSnapshot={order.telegram_username_snapshot}
                   />
-                  <p className="text-xs text-muted-foreground">{formatDateTime(order.submitted_at)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatDateTime(order.submitted_at)}
+                    {order.shop_area ? ` · ${formatShopAreaLabel(order.shop_area)}` : ""}
+                  </p>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">

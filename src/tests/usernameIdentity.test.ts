@@ -37,7 +37,7 @@ describe("canonical username identity", () => {
 
   it("shop cart creation does not invent a name from email", () => {
     const shopCart = readSource("src/hooks/useShopCart.ts");
-    expect(shopCart).toContain("create.mutateAsync");
+    expect(shopCart).toContain("ensureShopAreaCart");
     expect(shopCart).not.toMatch(/email/);
     expect(shopCart).not.toMatch(/display_name/);
     expect(shopCart).not.toContain("defaultCartName");

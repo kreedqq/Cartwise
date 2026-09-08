@@ -31,6 +31,7 @@ import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/or
 import { buildSharedKitsForOrder, kitSizeForOrderItem } from "@/lib/kitOrderSummary";
 import { formatDateTime, formatQuantity, formatRate, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { formatOrderItemQuantity } from "@/lib/quantityFormat";
+import { formatShopAreaLabel, saleModeForShopArea } from "@/lib/shop/shopAreas";
 import { orderRoleSurchargeFromSnapshots } from "@/lib/roleSurcharge";
 import { QUERY_KEYS } from "@/lib/constants";
 import { canPermanentlyDeleteOrder, formatOrderTelegramSnapshot, ORDER_STATUS_LABELS } from "@/services/orders";
@@ -172,6 +173,7 @@ export default function AdminOrderDetailPage() {
               </span>
               {customer?.email && <span>{customer.email}</span>}
               <span>{formatDateTime(order.submitted_at)}</span>
+              {order.shop_area && <span>Bereich: {formatShopAreaLabel(order.shop_area)}</span>}
             </div>
           </div>
 
@@ -232,6 +234,7 @@ export default function AdminOrderDetailPage() {
                     {formatOrderItemQuantity(
                       item,
                       kitQuery.data ? kitSizeForOrderItem(item, order, kitQuery.data) : null,
+                      saleModeForShopArea(order.shop_area),
                     )}
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-sm">

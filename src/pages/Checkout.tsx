@@ -222,7 +222,9 @@ export default function CheckoutPage() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">{cartItemQuantityLabel(item)}</TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {cartItemQuantityLabel({ ...item, shop_area: cart.shop_area })}
+                      </TableCell>
                       <TableCell className="text-right tabular-nums">{formatUsd(item.unit_price_usd_snapshot)}</TableCell>
                       <TableCell className="hidden sm:table-cell">
                         <Badge variant={item.applied_price_tier === "bulk" ? "default" : "secondary"}>

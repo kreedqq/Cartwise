@@ -2,6 +2,21 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-08 (Shop-Bereiche + Group Buy)
+
+### Added
+
+- One catalog, three shop areas: Shop (Einzelverkauf), Group Buy 1, Group Buy 2. Config in `shop_areas` / `shop_area_role_access` (migration `0051`, not applied to production).
+- Central pricing context `shop_area` + `pricing_profile`. Retail: peptides/water `kit/10 × 5` per vial; oils/orals existing unit × 5; then existing role markup once. Group Buy keeps `sell_unit_price`.
+- Carts and new orders snapshot `shop_area`. Mixed-area carts are not used (`ensure_shop_area_cart`). Historical orders keep `shop_area` NULL.
+- Direct `carts.shop_area` writes: INSERT only if `user_can_access_shop_area`; UPDATE cannot change `shop_area` (`carts_protect_shop_area`). No cart-row rewrite.
+- Admin `/admin/shop-areas` plus Übersicht filter by area. Nav shows only allowed areas.
+
+### Notes
+
+- Roles stay 1:1 (`user_customer_roles`). A **Group Buy** catalog role is inserted unassigned. Kunde/Stammkunde see only Shop until an admin grants Group Buy.
+- Kits stay Group Buy only. `list_shop_products()` now lists the retail Shop. No catalog copies. No production migration/deploy.
+
 ## 2026-09-05 (Übersicht: eine Statusspalte)
 
 ### Changed

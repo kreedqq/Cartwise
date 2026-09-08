@@ -2,6 +2,8 @@ import { isInjectableOilCatalogName, isOralCatalogName, isReconstitutionWaterNam
 import { shopCategoryIdFor, type ShopCategoryId } from "@/lib/shopCategories";
 
 export type ProductQuantityKind = "kit" | "vial" | "packung";
+/** catalog = existing kit/tier nouns. retail_unit = Shop Einzelverkauf (Vial/Packung). */
+export type QuantitySaleMode = "catalog" | "retail_unit";
 
 export interface ProductQuantityInput {
   quantity: number | string | null | undefined;
@@ -12,6 +14,7 @@ export interface ProductQuantityInput {
   dosageVial?: string | null;
   /** Only when a real kit_share identity exists. Never inferred from SKU/name/qty. */
   kitSize?: number | string | null;
+  saleMode?: QuantitySaleMode;
 }
 
 /** Postgres `numeric` often arrives as `"5.000"`. Never treat that string as kit count. */
@@ -47,9 +50,13 @@ function looksLikeOralPack(dosage?: string | null): boolean {
   return Boolean(dosage && /\b(tablets?|capsules?|kapseln|tabletten)\b/i.test(dosage));
 }
 
-export function productQuantityKindFor(categoryId: ShopCategoryId): ProductQuantityKind {
+export function productQuantityKindFor(
+  categoryId: ShopCategoryId,
+  saleMode: QuantitySaleMode = "catalog",
+): ProductQuantityKind {
   if (categoryId === "injectable-oils") return "vial";
   if (categoryId === "orals") return "packung";
+  if (saleMode === "retail_unit") return "vial";
   return "kit";
 }
 
@@ -80,8 +87,12 @@ export function formatCountedQuantity(count: number, kind: ProductQuantityKind):
 }
 
 /** Catalog / cart / order lines without a real kit share. */
-export function formatCatalogQuantity(quantity: number, categoryId: ShopCategoryId): string {
-  return formatCountedQuantity(quantity, productQuantityKindFor(categoryId));
+export function formatCatalogQuantity(
+  quantity: number,
+  categoryId: ShopCategoryId,
+  saleMode: QuantitySaleMode = "catalog",
+): string {
+  return formatCountedQuantity(quantity, productQuantityKindFor(categoryId, saleMode));
 }
 
 /**
@@ -143,12 +154,13 @@ export function formatProductQuantity(input: ProductQuantityInput): string {
   const categoryId = resolveProductCategoryId(input);
   const quantity = asQuantity(input.quantity);
   const kitSize = input.kitSize == null || input.kitSize === "" ? 0 : asQuantity(input.kitSize);
+  const saleMode = input.saleMode ?? "catalog";
   if (kitSize > 0) {
     const completeKits = Math.floor(quantity / kitSize);
     const remainderVials = quantity % kitSize;
     return formatKitSplitQuantity(completeKits, remainderVials, kitSize, categoryId);
   }
-  return formatCatalogQuantity(quantity, categoryId);
+  return formatCatalogQuantity(quantity, categoryId, saleMode);
 }
 
 export function formatOrderItemQuantity(
@@ -160,6 +172,7 @@ export function formatOrderItemQuantity(
     dosage_vial_snapshot?: string | null;
   },
   kitSize?: number | null,
+  saleMode: QuantitySaleMode = "catalog",
 ): string {
   return formatProductQuantity({
     quantity: item.quantity,
@@ -167,6 +180,7 @@ export function formatOrderItemQuantity(
     code: item.product_code_snapshot,
     dosageVial: item.dosage_vial_snapshot,
     kitSize,
+    saleMode,
   });
 }
 

@@ -29,9 +29,10 @@ interface CartItemsMobileListProps {
   currentRate: number | null;
   nextPosition: number;
   readOnly?: boolean;
+  shopArea?: string | null;
 }
 
-export function CartItemsMobileList({ items, cartId, currentRate, nextPosition, readOnly }: CartItemsMobileListProps) {
+export function CartItemsMobileList({ items, cartId, currentRate, nextPosition, readOnly, shopArea }: CartItemsMobileListProps) {
   return (
     <div className="space-y-3">
       {items.map((item, index) => (
@@ -43,6 +44,7 @@ export function CartItemsMobileList({ items, cartId, currentRate, nextPosition, 
           currentRate={currentRate}
           nextPosition={nextPosition + index}
           readOnly={readOnly}
+          shopArea={shopArea}
         />
       ))}
     </div>
@@ -56,6 +58,7 @@ function CartItemCardMobile({
   currentRate,
   nextPosition,
   readOnly,
+  shopArea,
 }: {
   item: ComputedCartItem;
   index: number;
@@ -63,6 +66,7 @@ function CartItemCardMobile({
   currentRate: number | null;
   nextPosition: number;
   readOnly?: boolean;
+  shopArea?: string | null;
 }) {
   const row = useCartItemRow(item, cartId, currentRate);
   const isProblem = item.resolution_status === "not_found" || item.resolution_status === "inactive";
@@ -126,7 +130,7 @@ function CartItemCardMobile({
               inputMode="decimal"
               className="h-9 text-right tabular-nums"
             />
-            <p className="text-[11px] text-muted-foreground">{cartItemQuantityLabel(item)}</p>
+            <p className="text-[11px] text-muted-foreground">{cartItemQuantityLabel({ ...item, shop_area: shopArea })}</p>
           </div>
         </div>
         {row.quantityError && <p className="text-xs text-destructive">{row.quantityError}</p>}

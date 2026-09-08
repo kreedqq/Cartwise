@@ -3,40 +3,46 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@/lib/constants";
 import { useAuth } from "@/context/AuthProvider";
-import { useCarts, useCartMutations } from "@/hooks/useCarts";
+import { useShopAreaContext } from "@/context/ShopAreaContext";
+import { useCarts } from "@/hooks/useCarts";
+import { DEFAULT_SHOP_AREA, type ShopAreaKey } from "@/lib/shop/shopAreas";
 import { addCartItem, addCartItemsBulk, type BulkImportLine } from "@/services/cartItems";
 import { pickActiveOpenCart } from "@/services/carts";
+import { ensureShopAreaCart } from "@/services/shopAreas";
 import type { Tables } from "@/types/database";
 
 /**
- * Resolves (creating + activating if necessary) the current user's active
- * cart, so the Shop / Quick-Order / Favorites / Reorder screens can add
- * items with a single click (sections 8/9/13/24/25) without first
- * navigating to a cart page.
- *
- * Deliberately bypasses useCartItemMutations here: that hook binds to a
- * cartId at render time, but the very first "add to cart" click on this
- * page may need to *create* the cart first - the freshly created id would
- * not be reflected in an already-rendered mutation hook until the next
- * render. Reading/writing the query cache directly avoids that race.
+ * Resolves the cart for a shop area (creating + activating if needed).
+ * Shop add-to-cart always uses the area from ShopAreaProvider, not a mixed cart.
  */
-export function useShopCart() {
+export function useShopCart(shopArea?: ShopAreaKey) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const cartsQuery = useCarts();
-  const { create, activate } = useCartMutations();
+  const context = useShopAreaContext();
+  const area = shopArea ?? context.shopArea ?? DEFAULT_SHOP_AREA;
   const [ensuring, setEnsuring] = React.useState(false);
 
   const activeCart = pickActiveOpenCart(cartsQuery.data, user?.id);
+  const areaCart =
+    cartsQuery.data?.find(
+      (cart) =>
+        cart.user_id === user?.id &&
+        cart.shop_area === area &&
+        !cart.deleted_at &&
+        cart.status !== "ordered",
+    ) ?? null;
 
   async function ensureActiveCartId(): Promise<string> {
-    if (activeCart) return activeCart.id;
     if (!user) throw new Error("Nicht angemeldet.");
     setEnsuring(true);
     try {
-      const created = await create.mutateAsync({});
-      await activate.mutateAsync(created.id);
-      return created.id;
+      const cart = await ensureShopAreaCart(area);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.carts(user.id) }),
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.cartSummaries(user.id) }),
+      ]);
+      return cart.id;
     } finally {
       setEnsuring(false);
     }
@@ -79,7 +85,7 @@ export function useShopCart() {
   }
 
   return {
-    activeCart,
+    activeCart: areaCart ?? activeCart,
     cartsLoading: cartsQuery.isLoading,
     ensuring,
     addToActiveCart,

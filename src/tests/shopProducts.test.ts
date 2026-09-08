@@ -67,7 +67,7 @@ describe("resolveProductByCode", () => {
   it("uses get_shop_product_by_code and does not send a client markup", async () => {
     rpc.mockResolvedValue({ data: SHOP_ROW, error: null });
     const result = await resolveProductByCode("art-100");
-    expect(rpc).toHaveBeenCalledWith("get_shop_product_by_code", { _code: "ART-100" });
+    expect(rpc).toHaveBeenCalledWith("get_shop_product_by_code", { _code: "ART-100", _shop_area: "shop" });
     expect(rpc.mock.calls[0]?.[1]).not.toHaveProperty("markup");
     expect(result.status).toBe("resolved");
     expect(result.product?.price_usd).toBe(125);

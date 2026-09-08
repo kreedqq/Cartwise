@@ -55,13 +55,19 @@ export default function FavoritesPage() {
       {products.length > 0 && (
         <>
           <div className="hidden lg:block">
-            <ShopProductsTable products={products} rate={rateQuery.data?.rate ?? null} favoriteProductIds={favoriteProductIds} />
+            <ShopProductsTable
+              products={products}
+              rate={rateQuery.data?.rate ?? null}
+              favoriteProductIds={favoriteProductIds}
+              pricingProfile="retail"
+            />
           </div>
           <div className="lg:hidden">
             <ShopProductsMobileList
               products={products}
               rate={rateQuery.data?.rate ?? null}
               favoriteProductIds={favoriteProductIds}
+              pricingProfile="retail"
             />
           </div>
         </>

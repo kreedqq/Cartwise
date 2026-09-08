@@ -36,9 +36,10 @@ interface CartItemsTableProps {
   currentRate: number | null;
   nextPosition: number;
   readOnly?: boolean;
+  shopArea?: string | null;
 }
 
-export function CartItemsTable({ items, cartId, currentRate, nextPosition, readOnly }: CartItemsTableProps) {
+export function CartItemsTable({ items, cartId, currentRate, nextPosition, readOnly, shopArea }: CartItemsTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -66,6 +67,7 @@ export function CartItemsTable({ items, cartId, currentRate, nextPosition, readO
             currentRate={currentRate}
             nextPosition={nextPosition + index}
             readOnly={readOnly}
+            shopArea={shopArea}
           />
         ))}
       </TableBody>
@@ -80,6 +82,7 @@ function CartItemRowDesktop({
   currentRate,
   nextPosition,
   readOnly,
+  shopArea,
 }: {
   item: ComputedCartItem;
   index: number;
@@ -87,6 +90,7 @@ function CartItemRowDesktop({
   currentRate: number | null;
   nextPosition: number;
   readOnly?: boolean;
+  shopArea?: string | null;
 }) {
   const row = useCartItemRow(item, cartId, currentRate);
   const isProblem = item.resolution_status === "not_found" || item.resolution_status === "inactive";
@@ -141,7 +145,7 @@ function CartItemRowDesktop({
         />
         {row.quantityError && <p className="mt-1 text-[11px] text-destructive">{row.quantityError}</p>}
         <SaveStatusIndicator status={row.quantityStatus} className="mt-1 justify-end" />
-        <p className="mt-1 text-[11px] text-muted-foreground">{cartItemQuantityLabel(item)}</p>
+        <p className="mt-1 text-[11px] text-muted-foreground">{cartItemQuantityLabel({ ...item, shop_area: shopArea })}</p>
       </TableCell>
       <TableCell className="text-right tabular-nums text-sm">
         {formatUsd(item.unit_price_usd_snapshot)}

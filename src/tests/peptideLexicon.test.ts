@@ -90,11 +90,11 @@ describe("research connectors", () => {
 describe("peptide routing isolation", () => {
   it("keeps peptide routes outside the shop", () => {
     const app = readFileSync(resolve(process.cwd(), "src/App.tsx"), "utf8");
-    const sidebar = readFileSync(resolve(process.cwd(), "src/components/layout/Sidebar.tsx"), "utf8");
+    const navigation = readFileSync(resolve(process.cwd(), "src/lib/navigation.ts"), "utf8");
     expect(app).toMatch('path="/peptide"');
     expect(app).toMatch('path="/peptide/rechner"');
     expect(app).toMatch('path="/peptide/lexikon/:slug"');
     expect(app).not.toMatch("/shop/peptide");
-    expect(sidebar).toMatch('to: "/peptide"');
+    expect(navigation).toMatch('to: "/peptide"');
   });
 });
