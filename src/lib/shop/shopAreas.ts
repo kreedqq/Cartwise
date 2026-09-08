@@ -7,9 +7,20 @@ export type GroupBuyAreaKey = (typeof GROUP_BUY_AREA_KEYS)[number];
 export const SHOP_PRICING_PROFILES = ["retail", "group_buy"] as const;
 export type ShopPricingProfile = (typeof SHOP_PRICING_PROFILES)[number];
 
-/** Central retail conversion. SQL `shop_areas.retail_price_factor` / `kit_unit_divisor` must stay in sync. */
+/**
+ * Legacy retail multiplier (direct ×). Kept for tests and historical reference.
+ * The active pricing pipeline uses `base_price_factor_pct` (percentage) instead.
+ * SQL `shop_areas.retail_price_factor` is retained but no longer used in production pricing.
+ */
 export const RETAIL_PRICE_FACTOR = 5;
 export const RETAIL_KIT_UNIT_DIVISOR = 10;
+
+/**
+ * Default base price factor (percentage) when no area value is available.
+ * 100 % = 1× (pass-through). The active production value per area is stored in
+ * `shop_areas.base_price_factor_pct` (e.g. 300 for the retail shop area).
+ */
+export const DEFAULT_BASE_PRICE_FACTOR_PCT = 100;
 
 export const DEFAULT_SHOP_AREA: ShopAreaKey = "shop";
 
@@ -49,6 +60,8 @@ export interface MyShopArea {
   pricing_profile: ShopPricingProfile;
   sort_order: number;
   path: string;
+  /** Price multiplier as a percentage (100 = 1×, 300 = 3×). Loaded from `shop_areas.base_price_factor_pct`. */
+  base_price_factor_pct: number;
 }
 
 export function isRetailPricing(profile: ShopPricingProfile | null | undefined): boolean {

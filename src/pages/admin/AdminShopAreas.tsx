@@ -2,7 +2,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
-import { AdminSection } from "@/components/admin/AdminSection";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,12 +15,11 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toaster";
 import { MAX_PDF_SIZE_BYTES, QUERY_KEYS } from "@/lib/constants";
-import { formatDateTime, formatUsd } from "@/lib/money";
+import { applyRoleMarkup, formatDateTime, formatUsd } from "@/lib/money";
 import { shopAreaCatalogUnit } from "@/lib/shop/shopAreaPricing";
-import { shopCategoryIdFor } from "@/lib/shopCategories";
 import {
+  DEFAULT_BASE_PRICE_FACTOR_PCT,
   RETAIL_KIT_UNIT_DIVISOR,
-  RETAIL_PRICE_FACTOR,
   SHOP_AREA_KEYS,
   SHOP_AREA_LABELS,
   isShopAreaKey,
@@ -34,9 +32,7 @@ import { listCustomerRoles } from "@/services/customerRoles";
 import { listAllProducts } from "@/services/products";
 import {
   deleteAdminShopAreaDocument,
-  deleteAdminShopAreaProductPrice,
   getAdminShopAreaDocument,
-  listAdminShopAreaProductPrices,
   listAdminShopAreaProducts,
   listAdminShopAreaRoleAccess,
   listAdminShopAreas,
@@ -45,7 +41,6 @@ import {
   signedAdminShopAreaDocumentUrl,
   updateAdminShopArea,
   uploadAdminShopAreaDocument,
-  upsertAdminShopAreaProductPrice,
 } from "@/services/shopAreas";
 import type { Tables } from "@/types/database";
 
@@ -161,53 +156,15 @@ export default function AdminShopAreasPage() {
           </TabsContent>
 
           <TabsContent value="preise">
-            {productsQuery.isLoading ? (
-              <Skeleton className="h-64 w-full" />
-            ) : (
-              <AreaPricesPanel areaKey={areaKey} products={products} profile={lockedProfile} onChanged={invalidate} />
-            )}
+            <AreaPricesPanel
+              areaKey={areaKey}
+              area={selected}
+              profile={lockedProfile}
+              onChanged={invalidate}
+            />
           </TabsContent>
         </Tabs>
       )}
-
-      <AdminSection>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Preisvorschau (Katalog, ohne Rollenaufschlag)</CardTitle>
-            <CardDescription>
-              Faktor {RETAIL_PRICE_FACTOR}, Kit-Teiler {RETAIL_KIT_UNIT_DIVISOR}. Der Rollenaufschlag wird danach genau
-              einmal angewendet.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-3 text-sm sm:grid-cols-3">
-            <PreviewLine
-              title="Peptid / Water"
-              shop={`${shopAreaCatalogUnit({ price_usd: 100 }, 1, "retail", true)} USD / Vial`}
-              groupBuy="100 USD / Kit (bestehende Logik)"
-            />
-            <PreviewLine
-              title="Injectable Oil"
-              shop={`${shopAreaCatalogUnit({ price_usd: 18, bulk_price_usd: 160, bulk_price_min_quantity: 10 }, 1, "retail", false)} USD / Vial`}
-              groupBuy="18 USD / Vial (bestehende Logik)"
-            />
-            <PreviewLine
-              title="Oral"
-              shop={`${shopAreaCatalogUnit({ price_usd: 20 }, 1, "retail", false)} USD / Packung`}
-              groupBuy="20 USD / Packung (bestehende Logik)"
-            />
-          </CardContent>
-        </Card>
-      </AdminSection>
-    </div>
-  );
-}
-
-function PreviewLine({ title, shop, groupBuy }: { title: string; shop: string; groupBuy: string }) {
-  return (
-    <div className="rounded-lg border border-border p-3">
-      <p className="font-medium">{title}</p>
-      <p className="mt-1 text-muted-foreground">Shop: {shop}</p>
-      <p className="text-muted-foreground">Group Buy: {groupBuy}</p>
     </div>
   );
 }
@@ -485,210 +442,154 @@ function AreaDocumentPanel({ areaKey }: { areaKey: ShopAreaKey }) {
   );
 }
 
-function parseOptionalNumber(value: string): number | null {
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  const parsed = Number(trimmed.replace(",", "."));
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
+/**
+ * Preise tab: area-level base price factor (replaces per-product price table).
+ * The factor applies uniformly to all products in this area.
+ * Per-product catalog price overrides (shop_area_product_prices) are still supported
+ * via import workflows; they are not surfaced in this UI.
+ */
 function AreaPricesPanel({
   areaKey,
-  products,
+  area,
   profile,
   onChanged,
 }: {
   areaKey: ShopAreaKey;
-  products: Tables<"products">[];
+  area: Tables<"shop_areas">;
   profile: ShopPricingProfile;
   onChanged: () => Promise<void>;
 }) {
-  const pricesQuery = useQuery({
-    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("prices"),
-    queryFn: () => listAdminShopAreaProductPrices(areaKey),
-  });
-  const [search, setSearch] = React.useState("");
-  const [selectedId, setSelectedId] = React.useState<string>(products[0]?.id ?? "");
+  const [localFactor, setLocalFactor] = React.useState<number>(
+    area.base_price_factor_pct ?? DEFAULT_BASE_PRICE_FACTOR_PCT,
+  );
+  const [saving, setSaving] = React.useState(false);
 
-  const priceMap = React.useMemo(() => {
-    const map = new Map<string, Tables<"shop_area_product_prices">>();
-    for (const row of pricesQuery.data ?? []) map.set(row.product_id, row);
-    return map;
-  }, [pricesQuery.data]);
+  async function saveFactor() {
+    const value = Number(localFactor);
+    if (!Number.isFinite(value) || value <= 0) {
+      toast.error("Faktor muss eine positive Zahl sein.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateAdminShopArea(areaKey, { base_price_factor_pct: value });
+      toast.success(`Grundpreisfaktor für ${SHOP_AREA_LABELS[areaKey]} gespeichert.`);
+      await onChanged();
+    } catch (error) {
+      console.error("Faktor speichern fehlgeschlagen:", error);
+      toast.error(error instanceof Error ? error.message : "Faktor konnte nicht gespeichert werden.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
-  const filtered = React.useMemo(() => {
-    const term = search.trim().toLowerCase();
-    return products.filter((product) => {
-      if (!term) return true;
-      return `${product.code} ${product.name}`.toLowerCase().includes(term);
-    });
-  }, [products, search]);
-
-  const selected = products.find((product) => product.id === selectedId) ?? filtered[0] ?? null;
+  const isRetail = profile === "retail";
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Preise in {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardTitle className="text-base">Preiseinstellungen {SHOP_AREA_LABELS[areaKey]}</CardTitle>
         <CardDescription>
-          Leere Felder übernehmen den zentralen Katalogpreis. Shop zeigt den resultierenden Einzelpreis, Group Buy die
-          Kit-/Staffellogik.
+          {isRetail
+            ? "Retail-Formel: (Importpreis ÷ Kit-Teiler) × (Faktor ÷ 100). Der Rollenaufschlag wird danach genau einmal angewendet."
+            : "Group-Buy-Formel: Importpreis × (Faktor ÷ 100). Der Rollenaufschlag wird danach genau einmal angewendet."}
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <div className="space-y-2">
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Produkt suchen …" />
-          <div className="max-h-80 overflow-y-auto rounded-lg border border-border">
-            {filtered.map((product) => (
-              <button
-                key={product.id}
-                type="button"
-                className={`flex w-full flex-col items-start border-b border-border px-3 py-2 text-left text-sm last:border-b-0 ${
-                  selected?.id === product.id ? "bg-secondary" : "hover:bg-secondary/50"
-                }`}
-                onClick={() => setSelectedId(product.id)}
-              >
-                <span className="font-medium">{product.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  {product.code} · Katalog {formatUsd(product.price_usd)}
-                </span>
-              </button>
-            ))}
+      <CardContent className="space-y-6">
+        {/* Factor input */}
+        <div className="space-y-3">
+          <Label htmlFor={`factor-${areaKey}`}>Grundpreisfaktor (%)</Label>
+          <p className="text-xs text-muted-foreground">
+            100 % = 1× (kein Aufschlag) · 300 % = 3× · 150 % = 1,5× · Formel: Faktor (%) ÷ 100 = Multiplikator
+          </p>
+          <div className="flex items-center gap-2">
+            <Input
+              id={`factor-${areaKey}`}
+              type="number"
+              min={1}
+              max={10000}
+              step={1}
+              value={localFactor}
+              onChange={(e) => setLocalFactor(Number(e.target.value))}
+              className="w-36"
+            />
+            <span className="text-sm text-muted-foreground">%</span>
+            <Button type="button" loading={saving} onClick={() => void saveFactor()}>
+              Speichern
+            </Button>
           </div>
         </div>
-        {selected && (
-          <AreaPriceEditor
-            key={`${areaKey}-${selected.id}-${priceMap.get(selected.id)?.updated_at ?? "catalog"}`}
-            areaKey={areaKey}
-            product={selected}
-            profile={profile}
-            override={priceMap.get(selected.id) ?? null}
-            onSaved={async () => {
-              await pricesQuery.refetch();
-              await onChanged();
-            }}
-          />
-        )}
+
+        {/* Price preview using SSoT functions */}
+        <PriceFactorPreview factorPct={localFactor} isRetail={isRetail} />
       </CardContent>
     </Card>
   );
 }
 
-function AreaPriceEditor({
-  areaKey,
-  product,
-  profile,
-  override,
-  onSaved,
-}: {
-  areaKey: ShopAreaKey;
-  product: Tables<"products">;
-  profile: ShopPricingProfile;
-  override: Tables<"shop_area_product_prices"> | null;
-  onSaved: () => Promise<void>;
-}) {
-  const [priceUsd, setPriceUsd] = React.useState(override?.price_usd != null ? String(override.price_usd) : "");
-  const [bulkUsd, setBulkUsd] = React.useState(override?.bulk_price_usd != null ? String(override.bulk_price_usd) : "");
-  const [bulkMin, setBulkMin] = React.useState(
-    override?.bulk_price_min_quantity != null ? String(override.bulk_price_min_quantity) : "",
-  );
-  const [saving, setSaving] = React.useState(false);
-  const categoryId = shopCategoryIdFor(product);
-  const usesKit = categoryId === "peptides" || categoryId === "reconstitution-water";
-  const kitUnit = shopAreaCatalogUnit(
-    {
-      price_usd: parseOptionalNumber(priceUsd) ?? product.price_usd,
-      bulk_price_usd: parseOptionalNumber(bulkUsd) ?? product.bulk_price_usd,
-      bulk_price_min_quantity: parseOptionalNumber(bulkMin) ?? product.bulk_price_min_quantity,
-    },
+/**
+ * Live preview of catalog and selling prices based on an example import price.
+ * Uses shopAreaCatalogUnit and applyRoleMarkup (SSoTs) – no inline pricing logic.
+ */
+function PriceFactorPreview({ factorPct, isRetail }: { factorPct: number; isRetail: boolean }) {
+  const EXAMPLE_IMPORT = 100;
+  const EXAMPLE_ROLE_MARKUPS = [0, 25] as const;
+
+  const safeFactorPct = Number.isFinite(factorPct) && factorPct > 0 ? factorPct : DEFAULT_BASE_PRICE_FACTOR_PCT;
+  const multiplier = safeFactorPct / 100;
+
+  // Retail: peptide example (usesKitUnitPricing = true), kitDivisor = 10
+  // Group Buy: vial unit example (usesKitUnitPricing = false, factor applies directly)
+  const catalogBase = shopAreaCatalogUnit(
+    { price_usd: EXAMPLE_IMPORT },
     1,
-    profile,
-    usesKit,
+    isRetail ? "retail" : "group_buy",
+    isRetail, // usesKitUnitPricing: true for retail (peptide), irrelevant for GB
+    safeFactorPct,
+    RETAIL_KIT_UNIT_DIVISOR,
   );
-
-  async function save() {
-    const nextPrice = parseOptionalNumber(priceUsd);
-    const nextBulk = parseOptionalNumber(bulkUsd);
-    const nextMin = parseOptionalNumber(bulkMin);
-    if ((nextBulk == null) !== (nextMin == null)) {
-      toast.error("Mengenstaffel braucht Preis und Mindestmenge gemeinsam.");
-      return;
-    }
-    setSaving(true);
-    try {
-      if (nextPrice == null && nextBulk == null) {
-        await deleteAdminShopAreaProductPrice(areaKey, product.id);
-      } else {
-        await upsertAdminShopAreaProductPrice(areaKey, product.id, {
-          price_usd: nextPrice,
-          bulk_price_usd: nextBulk,
-          bulk_price_min_quantity: nextMin,
-        });
-      }
-      toast.success("Bereichspreis gespeichert.");
-      await onSaved();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Preis konnte nicht gespeichert werden.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function resetToCatalog() {
-    setSaving(true);
-    try {
-      await deleteAdminShopAreaProductPrice(areaKey, product.id);
-      setPriceUsd("");
-      setBulkUsd("");
-      setBulkMin("");
-      toast.success("Katalogpreis übernommen.");
-      await onSaved();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Preis konnte nicht zurückgesetzt werden.");
-    } finally {
-      setSaving(false);
-    }
-  }
 
   return (
-    <div className="space-y-3">
-      <p className="text-sm font-medium">{product.name}</p>
-      <p className="text-xs text-muted-foreground">
-        Katalog {formatUsd(product.price_usd)} · Bereichseinheit {formatUsd(kitUnit)}
-      </p>
-      <div className="space-y-1">
-        <Label htmlFor="area-price">Basispreis USD</Label>
-        <Input
-          id="area-price"
-          inputMode="decimal"
-          value={priceUsd}
-          onChange={(e) => setPriceUsd(e.target.value)}
-          placeholder={String(product.price_usd)}
-        />
-      </div>
-      {profile === "group_buy" && (
-        <>
-          <div className="space-y-1">
-            <Label htmlFor="area-bulk">Staffelpreis USD</Label>
-            <Input id="area-bulk" inputMode="decimal" value={bulkUsd} onChange={(e) => setBulkUsd(e.target.value)} />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="area-bulk-min">Ab Menge</Label>
-            <Input id="area-bulk-min" inputMode="decimal" value={bulkMin} onChange={(e) => setBulkMin(e.target.value)} />
-          </div>
-        </>
+    <div className="space-y-3 rounded-lg border border-border bg-secondary/20 p-4">
+      <p className="text-sm font-medium">Preisvorschau (Beispiel: Importpreis {formatUsd(EXAMPLE_IMPORT)})</p>
+
+      {isRetail ? (
+        <p className="text-xs text-muted-foreground">
+          Schritt 1: {EXAMPLE_IMPORT} ÷ {RETAIL_KIT_UNIT_DIVISOR} = {EXAMPLE_IMPORT / RETAIL_KIT_UNIT_DIVISOR} USD/Vial
+          <br />
+          Schritt 2: {EXAMPLE_IMPORT / RETAIL_KIT_UNIT_DIVISOR} × {multiplier.toFixed(2)} ={" "}
+          <strong>{formatUsd(catalogBase)}</strong> (Katalogpreis ohne Aufschlag)
+        </p>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          {EXAMPLE_IMPORT} × {multiplier.toFixed(2)} = <strong>{formatUsd(catalogBase)}</strong> (Katalogpreis ohne
+          Aufschlag)
+        </p>
       )}
-      <div className="flex flex-wrap gap-2">
-        <Button type="button" loading={saving} onClick={() => void save()}>
-          Speichern
-        </Button>
-        <Button type="button" variant="outline" disabled={saving} onClick={() => void resetToCatalog()}>
-          Katalog übernehmen
-        </Button>
-      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Rollenaufschlag</TableHead>
+            <TableHead className="text-right">Verkaufspreis</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {EXAMPLE_ROLE_MARKUPS.map((markupPct) => (
+            <TableRow key={markupPct}>
+              <TableCell className="text-sm">{markupPct} %</TableCell>
+              <TableCell className="text-right text-sm font-medium">
+                {formatUsd(applyRoleMarkup(catalogBase, markupPct))} / {isRetail ? "Vial" : "Einheit"}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }
+
 // AreaRolePricesPanel and AreaRoleMarkupEditor removed in migration 0053.
 // Role markup is now global-only via markup_percent_for().
+// Per-product area price overrides (shop_area_product_prices) are retained for import workflows.
 // The shop_area_product_role_markups table is retained for future use.

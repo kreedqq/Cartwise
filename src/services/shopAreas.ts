@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { PDF_IMPORT_BUCKET } from "@/lib/constants";
 import {
+  DEFAULT_BASE_PRICE_FACTOR_PCT,
   DEFAULT_SHOP_AREA,
   isShopAreaKey,
   SHOP_PRICING_PROFILES,
@@ -27,6 +28,7 @@ export async function listMyShopAreas(): Promise<MyShopArea[]> {
         pricing_profile: row.pricing_profile,
         sort_order: row.sort_order,
         path: row.path,
+        base_price_factor_pct: row.base_price_factor_pct ?? DEFAULT_BASE_PRICE_FACTOR_PCT,
       },
     ];
   });
@@ -58,7 +60,7 @@ export async function listAdminShopAreaRoleAccess(): Promise<Tables<"shop_area_r
 
 export async function updateAdminShopArea(
   key: ShopAreaKey,
-  patch: Partial<Pick<Tables<"shop_areas">, "name" | "is_active" | "pricing_profile">>,
+  patch: Partial<Pick<Tables<"shop_areas">, "name" | "is_active" | "pricing_profile" | "base_price_factor_pct">>,
 ): Promise<void> {
   const { error } = await supabase.from("shop_areas").update(patch).eq("key", key);
   if (error) throw error;

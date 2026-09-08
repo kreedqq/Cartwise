@@ -44,12 +44,12 @@ describe("shop area domain", () => {
 
   it("buildCustomerNavItems returns a single Shop entry and no Favoriten", () => {
     const kunde: MyShopArea[] = [
-      { key: "shop", name: "Shop", pricing_profile: "retail", sort_order: 10, path: "/shop" },
+      { key: "shop", name: "Shop", pricing_profile: "retail", sort_order: 10, path: "/shop", base_price_factor_pct: 300 },
     ];
     const groupBuy: MyShopArea[] = [
       ...kunde,
-      { key: "group_buy_1", name: "Group Buy 1", pricing_profile: "group_buy", sort_order: 20, path: "/shop/group-buy-1" },
-      { key: "group_buy_2", name: "Group Buy 2", pricing_profile: "group_buy", sort_order: 30, path: "/shop/group-buy-2" },
+      { key: "group_buy_1", name: "Group Buy 1", pricing_profile: "group_buy", sort_order: 20, path: "/shop/group-buy-1", base_price_factor_pct: 100 },
+      { key: "group_buy_2", name: "Group Buy 2", pricing_profile: "group_buy", sort_order: 30, path: "/shop/group-buy-2", base_price_factor_pct: 100 },
     ];
     const kundeItems = buildCustomerNavItems(kunde);
     expect(kundeItems.map((item) => item.label)).toEqual([
@@ -82,10 +82,16 @@ describe("shop area domain", () => {
 
 describe("shop area pricing is one pipeline", () => {
   it("does not double-apply role markup", () => {
-    expect(shopAreaSellUnitPrice(PEPTIDE, 1, 25, "retail", true)).toBe(62.5);
+    // Explicit factorPct=500 (5×) preserves the historical factor=5 test values.
+    // The active production factor is configured per area (e.g. 300% for shop, 100% for GB).
+    expect(shopAreaSellUnitPrice(PEPTIDE, 1, 25, "retail", true, 500)).toBe(62.5);
+    // GB default factorPct=100 (1×): 100 × 1.0 × 1.25 = 125
     expect(shopAreaSellUnitPrice(PEPTIDE, 1, 25, "group_buy", true)).toBe(125);
-    expect(shopAreaCatalogUnit(OIL, 1, "retail", false)).toBe(90);
-    expect(shopAreaCatalogUnit(ORAL, 1, "retail", false)).toBe(100);
+    // Retail with factorPct=500: sell_unit_price(OIL,1)=18 × 5 = 90
+    expect(shopAreaCatalogUnit(OIL, 1, "retail", false, 500)).toBe(90);
+    // Retail with factorPct=500: 20 × 5 = 100
+    expect(shopAreaCatalogUnit(ORAL, 1, "retail", false, 500)).toBe(100);
+    // GB default: 100 × 1.0 = 100
     expect(shopAreaCatalogUnit(PEPTIDE, 1, "group_buy", true)).toBe(100);
   });
 
@@ -185,5 +191,61 @@ describe("global role markup SQL (migration 0053)", () => {
     expect(sql).not.toMatch(/delete from/i);
     expect(sql).not.toMatch(/truncate/i);
     expect(sql).not.toMatch(/alter table/i);
+  });
+});
+
+describe("area base price factor SQL (migration 0054)", () => {
+  const sql = read("supabase/migrations/0054_area_base_price_factor.sql");
+
+  it("adds base_price_factor_pct column and sets retail shop to 300%", () => {
+    expect(sql).toMatch(/add column if not exists base_price_factor_pct/);
+    expect(sql).toMatch(/base_price_factor_pct = 300 where key = 'shop'/);
+  });
+
+  it("replaces shop_area_catalog_unit and list_shop_products_for_area with new factor logic", () => {
+    expect(sql).toMatch(/create or replace function public\.shop_area_catalog_unit/);
+    expect(sql).toMatch(/create or replace function public\.list_shop_products_for_area/);
+    expect(sql).toMatch(/base_price_factor_pct \/ 100\.0/);
+  });
+
+  it("applies factor to group_buy pricing (NEW: GB also has a factor)", () => {
+    // The new catalog_unit applies factor for group_buy too.
+    expect(sql).toMatch(/group_buy.*_factor|_factor.*group_buy/s);
+    expect(sql).toMatch(/sell_unit_price[\s\S]*?\*\s*_factor/);
+  });
+
+  it("applies role markup exactly once (no double apply_role_markup nesting)", () => {
+    expect(sql).toMatch(/apply_role_markup\(/);
+    expect(sql).not.toMatch(/apply_role_markup\(\s*public\.apply_role_markup/);
+  });
+
+  it("retains retail_price_factor column (legacy, not dropped)", () => {
+    expect(sql).not.toMatch(/drop column.*retail_price_factor/i);
+    expect(sql).not.toMatch(/retail_price_factor.*drop/i);
+  });
+
+  it("does not drop or alter security objects from 0051", () => {
+    expect(sql).not.toMatch(/drop policy if exists carts_insert_own/);
+    expect(sql).not.toMatch(/drop function if exists public\.current_user_can_access_shop_area/);
+    expect(sql).not.toMatch(/drop trigger if exists carts_protect_shop_area/);
+    expect(sql).not.toMatch(/drop trigger if exists cart_items_reject_retail_kits/);
+  });
+
+  it("does not backfill historical orders or products", () => {
+    expect(sql).not.toMatch(/update public\.orders set shop_area/);
+    expect(sql).not.toMatch(/update public\.order_items set/);
+    expect(sql).not.toMatch(/update public\.products set price_usd/);
+  });
+
+  it("includes SECURITY DEFINER and correct grants", () => {
+    expect(sql).toMatch(/security definer/);
+    expect(sql).toMatch(/revoke all on function/);
+    expect(sql).toMatch(/grant execute on function public\.list_shop_products_for_area/);
+    expect(sql).toMatch(/grant execute on function public\.list_my_shop_areas/);
+  });
+
+  it("updates list_my_shop_areas to return base_price_factor_pct", () => {
+    expect(sql).toMatch(/create or replace function public\.list_my_shop_areas/);
+    expect(sql).toMatch(/base_price_factor_pct.*numeric|numeric.*base_price_factor_pct/s);
   });
 });

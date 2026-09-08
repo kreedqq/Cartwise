@@ -84,7 +84,7 @@ describe("ShopHub routing", () => {
 });
 
 describe("admin Verkaufsbereiche", () => {
-  it("configures products, document, and prices per area (Rollenpreise tab removed)", () => {
+  it("configures products, document, and prices per area (Rollenpreise tab removed, per-product price UI replaced by factor)", () => {
     const page = read("src/pages/admin/AdminShopAreas.tsx");
     expect(page).toContain("Verkaufsbereiche");
     expect(page).toContain('value="allgemein"');
@@ -94,8 +94,17 @@ describe("admin Verkaufsbereiche", () => {
     // Rollenpreise tab removed in migration 0053
     expect(page).not.toContain('value="rollenpreise"');
     expect(page).not.toContain("upsertAdminShopAreaRoleMarkup");
+    // Per-product price tab UI removed in migration 0054 — replaced by area-level factor.
+    // upsertAdminShopAreaProductPrice remains in the service for import workflows, but is no longer
+    // directly invoked from the admin UI page.
+    expect(page).not.toContain("upsertAdminShopAreaProductPrice");
+    // New Preise tab: factor-based UI
+    expect(page).toContain("base_price_factor_pct");
+    expect(page).toContain("PriceFactorPreview");
+    expect(page).toContain("Grundpreisfaktor");
+    expect(page).toContain("updateAdminShopArea");
+    // Document and product tabs remain intact
     expect(page).toContain("uploadAdminShopAreaDocument");
-    expect(page).toContain("upsertAdminShopAreaProductPrice");
     expect(page).toContain("setAdminShopAreaProductActive");
     expect(read("src/lib/adminNav.ts")).toContain("Verkaufsbereiche");
   });

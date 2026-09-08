@@ -526,6 +526,7 @@ export interface Database {
           pricing_profile: string;
           retail_price_factor: number;
           kit_unit_divisor: number;
+          base_price_factor_pct: number;
           sort_order: number;
           created_at: string;
           updated_at: string;
@@ -1440,6 +1441,7 @@ export interface Database {
           pricing_profile: string;
           sort_order: number;
           path: string;
+          base_price_factor_pct: number;
         }[];
       };
       ensure_shop_area_cart: {

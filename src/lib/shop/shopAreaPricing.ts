@@ -1,5 +1,5 @@
 import { applyRoleMarkup, getEffectiveUnitPrice, type PricedProduct } from "@/lib/money";
-import { RETAIL_KIT_UNIT_DIVISOR, RETAIL_PRICE_FACTOR, type ShopPricingProfile } from "@/lib/shop/shopAreas";
+import { RETAIL_KIT_UNIT_DIVISOR, type ShopPricingProfile } from "@/lib/shop/shopAreas";
 
 export interface ShopAreaPricedProduct extends PricedProduct {
   category?: string | null;
@@ -11,20 +11,25 @@ export interface ShopAreaPricedProduct extends PricedProduct {
  * Catalog unit (0% markup) for a shop area. Role markup is applied exactly once
  * afterwards via applyRoleMarkup / SQL apply_role_markup.
  *
- * retail peptides/water: kit_price / 10 × 5
- * retail oils/orals: existing quantity-tier unit × 5
- * group_buy: existing getEffectiveUnitPrice
+ * retail peptides/water: (kit_price / kitDivisor) × (factorPct / 100)
+ * retail oils/orals:     getEffectiveUnitPrice × (factorPct / 100)
+ * group_buy:             getEffectiveUnitPrice × (factorPct / 100)
+ *
+ * @param factorPct  Price multiplier expressed as a percentage.
+ *                   100 = 1× (pass-through), 300 = 3×, 150 = 1.5×.
+ *                   Default 100 (neutral). Pass `area.base_price_factor_pct` from the loaded area.
  */
 export function shopAreaCatalogUnit(
   product: ShopAreaPricedProduct,
   quantity: number,
   profile: ShopPricingProfile,
   usesKitUnitPricing: boolean,
-  factor = RETAIL_PRICE_FACTOR,
+  factorPct = 100,
   kitDivisor = RETAIL_KIT_UNIT_DIVISOR,
 ): number {
+  const factor = factorPct / 100;
   if (profile === "group_buy") {
-    return getEffectiveUnitPrice(product, quantity).unitPriceUsd;
+    return getEffectiveUnitPrice(product, quantity).unitPriceUsd * factor;
   }
   if (usesKitUnitPricing) {
     return (product.price_usd / kitDivisor) * factor;
@@ -38,11 +43,11 @@ export function shopAreaSellUnitPrice(
   markupPercent: number,
   profile: ShopPricingProfile,
   usesKitUnitPricing: boolean,
-  factor = RETAIL_PRICE_FACTOR,
+  factorPct = 100,
   kitDivisor = RETAIL_KIT_UNIT_DIVISOR,
 ): number {
   return applyRoleMarkup(
-    shopAreaCatalogUnit(product, quantity, profile, usesKitUnitPricing, factor, kitDivisor),
+    shopAreaCatalogUnit(product, quantity, profile, usesKitUnitPricing, factorPct, kitDivisor),
     markupPercent,
   );
 }
@@ -66,6 +71,9 @@ export function resolveAreaRoleMarkupPercent(
 /**
  * Final selling unit for one product in one area for one role.
  * Catalog override (optional) → area formula → applyRoleMarkup once.
+ *
+ * @param factorPct  Price multiplier as a percentage (100 = 1×, 300 = 3×).
+ *                   Must be the last parameter to preserve backwards-compatible optional args.
  */
 export function shopAreaSellUnitPriceForProductRole(
   globalProduct: ShopAreaPricedProduct,
@@ -75,6 +83,7 @@ export function shopAreaSellUnitPriceForProductRole(
   usesKitUnitPricing: boolean,
   areaPriceOverrideUsd?: number | null,
   areaRoleMarkupPercent?: number | null,
+  factorPct = 100,
 ): number {
   const catalog = {
     ...globalProduct,
@@ -86,5 +95,6 @@ export function shopAreaSellUnitPriceForProductRole(
     resolveAreaRoleMarkupPercent(roleMarkupPercent, areaRoleMarkupPercent),
     profile,
     usesKitUnitPricing,
+    factorPct,
   );
 }
