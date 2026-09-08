@@ -233,4 +233,30 @@ export async function signedAdminShopAreaDocumentUrl(storagePath: string): Promi
   return data.signedUrl;
 }
 
+/** Payload for one product entry in the area vendor catalog. */
+export interface VendorCatalogRow {
+  product_id: string;
+  price_usd: number;
+  bulk_price_usd: number | null;
+  bulk_price_min_quantity: number | null;
+}
+
+/**
+ * Atomically replaces the vendor catalog for one shop area.
+ * Corresponds to migration 0056 `apply_area_vendor_catalog` RPC.
+ * Only admins may call this.
+ */
+export async function applyAreaVendorCatalog(
+  shopAreaKey: ShopAreaKey,
+  rows: VendorCatalogRow[],
+): Promise<{ added: number; removed: number; skipped: number }> {
+  const { data, error } = await supabase.rpc("apply_area_vendor_catalog", {
+    _area_key: shopAreaKey,
+    _rows: rows,
+  });
+  if (error) throw error;
+  const result = data as { added: number; removed: number; skipped: number };
+  return result;
+}
+
 export { DEFAULT_SHOP_AREA };

@@ -31,6 +31,7 @@ import { ACCEPTED_IMPORT_ACCEPT, ACCEPTED_IMPORT_LABEL, detectImportSourceKind }
 import { listCustomerRoles } from "@/services/customerRoles";
 import { listAllProducts } from "@/services/products";
 import {
+  applyAreaVendorCatalog,
   deleteAdminShopAreaDocument,
   getAdminShopAreaDocument,
   listAdminShopAreaProducts,
@@ -42,6 +43,9 @@ import {
   updateAdminShopArea,
   uploadAdminShopAreaDocument,
 } from "@/services/shopAreas";
+import { matchVendorCatalogRows, type VendorCatalogMatchResult } from "@/lib/shop/vendorCatalog";
+import { parseProductXlsx } from "@/services/xlsxProducts";
+import { parseProductCsv } from "@/services/csvProducts";
 import type { Tables } from "@/types/database";
 
 const PROFILE_LABELS: Record<ShopPricingProfile, string> = {
@@ -152,7 +156,7 @@ export default function AdminShopAreasPage() {
           </TabsContent>
 
           <TabsContent value="dokument">
-            <AreaDocumentPanel areaKey={areaKey} />
+            <AreaDocumentPanel areaKey={areaKey} products={products} onCatalogChanged={invalidate} />
           </TabsContent>
 
           <TabsContent value="preise">
@@ -265,13 +269,19 @@ function AreaProductsPanel({
     return map;
   }, [overlayQuery.data]);
 
+  // Only show products that are explicitly in the vendor catalog for this area.
+  // The new semantics (migration 0056) require an explicit shop_area_products row;
+  // global products not in the vendor catalog are invisible here.
   const filtered = React.useMemo(() => {
     const term = search.trim().toLowerCase();
+    // Build the set of product_ids present in the vendor catalog
+    const catalogProductIds = new Set(overlayQuery.data?.map((row) => row.product_id) ?? []);
     return products.filter((product) => {
+      if (!catalogProductIds.has(product.id)) return false;
       if (!term) return true;
       return `${product.code} ${product.name} ${product.dosage_vial ?? ""}`.toLowerCase().includes(term);
     });
-  }, [products, search]);
+  }, [products, overlayQuery.data, search]);
 
   async function toggle(product: Tables<"products">, next: boolean) {
     setSavingId(product.id);
@@ -291,14 +301,21 @@ function AreaProductsPanel({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Produkte in {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardTitle className="text-base">Händlerkatalog – {SHOP_AREA_LABELS[areaKey]}</CardTitle>
         <CardDescription>
-          Zentrale Produktbasis bleibt erhalten. Aus ist eine Bereichsausblendung; ohne Eintrag gilt der Katalogstatus.
+          Zeigt nur Produkte, die über das Händlerdokument importiert wurden. Um den Katalog zu ändern, lade ein neues
+          Dokument im Tab &quot;Produktdokument&quot; hoch. Der Toggle deaktiviert ein Produkt vorübergehend innerhalb
+          des Katalogs, macht aber keine neuen Produkte sichtbar.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Produkt suchen …" />
         {overlayQuery.isLoading && <Skeleton className="h-48 w-full" />}
+        {!overlayQuery.isLoading && filtered.length === 0 && (
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            Kein Händlerkatalog vorhanden. Lade ein Händlerdokument im Tab &quot;Produktdokument&quot; hoch.
+          </p>
+        )}
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -344,14 +361,61 @@ function AreaProductsPanel({
   );
 }
 
-function AreaDocumentPanel({ areaKey }: { areaKey: ShopAreaKey }) {
+/**
+ * AreaDocumentPanel (migration 0056 version)
+ *
+ * The uploaded document is now the single source of truth for the vendor
+ * catalog of this area. Upload flow:
+ *   1. Admin selects a file → parsed client-side → preview shown.
+ *   2. Admin clicks "Dokument speichern & Katalog anwenden" → file stored in
+ *      Supabase Storage, apply_area_vendor_catalog RPC called atomically.
+ *
+ * Supports XLSX and CSV only for catalog parsing (PDF has no structured data).
+ */
+function AreaDocumentPanel({
+  areaKey,
+  products,
+  onCatalogChanged,
+}: {
+  areaKey: ShopAreaKey;
+  products: Tables<"products">[];
+  onCatalogChanged: () => Promise<void>;
+}) {
   const queryClient = useQueryClient();
   const docQuery = useQuery({
     queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("document"),
     queryFn: () => getAdminShopAreaDocument(areaKey),
   });
   const [busy, setBusy] = React.useState(false);
+  const [pendingMatch, setPendingMatch] = React.useState<{
+    file: File;
+    result: VendorCatalogMatchResult;
+  } | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+
+  async function parseFile(file: File): Promise<void> {
+    const kind = detectImportSourceKind(file.name);
+    if (!kind || kind === "pdf") {
+      toast.error("Händlerkatalog-Import erfordert eine XLSX- oder CSV-Datei.");
+      return;
+    }
+    try {
+      let rows;
+      if (kind === "xlsx") {
+        const result = await parseProductXlsx(file);
+        rows = result.rows;
+      } else {
+        const text = await file.text();
+        const result = parseProductCsv(text);
+        rows = result.rows;
+      }
+      const result = matchVendorCatalogRows(rows, products);
+      setPendingMatch({ file, result });
+    } catch (error) {
+      console.error("Datei konnte nicht geparst werden:", error);
+      toast.error(error instanceof Error ? error.message : "Datei konnte nicht geparst werden.");
+    }
+  }
 
   async function onFile(file: File | undefined) {
     if (!file) return;
@@ -363,17 +427,35 @@ function AreaDocumentPanel({ areaKey }: { areaKey: ShopAreaKey }) {
       toast.error(`Erlaubt: ${ACCEPTED_IMPORT_LABEL}.`);
       return;
     }
+    await parseFile(file);
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  async function applyPending() {
+    if (!pendingMatch) return;
     setBusy(true);
     try {
-      await uploadAdminShopAreaDocument(areaKey, file);
-      toast.success("Dokument gespeichert.");
+      // 1. Upload document to storage
+      await uploadAdminShopAreaDocument(areaKey, pendingMatch.file);
+      // 2. Apply vendor catalog atomically
+      const rows = pendingMatch.result.matched.map((e) => ({
+        product_id: e.product_id,
+        price_usd: e.price_usd,
+        bulk_price_usd: e.bulk_price_usd,
+        bulk_price_min_quantity: e.bulk_price_min_quantity,
+      }));
+      const result = await applyAreaVendorCatalog(areaKey, rows);
+      toast.success(
+        `Händlerkatalog angewendet: ${result.added} Produkte hinzugefügt, ${result.removed} entfernt.`,
+      );
+      setPendingMatch(null);
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey) });
+      await onCatalogChanged();
     } catch (error) {
-      console.error("Dokument-Upload fehlgeschlagen:", error);
-      toast.error(error instanceof Error ? error.message : "Dokument konnte nicht hochgeladen werden.");
+      console.error("Händlerkatalog-Import fehlgeschlagen:", error);
+      toast.error(error instanceof Error ? error.message : "Händlerkatalog konnte nicht importiert werden.");
     } finally {
       setBusy(false);
-      if (inputRef.current) inputRef.current.value = "";
     }
   }
 
@@ -404,9 +486,11 @@ function AreaDocumentPanel({ areaKey }: { areaKey: ShopAreaKey }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Produktdokument {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardTitle className="text-base">Händlerdokument – {SHOP_AREA_LABELS[areaKey]}</CardTitle>
         <CardDescription>
-          Nur für diesen Bereich. Ein Dokument für Group Buy 1 ändert Group Buy 2 und den Shop nicht.
+          Das hochgeladene Dokument definiert das Sortiment dieses Bereichs. Nur Produkte, deren Artikelcode im
+          Dokument steht, werden in {SHOP_AREA_LABELS[areaKey]} angezeigt. Ein Dokument für diesen Bereich ändert die
+          anderen Bereiche nicht.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -419,6 +503,45 @@ function AreaDocumentPanel({ areaKey }: { areaKey: ShopAreaKey }) {
         ) : (
           <p className="text-sm text-muted-foreground">Kein Dokument hinterlegt.</p>
         )}
+
+        {/* Import preview */}
+        {pendingMatch && (
+          <div className="space-y-3 rounded-lg border border-border bg-secondary/20 p-4">
+            <p className="text-sm font-medium">Vorschau: {pendingMatch.file.name}</p>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="rounded border border-green-200 bg-green-50 p-2 dark:border-green-900 dark:bg-green-950">
+                <p className="font-medium text-green-800 dark:text-green-200">
+                  {pendingMatch.result.matched.length} Produkte gefunden
+                </p>
+                <p className="text-xs text-green-700 dark:text-green-300">Werden in den Katalog übernommen</p>
+              </div>
+              <div
+                className={`rounded border p-2 ${pendingMatch.result.unmatchedCodes.length > 0 ? "border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950" : "border-border bg-secondary/10"}`}
+              >
+                <p
+                  className={`font-medium ${pendingMatch.result.unmatchedCodes.length > 0 ? "text-yellow-800 dark:text-yellow-200" : "text-muted-foreground"}`}
+                >
+                  {pendingMatch.result.unmatchedCodes.length} unbekannte Artikelcodes
+                </p>
+                <p
+                  className={`text-xs ${pendingMatch.result.unmatchedCodes.length > 0 ? "text-yellow-700 dark:text-yellow-300" : "text-muted-foreground"}`}
+                >
+                  Nicht im globalen Katalog – werden übersprungen
+                </p>
+              </div>
+            </div>
+            {pendingMatch.result.unmatchedCodes.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                Unbekannte Codes:{" "}
+                {pendingMatch.result.unmatchedCodes.slice(0, 20).join(", ")}
+                {pendingMatch.result.unmatchedCodes.length > 20
+                  ? ` … (+${pendingMatch.result.unmatchedCodes.length - 20} weitere)`
+                  : ""}
+              </p>
+            )}
+          </div>
+        )}
+
         <input
           ref={inputRef}
           type="file"
@@ -427,15 +550,33 @@ function AreaDocumentPanel({ areaKey }: { areaKey: ShopAreaKey }) {
           onChange={(e) => void onFile(e.target.files?.[0])}
         />
         <div className="flex flex-wrap gap-2">
-          <Button type="button" loading={busy} onClick={() => inputRef.current?.click()}>
-            {docQuery.data ? "Ersetzen" : "Hochladen"}
-          </Button>
-          <Button type="button" variant="outline" disabled={!docQuery.data || busy} onClick={() => void openCurrent()}>
-            Anzeigen
-          </Button>
-          <Button type="button" variant="outline" disabled={!docQuery.data || busy} onClick={() => void remove()}>
-            Entfernen
-          </Button>
+          {pendingMatch ? (
+            <>
+              <Button type="button" loading={busy} onClick={() => void applyPending()}>
+                Dokument speichern &amp; Katalog anwenden ({pendingMatch.result.matched.length} Produkte)
+              </Button>
+              <Button type="button" variant="outline" disabled={busy} onClick={() => setPendingMatch(null)}>
+                Abbrechen
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button type="button" loading={busy} onClick={() => inputRef.current?.click()}>
+                {docQuery.data ? "Neues Dokument importieren" : "Händlerdokument hochladen"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!docQuery.data || busy}
+                onClick={() => void openCurrent()}
+              >
+                Anzeigen
+              </Button>
+              <Button type="button" variant="outline" disabled={!docQuery.data || busy} onClick={() => void remove()}>
+                Entfernen
+              </Button>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>

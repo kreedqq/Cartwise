@@ -1480,6 +1480,31 @@ export interface Database {
       };
       delete_order: { Args: { _order_id: string }; Returns: undefined };
       refresh_product_substance_prefix_mappings: { Args: Record<string, never>; Returns: number };
+      /**
+       * Atomically replaces the vendor catalog for one shop area (migration 0056).
+       * Clears shop_area_products + shop_area_product_prices, then inserts the
+       * supplied rows. Returns { added, removed, skipped }.
+       */
+      apply_area_vendor_catalog: {
+        Args: {
+          _area_key: string;
+          _rows: {
+            product_id: string;
+            price_usd: number;
+            bulk_price_usd: number | null;
+            bulk_price_min_quantity: number | null;
+          }[];
+        };
+        Returns: { added: number; removed: number; skipped: number };
+      };
+      /**
+       * Returns true when a product has an explicit is_active=true row in
+       * shop_area_products for the given area (allowlist mode, migration 0056).
+       */
+      product_visible_in_shop_area: {
+        Args: { _product_id: string; _area_key: string };
+        Returns: boolean;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
