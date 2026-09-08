@@ -80,7 +80,7 @@ describe("hub admin navigation", () => {
     const products = ADMIN_NAV_GROUPS.find((group) => group.id === "products");
     expect(products?.items.map((item) => item.label)).toEqual([
       "Produktkatalog",
-      "Shop-Bereiche",
+      "Verkaufsbereiche",
       "Import",
       "Import-Verlauf",
     ]);

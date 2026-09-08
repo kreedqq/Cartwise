@@ -1,0 +1,58 @@
+---
+description: Database – migrations, RLS, RPCs, Supabase SQL conventions
+alwaysApply: true
+---
+
+# Database and Migrations
+
+## Migration rules
+
+- **Never modify an existing migration.** Create a new file for schema changes.
+- Filename format: `NNNN_description.sql` (next sequential number after 0052).
+- Every new migration must be **additive only** unless it explicitly replaces a locally-new function. No `DROP TABLE`, `DROP COLUMN`, `TRUNCATE`, or `DELETE` on permanent data tables.
+- `ALTER TABLE … ADD COLUMN IF NOT EXISTS` for new columns.
+- `CREATE TABLE` / `CREATE INDEX IF NOT EXISTS` / `CREATE POLICY` / `DROP FUNCTION IF EXISTS` before `CREATE OR REPLACE FUNCTION` – all safe.
+- `src/types/database.ts` is hand-mirrored. Update it whenever the schema changes.
+
+## SQL function conventions
+
+Every new Postgres function must have:
+```sql
+security definer
+set search_path = public
+```
+Followed immediately by `revoke all on function … from public, anon, authenticated;` then a targeted `grant`.
+
+## RLS
+
+- Enable RLS on every new table: `alter table … enable row level security;`
+- Admin write policies use `public.has_role(auth.uid(), 'admin')`.
+- Customer read/access checks use `public.user_can_access_shop_area` or `public.assert_kit_area_access` – never re-implement these checks.
+- RLS alone is not sufficient for priced data; priced queries go through `SECURITY DEFINER` RPCs.
+
+## Pricing RPCs
+
+Customers use `list_shop_products_for_area(_shop_area text)` – do not expose raw `products.price_usd` to them via a plain SELECT.
+
+`apply_role_markup` (SQL) mirrors `applyRoleMarkup` (TS in `src/lib/money.ts`). Both must stay in sync if the formula ever changes.
+
+`create_order` recomputes prices server-side via `shop_area_sell_unit_price`. Client-supplied prices are ignored.
+
+## Production database
+
+**Do not** run `supabase db push --linked`, `supabase db reset --linked`, or any production SQL without explicit user confirmation. Production ref: `cnjrjinvxycdkrmzcime` (project `cartwise-prod`).
+
+## Key tables
+
+| Table | Notes |
+|---|---|
+| `products` | Central catalog. All areas share this. |
+| `shop_areas` | Three rows: shop, group_buy_1, group_buy_2. |
+| `shop_area_products` | Optional per-area visibility override. Missing row = inherit. |
+| `shop_area_product_prices` | Optional catalog price override per area. |
+| `shop_area_product_role_markups` | Optional markup override per product×area×role. |
+| `shop_area_documents` | One document per area (primary key on shop_area_key). |
+| `kit_shares` | Has `shop_area` column (CHECK: group_buy_1 or group_buy_2 only). |
+| `carts` | Has `shop_area` (immutable after insert, trigger protected). |
+| `orders` | Has `shop_area` snapshot. NULL = legacy pre-0051 order. Do not backfill. |
+| `customer_roles` / `user_customer_roles` | Role markup source. 1:1 assignment. |

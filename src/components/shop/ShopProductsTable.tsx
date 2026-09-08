@@ -22,7 +22,7 @@ import type { ShopCategoryId } from "@/lib/shopCategories";
 import { shopCategoryById, shopCategoryIdFor } from "@/lib/shopCategories";
 import {
   groupAndSortShopProducts,
-  SHOP_QUANTITY_OPTIONS,
+  shopQuantityOptions,
   variantLabelForProduct,
   type ShopProductGroup,
 } from "@/lib/shop/display";
@@ -52,6 +52,7 @@ export function ShopProductsTable({
   );
   const saleMode = isRetailPricing(pricingProfile) ? "retail_unit" : "catalog";
   const showKitShare = !isRetailPricing(pricingProfile);
+  const showBulkColumn = !isRetailPricing(pricingProfile);
   const [kitShareContext, setKitShareContext] = React.useState<{
     group: ShopProductGroup;
     initialProductId: string;
@@ -71,7 +72,7 @@ export function ShopProductsTable({
             <TableHead className="w-20">Info</TableHead>
             <TableHead className="min-w-[240px]">Produkt</TableHead>
             <TableHead className="w-44">{priceLabels.unitPrice}</TableHead>
-            <TableHead className="w-48">{priceLabels.bulkPrice}</TableHead>
+            {showBulkColumn ? <TableHead className="w-48">{priceLabels.bulkPrice}</TableHead> : null}
             <TableHead className="w-28 text-right">Menge</TableHead>
             <TableHead className="w-16 text-right">In den Warenkorb</TableHead>
           </TableRow>
@@ -85,6 +86,7 @@ export function ShopProductsTable({
               favoriteProductIds={favoriteProductIds}
               priceLabels={priceLabels}
               saleMode={saleMode}
+              showBulkColumn={showBulkColumn}
               showKitShare={showKitShare}
               onKitShare={({ group, initialProductId }) => setKitShareContext({ group, initialProductId })}
             />
@@ -117,6 +119,7 @@ function ShopProductGroupTableRow({
   favoriteProductIds,
   priceLabels,
   saleMode,
+  showBulkColumn,
   showKitShare,
   onKitShare,
 }: {
@@ -125,6 +128,7 @@ function ShopProductGroupTableRow({
   favoriteProductIds: Set<string>;
   priceLabels: ReturnType<typeof shopPriceColumnLabels>;
   saleMode: "catalog" | "retail_unit";
+  showBulkColumn: boolean;
   showKitShare: boolean;
   onKitShare: (context: { group: ShopProductGroup; initialProductId: string }) => void;
 }) {
@@ -201,6 +205,7 @@ function ShopProductGroupTableRow({
         <p className="text-base font-semibold tabular-nums tracking-tight">{formatUsd(product.price_usd)}</p>
         <p className="text-xs tabular-nums text-muted-foreground">{formatEur(convertUsdToEur(product.price_usd, rate))}</p>
       </TableCell>
+      {showBulkColumn ? (
       <TableCell className="text-sm">
         {bulk ? (
           <>
@@ -222,13 +227,14 @@ function ShopProductGroupTableRow({
           <p className="text-xs text-muted-foreground">{priceLabels.noBulk}</p>
         )}
       </TableCell>
+      ) : null}
       <TableCell>
         <Select value={row.quantity} onValueChange={row.setQuantity}>
           <SelectTrigger className="ml-auto h-9 min-w-[9.5rem] w-[9.5rem]" aria-label="Menge wählen">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {SHOP_QUANTITY_OPTIONS.map((qty) => (
+            {shopQuantityOptions(shopCategoryIdFor(product), saleMode).map((qty) => (
               <SelectItem key={qty} value={String(qty)}>
                 {formatCatalogQuantity(qty, shopCategoryIdFor(product), saleMode)}
               </SelectItem>

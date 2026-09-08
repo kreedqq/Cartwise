@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { PDF_IMPORT_BUCKET } from "@/lib/constants";
 import {
   DEFAULT_SHOP_AREA,
   isShopAreaKey,
@@ -7,6 +8,7 @@ import {
   type ShopAreaKey,
   type ShopPricingProfile,
 } from "@/lib/shop/shopAreas";
+import { contentTypeForImportFile } from "@/services/productImportSource";
 import type { Tables } from "@/types/database";
 
 function isPricingProfile(value: string): value is ShopPricingProfile {
@@ -80,6 +82,153 @@ export async function setAdminRoleShopAreas(roleId: string, areaKeys: ShopAreaKe
     areaKeys.map((shop_area_key) => ({ shop_area_key, role_id: roleId })),
   );
   if (error) throw error;
+}
+
+export async function listAdminShopAreaProducts(shopAreaKey: ShopAreaKey) {
+  const { data, error } = await supabase.from("shop_area_products").select("*").eq("shop_area_key", shopAreaKey);
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function setAdminShopAreaProductActive(
+  shopAreaKey: ShopAreaKey,
+  productId: string,
+  isActive: boolean,
+): Promise<void> {
+  const { error } = await supabase.from("shop_area_products").upsert({
+    shop_area_key: shopAreaKey,
+    product_id: productId,
+    is_active: isActive,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) throw error;
+}
+
+export async function deleteAdminShopAreaProduct(shopAreaKey: ShopAreaKey, productId: string): Promise<void> {
+  const { error } = await supabase
+    .from("shop_area_products")
+    .delete()
+    .eq("shop_area_key", shopAreaKey)
+    .eq("product_id", productId);
+  if (error) throw error;
+}
+
+export async function listAdminShopAreaProductPrices(shopAreaKey: ShopAreaKey) {
+  const { data, error } = await supabase.from("shop_area_product_prices").select("*").eq("shop_area_key", shopAreaKey);
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function upsertAdminShopAreaProductPrice(
+  shopAreaKey: ShopAreaKey,
+  productId: string,
+  patch: {
+    price_usd: number | null;
+    bulk_price_usd: number | null;
+    bulk_price_min_quantity: number | null;
+  },
+): Promise<void> {
+  const { error } = await supabase.from("shop_area_product_prices").upsert({
+    shop_area_key: shopAreaKey,
+    product_id: productId,
+    price_usd: patch.price_usd,
+    bulk_price_usd: patch.bulk_price_usd,
+    bulk_price_min_quantity: patch.bulk_price_min_quantity,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) throw error;
+}
+
+export async function deleteAdminShopAreaProductPrice(shopAreaKey: ShopAreaKey, productId: string): Promise<void> {
+  const { error } = await supabase
+    .from("shop_area_product_prices")
+    .delete()
+    .eq("shop_area_key", shopAreaKey)
+    .eq("product_id", productId);
+  if (error) throw error;
+}
+
+export async function listAdminShopAreaRoleMarkups(shopAreaKey: ShopAreaKey) {
+  const { data, error } = await supabase
+    .from("shop_area_product_role_markups")
+    .select("*")
+    .eq("shop_area_key", shopAreaKey);
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function upsertAdminShopAreaRoleMarkup(
+  shopAreaKey: ShopAreaKey,
+  productId: string,
+  roleId: string,
+  markupPercent: number,
+): Promise<void> {
+  const { error } = await supabase.from("shop_area_product_role_markups").upsert({
+    shop_area_key: shopAreaKey,
+    product_id: productId,
+    role_id: roleId,
+    markup_percent: markupPercent,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) throw error;
+}
+
+export async function deleteAdminShopAreaRoleMarkup(
+  shopAreaKey: ShopAreaKey,
+  productId: string,
+  roleId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("shop_area_product_role_markups")
+    .delete()
+    .eq("shop_area_key", shopAreaKey)
+    .eq("product_id", productId)
+    .eq("role_id", roleId);
+  if (error) throw error;
+}
+
+export async function getAdminShopAreaDocument(shopAreaKey: ShopAreaKey) {
+  const { data, error } = await supabase.from("shop_area_documents").select("*").eq("shop_area_key", shopAreaKey).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function uploadAdminShopAreaDocument(shopAreaKey: ShopAreaKey, file: File): Promise<void> {
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const path = `shop-area-docs/${shopAreaKey}/${Date.now()}-${safeName}`;
+  const { error: uploadError } = await supabase.storage.from(PDF_IMPORT_BUCKET).upload(path, file, {
+    contentType: contentTypeForImportFile(file.name),
+    upsert: false,
+  });
+  if (uploadError) throw uploadError;
+
+  const existing = await getAdminShopAreaDocument(shopAreaKey);
+  if (existing?.storage_path) {
+    await supabase.storage.from(PDF_IMPORT_BUCKET).remove([existing.storage_path]);
+  }
+
+  const { error } = await supabase.from("shop_area_documents").upsert({
+    shop_area_key: shopAreaKey,
+    storage_path: path,
+    file_name: file.name,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) throw error;
+}
+
+export async function deleteAdminShopAreaDocument(shopAreaKey: ShopAreaKey): Promise<void> {
+  const existing = await getAdminShopAreaDocument(shopAreaKey);
+  if (existing?.storage_path) {
+    await supabase.storage.from(PDF_IMPORT_BUCKET).remove([existing.storage_path]);
+  }
+  const { error } = await supabase.from("shop_area_documents").delete().eq("shop_area_key", shopAreaKey);
+  if (error) throw error;
+}
+
+export async function signedAdminShopAreaDocumentUrl(storagePath: string): Promise<string> {
+  const { data, error } = await supabase.storage.from(PDF_IMPORT_BUCKET).createSignedUrl(storagePath, 120);
+  if (error) throw error;
+  return data.signedUrl;
 }
 
 export { DEFAULT_SHOP_AREA };

@@ -22,7 +22,7 @@ import type { ShopCategoryId } from "@/lib/shopCategories";
 import { shopCategoryIdFor } from "@/lib/shopCategories";
 import {
   groupAndSortShopProducts,
-  SHOP_QUANTITY_OPTIONS,
+  shopQuantityOptions,
   variantLabelForProduct,
   type ShopProductGroup,
 } from "@/lib/shop/display";
@@ -52,6 +52,7 @@ export function ShopProductsMobileList({
   );
   const saleMode = isRetailPricing(pricingProfile) ? "retail_unit" : "catalog";
   const showKitShare = !isRetailPricing(pricingProfile);
+  const showBulkColumn = !isRetailPricing(pricingProfile);
   const [kitShareContext, setKitShareContext] = React.useState<{
     group: ShopProductGroup;
     initialProductId: string;
@@ -74,6 +75,7 @@ export function ShopProductsMobileList({
             favoriteProductIds={favoriteProductIds}
             priceLabels={priceLabels}
             saleMode={saleMode}
+            showBulkColumn={showBulkColumn}
             showKitShare={showKitShare}
             onKitShare={({ group, initialProductId }) => setKitShareContext({ group, initialProductId })}
           />
@@ -103,6 +105,7 @@ function ShopProductGroupCard({
   favoriteProductIds,
   priceLabels,
   saleMode,
+  showBulkColumn,
   showKitShare,
   onKitShare,
 }: {
@@ -111,6 +114,7 @@ function ShopProductGroupCard({
   favoriteProductIds: Set<string>;
   priceLabels: ReturnType<typeof shopPriceColumnLabels>;
   saleMode: "catalog" | "retail_unit";
+  showBulkColumn: boolean;
   showKitShare: boolean;
   onKitShare: (context: { group: ShopProductGroup; initialProductId: string }) => void;
 }) {
@@ -183,7 +187,7 @@ function ShopProductGroupCard({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 rounded-md bg-secondary/50 p-2.5 text-sm">
+        <div className={showBulkColumn ? "grid grid-cols-2 gap-2 rounded-md bg-secondary/50 p-2.5 text-sm" : "rounded-md bg-secondary/50 p-2.5 text-sm"}>
           <div>
             <p className="text-[11px] text-muted-foreground">{priceLabels.unitPrice}</p>
             <p className="text-base font-semibold tabular-nums tracking-tight">{formatUsd(product.price_usd)}</p>
@@ -191,6 +195,7 @@ function ShopProductGroupCard({
               {formatEur(convertUsdToEur(product.price_usd, rate))}
             </p>
           </div>
+          {showBulkColumn ? (
           <div className="text-right">
             <p className="text-[11px] text-muted-foreground">{priceLabels.bulkPrice}</p>
             {bulk ? (
@@ -201,9 +206,10 @@ function ShopProductGroupCard({
               <p className="text-xs text-muted-foreground">Keiner</p>
             )}
           </div>
+          ) : null}
         </div>
 
-        {bulk && (bulkActive || (remaining != null && remaining > 0)) && (
+        {showBulkColumn && bulk && (bulkActive || (remaining != null && remaining > 0)) && (
           <p className={bulkActive ? "text-xs font-medium text-success" : "text-xs text-muted-foreground"}>
             {bulkActive ? priceLabels.bulkActive : priceLabels.bulkRemaining(formatQuantity(remaining!))}
           </p>
@@ -215,7 +221,7 @@ function ShopProductGroupCard({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {SHOP_QUANTITY_OPTIONS.map((qty) => (
+              {shopQuantityOptions(shopCategoryIdFor(product), saleMode).map((qty) => (
                 <SelectItem key={qty} value={String(qty)}>
                   {formatCatalogQuantity(qty, shopCategoryIdFor(product), saleMode)}
                 </SelectItem>

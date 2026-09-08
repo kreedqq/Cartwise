@@ -1,0 +1,55 @@
+---
+description: Layer rules – where code belongs, data fetching, mutations, query keys
+alwaysApply: true
+---
+
+# Architecture Layers
+
+## Where code belongs
+
+| Layer | Directory | Rule |
+|---|---|---|
+| Route screens | `src/pages/` | Only layout + orchestration. No raw Supabase calls. |
+| UI components | `src/components/` | Props-driven, no direct Supabase calls. |
+| Data fetching | `src/hooks/` | TanStack Query wrappers (`useQuery` / `useMutation`). One hook per concern. |
+| DB / API | `src/services/` | All `supabase.from()` / `supabase.rpc()` calls live here. |
+| Pure logic | `src/lib/` | No imports from `services/` or `hooks/`. |
+| DB schema + RPCs | `supabase/migrations/` | SQL only. |
+
+**Never** call `supabase.from()` or `supabase.rpc()` directly inside a page or component.
+
+## TanStack Query
+
+All cache keys live in `QUERY_KEYS` in `src/lib/constants.ts`. Do not define inline string arrays – always add a new key to `QUERY_KEYS` first.
+
+Default `staleTime: 30_000`. Do not override per-query unless there is a documented reason.
+
+Invalidate after mutations via `queryClient.invalidateQueries({ queryKey: QUERY_KEYS.xxx })`.
+
+## Error / loading / empty states
+
+Follow the established pattern in existing pages:
+```tsx
+if (query.isLoading) return <Skeleton ... />;
+if (query.isError) return <ErrorState ... onRetry={...} />;
+if (!data?.length) return <EmptyState ... />;
+```
+Use `<ErrorState>` (`src/components/common/ErrorState.tsx`) and `<EmptyState>` (`src/components/common/EmptyState.tsx`).
+
+## Routing
+
+React Router 6. Protected via `<ProtectedRoute>` → `<UsernameGate>` → `<AppShell>`. Admin routes wrapped in `<AdminRoute>`. New routes go in `src/App.tsx`. Lazy-load admin pages with `React.lazy`.
+
+## ShopAreaProvider
+
+Every shop page / kit page must be wrapped in `<ShopAreaProvider shopArea={...} pricingProfile={...}>`.
+- `/shop` → `pricingProfile="retail"`
+- `/shop/group-buy-*` → `pricingProfile="group_buy"`
+
+Read the context via `useShopAreaContext()` (`src/context/ShopAreaContext.tsx`).
+
+## Module boundaries
+
+- `src/lib/shop/` is used by both components and hooks. Keep it framework-free.
+- `src/lib/peptide/` is the lexicon subsystem. Do not import from it in shop components.
+- `src/lib/money.ts` is used by everything. It has no project-specific imports.

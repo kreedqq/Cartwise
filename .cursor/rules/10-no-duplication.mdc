@@ -1,0 +1,47 @@
+---
+description: Anti-duplication – search before creating, reuse existing abstractions
+alwaysApply: true
+---
+
+# No Duplication
+
+Before implementing any new logic, search first:
+
+1. `src/lib/money.ts` – pricing, rounding, currency formatting, cart totals
+2. `src/lib/quantityFormat.ts` – all unit/quantity labels (Kit, Vial, Packung)
+3. `src/lib/shop/shopAreaPricing.ts` – area-specific price calculation
+4. `src/lib/shop/shopAreas.ts` – area types, constants, profile helpers
+5. `src/lib/shop/priceLabels.ts` – price column label copy
+6. `src/lib/shop/display.ts` – product name normalisation, grouping, sorting
+7. `src/lib/shop/cartDisplay.ts` – cart line display (names, quantity labels, subtitles)
+8. `src/lib/constants.ts` – `QUERY_KEYS`, app constants, bucket names
+9. `src/services/` – existing Supabase calls (may be extendable)
+10. `src/hooks/` – existing TanStack Query hooks
+11. `supabase/migrations/` – existing SQL functions and RPCs
+
+## Specific SSoT functions – never reimplement
+
+| What you need | Use |
+|---|---|
+| Effective unit price (normal vs. bulk) | `getEffectiveUnitPrice` in `money.ts` |
+| Apply role markup | `applyRoleMarkup` in `money.ts` |
+| Area catalog unit | `shopAreaCatalogUnit` in `shopAreaPricing.ts` |
+| Full area+role sell price | `shopAreaSellUnitPriceForProductRole` in `shopAreaPricing.ts` |
+| Area pricing profile | `pricingProfileForArea` in `shopAreas.ts` |
+| Area from URL | `shopAreaFromPath` in `shopAreas.ts` |
+| Sale mode (kit vs vial noun) | `saleModeForShopArea` in `shopAreas.ts` |
+| Quantity label (any context) | `formatProductQuantity` in `quantityFormat.ts` |
+| Cart line totals | `calculateCartTotals` in `money.ts` |
+| Order charges | `summarizeOrderCharges` in `money.ts` |
+| Query cache key | `QUERY_KEYS.xxx` in `constants.ts` |
+
+## When extending is better than creating
+
+- A new shop area feature: extend `shopAreaPricing.ts` or `shopAreas.ts`, not a new file.
+- A new admin area config type: add to the existing `AdminShopAreas.tsx` tab system, not a new page.
+- A new quantity noun context: extend `quantityFormat.ts`, not an inline string.
+- A new RPC: check if an existing one can be parameterised first.
+
+## Scope of changes
+
+Only change files directly needed for the task. Do not refactor, rename, or reformat unrelated code in the same PR.

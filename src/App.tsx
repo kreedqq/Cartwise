@@ -81,8 +81,8 @@ export default function App() {
               <Route element={<UsernameGate />}>
               <Route element={<AppShell />}>
                 <Route path="/shop" element={<ShopPage />} />
-                <Route path="/shop/group-buy-1" element={<ShopPage />} />
-                <Route path="/shop/group-buy-2" element={<ShopPage />} />
+                <Route path="/shop/group-buy-1" element={<KitRequestsPage />} />
+                <Route path="/shop/group-buy-2" element={<KitRequestsPage />} />
                 <Route path="/kit-gesuche" element={<KitRequestsPage />} />
                 <Route path="/favorites" element={<FavoritesPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />

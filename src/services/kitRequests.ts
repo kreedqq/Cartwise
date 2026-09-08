@@ -71,6 +71,7 @@ export interface ListOpenKitRequestsParams {
   sort?: "newest" | "fewest_remaining" | "most_remaining";
   page?: number;
   pageSize?: number;
+  shopArea?: string | null;
 }
 
 function mapParticipant(raw: Record<string, unknown>): KitRequestParticipantView {
@@ -133,6 +134,7 @@ export async function listOpenKitRequests(params: ListOpenKitRequestsParams = {}
     _sort: params.sort ?? "newest",
     _page: params.page ?? 1,
     _page_size: params.pageSize ?? 20,
+    _shop_area: params.shopArea ?? "group_buy_1",
   });
   if (error) throw error;
   const raw = asRecord(data);
@@ -147,15 +149,19 @@ export async function listOpenKitRequests(params: ListOpenKitRequestsParams = {}
   };
 }
 
-export async function listMyKitRequests(): Promise<KitRequestCard[]> {
-  const { data, error } = await supabase.rpc("list_my_kit_requests");
+export async function listMyKitRequests(shopArea?: string | null): Promise<KitRequestCard[]> {
+  const { data, error } = await supabase.rpc("list_my_kit_requests", {
+    _shop_area: shopArea ?? null,
+  });
   if (error) throw error;
   const raw = asRecord(data);
   return Array.isArray(raw.items) ? (raw.items as Record<string, unknown>[]).map(mapKitRequestCard) : [];
 }
 
-export async function listMyKitRequestParticipations(): Promise<KitRequestCard[]> {
-  const { data, error } = await supabase.rpc("list_my_kit_request_participations");
+export async function listMyKitRequestParticipations(shopArea?: string | null): Promise<KitRequestCard[]> {
+  const { data, error } = await supabase.rpc("list_my_kit_request_participations", {
+    _shop_area: shopArea ?? null,
+  });
   if (error) throw error;
   const raw = asRecord(data);
   return Array.isArray(raw.items) ? (raw.items as Record<string, unknown>[]).map(mapKitRequestCard) : [];
@@ -173,6 +179,7 @@ export async function createKitRequest(input: {
   myQuantity: number;
   note?: string | null;
   expiresAt?: string | null;
+  shopArea?: string;
 }): Promise<KitRequestCard> {
   const { data, error } = await supabase.rpc("create_kit_request", {
     _product_id: input.productId,
@@ -180,6 +187,7 @@ export async function createKitRequest(input: {
     _my_quantity: input.myQuantity,
     _note: input.note ?? null,
     _expires_at: input.expiresAt ?? null,
+    _shop_area: input.shopArea ?? "group_buy_1",
   });
   if (error) throw error;
   return mapKitRequestCard(asRecord(data));

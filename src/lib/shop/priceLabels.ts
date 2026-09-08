@@ -30,19 +30,19 @@ const UNIT_PRICE_LABELS: ShopPriceColumnLabels = {
 
 const RETAIL_VIAL_LABELS: ShopPriceColumnLabels = {
   unitPrice: "Preis / Vial",
-  bulkPrice: "Preis ab 10 Vials",
-  bulkActive: "Preis ab 10 Vials aktiv",
-  bulkRemaining: (remaining) => `Noch ${remaining} bis Preis ab 10 Vials`,
-  noBulk: "Kein Mengenpreis",
+  bulkPrice: "",
+  bulkActive: "",
+  bulkRemaining: () => "",
+  noBulk: "",
   usesKitPricing: false,
 };
 
 const RETAIL_PACK_LABELS: ShopPriceColumnLabels = {
   unitPrice: "Preis / Packung",
-  bulkPrice: "Preis ab 10 Packungen",
-  bulkActive: "Preis ab 10 Packungen aktiv",
-  bulkRemaining: (remaining) => `Noch ${remaining} bis Preis ab 10 Packungen`,
-  noBulk: "Kein Mengenpreis",
+  bulkPrice: "",
+  bulkActive: "",
+  bulkRemaining: () => "",
+  noBulk: "",
   usesKitPricing: false,
 };
 

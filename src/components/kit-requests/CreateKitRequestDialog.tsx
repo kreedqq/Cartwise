@@ -21,8 +21,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toaster";
 import { useCreateKitRequest } from "@/hooks/useKitRequests";
-import { useFirstGroupBuyArea } from "@/hooks/useMyShopAreas";
 import { useShopProducts } from "@/hooks/useShopProducts";
+import type { ShopAreaKey } from "@/lib/shop/shopAreas";
 import { isValidCreatorQuantity } from "@/lib/kitRequests";
 import { groupAndSortShopProducts } from "@/lib/shop/display";
 import { KIT_SIZE_OPTIONS, formatKitQuantity, formatKitSizeOption, kitCategoryIdFor } from "@/lib/shop/kitUnits";
@@ -32,11 +32,11 @@ import type { Tables } from "@/types/database";
 interface CreateKitRequestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  shopArea: ShopAreaKey;
 }
 
-export function CreateKitRequestDialog({ open, onOpenChange }: CreateKitRequestDialogProps) {
-  const groupBuyQuery = useFirstGroupBuyArea();
-  const productsQuery = useShopProducts(groupBuyQuery.area?.key ?? "group_buy_1");
+export function CreateKitRequestDialog({ open, onOpenChange, shopArea }: CreateKitRequestDialogProps) {
+  const productsQuery = useShopProducts(shopArea);
   const createMutation = useCreateKitRequest();
   const groups = React.useMemo(
     () => groupAndSortShopProducts(productsQuery.data ?? []),
@@ -86,6 +86,7 @@ export function CreateKitRequestDialog({ open, onOpenChange }: CreateKitRequestD
         myQuantity: creatorQuantity,
         note: note.trim() || null,
         expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
+        shopArea,
       });
       toast.success("Kit-Gesuch wurde erstellt.");
       onOpenChange(false);

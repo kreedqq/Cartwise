@@ -1,10 +1,8 @@
 import * as React from "react";
-import { Navigate, Link, useLocation, useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, PackageSearch, Search } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
@@ -19,15 +17,9 @@ import { useMyShopAreas } from "@/hooks/useMyShopAreas";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
-import { hasBulkTier } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { productMatchesShopSearch } from "@/lib/shop/display";
-import {
-  DEFAULT_SHOP_AREA,
-  isRetailPricing,
-  shopAreaFromPath,
-  type ShopAreaKey,
-} from "@/lib/shop/shopAreas";
+import { DEFAULT_SHOP_AREA } from "@/lib/shop/shopAreas";
 import {
   countProductsByShopCategory,
   isShopCategoryId,
@@ -38,12 +30,9 @@ import {
 } from "@/lib/shopCategories";
 
 export default function ShopPage() {
-  const location = useLocation();
-  const shopArea = shopAreaFromPath(location.pathname);
   const areasQuery = useMyShopAreas();
-  const allowed = areasQuery.data?.some((area) => area.key === shopArea) ?? false;
-  const currentArea = areasQuery.data?.find((area) => area.key === shopArea);
-  const pricingProfile = currentArea?.pricing_profile ?? (shopArea === DEFAULT_SHOP_AREA ? "retail" : "group_buy");
+  const allowed = areasQuery.data?.some((area) => area.key === DEFAULT_SHOP_AREA) ?? false;
+  const currentArea = areasQuery.data?.find((area) => area.key === DEFAULT_SHOP_AREA);
 
   if (areasQuery.isLoading) return <FullScreenSpinner label="Shop wird geladen …" />;
   if (areasQuery.isError) {
@@ -52,37 +41,19 @@ export default function ShopPage() {
   if (!allowed) return <Navigate to="/403" replace />;
 
   return (
-    <ShopAreaProvider shopArea={shopArea} pricingProfile={pricingProfile}>
-      <ShopCatalog
-        shopArea={shopArea}
-        areaName={currentArea?.name ?? "Shop"}
-        pricingProfile={pricingProfile}
-        allowedAreas={areasQuery.data ?? []}
-      />
+    <ShopAreaProvider shopArea={DEFAULT_SHOP_AREA} pricingProfile="retail">
+      <ShopCatalog areaName={currentArea?.name ?? "Shop"} />
     </ShopAreaProvider>
   );
 }
 
-function ShopCatalog({
-  shopArea,
-  areaName,
-  pricingProfile,
-  allowedAreas,
-}: {
-  shopArea: ShopAreaKey;
-  areaName: string;
-  pricingProfile: "retail" | "group_buy";
-  allowedAreas: { key: ShopAreaKey; name: string; path: string }[];
-}) {
-  const productsQuery = useShopProducts(shopArea);
+function ShopCatalog({ areaName }: { areaName: string }) {
+  const productsQuery = useShopProducts(DEFAULT_SHOP_AREA);
   const favoritesQuery = useFavorites();
   const rateQuery = useExchangeRate();
   const [params, setParams] = useSearchParams();
   const selected = isShopCategoryId(params.get("cat")) ? (params.get("cat") as ShopCategoryId) : null;
-  const retail = isRetailPricing(pricingProfile);
-
   const [search, setSearch] = React.useState("");
-  const [bulkOnly, setBulkOnly] = React.useState(false);
 
   const products = React.useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
   const counts = React.useMemo(() => (products.length ? countProductsByShopCategory(products) : null), [products]);
@@ -92,10 +63,9 @@ function ShopCatalog({
     const term = search.trim();
     return products.filter((p) => {
       if (!productInShopCategory(p, selected)) return false;
-      if (bulkOnly && !hasBulkTier(p)) return false;
       return productMatchesShopSearch(p, term);
     });
-  }, [products, search, selected, bulkOnly]);
+  }, [products, search, selected]);
 
   const favoriteProductIds = React.useMemo(
     () => new Set((favoritesQuery.data ?? []).map((f) => f.productId)),
@@ -104,25 +74,8 @@ function ShopCatalog({
 
   function selectCategory(id: ShopCategoryId) {
     setSearch("");
-    setBulkOnly(false);
     setParams({ cat: id });
   }
-
-  const areaTabs =
-    allowedAreas.length > 1 ? (
-      <div className="flex flex-wrap gap-2">
-        {allowedAreas.map((area) => (
-          <Button
-            key={area.key}
-            variant={area.key === shopArea ? "default" : "secondary"}
-            size="sm"
-            asChild
-          >
-            <Link to={area.path}>{area.name}</Link>
-          </Button>
-        ))}
-      </div>
-    ) : null;
 
   if (!selected) {
     return (
@@ -130,13 +83,8 @@ function ShopCatalog({
         <PageHeader
           eyebrow={areaName}
           title="Katalog"
-          description={
-            retail
-              ? "Einzelverkauf. Peptide und Water als Vials, Oils und Orals in der bestehenden Einheit."
-              : "Group Buy mit bestehender Kit- und Mengenpreis-Logik. BAC Water und AA Water liegen unter Reconstitution Water."
-          }
+          description="Einzelverkauf. Peptide, Water und Oils als Vials, Orals als Packungen. Keine Kits, keine Mengenstaffeln."
         />
-        {areaTabs}
         {productsQuery.isLoading && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -159,7 +107,7 @@ function ShopCatalog({
       <PageHeader
         eyebrow={areaName}
         title={active.label}
-        description={`${filtered.length} Artikel · Variante und Menge wählen, dann in den Warenkorb legen.`}
+        description={`${filtered.length} Artikel · Einzelmenge wählen und in den Warenkorb legen.`}
         actions={
           <Button variant="ghost" size="sm" onClick={() => setParams({})} className="gap-1.5">
             <ArrowLeft className="h-4 w-4" />
@@ -167,8 +115,6 @@ function ShopCatalog({
           </Button>
         }
       />
-
-      {areaTabs}
 
       <div className="flex flex-wrap gap-2">
         {SHOP_CATEGORIES.map((category) => (
@@ -188,22 +134,14 @@ function ShopCatalog({
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-[160px] flex-1">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Produktname suchen …"
-            className="pl-8"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox id="bulk-only" checked={bulkOnly} onCheckedChange={(v) => setBulkOnly(v === true)} />
-          <Label htmlFor="bulk-only" className="cursor-pointer text-sm font-normal text-muted-foreground">
-            Nur mit Mengenpreis
-          </Label>
-        </div>
+      <div className="relative min-w-[160px] max-w-md">
+        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Produktname suchen …"
+          className="pl-8"
+        />
       </div>
 
       {productsQuery.isLoading && (
@@ -223,7 +161,7 @@ function ShopCatalog({
       )}
 
       {productsQuery.data && products.length > 0 && filtered.length === 0 && (
-        <EmptyState icon={PackageSearch} title="Keine Produkte gefunden." description="Passe deine Suche oder Filter an." />
+        <EmptyState icon={PackageSearch} title="Keine Produkte gefunden." description="Passe deine Suche an." />
       )}
 
       {filtered.length > 0 && (
@@ -234,7 +172,7 @@ function ShopCatalog({
               rate={rateQuery.data?.rate ?? null}
               favoriteProductIds={favoriteProductIds}
               categoryId={selected}
-              pricingProfile={pricingProfile}
+              pricingProfile="retail"
             />
           </div>
           <div className="lg:hidden">
@@ -243,7 +181,7 @@ function ShopCatalog({
               rate={rateQuery.data?.rate ?? null}
               favoriteProductIds={favoriteProductIds}
               categoryId={selected}
-              pricingProfile={pricingProfile}
+              pricingProfile="retail"
             />
           </div>
         </>

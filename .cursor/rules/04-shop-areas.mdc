@@ -1,0 +1,65 @@
+---
+description: Shop areas – types, routing, UI separation, kit isolation
+globs:
+  - "src/pages/Shop.tsx"
+  - "src/pages/KitRequests.tsx"
+  - "src/pages/Checkout.tsx"
+  - "src/components/shop/**"
+  - "src/components/kit-requests/**"
+  - "src/hooks/useShopProducts.ts"
+  - "src/hooks/useShopCart.ts"
+  - "src/services/shopAreas.ts"
+  - "src/lib/shop/**"
+alwaysApply: false
+---
+
+# Shop Areas
+
+## Types and constants
+
+Single source of truth: `src/lib/shop/shopAreas.ts`.
+
+```ts
+SHOP_AREA_KEYS     = ["shop", "group_buy_1", "group_buy_2"]
+GROUP_BUY_AREA_KEYS = ["group_buy_1", "group_buy_2"]
+SHOP_AREA_PATHS    = { shop: "/shop", group_buy_1: "/shop/group-buy-1", group_buy_2: "/shop/group-buy-2" }
+RETAIL_PRICE_FACTOR = 5
+RETAIL_KIT_UNIT_DIVISOR = 10
+```
+
+Use `isShopAreaKey`, `isGroupBuyAreaKey`, `pricingProfileForArea`, `shopAreaFromPath` from that file. Do not hardcode area strings outside this module.
+
+## Retail shop (`/shop`)
+
+- `pricingProfile="retail"` hardcoded in `Shop.tsx`.
+- Shows single-unit quantities only: Vial (peptides/water/oils) or Packung (orals).
+- **Must not** contain: `CreateKitRequestDialog`, `JoinKitRequestDialog`, `KitRequestCard`, `KitShareDialog`, any "Kit" or "ab 10 Vials" label, `pricingProfile="group_buy"`.
+
+## Group Buy areas (`/shop/group-buy-1`, `/shop/group-buy-2`)
+
+- Rendered by `KitRequestsPage` with `pricingProfile="group_buy"`.
+- Full Group Buy UX: KitRequests, KitShares, Participants, Join/Leave, 5/10, Cart Sync.
+- Area determined from URL: `group-buy-2` → `group_buy_2`, otherwise `group_buy_1`.
+- Users without access → `<Navigate to="/403" />`.
+
+## Kit isolation
+
+- `kit_shares.shop_area` column enforces per-area isolation in Postgres.
+- `list_open_kit_requests` and all kit RPCs take `_shop_area` parameter – always pass the current area.
+- `kit_share_target_cart_id(_user_id, _area_key)` creates the cart in the correct area. Do not pass `null`.
+- A user may not join a kit in an area they cannot access (trigger `kit_share_participants_protect_area`).
+
+## Product loading
+
+```ts
+useShopProducts(shopArea)  // src/hooks/useShopProducts.ts
+```
+For `shopArea === "shop"` this calls `listShopProducts()`. For group buy areas it calls `listShopProductsForArea(shopArea)` (server-side priced RPC).
+
+## Cart
+
+`useShopCart(shopArea)` – always area-scoped. One active cart per area. Cart `shop_area` is immutable after creation (DB trigger `carts_protect_shop_area`). Never mutate `cart.shop_area`.
+
+## Navigation
+
+Customer nav is built dynamically by `buildCustomerNavItems(areas)` (`src/lib/navigation.ts`) from the user's accessible areas. Unauthorized areas are hidden, not disabled.

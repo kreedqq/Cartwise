@@ -1,0 +1,65 @@
+---
+description: React and TypeScript conventions used across the codebase
+globs:
+  - "src/**/*.tsx"
+  - "src/**/*.ts"
+alwaysApply: false
+---
+
+# React + TypeScript Conventions
+
+## File naming
+
+- React components: `PascalCase.tsx`
+- Hooks: `useCamelCase.ts`
+- Services: `camelCase.ts` (noun-based, e.g. `carts.ts`, `kitRequests.ts`)
+- Lib utilities: `camelCase.ts`
+- Test files: `camelCase.test.ts` or `camelCase.test.tsx` in `src/tests/`
+
+## Imports
+
+- Path alias `@/` maps to `src/`. Always use it for internal imports.
+- Imports from the same directory: prefer `./relative`.
+- Barrel exports: not used for services or hooks – import files directly.
+
+## Types
+
+- DB types live in `src/types/database.ts`. Use `Tables<"table_name">` for row types.
+- For RPCs that don't return a table row, define interfaces in the relevant `src/services/` file.
+- Prefer explicit types over inference for function return types in services and hooks.
+
+## State and effects
+
+- Do not call `setState` synchronously inside `useEffect` when the value can be derived from props (causes cascade renders).
+- When a component must re-initialize local state from a changing prop (e.g. selected product), use `key={productId}` on the child component instead of a `useEffect` + `setState`.
+- Example: `AreaPriceEditor` / `AreaRoleMarkupEditor` in `AdminShopAreas.tsx` use `key={areaKey-productId-updatedAt}` for this pattern.
+
+## React Query usage
+
+```ts
+// hooks/useXxx.ts
+export function useXxx(param: string) {
+  return useQuery({
+    queryKey: QUERY_KEYS.xxx(param),
+    queryFn: () => serviceFunction(param),
+  });
+}
+```
+Do not inline `useQuery` calls in components.
+
+## Admin components
+
+Admin pages are lazy-loaded via `React.lazy`. Admin layout is `AdminLayout.tsx`; use `AdminSection`/`AdminPageHeader` for consistent admin UI chrome.
+
+## Error handling in services
+
+Throw on Supabase error: `if (error) throw error;`
+Return `data ?? []` or `data ?? null` – never assume data is non-null.
+
+## Optimistic locking
+
+`carts` and `orders` use `version` columns. Pass `expectedVersion` to update functions (e.g. `updateCartNote(id, expectedVersion, note)`). A `ConcurrencyError` is thrown on version mismatch.
+
+## Accessibility / UI components
+
+Use Radix UI primitives from `src/components/ui/`. Do not re-implement dialogs, selects, tabs from scratch.

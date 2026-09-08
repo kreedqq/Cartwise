@@ -32,11 +32,9 @@ export function buildCustomerNavItems(areas: MyShopArea[]): CustomerNavItem[] {
       end: area.path === "/shop",
     }),
   );
-  const showKits = areas.some((area) => area.pricing_profile === "group_buy");
   return [
     { to: "/dashboard", label: "Übersicht", icon: LayoutGrid },
     ...shopItems,
-    ...(showKits ? [{ to: "/kit-gesuche", label: "Kit Gesuche", shortLabel: "Kits", icon: Layers }] : []),
     { to: "/peptide", label: PEPTIDE_NAV_LABEL, icon: BookOpen },
     { to: "/orders", label: "Meine Bestellungen", icon: ClipboardList },
     { to: "/favorites", label: "Favoriten", icon: Star },

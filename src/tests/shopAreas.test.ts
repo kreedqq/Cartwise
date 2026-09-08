@@ -68,12 +68,12 @@ describe("shop area domain", () => {
       "/shop",
       "/shop/group-buy-1",
       "/shop/group-buy-2",
-      "/kit-gesuche",
       "/peptide",
       "/orders",
       "/favorites",
       "/profile",
     ]);
+    expect(gbItems.some((item) => item.to === "/kit-gesuche")).toBe(false);
   });
 });
 
@@ -125,5 +125,44 @@ describe("shop area SQL", () => {
     expect(sql).not.toMatch(/update public\.orders set shop_area/);
     expect(sql).not.toMatch(/update public\.order_items set/);
     expect(sql).not.toMatch(/update public\.products set price_usd/);
+  });
+});
+
+describe("shop area product config SQL", () => {
+  const sql = read("supabase/migrations/0052_shop_area_product_config.sql");
+  const sql0051 = read("supabase/migrations/0051_shop_areas.sql");
+
+  it("keeps kits on group-buy areas and adds per-product area config", () => {
+    expect(sql).toMatch(/kit_shares\.shop_area/);
+    expect(sql).toContain("group_buy_1");
+    expect(sql).toContain("group_buy_2");
+    expect(sql).toMatch(/create table public\.shop_area_products/);
+    expect(sql).toMatch(/create table public\.shop_area_product_prices/);
+    expect(sql).toMatch(/create table public\.shop_area_product_role_markups/);
+    expect(sql).toMatch(/create table public\.shop_area_documents/);
+    expect(sql).toMatch(/markup_percent_for_area/);
+    expect(sql).toMatch(/apply_shop_area_product_overrides/);
+    expect(sql).toMatch(/product_visible_in_shop_area/);
+    expect(sql).toMatch(/create_kit_request\(/);
+    expect(sql).toMatch(/_shop_area/);
+  });
+
+  it("applies role markup once after area overrides", () => {
+    expect(sql).toMatch(/apply_role_markup\(/);
+    expect(sql).toMatch(/_p\.bulk_price_usd := null/);
+    expect(sql).not.toMatch(/apply_role_markup\(\s*public\.apply_role_markup/);
+  });
+
+  it("does not remove cart shop_area security from 0051", () => {
+    expect(sql0051).toMatch(/carts_insert_own/);
+    expect(sql0051).toMatch(/current_user_can_access_shop_area/);
+    expect(sql0051).toMatch(/reject_cart_shop_area_mutation/);
+    expect(sql0051).toMatch(/carts_protect_shop_area/);
+    expect(sql).not.toMatch(/drop policy if exists carts_insert_own/);
+    expect(sql).not.toMatch(/drop function if exists public\.current_user_can_access_shop_area/);
+  });
+
+  it("does not backfill historical orders", () => {
+    expect(sql).not.toMatch(/update public\.orders set shop_area/);
   });
 });

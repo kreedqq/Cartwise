@@ -1,4 +1,4 @@
-import * as React from "react";
+﻿import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
@@ -9,73 +9,125 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toaster";
-import { QUERY_KEYS } from "@/lib/constants";
+import { MAX_PDF_SIZE_BYTES, QUERY_KEYS } from "@/lib/constants";
+import { formatDateTime, formatUsd } from "@/lib/money";
 import { shopAreaCatalogUnit } from "@/lib/shop/shopAreaPricing";
+import { shopCategoryIdFor } from "@/lib/shopCategories";
 import {
   RETAIL_KIT_UNIT_DIVISOR,
   RETAIL_PRICE_FACTOR,
+  SHOP_AREA_KEYS,
   SHOP_AREA_LABELS,
   isShopAreaKey,
+  pricingProfileForArea,
   type ShopAreaKey,
   type ShopPricingProfile,
 } from "@/lib/shop/shopAreas";
+import { ACCEPTED_IMPORT_ACCEPT, ACCEPTED_IMPORT_LABEL, detectImportSourceKind } from "@/services/productImportSource";
 import { listCustomerRoles } from "@/services/customerRoles";
+import { listAllProducts } from "@/services/products";
 import {
+  deleteAdminShopAreaDocument,
+  deleteAdminShopAreaProductPrice,
+  deleteAdminShopAreaRoleMarkup,
+  getAdminShopAreaDocument,
+  listAdminShopAreaProductPrices,
+  listAdminShopAreaProducts,
   listAdminShopAreaRoleAccess,
+  listAdminShopAreaRoleMarkups,
   listAdminShopAreas,
+  setAdminShopAreaProductActive,
   setAdminShopAreaRoles,
+  signedAdminShopAreaDocumentUrl,
   updateAdminShopArea,
+  uploadAdminShopAreaDocument,
+  upsertAdminShopAreaProductPrice,
+  upsertAdminShopAreaRoleMarkup,
 } from "@/services/shopAreas";
+import type { Tables } from "@/types/database";
 
 const PROFILE_LABELS: Record<ShopPricingProfile, string> = {
   retail: "Einzelverkauf",
   group_buy: "Group Buy",
 };
 
+type AreaTab = "allgemein" | "produkte" | "dokument" | "preise" | "rollenpreise";
+
 export default function AdminShopAreasPage() {
   const queryClient = useQueryClient();
   const areasQuery = useQuery({ queryKey: QUERY_KEYS.adminShopAreas, queryFn: listAdminShopAreas });
   const accessQuery = useQuery({ queryKey: [...QUERY_KEYS.adminShopAreas, "access"], queryFn: listAdminShopAreaRoleAccess });
   const rolesQuery = useQuery({ queryKey: ["customer-roles"], queryFn: listCustomerRoles });
+  const productsQuery = useQuery({ queryKey: ["admin-products"], queryFn: () => listAllProducts() });
+  const [areaKey, setAreaKey] = React.useState<ShopAreaKey>("shop");
+  const [tab, setTab] = React.useState<AreaTab>("allgemein");
   const [savingKey, setSavingKey] = React.useState<string | null>(null);
 
   async function invalidate() {
     await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreas });
     await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myShopAreas });
+    await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey) });
   }
 
   const roles = rolesQuery.data ?? [];
   const access = accessQuery.data ?? [];
+  const products = productsQuery.data ?? [];
+  const selected = (areasQuery.data ?? []).find((area) => area.key === areaKey);
+  const assigned = access.filter((row) => row.shop_area_key === areaKey).map((row) => row.role_id);
+  const lockedProfile = pricingProfileForArea(areaKey);
 
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        title="Shop-Bereiche"
-        description="Ein Katalog, drei Bereiche. Rollen steuern die Sichtbarkeit. Preise kommen aus der zentralen Pipeline inkl. bestehendem Rollenaufschlag."
+        title="Verkaufsbereiche"
+        description="Ein Produktkatalog, drei Bereiche: Shop als Einzelverkauf, Group Buy 1 und Group Buy 2 als getrennte Kit-Instanzen."
       />
 
       {areasQuery.isLoading && <Skeleton className="h-64 w-full" />}
       {areasQuery.isError && (
-        <ErrorState message="Shop-Bereiche konnten nicht geladen werden." onRetry={() => areasQuery.refetch()} />
+        <ErrorState message="Verkaufsbereiche konnten nicht geladen werden." onRetry={() => areasQuery.refetch()} />
       )}
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        {(areasQuery.data ?? []).map((area) => {
-          if (!isShopAreaKey(area.key)) return null;
-          const areaKey = area.key;
-          const assigned = access.filter((row) => row.shop_area_key === areaKey).map((row) => row.role_id);
-          const profile = area.pricing_profile as ShopPricingProfile;
-          return (
-            <ShopAreaCard
-              key={`${areaKey}|${area.name}|${String(area.is_active)}|${profile}|${assigned.slice().sort().join(",")}`}
+      <div className="flex flex-wrap gap-2">
+        {SHOP_AREA_KEYS.map((key) => (
+          <Button
+            key={key}
+            type="button"
+            size="sm"
+            variant={areaKey === key ? "default" : "outline"}
+            onClick={() => {
+              setAreaKey(key);
+              setTab("allgemein");
+            }}
+          >
+            {SHOP_AREA_LABELS[key]}
+          </Button>
+        ))}
+      </div>
+
+      {selected && isShopAreaKey(selected.key) && (
+        <Tabs value={tab} onValueChange={(value) => setTab(value as AreaTab)}>
+          <TabsList className="flex h-auto w-full flex-wrap justify-start">
+            <TabsTrigger value="allgemein">Allgemein</TabsTrigger>
+            <TabsTrigger value="produkte">Produkte</TabsTrigger>
+            <TabsTrigger value="dokument">Produktdokument</TabsTrigger>
+            <TabsTrigger value="preise">Preise</TabsTrigger>
+            <TabsTrigger value="rollenpreise">Rollenpreise</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="allgemein">
+            <ShopAreaGeneralCard
+              key={`${areaKey}|${selected.name}|${String(selected.is_active)}|${assigned.slice().sort().join(",")}`}
               areaKey={areaKey}
-              name={area.name}
-              isActive={area.is_active}
-              profile={profile}
+              name={selected.name}
+              isActive={selected.is_active}
+              profile={lockedProfile}
               assignedRoleIds={assigned}
               roles={roles}
               saving={savingKey === areaKey}
@@ -85,22 +137,50 @@ export default function AdminShopAreasPage() {
                   await updateAdminShopArea(areaKey, {
                     name: next.name,
                     is_active: next.isActive,
-                    pricing_profile: next.profile,
+                    pricing_profile: lockedProfile,
                   });
                   await setAdminShopAreaRoles(areaKey, next.roleIds);
                   toast.success(`${SHOP_AREA_LABELS[areaKey]} gespeichert.`);
                   await invalidate();
                 } catch (error) {
-                  console.error("Shop-Bereich speichern fehlgeschlagen:", error);
-                  toast.error(error instanceof Error ? error.message : "Shop-Bereich konnte nicht gespeichert werden.");
+                  console.error("Verkaufsbereich speichern fehlgeschlagen:", error);
+                  toast.error(error instanceof Error ? error.message : "Verkaufsbereich konnte nicht gespeichert werden.");
                 } finally {
                   setSavingKey(null);
                 }
               }}
             />
-          );
-        })}
-      </div>
+          </TabsContent>
+
+          <TabsContent value="produkte">
+            {productsQuery.isLoading ? (
+              <Skeleton className="h-64 w-full" />
+            ) : (
+              <AreaProductsPanel areaKey={areaKey} products={products} onChanged={invalidate} />
+            )}
+          </TabsContent>
+
+          <TabsContent value="dokument">
+            <AreaDocumentPanel areaKey={areaKey} />
+          </TabsContent>
+
+          <TabsContent value="preise">
+            {productsQuery.isLoading ? (
+              <Skeleton className="h-64 w-full" />
+            ) : (
+              <AreaPricesPanel areaKey={areaKey} products={products} profile={lockedProfile} onChanged={invalidate} />
+            )}
+          </TabsContent>
+
+          <TabsContent value="rollenpreise">
+            {productsQuery.isLoading || rolesQuery.isLoading ? (
+              <Skeleton className="h-64 w-full" />
+            ) : (
+              <AreaRolePricesPanel areaKey={areaKey} products={products} roles={roles} onChanged={invalidate} />
+            )}
+          </TabsContent>
+        </Tabs>
+      )}
 
       <AdminSection>
         <Card>
@@ -144,7 +224,7 @@ function PreviewLine({ title, shop, groupBuy }: { title: string; shop: string; g
   );
 }
 
-function ShopAreaCard({
+function ShopAreaGeneralCard({
   areaKey,
   name,
   isActive,
@@ -161,11 +241,10 @@ function ShopAreaCard({
   assignedRoleIds: string[];
   roles: { id: string; name: string }[];
   saving: boolean;
-  onSave: (next: { name: string; isActive: boolean; profile: ShopPricingProfile; roleIds: string[] }) => Promise<void>;
+  onSave: (next: { name: string; isActive: boolean; roleIds: string[] }) => Promise<void>;
 }) {
   const [localName, setLocalName] = React.useState(name);
   const [localActive, setLocalActive] = React.useState(isActive);
-  const [localProfile, setLocalProfile] = React.useState(profile);
   const [roleIds, setRoleIds] = React.useState(assignedRoleIds);
 
   function toggleRole(roleId: string, checked: boolean) {
@@ -179,7 +258,7 @@ function ShopAreaCard({
           <CardTitle className="text-base">{SHOP_AREA_LABELS[areaKey]}</CardTitle>
           <Badge variant={localActive ? "secondary" : "outline"}>{localActive ? "Aktiv" : "Deaktiviert"}</Badge>
         </div>
-        <CardDescription>Pricing: {PROFILE_LABELS[localProfile]}</CardDescription>
+        <CardDescription>Preismodell: {PROFILE_LABELS[profile]} (fest fÃ¼r diesen Bereich)</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
@@ -192,20 +271,8 @@ function ShopAreaCard({
             Aktiv
           </Label>
         </div>
-        <div className="space-y-1">
-          <Label>Pricing Profile</Label>
-          <Select value={localProfile} onValueChange={(v) => setLocalProfile(v as ShopPricingProfile)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="retail">Einzelverkauf</SelectItem>
-              <SelectItem value="group_buy">Group Buy</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
         <div className="space-y-2">
-          <Label>Sichtbar für</Label>
+          <Label>Sichtbar fÃ¼r</Label>
           {roles.map((role) => (
             <div key={role.id} className="flex items-center gap-2">
               <Checkbox
@@ -222,13 +289,559 @@ function ShopAreaCard({
         <Button
           type="button"
           loading={saving}
-          onClick={() =>
-            void onSave({ name: localName.trim() || name, isActive: localActive, profile: localProfile, roleIds })
-          }
+          onClick={() => void onSave({ name: localName.trim() || name, isActive: localActive, roleIds })}
         >
           Speichern
         </Button>
       </CardContent>
     </Card>
+  );
+}
+
+function AreaProductsPanel({
+  areaKey,
+  products,
+  onChanged,
+}: {
+  areaKey: ShopAreaKey;
+  products: Tables<"products">[];
+  onChanged: () => Promise<void>;
+}) {
+  const overlayQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("products"),
+    queryFn: () => listAdminShopAreaProducts(areaKey),
+  });
+  const [search, setSearch] = React.useState("");
+  const [savingId, setSavingId] = React.useState<string | null>(null);
+
+  const overlay = React.useMemo(() => {
+    const map = new Map<string, boolean>();
+    for (const row of overlayQuery.data ?? []) map.set(row.product_id, row.is_active);
+    return map;
+  }, [overlayQuery.data]);
+
+  const filtered = React.useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return products.filter((product) => {
+      if (!term) return true;
+      return `${product.code} ${product.name} ${product.dosage_vial ?? ""}`.toLowerCase().includes(term);
+    });
+  }, [products, search]);
+
+  async function toggle(product: Tables<"products">, next: boolean) {
+    setSavingId(product.id);
+    try {
+      await setAdminShopAreaProductActive(areaKey, product.id, next);
+      toast.success(`${product.name} in ${SHOP_AREA_LABELS[areaKey]} ${next ? "aktiviert" : "deaktiviert"}.`);
+      await overlayQuery.refetch();
+      await onChanged();
+    } catch (error) {
+      console.error("Produktzuordnung speichern fehlgeschlagen:", error);
+      toast.error(error instanceof Error ? error.message : "Produktzuordnung konnte nicht gespeichert werden.");
+    } finally {
+      setSavingId(null);
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Produkte in {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardDescription>
+          Zentrale Produktbasis bleibt erhalten. Aus ist eine Bereichsausblendung; ohne Eintrag gilt der Katalogstatus.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Produkt suchen â€¦" />
+        {overlayQuery.isLoading && <Skeleton className="h-48 w-full" />}
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Artikel</TableHead>
+                <TableHead>Katalog</TableHead>
+                <TableHead className="text-right">In diesem Bereich</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((product) => {
+                const areaActive = overlay.get(product.id) ?? product.is_active;
+                return (
+                  <TableRow key={product.id}>
+                    <TableCell>
+                      <p className="font-medium">{product.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {product.code}
+                        {product.dosage_vial ? ` Â· ${product.dosage_vial}` : ""}
+                      </p>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={product.is_active ? "secondary" : "outline"}>
+                        {product.is_active ? "Aktiv" : "Inaktiv"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Switch
+                        checked={areaActive}
+                        disabled={savingId === product.id || !product.is_active}
+                        onCheckedChange={(checked) => void toggle(product, checked)}
+                        aria-label={`${product.name} in ${SHOP_AREA_LABELS[areaKey]}`}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function AreaDocumentPanel({ areaKey }: { areaKey: ShopAreaKey }) {
+  const queryClient = useQueryClient();
+  const docQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("document"),
+    queryFn: () => getAdminShopAreaDocument(areaKey),
+  });
+  const [busy, setBusy] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  async function onFile(file: File | undefined) {
+    if (!file) return;
+    if (file.size > MAX_PDF_SIZE_BYTES) {
+      toast.error("Datei ist grÃ¶ÃŸer als 10 MB.");
+      return;
+    }
+    if (!detectImportSourceKind(file.name)) {
+      toast.error(`Erlaubt: ${ACCEPTED_IMPORT_LABEL}.`);
+      return;
+    }
+    setBusy(true);
+    try {
+      await uploadAdminShopAreaDocument(areaKey, file);
+      toast.success("Dokument gespeichert.");
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey) });
+    } catch (error) {
+      console.error("Dokument-Upload fehlgeschlagen:", error);
+      toast.error(error instanceof Error ? error.message : "Dokument konnte nicht hochgeladen werden.");
+    } finally {
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  async function openCurrent() {
+    const path = docQuery.data?.storage_path;
+    if (!path) return;
+    try {
+      const url = await signedAdminShopAreaDocumentUrl(path);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Dokument konnte nicht geÃ¶ffnet werden.");
+    }
+  }
+
+  async function remove() {
+    setBusy(true);
+    try {
+      await deleteAdminShopAreaDocument(areaKey);
+      toast.success("Dokument entfernt.");
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey) });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Dokument konnte nicht entfernt werden.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Produktdokument {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardDescription>
+          Nur fÃ¼r diesen Bereich. Ein Dokument fÃ¼r Group Buy 1 Ã¤ndert Group Buy 2 und den Shop nicht.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {docQuery.isLoading && <Skeleton className="h-16 w-full" />}
+        {docQuery.data ? (
+          <div className="rounded-lg border border-border p-3 text-sm">
+            <p className="font-medium">{docQuery.data.file_name}</p>
+            <p className="text-muted-foreground">Aktualisiert {formatDateTime(docQuery.data.updated_at)}</p>
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">Kein Dokument hinterlegt.</p>
+        )}
+        <input
+          ref={inputRef}
+          type="file"
+          accept={ACCEPTED_IMPORT_ACCEPT}
+          className="hidden"
+          onChange={(e) => void onFile(e.target.files?.[0])}
+        />
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" loading={busy} onClick={() => inputRef.current?.click()}>
+            {docQuery.data ? "Ersetzen" : "Hochladen"}
+          </Button>
+          <Button type="button" variant="outline" disabled={!docQuery.data || busy} onClick={() => void openCurrent()}>
+            Anzeigen
+          </Button>
+          <Button type="button" variant="outline" disabled={!docQuery.data || busy} onClick={() => void remove()}>
+            Entfernen
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function parseOptionalNumber(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Number(trimmed.replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function AreaPricesPanel({
+  areaKey,
+  products,
+  profile,
+  onChanged,
+}: {
+  areaKey: ShopAreaKey;
+  products: Tables<"products">[];
+  profile: ShopPricingProfile;
+  onChanged: () => Promise<void>;
+}) {
+  const pricesQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("prices"),
+    queryFn: () => listAdminShopAreaProductPrices(areaKey),
+  });
+  const [search, setSearch] = React.useState("");
+  const [selectedId, setSelectedId] = React.useState<string>(products[0]?.id ?? "");
+
+  const priceMap = React.useMemo(() => {
+    const map = new Map<string, Tables<"shop_area_product_prices">>();
+    for (const row of pricesQuery.data ?? []) map.set(row.product_id, row);
+    return map;
+  }, [pricesQuery.data]);
+
+  const filtered = React.useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return products.filter((product) => {
+      if (!term) return true;
+      return `${product.code} ${product.name}`.toLowerCase().includes(term);
+    });
+  }, [products, search]);
+
+  const selected = products.find((product) => product.id === selectedId) ?? filtered[0] ?? null;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Preise in {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardDescription>
+          Leere Felder Ã¼bernehmen den zentralen Katalogpreis. Shop zeigt den resultierenden Einzelpreis, Group Buy die
+          Kit-/Staffellogik.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="space-y-2">
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Produkt suchen â€¦" />
+          <div className="max-h-80 overflow-y-auto rounded-lg border border-border">
+            {filtered.map((product) => (
+              <button
+                key={product.id}
+                type="button"
+                className={`flex w-full flex-col items-start border-b border-border px-3 py-2 text-left text-sm last:border-b-0 ${
+                  selected?.id === product.id ? "bg-secondary" : "hover:bg-secondary/50"
+                }`}
+                onClick={() => setSelectedId(product.id)}
+              >
+                <span className="font-medium">{product.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  {product.code} Â· Katalog {formatUsd(product.price_usd)}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+        {selected && (
+          <AreaPriceEditor
+            key={`${areaKey}-${selected.id}-${priceMap.get(selected.id)?.updated_at ?? "catalog"}`}
+            areaKey={areaKey}
+            product={selected}
+            profile={profile}
+            override={priceMap.get(selected.id) ?? null}
+            onSaved={async () => {
+              await pricesQuery.refetch();
+              await onChanged();
+            }}
+          />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function AreaPriceEditor({
+  areaKey,
+  product,
+  profile,
+  override,
+  onSaved,
+}: {
+  areaKey: ShopAreaKey;
+  product: Tables<"products">;
+  profile: ShopPricingProfile;
+  override: Tables<"shop_area_product_prices"> | null;
+  onSaved: () => Promise<void>;
+}) {
+  const [priceUsd, setPriceUsd] = React.useState(override?.price_usd != null ? String(override.price_usd) : "");
+  const [bulkUsd, setBulkUsd] = React.useState(override?.bulk_price_usd != null ? String(override.bulk_price_usd) : "");
+  const [bulkMin, setBulkMin] = React.useState(
+    override?.bulk_price_min_quantity != null ? String(override.bulk_price_min_quantity) : "",
+  );
+  const [saving, setSaving] = React.useState(false);
+  const categoryId = shopCategoryIdFor(product);
+  const usesKit = categoryId === "peptides" || categoryId === "reconstitution-water";
+  const kitUnit = shopAreaCatalogUnit(
+    {
+      price_usd: parseOptionalNumber(priceUsd) ?? product.price_usd,
+      bulk_price_usd: parseOptionalNumber(bulkUsd) ?? product.bulk_price_usd,
+      bulk_price_min_quantity: parseOptionalNumber(bulkMin) ?? product.bulk_price_min_quantity,
+    },
+    1,
+    profile,
+    usesKit,
+  );
+
+  async function save() {
+    const nextPrice = parseOptionalNumber(priceUsd);
+    const nextBulk = parseOptionalNumber(bulkUsd);
+    const nextMin = parseOptionalNumber(bulkMin);
+    if ((nextBulk == null) !== (nextMin == null)) {
+      toast.error("Mengenstaffel braucht Preis und Mindestmenge gemeinsam.");
+      return;
+    }
+    setSaving(true);
+    try {
+      if (nextPrice == null && nextBulk == null) {
+        await deleteAdminShopAreaProductPrice(areaKey, product.id);
+      } else {
+        await upsertAdminShopAreaProductPrice(areaKey, product.id, {
+          price_usd: nextPrice,
+          bulk_price_usd: nextBulk,
+          bulk_price_min_quantity: nextMin,
+        });
+      }
+      toast.success("Bereichspreis gespeichert.");
+      await onSaved();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Preis konnte nicht gespeichert werden.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function resetToCatalog() {
+    setSaving(true);
+    try {
+      await deleteAdminShopAreaProductPrice(areaKey, product.id);
+      setPriceUsd("");
+      setBulkUsd("");
+      setBulkMin("");
+      toast.success("Katalogpreis Ã¼bernommen.");
+      await onSaved();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Preis konnte nicht zurÃ¼ckgesetzt werden.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm font-medium">{product.name}</p>
+      <p className="text-xs text-muted-foreground">
+        Katalog {formatUsd(product.price_usd)} Â· Bereichseinheit {formatUsd(kitUnit)}
+      </p>
+      <div className="space-y-1">
+        <Label htmlFor="area-price">Basispreis USD</Label>
+        <Input
+          id="area-price"
+          inputMode="decimal"
+          value={priceUsd}
+          onChange={(e) => setPriceUsd(e.target.value)}
+          placeholder={String(product.price_usd)}
+        />
+      </div>
+      {profile === "group_buy" && (
+        <>
+          <div className="space-y-1">
+            <Label htmlFor="area-bulk">Staffelpreis USD</Label>
+            <Input id="area-bulk" inputMode="decimal" value={bulkUsd} onChange={(e) => setBulkUsd(e.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="area-bulk-min">Ab Menge</Label>
+            <Input id="area-bulk-min" inputMode="decimal" value={bulkMin} onChange={(e) => setBulkMin(e.target.value)} />
+          </div>
+        </>
+      )}
+      <div className="flex flex-wrap gap-2">
+        <Button type="button" loading={saving} onClick={() => void save()}>
+          Speichern
+        </Button>
+        <Button type="button" variant="outline" disabled={saving} onClick={() => void resetToCatalog()}>
+          Katalog Ã¼bernehmen
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function AreaRolePricesPanel({
+  areaKey,
+  products,
+  roles,
+  onChanged,
+}: {
+  areaKey: ShopAreaKey;
+  products: Tables<"products">[];
+  roles: Tables<"customer_roles">[];
+  onChanged: () => Promise<void>;
+}) {
+  const markupsQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("role-markups"),
+    queryFn: () => listAdminShopAreaRoleMarkups(areaKey),
+  });
+  const [search, setSearch] = React.useState("");
+  const [selectedId, setSelectedId] = React.useState<string>(products[0]?.id ?? "");
+
+  const filtered = React.useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return products.filter((product) => {
+      if (!term) return true;
+      return `${product.code} ${product.name}`.toLowerCase().includes(term);
+    });
+  }, [products, search]);
+
+  const selected = products.find((product) => product.id === selectedId) ?? filtered[0] ?? null;
+  const selectedMarkups = (markupsQuery.data ?? []).filter((row) => row.product_id === selected?.id);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Rollenpreise in {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardDescription>
+          Markup in Prozent pro Produkt und Rolle. Leer = zentraler Rollenaufschlag (z. B. 25 %). Genau einmal Ã¼ber
+          apply_role_markup.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="space-y-2">
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Produkt suchen â€¦" />
+          <div className="max-h-80 overflow-y-auto rounded-lg border border-border">
+            {filtered.map((product) => (
+              <button
+                key={product.id}
+                type="button"
+                className={`flex w-full flex-col items-start border-b border-border px-3 py-2 text-left text-sm last:border-b-0 ${
+                  selected?.id === product.id ? "bg-secondary" : "hover:bg-secondary/50"
+                }`}
+                onClick={() => setSelectedId(product.id)}
+              >
+                <span className="font-medium">{product.name}</span>
+                <span className="text-xs text-muted-foreground">{product.code}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        {selected && (
+          <AreaRoleMarkupEditor
+            key={`${areaKey}-${selected.id}-${selectedMarkups.map((row) => `${row.role_id}:${row.markup_percent}`).join("|")}`}
+            areaKey={areaKey}
+            product={selected}
+            roles={roles}
+            overrides={selectedMarkups}
+            onSaved={async () => {
+              await markupsQuery.refetch();
+              await onChanged();
+            }}
+          />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function AreaRoleMarkupEditor({
+  areaKey,
+  product,
+  roles,
+  overrides,
+  onSaved,
+}: {
+  areaKey: ShopAreaKey;
+  product: Tables<"products">;
+  roles: Tables<"customer_roles">[];
+  overrides: Tables<"shop_area_product_role_markups">[];
+  onSaved: () => Promise<void>;
+}) {
+  const initial = React.useMemo(() => {
+    const map = new Map(overrides.map((row) => [row.role_id, row.markup_percent]));
+    const next: Record<string, string> = {};
+    for (const role of roles) {
+      const override = map.get(role.id);
+      next[role.id] = override != null ? String(override) : "";
+    }
+    return next;
+  }, [overrides, roles]);
+  const [drafts, setDrafts] = React.useState(initial);
+  const [saving, setSaving] = React.useState(false);
+
+  async function save() {
+    setSaving(true);
+    try {
+      for (const role of roles) {
+        const parsed = parseOptionalNumber(drafts[role.id] ?? "");
+        if (parsed == null) {
+          await deleteAdminShopAreaRoleMarkup(areaKey, product.id, role.id);
+        } else {
+          await upsertAdminShopAreaRoleMarkup(areaKey, product.id, role.id, parsed);
+        }
+      }
+      toast.success("Rollenpreise gespeichert.");
+      await onSaved();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Rollenpreise konnten nicht gespeichert werden.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm font-medium">{product.name}</p>
+      {roles.map((role) => (
+        <div key={role.id} className="space-y-1">
+          <Label htmlFor={`markup-${role.id}`}>
+            {role.name} (Standard {role.markup_percent} %)
+          </Label>
+          <Input
+            id={`markup-${role.id}`}
+            inputMode="decimal"
+            value={drafts[role.id] ?? ""}
+            onChange={(e) => setDrafts((current) => ({ ...current, [role.id]: e.target.value }))}
+            placeholder={String(role.markup_percent)}
+          />
+        </div>
+      ))}
+      <Button type="button" loading={saving} onClick={() => void save()}>
+        Speichern
+      </Button>
+    </div>
   );
 }

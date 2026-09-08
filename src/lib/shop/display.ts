@@ -15,6 +15,17 @@ import type { Tables } from "@/types/database";
 
 /** Common cart quantities supported by existing validation (1–10). */
 export const SHOP_QUANTITY_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
+export const RETAIL_VIAL_QUANTITY_OPTIONS = [1, 5, 10] as const;
+
+export function shopQuantityOptions(
+  categoryId: ShopCategoryId | null | undefined,
+  saleMode: "catalog" | "retail_unit",
+): readonly number[] {
+  if (saleMode === "retail_unit" && categoryId !== "orals") {
+    return RETAIL_VIAL_QUANTITY_OPTIONS;
+  }
+  return SHOP_QUANTITY_OPTIONS;
+}
 
 const STRENGTH_SUFFIX =
   /\s+\d+(?:[.,]\d+)?\s*(?:mg|mcg|µg|ug|iu|ml|ui)\b\s*$/i;

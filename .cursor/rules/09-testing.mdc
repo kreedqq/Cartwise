@@ -1,0 +1,60 @@
+---
+description: Testing conventions – Vitest, test structure, rules for modifying tests
+globs:
+  - "src/tests/**"
+alwaysApply: false
+---
+
+# Testing
+
+## Framework
+
+Vitest 4 with jsdom. Tests live in `src/tests/`. Run: `npm test` (= `vitest run`).
+
+## Naming
+
+- `src/tests/camelCase.test.ts` (pure logic)
+- `src/tests/camelCase.test.tsx` (React component tests)
+- `describe` block names match the feature/file under test.
+- `it` descriptions are concise statements of expected behaviour.
+
+## Structure pattern
+
+```ts
+import { describe, expect, it } from "vitest";
+import { functionUnderTest } from "@/lib/...";
+
+describe("feature name", () => {
+  it("does the expected thing", () => {
+    expect(functionUnderTest(input)).toBe(expected);
+  });
+});
+```
+
+## What gets tested
+
+- All `src/lib/money.ts` functions (critical – `money.test.ts`)
+- Quantity format functions (`quantityFormat.test.ts`)
+- Shop area pricing (`shopAreaPricing.test.ts`)
+- Price label regression: retail shop must never show kit/bulk labels (`priceLabels.test.ts`)
+- Navigation logic (`kitRequestNav.test.ts`, `shopAreas.test.ts`)
+- Kit order lifecycle (`kitOrderLifecycle.test.ts`) – **do not modify**
+- SQL source checks for migration 0052 (`shopAreas.test.ts`)
+
+## Rules for modifying tests
+
+- **Never** delete or skip a passing test without a documented reason.
+- **Never** weaken an assertion (e.g. change `toBe` to `toBeDefined`) to make a test pass.
+- If a test fails after a code change, fix the implementation, not the test – unless the test was specifically testing behaviour that has been intentionally changed.
+- The `kitOrderLifecycle.test.ts` file is payment-scope protected. Do not touch it.
+- Source-level migration checks (SQL `readFileSync`) are valid substitutes for runtime tests only when no local DB is available.
+
+## Running quality gates
+
+After any implementation change, run in order:
+1. `npm run typecheck`
+2. `npm run lint`
+3. `npm test`
+4. `npm run build`
+
+All four must pass before a change is considered complete.

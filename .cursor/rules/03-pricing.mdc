@@ -1,0 +1,54 @@
+---
+description: Pricing – single sources of truth, markup pipeline, anti-duplication rules
+alwaysApply: true
+---
+
+# Pricing – Single Sources of Truth
+
+## Central money utilities (`src/lib/money.ts`)
+
+These functions are the **only** place for the respective calculation. Never reimplement them elsewhere:
+
+| Function | Purpose |
+|---|---|
+| `getEffectiveUnitPrice(product, qty)` | Decides normal vs. bulk tier. One product, one quantity → one unit price. |
+| `catalogBulkUnitPriceUsd(product)` | Per-unit bulk price, handles pack-total oils. Never divide by 10 blindly. |
+| `applyRoleMarkup(amount, markupPercent)` | Applies role markup **once** at 4 decimal places. Matches SQL `apply_role_markup`. |
+| `calculateCartTotals(lines)` | Cart USD + EUR totals. |
+| `summarizeOrderCharges(input)` | Order subtotal + shipping (USD→EUR pipeline). |
+| `calculateLineTotalUsd(qty, unit)` | Line total rounded to cents. |
+| `formatUsd` / `formatEur` / `formatQuantity` | Display formatting with `de-DE` locale. |
+
+**Do not** scatter `* rate`, `.toFixed(2)`, `Math.round(x * 100) / 100` calls outside `money.ts`.
+
+## Area pricing pipeline (`src/lib/shop/shopAreaPricing.ts`)
+
+Order of operations (must not change):
+1. `resolveAreaCatalogPriceUsd` – area price override **or** global catalog price (never both added together)
+2. `shopAreaCatalogUnit` – retail formula (kit/10×5 or unit×5) **or** group_buy `getEffectiveUnitPrice`
+3. `applyRoleMarkup` – role markup applied **exactly once**
+
+Use `shopAreaSellUnitPriceForProductRole` for the complete pipeline. Do not re-implement it inline.
+
+## SQL pricing pipeline (migration 0051 / 0052)
+
+Server-side mirrors the TypeScript pipeline:
+- `apply_role_markup` ← call exactly once per price
+- `markup_percent_for_area` ← resolves product×area×role override, else `customer_roles.markup_percent`, else 0
+- `apply_shop_area_product_overrides` ← area catalog price override, then pass to `shop_area_catalog_unit`
+- `list_shop_products_for_area` ← the **only** RPC that returns priced products to the client
+
+Customers never SELECT raw `products.price_usd` directly. They always go through `list_shop_products_for_area` or an equivalent server-side priced RPC.
+
+## Role markup
+
+Default: `customer_roles.markup_percent` (e.g. 25%).
+Override: `shop_area_product_role_markups` (product × area × role). Override **replaces** default; they are never additive.
+
+## Retail pricing
+
+`/shop` area: `pricingProfile = "retail"`. Prices shown as per-unit (Vial or Packung). No kit labels, no bulk tier labels, no "Preis ab 10 Kits".
+
+Group Buy areas: `pricingProfile = "group_buy"`. Existing kit/tier pricing. `getEffectiveUnitPrice` applies.
+
+**Do not** show retail-mode price in a Group Buy area or vice versa.

@@ -1,0 +1,53 @@
+---
+description: Security – production protection, auth, secrets, pricing integrity
+alwaysApply: true
+---
+
+# Security Rules
+
+## Production – hard stops
+
+Never do the following without explicit user confirmation:
+- `supabase db push --linked`
+- `supabase db reset --linked`
+- Any SQL against production
+- `git push` (any branch)
+- Vercel deployment
+- Modify `schema_migrations` on production
+
+## Secrets
+
+- Never commit `.env` files or any actual key/secret values.
+- Document env var **names** only: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
+- Anon key is intentionally public; authorization is enforced by RLS and RPCs.
+
+## Pricing integrity
+
+- Prices must never be read from request bodies or URL params in RPCs.
+- `create_order` recomputes all prices server-side. Client prices are snapshots for display only.
+- Role markup percent must never be sent to a client (it is resolved server-side in `markup_percent_for_area`).
+
+## Auth boundaries
+
+- `AuthProvider` + `ProtectedRoute`: all authenticated routes are behind these.
+- `AdminRoute`: admin pages require `user_roles.role = 'admin'`.
+- `UsernameGate`: enforces `profiles.username` set before shop access.
+- Area access: `user_can_access_shop_area(_uid, _area)` (SQL). Frontend navigation hides unauthorized areas but the backend independently enforces them via `assert_kit_area_access`.
+- Admin delete uses `admin_delete_user` (SECURITY DEFINER). It does not cascade-delete orders.
+
+## Cart security (migration 0051 – do not remove or weaken)
+
+- `carts_insert_own` policy: user can only insert carts with their own `user_id`.
+- `reject_cart_shop_area_mutation` trigger function + `carts_protect_shop_area` trigger: `cart.shop_area` is immutable after creation.
+- These objects must not be dropped or altered without explicit user authorization.
+
+## Kit participant security (migration 0052)
+
+- Trigger `kit_share_participants_protect_area` (`BEFORE INSERT` on `kit_share_participants`): calls `assert_kit_area_access` to block cross-area joins.
+- Do not drop or bypass this trigger.
+
+## RLS policies
+
+- Every new table gets RLS enabled.
+- Never rely on client-side filtering as the only access control.
+- Priced data goes through SECURITY DEFINER RPCs, not plain SELECTs.

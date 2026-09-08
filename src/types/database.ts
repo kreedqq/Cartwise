@@ -319,6 +319,7 @@ export interface Database {
           note: string | null;
           expires_at: string | null;
           completed_at: string | null;
+          shop_area: string;
           created_at: string;
           updated_at: string;
         };
@@ -543,6 +544,62 @@ export interface Database {
         };
         Insert: Database["public"]["Tables"]["shop_area_role_access"]["Row"];
         Update: Partial<Database["public"]["Tables"]["shop_area_role_access"]["Row"]>;
+        Relationships: never[];
+      };
+      shop_area_products: {
+        Row: {
+          shop_area_key: string;
+          product_id: string;
+          is_active: boolean;
+          updated_at: string;
+        };
+        Insert: Database["public"]["Tables"]["shop_area_products"]["Row"];
+        Update: Partial<Database["public"]["Tables"]["shop_area_products"]["Row"]>;
+        Relationships: never[];
+      };
+      shop_area_product_prices: {
+        Row: {
+          shop_area_key: string;
+          product_id: string;
+          price_usd: number | null;
+          bulk_price_usd: number | null;
+          bulk_price_min_quantity: number | null;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["shop_area_product_prices"]["Row"]> & {
+          shop_area_key: string;
+          product_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["shop_area_product_prices"]["Row"]>;
+        Relationships: never[];
+      };
+      shop_area_product_role_markups: {
+        Row: {
+          shop_area_key: string;
+          product_id: string;
+          role_id: string;
+          markup_percent: number;
+          updated_at: string;
+        };
+        Insert: Database["public"]["Tables"]["shop_area_product_role_markups"]["Row"];
+        Update: Partial<Database["public"]["Tables"]["shop_area_product_role_markups"]["Row"]>;
+        Relationships: never[];
+      };
+      shop_area_documents: {
+        Row: {
+          shop_area_key: string;
+          storage_path: string;
+          file_name: string;
+          uploaded_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["shop_area_documents"]["Row"]> & {
+          shop_area_key: string;
+          storage_path: string;
+          file_name: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["shop_area_documents"]["Row"]>;
         Relationships: never[];
       };
       substances: {
@@ -1304,6 +1361,7 @@ export interface Database {
           _my_quantity: number;
           _note?: string | null;
           _expires_at?: string | null;
+          _shop_area?: string | null;
         };
         Returns: Record<string, unknown>;
       };
@@ -1332,11 +1390,15 @@ export interface Database {
           _sort?: string | null;
           _page?: number;
           _page_size?: number;
+          _shop_area?: string | null;
         };
         Returns: Record<string, unknown>;
       };
-      list_my_kit_requests: { Args: Record<string, never>; Returns: Record<string, unknown> };
-      list_my_kit_request_participations: { Args: Record<string, never>; Returns: Record<string, unknown> };
+      list_my_kit_requests: { Args: { _shop_area?: string | null }; Returns: Record<string, unknown> };
+      list_my_kit_request_participations: {
+        Args: { _shop_area?: string | null };
+        Returns: Record<string, unknown>;
+      };
       get_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
       set_order_status: {
         Args: { _order_id: string; _status: OrderStatus; _admin_note: string | null };

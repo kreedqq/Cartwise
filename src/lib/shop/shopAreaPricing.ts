@@ -46,3 +46,45 @@ export function shopAreaSellUnitPrice(
     markupPercent,
   );
 }
+
+/** Missing area override inherits the central catalog price. */
+export function resolveAreaCatalogPriceUsd(
+  globalPriceUsd: number,
+  areaOverrideUsd: number | null | undefined,
+): number {
+  return areaOverrideUsd ?? globalPriceUsd;
+}
+
+/** Missing product×area×role markup inherits customer_roles.markup_percent (e.g. 25%). */
+export function resolveAreaRoleMarkupPercent(
+  roleMarkupPercent: number,
+  areaProductRoleMarkup: number | null | undefined,
+): number {
+  return areaProductRoleMarkup ?? roleMarkupPercent;
+}
+
+/**
+ * Final selling unit for one product in one area for one role.
+ * Catalog override (optional) → area formula → applyRoleMarkup once.
+ */
+export function shopAreaSellUnitPriceForProductRole(
+  globalProduct: ShopAreaPricedProduct,
+  quantity: number,
+  roleMarkupPercent: number,
+  profile: ShopPricingProfile,
+  usesKitUnitPricing: boolean,
+  areaPriceOverrideUsd?: number | null,
+  areaRoleMarkupPercent?: number | null,
+): number {
+  const catalog = {
+    ...globalProduct,
+    price_usd: resolveAreaCatalogPriceUsd(globalProduct.price_usd, areaPriceOverrideUsd),
+  };
+  return shopAreaSellUnitPrice(
+    catalog,
+    quantity,
+    resolveAreaRoleMarkupPercent(roleMarkupPercent, areaRoleMarkupPercent),
+    profile,
+    usesKitUnitPricing,
+  );
+}

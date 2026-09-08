@@ -1,6 +1,9 @@
 export const SHOP_AREA_KEYS = ["shop", "group_buy_1", "group_buy_2"] as const;
 export type ShopAreaKey = (typeof SHOP_AREA_KEYS)[number];
 
+export const GROUP_BUY_AREA_KEYS = ["group_buy_1", "group_buy_2"] as const;
+export type GroupBuyAreaKey = (typeof GROUP_BUY_AREA_KEYS)[number];
+
 export const SHOP_PRICING_PROFILES = ["retail", "group_buy"] as const;
 export type ShopPricingProfile = (typeof SHOP_PRICING_PROFILES)[number];
 
@@ -24,6 +27,10 @@ export const SHOP_AREA_LABELS: Record<ShopAreaKey, string> = {
 
 export function isShopAreaKey(value: string | null | undefined): value is ShopAreaKey {
   return Boolean(value && (SHOP_AREA_KEYS as readonly string[]).includes(value));
+}
+
+export function isGroupBuyAreaKey(value: string | null | undefined): value is GroupBuyAreaKey {
+  return Boolean(value && (GROUP_BUY_AREA_KEYS as readonly string[]).includes(value));
 }
 
 export function shopAreaFromPath(pathname: string): ShopAreaKey {
@@ -67,4 +74,9 @@ export function saleModeForShopArea(area: string | null | undefined): "catalog" 
 
 export function isGroupBuyPricing(profile: ShopPricingProfile | null | undefined): boolean {
   return profile === "group_buy";
+}
+
+/** Shop stays retail; both Group Buy areas keep the existing kit pricing profile. */
+export function pricingProfileForArea(key: ShopAreaKey): ShopPricingProfile {
+  return key === "shop" ? "retail" : "group_buy";
 }

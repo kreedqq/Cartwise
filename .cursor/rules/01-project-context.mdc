@@ -1,0 +1,46 @@
+---
+description: Peptix project overview – stack, areas, env vars, deployment
+alwaysApply: true
+---
+
+# Peptix – Project Context
+
+**What**: B2B Bestellplattform for peptides. App name: **Peptix**. Production: `https://peptix.app` (Vercel, GitHub `kreedqq/Cartwise` `main` branch).
+
+**Stack**
+- React 19 + TypeScript ~6.0 + Vite 8
+- Supabase (Postgres + GoTrue Auth + Storage + Edge Functions)
+- TanStack Query 5, React Router 6, Tailwind 3 + Radix UI primitives
+- Vitest 4 (test runner), ESLint 10, Prettier
+
+**Three selling areas** (DB table `shop_areas`, migration 0051):
+| Key | Route | Profile | Description |
+|---|---|---|---|
+| `shop` | `/shop` | `retail` | Retail Einzelverkauf – single units only |
+| `group_buy_1` | `/shop/group-buy-1` | `group_buy` | Group Buy with Kit Gesuche |
+| `group_buy_2` | `/shop/group-buy-2` | `group_buy` | Second Group Buy instance |
+
+`/kit-gesuche` redirects to the first accessible Group Buy area.
+
+**Env vars (names only – never commit values)**
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+**Key directories**
+```
+src/pages/          Route screens
+src/components/     UI components (shop|cart|orders|auth|admin|layout|ui|kit-requests)
+src/hooks/          TanStack Query wrappers (useXxx)
+src/services/       Supabase RPC / table calls (noun + verb)
+src/lib/            Pure logic, utilities, constants
+src/lib/shop/       Shop-area types, pricing, display, labels
+src/lib/peptide/    Peptide lexicon / research (separate from shop)
+src/context/        React contexts (Auth, ShopArea, NavShell)
+src/types/          database.ts – hand-mirrored DB schema
+supabase/migrations/ 0001–0052 SQL, sequential, never modified post-apply
+```
+
+**Separate systems – never mix**
+- **Shop** (`products`, prices, carts, orders) ↔ **Lexicon** (`substances`, sources, studies).
+- Lexicon UI must not render prices or cart actions.
+- Shop UI must not render lexicon evidence grades or study sources.

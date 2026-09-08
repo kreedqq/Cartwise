@@ -20,4 +20,17 @@ describe("shopPriceColumnLabels", () => {
       expect(labels.usesKitPricing).toBe(false);
     }
   });
+
+  it("never uses kit or ab-10 copy in the retail shop", () => {
+    for (const categoryId of ["peptides", "reconstitution-water", "injectable-oils", "orals"] as const) {
+      const labels = shopPriceColumnLabels(categoryId, "retail");
+      expect(labels.unitPrice).not.toMatch(/10 Vials/);
+      expect(labels.unitPrice).not.toMatch(/Kit/);
+      expect(labels.bulkPrice).toBe("");
+      expect(labels.bulkActive).not.toMatch(/Preis ab 10/);
+      expect(labels.usesKitPricing).toBe(false);
+    }
+    expect(shopPriceColumnLabels("peptides", "retail").unitPrice).toBe("Preis / Vial");
+    expect(shopPriceColumnLabels("orals", "retail").unitPrice).toBe("Preis / Packung");
+  });
 });

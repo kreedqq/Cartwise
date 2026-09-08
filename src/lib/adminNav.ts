@@ -46,7 +46,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       pathname.startsWith("/admin/import-history"),
     items: [
       { to: "/admin/products", label: "Produktkatalog" },
-      { to: "/admin/shop-areas", label: "Shop-Bereiche" },
+      { to: "/admin/shop-areas", label: "Verkaufsbereiche" },
       { to: "/admin/pdf-import", label: "Import" },
       { to: "/admin/import-history", label: "Import-Verlauf" },
     ],

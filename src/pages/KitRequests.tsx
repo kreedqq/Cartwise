@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { Layers, Plus } from "lucide-react";
 
 import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitRequestDialog";
@@ -32,9 +32,15 @@ import {
   useSyncKitRequestCarts,
   type OpenKitRequestFilters,
 } from "@/hooks/useKitRequests";
-import { useFirstGroupBuyArea } from "@/hooks/useMyShopAreas";
+import { useMyShopAreas } from "@/hooks/useMyShopAreas";
 import { useShopProducts } from "@/hooks/useShopProducts";
-import type { ShopAreaKey } from "@/lib/shop/shopAreas";
+import { ShopAreaProvider } from "@/context/ShopAreaContext";
+import {
+  isGroupBuyAreaKey,
+  SHOP_AREA_LABELS,
+  SHOP_AREA_PATHS,
+  type ShopAreaKey,
+} from "@/lib/shop/shopAreas";
 import {
   kitRequestStatusLabel,
   type KitRequestSort,
@@ -47,18 +53,33 @@ import type { KitRequestCard } from "@/services/kitRequests";
 const PAGE_SIZE = 20;
 
 export default function KitRequestsPage() {
-  const groupBuyQuery = useFirstGroupBuyArea();
+  const location = useLocation();
+  const areasQuery = useMyShopAreas();
 
-  if (groupBuyQuery.isLoading) return <FullScreenSpinner label="Kit Gesuche werden geladen …" />;
-  if (groupBuyQuery.isError) {
-    return <ErrorState message="Shop-Bereiche konnten nicht geladen werden." onRetry={() => groupBuyQuery.refetch()} />;
+  if (areasQuery.isLoading) return <FullScreenSpinner label="Group Buy wird geladen …" />;
+  if (areasQuery.isError) {
+    return <ErrorState message="Shop-Bereiche konnten nicht geladen werden." onRetry={() => areasQuery.refetch()} />;
   }
-  if (!groupBuyQuery.area) return <Navigate to="/403" replace />;
 
-  return <KitRequestsContent shopArea={groupBuyQuery.area.key} />;
+  const groupBuyAreas = (areasQuery.data ?? []).filter((area) => isGroupBuyAreaKey(area.key));
+  if (groupBuyAreas.length === 0) return <Navigate to="/403" replace />;
+
+  if (location.pathname.startsWith("/kit-gesuche")) {
+    return <Navigate to={groupBuyAreas[0]?.path ?? SHOP_AREA_PATHS.group_buy_1} replace />;
+  }
+
+  const requested = location.pathname.startsWith("/shop/group-buy-2") ? "group_buy_2" : "group_buy_1";
+  const current = groupBuyAreas.find((area) => area.key === requested);
+  if (!current || !isGroupBuyAreaKey(current.key)) return <Navigate to="/403" replace />;
+
+  return (
+    <ShopAreaProvider shopArea={current.key} pricingProfile="group_buy">
+      <KitRequestsContent shopArea={current.key} areaName={current.name} />
+    </ShopAreaProvider>
+  );
 }
 
-function KitRequestsContent({ shopArea }: { shopArea: ShopAreaKey }) {
+function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaName: string }) {
   const productsQuery = useShopProducts(shopArea);
 
   const [tab, setTab] = React.useState("open");
@@ -94,11 +115,12 @@ function KitRequestsContent({ shopArea }: { shopArea: ShopAreaKey }) {
     minRemaining,
     sort,
     page,
+    shopArea,
   };
 
   const openQuery = useOpenKitRequests(filters);
-  const mineQuery = useMyKitRequests();
-  const joinedQuery = useMyKitRequestParticipations();
+  const mineQuery = useMyKitRequests(shopArea);
+  const joinedQuery = useMyKitRequestParticipations(shopArea);
   const leaveMutation = useLeaveKitRequest();
   const cancelMutation = useCancelKitRequest();
   const syncMutation = useSyncKitRequestCarts();
@@ -134,9 +156,9 @@ function KitRequestsContent({ shopArea }: { shopArea: ShopAreaKey }) {
   return (
     <div className="min-w-0 space-y-8">
       <PageHeader
-        eyebrow="Marktplatz"
-        title="Kit Gesuche"
-        description="Offene Kits durchsuchen, Vials reservieren und automatisch in den Warenkorb legen, sobald das Kit vollständig ist."
+        eyebrow={SHOP_AREA_LABELS[shopArea] ?? areaName}
+        title={areaName}
+        description="Bestehende Group-Buy-Struktur: Kits, Anteile, Teilnehmer, Join und Leave. Kein Einzelverkauf."
         actions={
           <Button className="w-full sm:w-auto" onClick={() => setCreateOpen(true)}>
             <Plus className="h-4 w-4" />
@@ -404,7 +426,7 @@ function KitRequestsContent({ shopArea }: { shopArea: ShopAreaKey }) {
         </TabsContent>
       </Tabs>
 
-      <CreateKitRequestDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <CreateKitRequestDialog shopArea={shopArea} open={createOpen} onOpenChange={setCreateOpen} />
       <JoinKitRequestDialog request={joinTarget} open={joinTarget != null} onOpenChange={(next) => !next && setJoinTarget(null)} />
 
       <ConfirmDialog

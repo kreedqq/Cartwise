@@ -1,0 +1,55 @@
+---
+description: Quantity and price label conventions – single source of truth
+globs:
+  - "src/components/shop/**"
+  - "src/components/cart/**"
+  - "src/components/orders/**"
+  - "src/components/kit-requests/**"
+  - "src/pages/Shop.tsx"
+  - "src/pages/KitRequests.tsx"
+  - "src/pages/CartDetail.tsx"
+  - "src/pages/Checkout.tsx"
+  - "src/pages/OrderDetail.tsx"
+alwaysApply: false
+---
+
+# Quantity Labels
+
+## Single source of truth: `src/lib/quantityFormat.ts`
+
+All quantity display in shop, cart, orders, and PDFs goes through this file. Never write inline `"Kit"`, `"Vials"`, `"Packung"` strings in components.
+
+| Function | Use |
+|---|---|
+| `formatProductQuantity(input)` | General-purpose (resolves category, kit size, saleMode) |
+| `formatCatalogQuantity(qty, categoryId, saleMode)` | Without a real kit share |
+| `formatPartialKitQuantity(filled, kitSize, categoryId)` | `5/10 Kit` – only with a real `kit_share_id` |
+| `formatCompleteKitCount(kitCount, categoryId, kitSize)` | `2 Kits` |
+| `formatKitSplitQuantity(complete, remainder, size, cat)` | `2 Kits + 5/10 Kit` |
+| `formatOrderItemQuantity(item, kitSize, saleMode)` | Orders + cart items |
+
+## Sale mode
+
+`saleModeForShopArea(area)` (`src/lib/shop/shopAreas.ts`):
+- `"shop"` → `"retail_unit"` (Vial/Packung nouns)
+- `"group_buy_1"` / `"group_buy_2"` / `null` → `"catalog"` (Kit/Vial/Packung nouns)
+
+Always pass `saleMode` derived from the current area – never hardcode `"catalog"` in shop components.
+
+## Price column labels: `src/lib/shop/priceLabels.ts`
+
+`shopPriceColumnLabels(categoryId, profile)`:
+- `profile = "retail"` → `"Preis / Vial"` or `"Preis / Packung"`. No bulk-tier labels.
+- `profile = "group_buy"` + peptides/water → `"Preis / 10 Vials (Kit)"`, `"Preis / 10 Kits"`.
+- `profile = "group_buy"` + other → `"Einzelpreis"`, `"Preis ab 10 Stück"`.
+
+## Cart display: `src/lib/shop/cartDisplay.ts`
+
+`cartItemQuantityLabel(item, kitSize, saleMode)` resolves category from snapshots and delegates to `quantityFormat.ts`. Do not re-implement this logic in cart components.
+
+## Anti-patterns
+
+- ❌ `"Preis ab 10 Vials"` in retail shop
+- ❌ `"Kit"` quantity label in `/shop`
+- ❌ `"5/10 Kit"` without a real `kit_share_id`
+- ❌ Dividing by 10 to get a per-vial price outside `shopAreaCatalogUnit`

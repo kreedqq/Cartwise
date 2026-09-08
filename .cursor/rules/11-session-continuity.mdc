@@ -1,0 +1,39 @@
+---
+description: How to use Plans for session continuity across Cursor chats
+alwaysApply: true
+---
+
+# Session Continuity with Plans
+
+## Start of a new task
+
+1. Read relevant rules from `.cursor/rules/`.
+2. Check `.cursor/plans/active/` for any in-progress plan for this task.
+3. Analyze the **current code** as the source of truth (not the plan).
+4. Continue from the current state, not from the plan's last-written state.
+
+## After significant changes
+
+Update the active plan with:
+- What was completed in this session
+- Decisions made and why
+- Remaining steps
+- Risks or known limitations
+- Which tests were run and their result
+
+Keep the plan short. It is a continuation prompt, not a full specification.
+
+## End of a task
+
+Move the plan file from `.cursor/plans/active/` to `.cursor/plans/archive/`. Document final state in the plan before archiving.
+
+## What belongs where
+
+| Content | Location |
+|---|---|
+| Permanent project rules and architecture | `.cursor/rules/` |
+| In-progress task context | `.cursor/plans/active/` |
+| Completed task history | `.cursor/plans/archive/` |
+| Current code state | The actual source files |
+
+**Never** put temporary task state or open bugs into `.cursor/rules/`. **Never** repeat full rule content inside a plan.
