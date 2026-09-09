@@ -14,20 +14,20 @@ import { ShopCategoryHub } from "@/components/shop/ShopCategoryHub";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ShopAreaProvider } from "@/context/ShopAreaContext";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
+import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { cn } from "@/lib/utils";
 import { productMatchesShopSearch } from "@/lib/shop/display";
-import { DEFAULT_SHOP_AREA } from "@/lib/shop/shopAreas";
 import {
-  countProductsByShopCategory,
-  isShopCategoryId,
-  productInShopCategory,
-  shopCategoryById,
-  SHOP_CATEGORIES,
-  type ShopCategoryId,
-} from "@/lib/shopCategories";
+  countProductsByAreaCategory,
+  productsInAreaCategory,
+  storefrontHeadline,
+  visibleStorefrontCategories,
+} from "@/lib/shop/areaCategories";
+import { DEFAULT_SHOP_AREA } from "@/lib/shop/shopAreas";
+import { isShopCategoryId } from "@/lib/shopCategories";
 
 export default function ShopRetailPage() {
   const areasQuery = useMyShopAreas();
@@ -49,32 +49,52 @@ export default function ShopRetailPage() {
 
 function ShopCatalog({ areaName }: { areaName: string }) {
   const productsQuery = useShopProducts(DEFAULT_SHOP_AREA);
+  const storefrontQuery = useShopAreaStorefront(DEFAULT_SHOP_AREA);
   const favoritesQuery = useFavorites();
   const rateQuery = useExchangeRate();
   const [params, setParams] = useSearchParams();
-  const selected = isShopCategoryId(params.get("cat")) ? (params.get("cat") as ShopCategoryId) : null;
   const [search, setSearch] = React.useState("");
 
   const products = React.useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
-  const counts = React.useMemo(() => (products.length ? countProductsByShopCategory(products) : null), [products]);
+  const assignments = React.useMemo(
+    () => storefrontQuery.data?.assignments ?? [],
+    [storefrontQuery.data?.assignments],
+  );
+  const visible = React.useMemo(
+    () =>
+      visibleStorefrontCategories(
+        storefrontQuery.data?.categories ?? [],
+        assignments,
+        products.map((product) => product.id),
+      ),
+    [assignments, products, storefrontQuery.data?.categories],
+  );
+  const counts = React.useMemo(
+    () => countProductsByAreaCategory(
+      products.map((product) => product.id),
+      assignments,
+    ),
+    [assignments, products],
+  );
+  const selectedKey = params.get("cat");
+  const selected = visible.find((category) => category.category_key === selectedKey) ?? null;
 
   const filtered = React.useMemo(() => {
     if (!selected) return [];
     const term = search.trim();
-    return products.filter((p) => {
-      if (!productInShopCategory(p, selected)) return false;
-      return productMatchesShopSearch(p, term);
-    });
-  }, [products, search, selected]);
+    return productsInAreaCategory(products, assignments, selected.category_key).filter((product) =>
+      productMatchesShopSearch(product, term),
+    );
+  }, [assignments, products, search, selected]);
 
   const favoriteProductIds = React.useMemo(
     () => new Set((favoritesQuery.data ?? []).map((f) => f.productId)),
     [favoritesQuery.data],
   );
 
-  function selectCategory(id: ShopCategoryId) {
+  function selectCategory(key: string) {
     setSearch("");
-    setParams({ cat: id });
+    setParams({ cat: key });
   }
 
   if (!selected) {
@@ -85,28 +105,39 @@ function ShopCatalog({ areaName }: { areaName: string }) {
           title="Katalog"
           description="Einzelverkauf. Peptide, Water und Oils als Vials, Orals als Packungen. Keine Kits, keine Mengenstaffeln."
         />
-        {productsQuery.isLoading && (
+        {(productsQuery.isLoading || storefrontQuery.isLoading) && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-[200px] w-full rounded-2xl" />
             ))}
           </div>
         )}
-        {productsQuery.isError && (
-          <ErrorState message="Produkte konnten nicht geladen werden." onRetry={() => productsQuery.refetch()} />
+        {(productsQuery.isError || storefrontQuery.isError) && (
+          <ErrorState
+            message="Produkte konnten nicht geladen werden."
+            onRetry={() => {
+              void productsQuery.refetch();
+              void storefrontQuery.refetch();
+            }}
+          />
         )}
-        {productsQuery.data && <ShopCategoryHub counts={counts} onSelect={selectCategory} />}
+        {productsQuery.data && storefrontQuery.data && visible.length === 0 && (
+          <EmptyState icon={PackageSearch} title="Aktuell sind keine Produkte verfügbar." />
+        )}
+        {productsQuery.data && storefrontQuery.data && visible.length > 0 && (
+          <ShopCategoryHub categories={visible} counts={counts} onSelect={selectCategory} />
+        )}
       </div>
     );
   }
 
-  const active = shopCategoryById(selected);
+  const tableCategoryId = isShopCategoryId(selected.category_key) ? selected.category_key : undefined;
 
   return (
     <div className="space-y-8">
       <PageHeader
         eyebrow={areaName}
-        title={active.label}
+        title={selected.label}
         description={`${filtered.length} Artikel · Einzelmenge wählen und in den Warenkorb legen.`}
         actions={
           <Button variant="ghost" size="sm" onClick={() => setParams({})} className="gap-1.5">
@@ -117,19 +148,19 @@ function ShopCatalog({ areaName }: { areaName: string }) {
       />
 
       <div className="flex flex-wrap gap-2">
-        {SHOP_CATEGORIES.map((category) => (
+        {visible.map((category) => (
           <button
-            key={category.id}
+            key={category.category_key}
             type="button"
-            onClick={() => selectCategory(category.id)}
+            onClick={() => selectCategory(category.category_key)}
             className={cn(
               "rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] transition-colors",
-              category.id === selected
+              category.category_key === selected.category_key
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
             )}
           >
-            {category.headline}
+            {storefrontHeadline(category.label)}
           </button>
         ))}
       </div>
@@ -171,7 +202,8 @@ function ShopCatalog({ areaName }: { areaName: string }) {
               products={filtered}
               rate={rateQuery.data?.rate ?? null}
               favoriteProductIds={favoriteProductIds}
-              categoryId={selected}
+              categoryId={tableCategoryId}
+              categoryLabel={selected.label}
               pricingProfile="retail"
             />
           </div>
@@ -180,7 +212,7 @@ function ShopCatalog({ areaName }: { areaName: string }) {
               products={filtered}
               rate={rateQuery.data?.rate ?? null}
               favoriteProductIds={favoriteProductIds}
-              categoryId={selected}
+              categoryId={tableCategoryId}
               pricingProfile="retail"
             />
           </div>

@@ -26,6 +26,8 @@ export interface ParsedProductImportRow {
   parsedIsActive: boolean | null;
   quality: ImportRowQuality;
   qualityReason: string | null;
+  /** Header cells that did not map onto a known field, kept for vendor-catalog raw storage. */
+  extraFields: Record<string, string> | null;
 }
 
 /** The importable product fields, in the order the CSV/XLSX template uses. */
@@ -337,6 +339,7 @@ export function buildImportRow(
     parsedIsActive: isActive.value,
     quality,
     qualityReason: [...errors, ...warnings].join(" ") || null,
+    extraFields: null,
   };
 }
 
@@ -360,6 +363,7 @@ export function unparsableImportRow(
     parsedIsActive: null,
     quality: "error",
     qualityReason: reason,
+    extraFields: null,
   };
 }
 
@@ -420,14 +424,24 @@ export function parseProductTable(table: ImportCellValue[][]): ProductTableParse
     if (looksLikeHeaderRow(cells)) continue;
 
     const record: ImportRecord = {};
+    const extraFields: Record<string, string> = {};
     cells.forEach((cell, columnIndex) => {
       const field = columnFields[columnIndex];
-      if (!field || cell === "") return;
+      if (cell === "") return;
+      if (!field) {
+        const header = headerCells[columnIndex] || `spalte_${columnIndex + 1}`;
+        extraFields[header] = extraFields[header] ? `${extraFields[header]} ${cell}` : cell;
+        return;
+      }
       record[field] = record[field] ? `${record[field]} ${cell}` : cell;
     });
 
     rowNumber += 1;
-    rows.push(buildImportRow(record, rowNumber, cells.filter(Boolean).join(" | ")));
+    const built = buildImportRow(record, rowNumber, cells.filter(Boolean).join(" | "));
+    rows.push({
+      ...built,
+      extraFields: Object.keys(extraFields).length > 0 ? extraFields : null,
+    });
   }
 
   return { rows: flagDuplicateCodes(rows), recognizedFields, unknownHeaders };
@@ -453,7 +467,7 @@ export function flagDuplicateCodes(rows: ParsedProductImportRow[]): ParsedProduc
  * actually on screen.
  */
 export function revalidateImportRow(row: ParsedProductImportRow): ParsedProductImportRow {
-  return buildImportRow(
+  const rebuilt = buildImportRow(
     {
       code: row.parsedCode,
       name: row.parsedName,
@@ -469,4 +483,5 @@ export function revalidateImportRow(row: ParsedProductImportRow): ParsedProductI
     row.rowNumber,
     row.rawText,
   );
+  return { ...rebuilt, extraFields: row.extraFields };
 }

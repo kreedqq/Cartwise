@@ -84,28 +84,42 @@ describe("ShopHub routing", () => {
 });
 
 describe("admin Verkaufsbereiche", () => {
-  it("configures products, document, and prices per area (Rollenpreise tab removed, per-product price UI replaced by factor)", () => {
+  it("is one vendor catalog per area with Händlerkatalog, Produkte, and Preise", () => {
     const page = read("src/pages/admin/AdminShopAreas.tsx");
     expect(page).toContain("Verkaufsbereiche");
-    expect(page).toContain('value="allgemein"');
+    expect(page).toContain("Händlerkatalog");
+    expect(page).toContain("Katalog anwenden");
+    expect(page).toContain("applyVendorCatalogFromFile");
+    expect(page).toContain("parseVendorCatalogFile");
+    expect(page).toContain("Nicht zugeordnet");
+    expect(page).toContain("Aktuelle Händlerdatei (angewendet)");
+    expect(page).toContain('value="haendlerkatalog"');
     expect(page).toContain('value="produkte"');
-    expect(page).toContain('value="dokument"');
     expect(page).toContain('value="preise"');
-    // Rollenpreise tab removed in migration 0053
+    expect(page).not.toContain('value="allgemein"');
+    expect(page).not.toContain('value="dokument"');
     expect(page).not.toContain('value="rollenpreise"');
     expect(page).not.toContain("upsertAdminShopAreaRoleMarkup");
-    // Per-product price tab UI removed in migration 0054 — replaced by area-level factor.
-    // upsertAdminShopAreaProductPrice remains in the service for import workflows, but is no longer
-    // directly invoked from the admin UI page.
     expect(page).not.toContain("upsertAdminShopAreaProductPrice");
-    // New Preise tab: factor-based UI
+    expect(page).not.toContain("setAdminShopAreaProductActive");
+    expect(page).toContain("setAdminShopAreaManualPrice");
+    expect(page).toContain("setAdminShopAreaProductCategory");
+    expect(page).toContain("Zur Importkategorie zurücksetzen");
+    expect(page).toContain("Kategorien");
+    expect(page).toContain("Manuelle Grundpreise für vorhandene Artikel behalten");
+    expect(page).toContain("Override entfernen");
+    expect(page).toContain("Bereichs-%-Grundpreis");
     expect(page).toContain("base_price_factor_pct");
-    expect(page).toContain("PriceFactorPreview");
-    expect(page).toContain("Grundpreisfaktor");
     expect(page).toContain("updateAdminShopArea");
-    // Document and product tabs remain intact
-    expect(page).toContain("uploadAdminShopAreaDocument");
-    expect(page).toContain("setAdminShopAreaProductActive");
+    expect(page).not.toContain("uploadAdminShopAreaDocument");
     expect(read("src/lib/adminNav.ts")).toContain("Verkaufsbereiche");
+    expect(read("src/lib/adminNav.ts")).not.toContain("Globaler Produkt-Master");
+    expect(read("src/lib/adminNav.ts")).not.toContain("Master-Verlauf");
+    const service = read("src/services/shopAreas.ts");
+    expect(service.indexOf("uploadNewFile")).toBeLessThan(service.indexOf("applyCatalog"));
+    expect(service).toContain("_keep_manual_overrides");
+    expect(service).toContain("set_area_product_manual_price");
+    expect(service).toContain("set_area_product_category");
+    expect(service).toContain("list_shop_area_storefront");
   });
 });

@@ -8,18 +8,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toaster";
 import { MAX_PDF_SIZE_BYTES, QUERY_KEYS } from "@/lib/constants";
-import { applyRoleMarkup, formatDateTime, formatUsd } from "@/lib/money";
-import { shopAreaCatalogUnit } from "@/lib/shop/shopAreaPricing";
+import { formatDateTime, formatUsd } from "@/lib/money";
+import { usesKitNoun } from "@/lib/quantityFormat";
+import { shopCategoryIdFor } from "@/lib/shopCategories";
+import {
+  areaCategorySource,
+  effectiveAreaCategoryKey,
+  type AreaCategory,
+} from "@/lib/shop/areaCategories";
+import {
+  areaPriceSource,
+  effectiveAreaPriceUsd,
+  shopAreaCatalogUnit,
+  shopAreaSellUnitPrice,
+} from "@/lib/shop/shopAreaPricing";
 import {
   DEFAULT_BASE_PRICE_FACTOR_PCT,
-  RETAIL_KIT_UNIT_DIVISOR,
   SHOP_AREA_KEYS,
   SHOP_AREA_LABELS,
   isShopAreaKey,
@@ -27,33 +37,34 @@ import {
   type ShopAreaKey,
   type ShopPricingProfile,
 } from "@/lib/shop/shopAreas";
+import {
+  matchVendorCatalogRows,
+  vendorOverrideConflicts,
+  type VendorCatalogMatchResult,
+} from "@/lib/shop/vendorCatalog";
 import { ACCEPTED_IMPORT_ACCEPT, ACCEPTED_IMPORT_LABEL, detectImportSourceKind } from "@/services/productImportSource";
 import { listCustomerRoles } from "@/services/customerRoles";
 import { listAllProducts } from "@/services/products";
 import {
-  applyAreaVendorCatalog,
-  deleteAdminShopAreaDocument,
+  applyVendorCatalogFromFile,
+  createAdminShopAreaCategory,
   getAdminShopAreaDocument,
+  listAdminShopAreaCategories,
+  listAdminShopAreaProductPrices,
   listAdminShopAreaProducts,
   listAdminShopAreaRoleAccess,
   listAdminShopAreas,
-  setAdminShopAreaProductActive,
+  renameAdminShopAreaCategory,
+  reorderAdminShopAreaCategories,
+  setAdminShopAreaCategoryActive,
+  setAdminShopAreaManualPrice,
+  setAdminShopAreaProductCategory,
   setAdminShopAreaRoles,
   signedAdminShopAreaDocumentUrl,
   updateAdminShopArea,
-  uploadAdminShopAreaDocument,
 } from "@/services/shopAreas";
-import { matchVendorCatalogRows, type VendorCatalogMatchResult } from "@/lib/shop/vendorCatalog";
-import { parseProductXlsx } from "@/services/xlsxProducts";
-import { parseProductCsv } from "@/services/csvProducts";
+import { parseVendorCatalogFile } from "@/services/vendorCatalogImport";
 import type { Tables } from "@/types/database";
-
-const PROFILE_LABELS: Record<ShopPricingProfile, string> = {
-  retail: "Einzelverkauf",
-  group_buy: "Group Buy",
-};
-
-type AreaTab = "allgemein" | "produkte" | "dokument" | "preise";
 
 export default function AdminShopAreasPage() {
   const queryClient = useQueryClient();
@@ -62,13 +73,13 @@ export default function AdminShopAreasPage() {
   const rolesQuery = useQuery({ queryKey: ["customer-roles"], queryFn: listCustomerRoles });
   const productsQuery = useQuery({ queryKey: ["admin-products"], queryFn: () => listAllProducts() });
   const [areaKey, setAreaKey] = React.useState<ShopAreaKey>("shop");
-  const [tab, setTab] = React.useState<AreaTab>("allgemein");
-  const [savingKey, setSavingKey] = React.useState<string | null>(null);
 
   async function invalidate() {
     await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreas });
     await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myShopAreas });
     await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey) });
+    await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.shopAreaStorefront(areaKey) });
+    await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.shopProducts(areaKey) });
   }
 
   const roles = rolesQuery.data ?? [];
@@ -82,7 +93,7 @@ export default function AdminShopAreasPage() {
     <div className="space-y-4">
       <AdminPageHeader
         title="Verkaufsbereiche"
-        description="Ein Produktkatalog, drei Bereiche: Shop als Einzelverkauf, Group Buy 1 und Group Buy 2 als getrennte Kit-Instanzen."
+        description="Händlerdatei bestimmt das Sortiment. Grundpreis × Bereichs-% × Rolle = Endpreis. Der globale Produkt-Master bleibt unverändert."
       />
 
       {areasQuery.isLoading && <Skeleton className="h-64 w-full" />}
@@ -97,10 +108,7 @@ export default function AdminShopAreasPage() {
             type="button"
             size="sm"
             variant={areaKey === key ? "default" : "outline"}
-            onClick={() => {
-              setAreaKey(key);
-              setTab("allgemein");
-            }}
+            onClick={() => setAreaKey(key)}
           >
             {SHOP_AREA_LABELS[key]}
           </Button>
@@ -108,62 +116,26 @@ export default function AdminShopAreasPage() {
       </div>
 
       {selected && isShopAreaKey(selected.key) && (
-        <Tabs value={tab} onValueChange={(value) => setTab(value as AreaTab)}>
-          <TabsList className="flex h-auto w-full flex-wrap justify-start">
-            <TabsTrigger value="allgemein">Allgemein</TabsTrigger>
+        <Tabs key={areaKey} defaultValue="haendlerkatalog" className="space-y-4">
+          <TabsList className="flex h-auto flex-wrap">
+            <TabsTrigger value="haendlerkatalog">Händlerkatalog</TabsTrigger>
             <TabsTrigger value="produkte">Produkte</TabsTrigger>
-            <TabsTrigger value="dokument">Produktdokument</TabsTrigger>
             <TabsTrigger value="preise">Preise</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="allgemein">
-            <ShopAreaGeneralCard
-              key={`${areaKey}|${selected.name}|${String(selected.is_active)}|${assigned.slice().sort().join(",")}`}
-              areaKey={areaKey}
-              name={selected.name}
-              isActive={selected.is_active}
-              profile={lockedProfile}
-              assignedRoleIds={assigned}
-              roles={roles}
-              saving={savingKey === areaKey}
-              onSave={async (next) => {
-                setSavingKey(areaKey);
-                try {
-                  await updateAdminShopArea(areaKey, {
-                    name: next.name,
-                    is_active: next.isActive,
-                    pricing_profile: lockedProfile,
-                  });
-                  await setAdminShopAreaRoles(areaKey, next.roleIds);
-                  toast.success(`${SHOP_AREA_LABELS[areaKey]} gespeichert.`);
-                  await invalidate();
-                } catch (error) {
-                  console.error("Verkaufsbereich speichern fehlgeschlagen:", error);
-                  toast.error(error instanceof Error ? error.message : "Verkaufsbereich konnte nicht gespeichert werden.");
-                } finally {
-                  setSavingKey(null);
-                }
-              }}
-            />
+          <TabsContent value="haendlerkatalog">
+            <VendorCatalogPanel areaKey={areaKey} products={products} onChanged={invalidate} />
           </TabsContent>
-
           <TabsContent value="produkte">
-            {productsQuery.isLoading ? (
-              <Skeleton className="h-64 w-full" />
-            ) : (
-              <AreaProductsPanel areaKey={areaKey} products={products} onChanged={invalidate} />
-            )}
+            <VendorProductsPanel areaKey={areaKey} profile={lockedProfile} products={products} onChanged={invalidate} />
           </TabsContent>
-
-          <TabsContent value="dokument">
-            <AreaDocumentPanel areaKey={areaKey} products={products} onCatalogChanged={invalidate} />
-          </TabsContent>
-
           <TabsContent value="preise">
-            <AreaPricesPanel
+            <AreaSettingsCard
+              key={`${areaKey}|${selected.name}|${String(selected.is_active)}|${assigned.slice().sort().join(",")}|${selected.base_price_factor_pct}`}
               areaKey={areaKey}
               area={selected}
               profile={lockedProfile}
+              assignedRoleIds={assigned}
+              roles={roles}
               onChanged={invalidate}
             />
           </TabsContent>
@@ -173,81 +145,113 @@ export default function AdminShopAreasPage() {
   );
 }
 
-function ShopAreaGeneralCard({
+function AreaSettingsCard({
   areaKey,
-  name,
-  isActive,
+  area,
   profile,
   assignedRoleIds,
   roles,
-  saving,
-  onSave,
+  onChanged,
 }: {
   areaKey: ShopAreaKey;
-  name: string;
-  isActive: boolean;
+  area: Tables<"shop_areas">;
   profile: ShopPricingProfile;
   assignedRoleIds: string[];
   roles: { id: string; name: string }[];
-  saving: boolean;
-  onSave: (next: { name: string; isActive: boolean; roleIds: string[] }) => Promise<void>;
+  onChanged: () => Promise<void>;
 }) {
-  const [localName, setLocalName] = React.useState(name);
-  const [localActive, setLocalActive] = React.useState(isActive);
+  const [factor, setFactor] = React.useState(area.base_price_factor_pct ?? DEFAULT_BASE_PRICE_FACTOR_PCT);
   const [roleIds, setRoleIds] = React.useState(assignedRoleIds);
+  const [saving, setSaving] = React.useState(false);
+  const isRetail = profile === "retail";
+  const safeFactor = Number.isFinite(factor) && factor > 0 ? factor : DEFAULT_BASE_PRICE_FACTOR_PCT;
 
-  function toggleRole(roleId: string, checked: boolean) {
-    setRoleIds((current) => (checked ? [...current, roleId] : current.filter((id) => id !== roleId)));
+  async function save() {
+    const value = Number(factor);
+    if (!Number.isFinite(value) || value <= 0) {
+      toast.error("Faktor muss eine positive Zahl sein.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateAdminShopArea(areaKey, { base_price_factor_pct: value, pricing_profile: profile });
+      await setAdminShopAreaRoles(areaKey, roleIds);
+      toast.success(`${SHOP_AREA_LABELS[areaKey]} gespeichert.`);
+      await onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Einstellungen konnten nicht gespeichert werden.");
+    } finally {
+      setSaving(false);
+    }
   }
+
+  const kitCatalog = shopAreaCatalogUnit({ price_usd: 100 }, 1, isRetail ? "retail" : "group_buy", true, safeFactor);
+  const kitSell = shopAreaSellUnitPrice({ price_usd: 100 }, 1, 25, isRetail ? "retail" : "group_buy", true, safeFactor);
+  const unitCatalog = shopAreaCatalogUnit({ price_usd: 100 }, 1, isRetail ? "retail" : "group_buy", false, safeFactor);
+  const unitSell = shopAreaSellUnitPrice({ price_usd: 100 }, 1, 25, isRetail ? "retail" : "group_buy", false, safeFactor);
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-base">{SHOP_AREA_LABELS[areaKey]}</CardTitle>
-          <Badge variant={localActive ? "secondary" : "outline"}>{localActive ? "Aktiv" : "Deaktiviert"}</Badge>
-        </div>
-        <CardDescription>Preismodell: {PROFILE_LABELS[profile]} (fest für diesen Bereich)</CardDescription>
+        <CardTitle className="text-base">Bereichs-%-Grundpreis {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardDescription>
+          Dieser Faktor gilt für alle Händlerartikel des Bereichs. Der Grundpreis bleibt pro Artikel.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-1">
-          <Label htmlFor={`name-${areaKey}`}>Name</Label>
-          <Input id={`name-${areaKey}`} value={localName} onChange={(e) => setLocalName(e.target.value)} />
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="space-y-1">
+            <Label htmlFor={`factor-${areaKey}`}>Bereichs-%-Grundpreis</Label>
+            <Input
+              id={`factor-${areaKey}`}
+              type="number"
+              min={1}
+              className="w-32"
+              value={factor}
+              onChange={(event) => setFactor(Number(event.target.value))}
+            />
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Checkbox id={`active-${areaKey}`} checked={localActive} onCheckedChange={(v) => setLocalActive(v === true)} />
-          <Label htmlFor={`active-${areaKey}`} className="font-normal">
-            Aktiv
-          </Label>
+        <div className="space-y-1 rounded-lg border border-border p-3 text-sm">
+          <p className="font-medium">Vorschau bei 100,00 USD Grundpreis und 25 % Rolle</p>
+          {isRetail ? (
+            <>
+              <p>Peptid-Kit (÷ 10): {formatUsd(100)} → {formatUsd(kitCatalog)} Bereichspreis → {formatUsd(kitSell)} Kunde</p>
+              <p>Einzelpreis (Oil/Oral): {formatUsd(100)} → {formatUsd(unitCatalog)} Bereichspreis → {formatUsd(unitSell)} Kunde</p>
+            </>
+          ) : (
+            <p>
+              {formatUsd(100)} × {safeFactor} % → {formatUsd(unitCatalog)} Bereichspreis → {formatUsd(unitSell)} Kunde
+            </p>
+          )}
         </div>
         <div className="space-y-2">
           <Label>Sichtbar für</Label>
-          {roles.map((role) => (
-            <div key={role.id} className="flex items-center gap-2">
-              <Checkbox
-                id={`${areaKey}-${role.id}`}
-                checked={roleIds.includes(role.id)}
-                onCheckedChange={(v) => toggleRole(role.id, v === true)}
-              />
-              <Label htmlFor={`${areaKey}-${role.id}`} className="font-normal">
+          <div className="flex flex-wrap gap-3">
+            {roles.map((role) => (
+              <label key={role.id} className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={roleIds.includes(role.id)}
+                  onCheckedChange={(checked) =>
+                    setRoleIds((current) =>
+                      checked === true ? [...current, role.id] : current.filter((id) => id !== role.id),
+                    )
+                  }
+                />
                 {role.name}
-              </Label>
-            </div>
-          ))}
+              </label>
+            ))}
+          </div>
         </div>
-        <Button
-          type="button"
-          loading={saving}
-          onClick={() => void onSave({ name: localName.trim() || name, isActive: localActive, roleIds })}
-        >
-          Speichern
+        <Button type="button" loading={saving} onClick={() => void save()}>
+          Einstellungen speichern
         </Button>
       </CardContent>
     </Card>
   );
 }
 
-function AreaProductsPanel({
+function VendorCatalogPanel({
   areaKey,
   products,
   onChanged,
@@ -256,166 +260,31 @@ function AreaProductsPanel({
   products: Tables<"products">[];
   onChanged: () => Promise<void>;
 }) {
-  const overlayQuery = useQuery({
-    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("products"),
-    queryFn: () => listAdminShopAreaProducts(areaKey),
-  });
-  const [search, setSearch] = React.useState("");
-  const [savingId, setSavingId] = React.useState<string | null>(null);
-
-  const overlay = React.useMemo(() => {
-    const map = new Map<string, boolean>();
-    for (const row of overlayQuery.data ?? []) map.set(row.product_id, row.is_active);
-    return map;
-  }, [overlayQuery.data]);
-
-  // Only show products that are explicitly in the vendor catalog for this area.
-  // The new semantics (migration 0056) require an explicit shop_area_products row;
-  // global products not in the vendor catalog are invisible here.
-  const filtered = React.useMemo(() => {
-    const term = search.trim().toLowerCase();
-    // Build the set of product_ids present in the vendor catalog
-    const catalogProductIds = new Set(overlayQuery.data?.map((row) => row.product_id) ?? []);
-    return products.filter((product) => {
-      if (!catalogProductIds.has(product.id)) return false;
-      if (!term) return true;
-      return `${product.code} ${product.name} ${product.dosage_vial ?? ""}`.toLowerCase().includes(term);
-    });
-  }, [products, overlayQuery.data, search]);
-
-  async function toggle(product: Tables<"products">, next: boolean) {
-    setSavingId(product.id);
-    try {
-      await setAdminShopAreaProductActive(areaKey, product.id, next);
-      toast.success(`${product.name} in ${SHOP_AREA_LABELS[areaKey]} ${next ? "aktiviert" : "deaktiviert"}.`);
-      await overlayQuery.refetch();
-      await onChanged();
-    } catch (error) {
-      console.error("Produktzuordnung speichern fehlgeschlagen:", error);
-      toast.error(error instanceof Error ? error.message : "Produktzuordnung konnte nicht gespeichert werden.");
-    } finally {
-      setSavingId(null);
-    }
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Händlerkatalog – {SHOP_AREA_LABELS[areaKey]}</CardTitle>
-        <CardDescription>
-          Zeigt nur Produkte, die über das Händlerdokument importiert wurden. Um den Katalog zu ändern, lade ein neues
-          Dokument im Tab &quot;Produktdokument&quot; hoch. Der Toggle deaktiviert ein Produkt vorübergehend innerhalb
-          des Katalogs, macht aber keine neuen Produkte sichtbar.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Produkt suchen …" />
-        {overlayQuery.isLoading && <Skeleton className="h-48 w-full" />}
-        {!overlayQuery.isLoading && filtered.length === 0 && (
-          <p className="py-6 text-center text-sm text-muted-foreground">
-            Kein Händlerkatalog vorhanden. Lade ein Händlerdokument im Tab &quot;Produktdokument&quot; hoch.
-          </p>
-        )}
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Artikel</TableHead>
-                <TableHead>Katalog</TableHead>
-                <TableHead className="text-right">In diesem Bereich</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((product) => {
-                const areaActive = overlay.get(product.id) ?? product.is_active;
-                return (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <p className="font-medium">{product.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {product.code}
-                        {product.dosage_vial ? ` · ${product.dosage_vial}` : ""}
-                      </p>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={product.is_active ? "secondary" : "outline"}>
-                        {product.is_active ? "Aktiv" : "Inaktiv"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Switch
-                        checked={areaActive}
-                        disabled={savingId === product.id || !product.is_active}
-                        onCheckedChange={(checked) => void toggle(product, checked)}
-                        aria-label={`${product.name} in ${SHOP_AREA_LABELS[areaKey]}`}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-/**
- * AreaDocumentPanel (migration 0056 version)
- *
- * The uploaded document is now the single source of truth for the vendor
- * catalog of this area. Upload flow:
- *   1. Admin selects a file → parsed client-side → preview shown.
- *   2. Admin clicks "Dokument speichern & Katalog anwenden" → file stored in
- *      Supabase Storage, apply_area_vendor_catalog RPC called atomically.
- *
- * Supports XLSX and CSV only for catalog parsing (PDF has no structured data).
- */
-function AreaDocumentPanel({
-  areaKey,
-  products,
-  onCatalogChanged,
-}: {
-  areaKey: ShopAreaKey;
-  products: Tables<"products">[];
-  onCatalogChanged: () => Promise<void>;
-}) {
   const queryClient = useQueryClient();
   const docQuery = useQuery({
     queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("document"),
     queryFn: () => getAdminShopAreaDocument(areaKey),
   });
+  const catalogQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("products"),
+    queryFn: () => listAdminShopAreaProducts(areaKey),
+  });
+  const pricesQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("prices"),
+    queryFn: () => listAdminShopAreaProductPrices(areaKey),
+  });
+  const categoriesQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("categories"),
+    queryFn: () => listAdminShopAreaCategories(areaKey),
+  });
   const [busy, setBusy] = React.useState(false);
-  const [pendingMatch, setPendingMatch] = React.useState<{
-    file: File;
-    result: VendorCatalogMatchResult;
-  } | null>(null);
+  const [keepManuals, setKeepManuals] = React.useState(true);
+  const [pending, setPending] = React.useState<{ file: File; result: VendorCatalogMatchResult } | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  async function parseFile(file: File): Promise<void> {
-    const kind = detectImportSourceKind(file.name);
-    if (!kind || kind === "pdf") {
-      toast.error("Händlerkatalog-Import erfordert eine XLSX- oder CSV-Datei.");
-      return;
-    }
-    try {
-      let rows;
-      if (kind === "xlsx") {
-        const result = await parseProductXlsx(file);
-        rows = result.rows;
-      } else {
-        const text = await file.text();
-        const result = parseProductCsv(text);
-        rows = result.rows;
-      }
-      const result = matchVendorCatalogRows(rows, products);
-      setPendingMatch({ file, result });
-    } catch (error) {
-      console.error("Datei konnte nicht geparst werden:", error);
-      toast.error(error instanceof Error ? error.message : "Datei konnte nicht geparst werden.");
-    }
-  }
+  const conflicts = pending
+    ? vendorOverrideConflicts(pending.result.matched, pricesQuery.data ?? [])
+    : [];
 
   async function onFile(file: File | undefined) {
     if (!file) return;
@@ -427,33 +296,47 @@ function AreaDocumentPanel({
       toast.error(`Erlaubt: ${ACCEPTED_IMPORT_LABEL}.`);
       return;
     }
-    await parseFile(file);
-    if (inputRef.current) inputRef.current.value = "";
+    setBusy(true);
+    try {
+      const parsed = await parseVendorCatalogFile(file);
+      setPending({
+        file,
+        result: matchVendorCatalogRows(parsed.rows, products, categoriesQuery.data ?? []),
+      });
+      setKeepManuals(true);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Datei konnte nicht gelesen werden.");
+    } finally {
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
   }
 
   async function applyPending() {
-    if (!pendingMatch) return;
+    if (!pending) return;
     setBusy(true);
     try {
-      // 1. Upload document to storage
-      await uploadAdminShopAreaDocument(areaKey, pendingMatch.file);
-      // 2. Apply vendor catalog atomically
-      const rows = pendingMatch.result.matched.map((e) => ({
-        product_id: e.product_id,
-        price_usd: e.price_usd,
-        bulk_price_usd: e.bulk_price_usd,
-        bulk_price_min_quantity: e.bulk_price_min_quantity,
+      const rows = pending.result.matched.map((entry) => ({
+        product_id: entry.product_id,
+        price_usd: entry.price_usd,
+        bulk_price_usd: entry.bulk_price_usd,
+        bulk_price_min_quantity: entry.bulk_price_min_quantity,
+        vendor_name: entry.name,
+        vendor_dosage: entry.dosage_vial,
+        vendor_raw: entry.vendor_raw,
+        imported_category_key: entry.imported_category_key,
       }));
-      const result = await applyAreaVendorCatalog(areaKey, rows);
+      const { applied } = await applyVendorCatalogFromFile(areaKey, pending.file, rows, keepManuals);
       toast.success(
-        `Händlerkatalog angewendet: ${result.added} Produkte hinzugefügt, ${result.removed} entfernt.`,
+        keepManuals && (applied.kept_manuals ?? 0) > 0
+          ? `Händlerkatalog angewendet: ${applied.added} Artikel, ${applied.kept_manuals} manuelle Preise behalten.`
+          : `Händlerkatalog angewendet: ${applied.added} Artikel.`,
       );
-      setPendingMatch(null);
+      setPending(null);
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey) });
-      await onCatalogChanged();
+      await onChanged();
     } catch (error) {
-      console.error("Händlerkatalog-Import fehlgeschlagen:", error);
-      toast.error(error instanceof Error ? error.message : "Händlerkatalog konnte nicht importiert werden.");
+      toast.error(error instanceof Error ? error.message : "Händlerkatalog konnte nicht angewendet werden.");
     } finally {
       setBusy(false);
     }
@@ -463,81 +346,74 @@ function AreaDocumentPanel({
     const path = docQuery.data?.storage_path;
     if (!path) return;
     try {
-      const url = await signedAdminShopAreaDocumentUrl(path);
-      window.open(url, "_blank", "noopener,noreferrer");
+      window.open(await signedAdminShopAreaDocumentUrl(path), "_blank", "noopener,noreferrer");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Dokument konnte nicht geöffnet werden.");
-    }
-  }
-
-  async function remove() {
-    setBusy(true);
-    try {
-      await deleteAdminShopAreaDocument(areaKey);
-      toast.success("Dokument entfernt.");
-      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey) });
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Dokument konnte nicht entfernt werden.");
-    } finally {
-      setBusy(false);
     }
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Händlerdokument – {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardTitle className="text-base">Händlerkatalog {SHOP_AREA_LABELS[areaKey]}</CardTitle>
         <CardDescription>
-          Das hochgeladene Dokument definiert das Sortiment dieses Bereichs. Nur Produkte, deren Artikelcode im
-          Dokument steht, werden in {SHOP_AREA_LABELS[areaKey]} angezeigt. Ein Dokument für diesen Bereich ändert die
-          anderen Bereiche nicht.
+          Nur Artikel aus der Händlerdatei. Globale Produkte ohne SKU in der Datei erscheinen nicht.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {docQuery.isLoading && <Skeleton className="h-16 w-full" />}
         {docQuery.data ? (
           <div className="rounded-lg border border-border p-3 text-sm">
-            <p className="font-medium">{docQuery.data.file_name}</p>
-            <p className="text-muted-foreground">Aktualisiert {formatDateTime(docQuery.data.updated_at)}</p>
+            <p className="font-medium">Aktuelle Händlerdatei (angewendet): {docQuery.data.file_name}</p>
+            <p className="text-muted-foreground">Angewendet: {formatDateTime(docQuery.data.updated_at)}</p>
+            <p className="text-muted-foreground">Artikel: {(catalogQuery.data ?? []).length}</p>
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">Kein Dokument hinterlegt.</p>
+          <p className="text-sm text-muted-foreground">Noch keine Händlerdatei für diesen Bereich.</p>
         )}
 
-        {/* Import preview */}
-        {pendingMatch && (
+        {pending && (
           <div className="space-y-3 rounded-lg border border-border bg-secondary/20 p-4">
-            <p className="text-sm font-medium">Vorschau: {pendingMatch.file.name}</p>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="rounded border border-green-200 bg-green-50 p-2 dark:border-green-900 dark:bg-green-950">
-                <p className="font-medium text-green-800 dark:text-green-200">
-                  {pendingMatch.result.matched.length} Produkte gefunden
-                </p>
-                <p className="text-xs text-green-700 dark:text-green-300">Werden in den Katalog übernommen</p>
-              </div>
-              <div
-                className={`rounded border p-2 ${pendingMatch.result.unmatchedCodes.length > 0 ? "border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950" : "border-border bg-secondary/10"}`}
-              >
-                <p
-                  className={`font-medium ${pendingMatch.result.unmatchedCodes.length > 0 ? "text-yellow-800 dark:text-yellow-200" : "text-muted-foreground"}`}
-                >
-                  {pendingMatch.result.unmatchedCodes.length} unbekannte Artikelcodes
-                </p>
-                <p
-                  className={`text-xs ${pendingMatch.result.unmatchedCodes.length > 0 ? "text-yellow-700 dark:text-yellow-300" : "text-muted-foreground"}`}
-                >
-                  Nicht im globalen Katalog – werden übersprungen
-                </p>
-              </div>
-            </div>
-            {pendingMatch.result.unmatchedCodes.length > 0 && (
+            <p className="text-sm font-medium">Vorschau: {pending.file.name}</p>
+            <p className="text-sm">
+              {pending.result.matched.length} Artikel erkannt · {pending.result.matched.length} zugeordnet ·{" "}
+              {pending.result.unmatched.length} nicht zugeordnet
+            </p>
+            {pending.result.unmatched.length > 0 && (
               <p className="text-xs text-muted-foreground">
-                Unbekannte Codes:{" "}
-                {pendingMatch.result.unmatchedCodes.slice(0, 20).join(", ")}
-                {pendingMatch.result.unmatchedCodes.length > 20
-                  ? ` … (+${pendingMatch.result.unmatchedCodes.length - 20} weitere)`
-                  : ""}
+                Nicht zugeordnet:{" "}
+                {pending.result.unmatched
+                  .slice(0, 20)
+                  .map((row) => `${row.code} (${row.reason === "no_price" ? "kein Preis" : "nicht im Master"})`)
+                  .join(", ")}
+                {pending.result.unmatched.length > 20 ? " …" : ""}
               </p>
+            )}
+            {conflicts.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Bestehende manuelle Grundpreise</p>
+                <p className="text-xs text-muted-foreground">
+                  {conflicts.length} Artikel haben einen Override. Entfernte SKUs verlieren ihren Override immer.
+                </p>
+                <label className="flex items-center gap-2 text-sm">
+                  <Checkbox checked={keepManuals} onCheckedChange={(checked) => setKeepManuals(checked === true)} />
+                  Manuelle Grundpreise für vorhandene Artikel behalten
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  {keepManuals
+                    ? "Import setzt den Händlerpreis neu. Der manuelle Grundpreis bleibt aktiv, bis er entfernt wird."
+                    : "Import ersetzt den Händlerpreis und löscht manuelle Overrides der übernommenen Artikel."}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {conflicts
+                    .slice(0, 12)
+                    .map(
+                      (row) =>
+                        `${row.code}: Override ${formatUsd(row.currentManualUsd)} / neu ${formatUsd(row.newImportedUsd)}`,
+                    )
+                    .join(" · ")}
+                  {conflicts.length > 12 ? " …" : ""}
+                </p>
+              </div>
             )}
           </div>
         )}
@@ -547,190 +423,414 @@ function AreaDocumentPanel({
           type="file"
           accept={ACCEPTED_IMPORT_ACCEPT}
           className="hidden"
-          onChange={(e) => void onFile(e.target.files?.[0])}
+          onChange={(event) => void onFile(event.target.files?.[0])}
         />
         <div className="flex flex-wrap gap-2">
-          {pendingMatch ? (
+          {pending ? (
             <>
               <Button type="button" loading={busy} onClick={() => void applyPending()}>
-                Dokument speichern &amp; Katalog anwenden ({pendingMatch.result.matched.length} Produkte)
+                Katalog anwenden ({pending.result.matched.length} Artikel)
               </Button>
-              <Button type="button" variant="outline" disabled={busy} onClick={() => setPendingMatch(null)}>
+              <Button type="button" variant="outline" disabled={busy} onClick={() => setPending(null)}>
                 Abbrechen
               </Button>
             </>
           ) : (
             <>
               <Button type="button" loading={busy} onClick={() => inputRef.current?.click()}>
-                {docQuery.data ? "Neues Dokument importieren" : "Händlerdokument hochladen"}
+                {docQuery.data ? "Neue Händlerdatei hochladen" : "Händlerdatei hochladen"}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!docQuery.data || busy}
-                onClick={() => void openCurrent()}
-              >
+              <Button type="button" variant="outline" disabled={!docQuery.data || busy} onClick={() => void openCurrent()}>
                 Anzeigen
-              </Button>
-              <Button type="button" variant="outline" disabled={!docQuery.data || busy} onClick={() => void remove()}>
-                Entfernen
               </Button>
             </>
           )}
+        </div>
+        <p className="text-xs text-muted-foreground">Unterstützt: {ACCEPTED_IMPORT_LABEL}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function VendorProductsPanel({
+  areaKey,
+  profile,
+  products,
+  onChanged,
+}: {
+  areaKey: ShopAreaKey;
+  profile: ShopPricingProfile;
+  products: Tables<"products">[];
+  onChanged: () => Promise<void>;
+}) {
+  const catalogQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("products"),
+    queryFn: () => listAdminShopAreaProducts(areaKey),
+  });
+  const pricesQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("prices"),
+    queryFn: () => listAdminShopAreaProductPrices(areaKey),
+  });
+  const categoriesQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("categories"),
+    queryFn: () => listAdminShopAreaCategories(areaKey),
+  });
+
+  const categories = categoriesQuery.data ?? [];
+  const rows = React.useMemo(() => {
+    const priceById = new Map((pricesQuery.data ?? []).map((row) => [row.product_id, row]));
+    const productById = new Map(products.map((product) => [product.id, product]));
+    return (catalogQuery.data ?? []).map((row) => {
+      const product = productById.get(row.product_id);
+      const price = priceById.get(row.product_id);
+      const imported = price?.imported_price_usd ?? price?.price_usd ?? null;
+      const manual = price?.manual_price_usd ?? null;
+      const kitBasis = usesKitNoun(shopCategoryIdFor(product ?? { category: null, name: row.vendor_name, code: null }));
+      const importedCategory = row.imported_category_key;
+      const manualCategory = row.manual_category_key;
+      return {
+        productId: row.product_id,
+        code: product?.code ?? "—",
+        name: row.vendor_name ?? product?.name ?? "—",
+        variant: row.vendor_dosage ?? product?.dosage_vial ?? "—",
+        imported,
+        manual,
+        effective: effectiveAreaPriceUsd(imported, manual),
+        source: areaPriceSource(manual),
+        kitBasis,
+        importedCategory,
+        manualCategory,
+        effectiveCategory: effectiveAreaCategoryKey(importedCategory, manualCategory),
+        categorySource: areaCategorySource(importedCategory, manualCategory),
+      };
+    });
+  }, [catalogQuery.data, pricesQuery.data, products]);
+
+  return (
+    <div className="space-y-4">
+      <AreaCategoriesEditor areaKey={areaKey} categories={categories} onChanged={onChanged} />
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Produkte {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+          <CardDescription>
+            Nur der Händlerkatalog dieses Bereichs. Die Kategorie gilt nur hier, nicht im globalen Produkt-Master.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {catalogQuery.isLoading || pricesQuery.isLoading || categoriesQuery.isLoading ? (
+            <Skeleton className="h-32 w-full" />
+          ) : rows.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Dieser Bereich ist leer, solange keine Händlerdatei angewendet wurde.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Code</TableHead>
+                    <TableHead>Produkt</TableHead>
+                    <TableHead>Variante</TableHead>
+                    <TableHead>Kategorie</TableHead>
+                    <TableHead>Basis</TableHead>
+                    <TableHead className="text-right">Importpreis</TableHead>
+                    <TableHead>Grundpreis</TableHead>
+                    <TableHead>Quelle</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {rows.map((row) => (
+                    <VendorPriceRow
+                      key={`${row.productId}|${row.effective}|${row.source}|${row.effectiveCategory}|${row.categorySource}`}
+                      areaKey={areaKey}
+                      profile={profile}
+                      categories={categories}
+                      row={row}
+                      onChanged={onChanged}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function AreaCategoriesEditor({
+  areaKey,
+  categories,
+  onChanged,
+}: {
+  areaKey: ShopAreaKey;
+  categories: AreaCategory[];
+  onChanged: () => Promise<void>;
+}) {
+  const [newKey, setNewKey] = React.useState("");
+  const [newLabel, setNewLabel] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
+
+  async function toggle(category: AreaCategory, isActive: boolean) {
+    setBusy(true);
+    try {
+      await setAdminShopAreaCategoryActive(areaKey, category.category_key, isActive);
+      await onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Kategorie konnte nicht geändert werden.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function move(index: number, direction: -1 | 1) {
+    const next = index + direction;
+    if (next < 0 || next >= categories.length) return;
+    const keys = categories.map((category) => category.category_key);
+    const [removed] = keys.splice(index, 1);
+    keys.splice(next, 0, removed);
+    setBusy(true);
+    try {
+      await reorderAdminShopAreaCategories(areaKey, keys);
+      await onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Reihenfolge konnte nicht gespeichert werden.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function rename(category: AreaCategory, label: string) {
+    const next = label.trim();
+    if (!next || next === category.label) return;
+    setBusy(true);
+    try {
+      await renameAdminShopAreaCategory(areaKey, category.category_key, next);
+      await onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Name konnte nicht gespeichert werden.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function addCategory() {
+    setBusy(true);
+    try {
+      await createAdminShopAreaCategory(areaKey, newKey, newLabel);
+      setNewKey("");
+      setNewLabel("");
+      await onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Kategorie konnte nicht angelegt werden.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Kategorien {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardDescription>
+          Aktivierung und Reihenfolge gelten nur in diesem Verkaufsbereich. Produkte bleiben im Händlerkatalog.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {categories.map((category, index) => (
+          <div key={category.category_key} className="flex flex-wrap items-center gap-2">
+            <Checkbox
+              checked={category.is_active}
+              disabled={busy}
+              onCheckedChange={(checked) => void toggle(category, checked === true)}
+            />
+            <Input
+              defaultValue={category.label}
+              className="h-8 max-w-xs"
+              disabled={busy}
+              onBlur={(event) => void rename(category, event.target.value)}
+            />
+            <span className="text-xs text-muted-foreground">{category.category_key}</span>
+            <Button type="button" size="sm" variant="outline" disabled={busy || index === 0} onClick={() => void move(index, -1)}>
+              Nach oben
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={busy || index === categories.length - 1}
+              onClick={() => void move(index, 1)}
+            >
+              Nach unten
+            </Button>
+          </div>
+        ))}
+        <div className="flex flex-wrap items-end gap-2 pt-2">
+          <div className="space-y-1">
+            <Label className="text-xs">Schlüssel</Label>
+            <Input className="h-8 w-40" value={newKey} onChange={(event) => setNewKey(event.target.value)} placeholder="peptides" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Name</Label>
+            <Input className="h-8 w-40" value={newLabel} onChange={(event) => setNewLabel(event.target.value)} placeholder="Peptides" />
+          </div>
+          <Button type="button" size="sm" disabled={busy || !newKey.trim() || !newLabel.trim()} onClick={() => void addCategory()}>
+            Kategorie hinzufügen
+          </Button>
         </div>
       </CardContent>
     </Card>
   );
 }
 
-/**
- * Preise tab: area-level base price factor (replaces per-product price table).
- * The factor applies uniformly to all products in this area.
- * Per-product catalog price overrides (shop_area_product_prices) are still supported
- * via import workflows; they are not surfaced in this UI.
- */
-function AreaPricesPanel({
+function VendorPriceRow({
   areaKey,
-  area,
   profile,
+  categories,
+  row,
   onChanged,
 }: {
   areaKey: ShopAreaKey;
-  area: Tables<"shop_areas">;
   profile: ShopPricingProfile;
+  categories: AreaCategory[];
+  row: {
+    productId: string;
+    code: string;
+    name: string;
+    variant: string;
+    imported: number | null;
+    manual: number | null;
+    effective: number | null;
+    source: "manual" | "vendor_file";
+    kitBasis: boolean;
+    importedCategory: string | null;
+    manualCategory: string | null;
+    effectiveCategory: string | null;
+    categorySource: "manual" | "vendor_file" | "none";
+  };
   onChanged: () => Promise<void>;
 }) {
-  const [localFactor, setLocalFactor] = React.useState<number>(
-    area.base_price_factor_pct ?? DEFAULT_BASE_PRICE_FACTOR_PCT,
-  );
+  const [draft, setDraft] = React.useState(String(row.effective ?? ""));
   const [saving, setSaving] = React.useState(false);
 
-  async function saveFactor() {
-    const value = Number(localFactor);
-    if (!Number.isFinite(value) || value <= 0) {
-      toast.error("Faktor muss eine positive Zahl sein.");
-      return;
-    }
+  async function save(manual: number | null) {
     setSaving(true);
     try {
-      await updateAdminShopArea(areaKey, { base_price_factor_pct: value });
-      toast.success(`Grundpreisfaktor für ${SHOP_AREA_LABELS[areaKey]} gespeichert.`);
+      await setAdminShopAreaManualPrice(areaKey, row.productId, manual);
+      toast.success(`${row.code} gespeichert.`);
       await onChanged();
     } catch (error) {
-      console.error("Faktor speichern fehlgeschlagen:", error);
-      toast.error(error instanceof Error ? error.message : "Faktor konnte nicht gespeichert werden.");
+      toast.error(error instanceof Error ? error.message : "Grundpreis konnte nicht gespeichert werden.");
     } finally {
       setSaving(false);
     }
   }
 
-  const isRetail = profile === "retail";
+  async function saveCategory(categoryKey: string | null) {
+    setSaving(true);
+    try {
+      await setAdminShopAreaProductCategory(areaKey, row.productId, categoryKey);
+      toast.success(`${row.code} Kategorie gespeichert.`);
+      await onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Kategorie konnte nicht gespeichert werden.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Preiseinstellungen {SHOP_AREA_LABELS[areaKey]}</CardTitle>
-        <CardDescription>
-          {isRetail
-            ? "Retail-Formel: (Importpreis ÷ Kit-Teiler) × (Faktor ÷ 100). Der Rollenaufschlag wird danach genau einmal angewendet."
-            : "Group-Buy-Formel: Importpreis × (Faktor ÷ 100). Der Rollenaufschlag wird danach genau einmal angewendet."}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Factor input */}
-        <div className="space-y-3">
-          <Label htmlFor={`factor-${areaKey}`}>Grundpreisfaktor (%)</Label>
-          <p className="text-xs text-muted-foreground">
-            100 % = 1× (kein Aufschlag) · 300 % = 3× · 150 % = 1,5× · Formel: Faktor (%) ÷ 100 = Multiplikator
-          </p>
-          <div className="flex items-center gap-2">
-            <Input
-              id={`factor-${areaKey}`}
-              type="number"
-              min={1}
-              max={10000}
-              step={1}
-              value={localFactor}
-              onChange={(e) => setLocalFactor(Number(e.target.value))}
-              className="w-36"
-            />
-            <span className="text-sm text-muted-foreground">%</span>
-            <Button type="button" loading={saving} onClick={() => void saveFactor()}>
-              Speichern
-            </Button>
+    <TableRow>
+      <TableCell className="font-mono text-xs">{row.code}</TableCell>
+      <TableCell>{row.name}</TableCell>
+      <TableCell>{row.variant}</TableCell>
+      <TableCell>
+        <div className="space-y-1">
+          <select
+            className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+            value={row.effectiveCategory ?? ""}
+            disabled={saving}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (!value) return;
+              void saveCategory(value);
+            }}
+          >
+            {!row.effectiveCategory && <option value="">Keine Kategorie</option>}
+            {categories.map((category) => (
+              <option key={category.category_key} value={category.category_key}>
+                {category.label}
+              </option>
+            ))}
+          </select>
+          <div className="flex flex-wrap items-center gap-1">
+            <Badge variant={row.categorySource === "manual" ? "default" : "secondary"}>
+              {row.categorySource === "manual"
+                ? "Manuell"
+                : row.categorySource === "vendor_file"
+                  ? "Händlerdatei"
+                  : "Keine Kategorie"}
+            </Badge>
+            {row.categorySource === "manual" && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={saving}
+                onClick={() => void saveCategory(null)}
+              >
+                Zur Importkategorie zurücksetzen
+              </Button>
+            )}
           </div>
         </div>
-
-        {/* Price preview using SSoT functions */}
-        <PriceFactorPreview factorPct={localFactor} isRetail={isRetail} />
-      </CardContent>
-    </Card>
+      </TableCell>
+      <TableCell className="text-xs text-muted-foreground">
+        {profile === "retail" && row.kitBasis ? "Kit-/10er-Grundpreis" : "Einzelpreis"}
+      </TableCell>
+      <TableCell className="text-right">{row.imported == null ? "—" : formatUsd(row.imported)}</TableCell>
+      <TableCell>
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            type="number"
+            min={0.01}
+            step="0.01"
+            className="h-8 w-28"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+          />
+          <Button
+            type="button"
+            size="sm"
+            loading={saving}
+            onClick={() => {
+              const value = Number(draft.replace(",", "."));
+              if (!Number.isFinite(value) || value <= 0) {
+                toast.error("Grundpreis muss größer als 0 sein.");
+                return;
+              }
+              void save(value);
+            }}
+          >
+            Speichern
+          </Button>
+          {row.source === "manual" && (
+            <Button type="button" size="sm" variant="outline" disabled={saving} onClick={() => void save(null)}>
+              Override entfernen
+            </Button>
+          )}
+        </div>
+      </TableCell>
+      <TableCell>
+        <Badge variant={row.source === "manual" ? "default" : "secondary"}>
+          {row.source === "manual" ? "Manuell" : "Händlerdatei"}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        <Badge variant="secondary">Aktiv</Badge>
+      </TableCell>
+    </TableRow>
   );
 }
-
-/**
- * Live preview of catalog and selling prices based on an example import price.
- * Uses shopAreaCatalogUnit and applyRoleMarkup (SSoTs) – no inline pricing logic.
- */
-function PriceFactorPreview({ factorPct, isRetail }: { factorPct: number; isRetail: boolean }) {
-  const EXAMPLE_IMPORT = 100;
-  const EXAMPLE_ROLE_MARKUPS = [0, 25] as const;
-
-  const safeFactorPct = Number.isFinite(factorPct) && factorPct > 0 ? factorPct : DEFAULT_BASE_PRICE_FACTOR_PCT;
-  const multiplier = safeFactorPct / 100;
-
-  // Retail: peptide example (usesKitUnitPricing = true), kitDivisor = 10
-  // Group Buy: vial unit example (usesKitUnitPricing = false, factor applies directly)
-  const catalogBase = shopAreaCatalogUnit(
-    { price_usd: EXAMPLE_IMPORT },
-    1,
-    isRetail ? "retail" : "group_buy",
-    isRetail, // usesKitUnitPricing: true for retail (peptide), irrelevant for GB
-    safeFactorPct,
-    RETAIL_KIT_UNIT_DIVISOR,
-  );
-
-  return (
-    <div className="space-y-3 rounded-lg border border-border bg-secondary/20 p-4">
-      <p className="text-sm font-medium">Preisvorschau (Beispiel: Importpreis {formatUsd(EXAMPLE_IMPORT)})</p>
-
-      {isRetail ? (
-        <p className="text-xs text-muted-foreground">
-          Schritt 1: {EXAMPLE_IMPORT} ÷ {RETAIL_KIT_UNIT_DIVISOR} = {EXAMPLE_IMPORT / RETAIL_KIT_UNIT_DIVISOR} USD/Vial
-          <br />
-          Schritt 2: {EXAMPLE_IMPORT / RETAIL_KIT_UNIT_DIVISOR} × {multiplier.toFixed(2)} ={" "}
-          <strong>{formatUsd(catalogBase)}</strong> (Katalogpreis ohne Aufschlag)
-        </p>
-      ) : (
-        <p className="text-xs text-muted-foreground">
-          {EXAMPLE_IMPORT} × {multiplier.toFixed(2)} = <strong>{formatUsd(catalogBase)}</strong> (Katalogpreis ohne
-          Aufschlag)
-        </p>
-      )}
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Rollenaufschlag</TableHead>
-            <TableHead className="text-right">Verkaufspreis</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {EXAMPLE_ROLE_MARKUPS.map((markupPct) => (
-            <TableRow key={markupPct}>
-              <TableCell className="text-sm">{markupPct} %</TableCell>
-              <TableCell className="text-right text-sm font-medium">
-                {formatUsd(applyRoleMarkup(catalogBase, markupPct))} / {isRetail ? "Vial" : "Einheit"}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
-
-// AreaRolePricesPanel and AreaRoleMarkupEditor removed in migration 0053.
-// Role markup is now global-only via markup_percent_for().
-// Per-product area price overrides (shop_area_product_prices) are retained for import workflows.
-// The shop_area_product_role_markups table is retained for future use.

@@ -5,7 +5,7 @@
  * can never drift apart.
  */
 
-export type ImportSourceKind = "pdf" | "csv" | "xlsx";
+export type ImportSourceKind = "pdf" | "csv" | "xlsx" | "xls";
 
 interface SourceDefinition {
   kind: ImportSourceKind;
@@ -22,6 +22,12 @@ const SOURCES: SourceDefinition[] = [
     extension: ".xlsx",
     contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     label: "Excel (XLSX)",
+  },
+  {
+    kind: "xls",
+    extension: ".xls",
+    contentType: "application/vnd.ms-excel",
+    label: "Excel (XLS)",
   },
 ];
 

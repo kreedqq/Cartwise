@@ -52,6 +52,22 @@ export function shopAreaSellUnitPrice(
   );
 }
 
+/** Effective area grundpreis: manual override wins, else imported vendor price. */
+export function effectiveAreaPriceUsd(
+  importedPriceUsd: number | null | undefined,
+  manualPriceUsd: number | null | undefined,
+): number | null {
+  if (manualPriceUsd != null && manualPriceUsd > 0) return manualPriceUsd;
+  if (importedPriceUsd != null && importedPriceUsd > 0) return importedPriceUsd;
+  return null;
+}
+
+export type AreaPriceSource = "manual" | "vendor_file";
+
+export function areaPriceSource(manualPriceUsd: number | null | undefined): AreaPriceSource {
+  return manualPriceUsd != null && manualPriceUsd > 0 ? "manual" : "vendor_file";
+}
+
 /** Missing area override inherits the central catalog price. */
 export function resolveAreaCatalogPriceUsd(
   globalPriceUsd: number,

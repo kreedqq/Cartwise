@@ -1,32 +1,35 @@
-import { Droplets, FlaskConical, Pill, Waves } from "lucide-react";
+import { Droplets, FlaskConical, Package, Pill, Waves } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-import { SHOP_CATEGORIES, type ShopCategoryId } from "@/lib/shopCategories";
+import { storefrontHeadline, type AreaCategory } from "@/lib/shop/areaCategories";
 import { cn } from "@/lib/utils";
 
-const ICONS = {
+const KNOWN_ICONS: Record<string, LucideIcon> = {
   peptides: FlaskConical,
   "injectable-oils": Droplets,
   orals: Pill,
   "reconstitution-water": Waves,
-} as const;
+};
 
 export function ShopCategoryHub({
+  categories,
   counts,
   onSelect,
 }: {
-  counts: Record<ShopCategoryId, number> | null;
-  onSelect: (id: ShopCategoryId) => void;
+  categories: readonly AreaCategory[];
+  counts: Record<string, number> | null;
+  onSelect: (key: string) => void;
 }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {SHOP_CATEGORIES.map((category) => {
-        const Icon = ICONS[category.id];
-        const count = counts?.[category.id];
+      {categories.map((category) => {
+        const Icon = KNOWN_ICONS[category.category_key] ?? Package;
+        const count = counts?.[category.category_key];
         return (
           <button
-            key={category.id}
+            key={category.category_key}
             type="button"
-            onClick={() => onSelect(category.id)}
+            onClick={() => onSelect(category.category_key)}
             className={cn(
               "group relative flex min-h-[200px] flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card p-7 text-left transition-colors duration-200",
               "hover:border-primary/45 hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -37,11 +40,10 @@ export function ShopCategoryHub({
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Katalog</p>
               <p className="mt-2 font-display text-[1.65rem] font-semibold leading-tight tracking-tight sm:text-3xl">
-                {category.headline}
+                {storefrontHeadline(category.label)}
               </p>
               <p className="mt-4 text-sm text-muted-foreground">
-                {category.description}
-                {count != null ? ` · ${count} Artikel` : ""}
+                {count != null ? `${count} Artikel` : "Artikel"}
               </p>
             </div>
           </button>

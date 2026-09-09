@@ -29,7 +29,10 @@ export default function AdminImportHistoryPage() {
 
   return (
     <div className="space-y-4">
-      <AdminPageHeader title="Import-Verlauf" description="Alle bisherigen PDF- und CSV-Importe." />
+      <AdminPageHeader
+        title="Master-Verlauf"
+        description="Verlauf der globalen Produkt-Master-Importe. Schreibt nur in products, nicht in Shop / Group Buy 1 / Group Buy 2."
+      />
 
       {!importsQuery.data || importsQuery.data.length === 0 ? (
         <EmptyState title="Noch keine Importe" description="Hier erscheinen alle bisherigen PDF- und CSV-Importe." />

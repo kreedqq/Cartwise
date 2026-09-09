@@ -36,6 +36,7 @@ import {
   type OpenKitRequestFilters,
 } from "@/hooks/useKitRequests";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
+import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
@@ -49,13 +50,14 @@ import { kitRequestStatusLabel, type KitRequestSort } from "@/lib/kitRequests";
 import { shopGroupsForCategory, productMatchesShopSearch } from "@/lib/shop/display";
 import { formatProductVariant } from "@/lib/shop/variantCoverage";
 import {
-  countProductsByShopCategory,
-  isShopCategoryId,
-  productInShopCategory,
-  shopCategoryById,
-  SHOP_CATEGORIES,
-  type ShopCategoryId,
-} from "@/lib/shopCategories";
+  countProductsByAreaCategory,
+  productsInAreaCategory,
+  storefrontHeadline,
+  visibleStorefrontCategories,
+  type AreaCategory,
+  type AreaCategoryAssignment,
+} from "@/lib/shop/areaCategories";
+import { isShopCategoryId } from "@/lib/shopCategories";
 import { cn } from "@/lib/utils";
 import type { KitRequestCard } from "@/services/kitRequests";
 import type { Tables } from "@/types/database";
@@ -87,35 +89,52 @@ export default function GroupBuyPage() {
 
 function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaName: string }) {
   const productsQuery = useShopProducts(shopArea);
+  const storefrontQuery = useShopAreaStorefront(shopArea);
   const favoritesQuery = useFavorites();
   const rateQuery = useExchangeRate();
-  const [selectedCategory, setSelectedCategory] = React.useState<ShopCategoryId | null>(null);
+  const [selectedKey, setSelectedKey] = React.useState<string | null>(null);
   const [search, setSearch] = React.useState("");
   const [activeSection, setActiveSection] = React.useState<"catalog" | "kits">("catalog");
 
   const products = React.useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
-  const counts = React.useMemo(
-    () => (products.length ? countProductsByShopCategory(products) : null),
-    [products],
+  const assignments = React.useMemo(
+    () => storefrontQuery.data?.assignments ?? [],
+    [storefrontQuery.data?.assignments],
   );
+  const visible = React.useMemo(
+    () =>
+      visibleStorefrontCategories(
+        storefrontQuery.data?.categories ?? [],
+        assignments,
+        products.map((product) => product.id),
+      ),
+    [assignments, products, storefrontQuery.data?.categories],
+  );
+  const counts = React.useMemo(
+    () => countProductsByAreaCategory(
+      products.map((product) => product.id),
+      assignments,
+    ),
+    [assignments, products],
+  );
+  const selectedCategory = visible.find((category) => category.category_key === selectedKey) ?? null;
 
   const filtered = React.useMemo(() => {
     if (!selectedCategory) return [];
     const term = search.trim();
-    return products.filter((p) => {
-      if (!productInShopCategory(p, selectedCategory)) return false;
-      return productMatchesShopSearch(p, term);
-    });
-  }, [products, search, selectedCategory]);
+    return productsInAreaCategory(products, assignments, selectedCategory.category_key).filter((p) =>
+      productMatchesShopSearch(p, term),
+    );
+  }, [assignments, products, search, selectedCategory]);
 
   const favoriteProductIds = React.useMemo(
     () => new Set((favoritesQuery.data ?? []).map((f) => f.productId)),
     [favoritesQuery.data],
   );
 
-  function selectCategory(id: ShopCategoryId) {
+  function selectCategory(key: string) {
     setSearch("");
-    setSelectedCategory(id);
+    setSelectedKey(key);
   }
 
   return (
@@ -149,6 +168,11 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
           areaName={areaName}
           products={products}
           counts={counts}
+          visible={visible}
+          assignments={assignments}
+          storefrontLoading={storefrontQuery.isLoading}
+          storefrontError={storefrontQuery.isError}
+          onStorefrontRetry={() => void storefrontQuery.refetch()}
           filtered={filtered}
           search={search}
           selectedCategory={selectedCategory}
@@ -159,12 +183,17 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
           onRefetch={() => void productsQuery.refetch()}
           onSelectCategory={selectCategory}
           onSearch={setSearch}
-          onClearCategory={() => setSelectedCategory(null)}
+          onClearCategory={() => setSelectedKey(null)}
         />
       )}
 
       {activeSection === "kits" && (
-        <KitRequestsSection shopArea={shopArea} areaName={areaName} />
+        <KitRequestsSection
+          shopArea={shopArea}
+          areaName={areaName}
+          categories={visible}
+          assignments={assignments}
+        />
       )}
     </div>
   );
@@ -174,16 +203,21 @@ interface GroupBuyCatalogProps {
   shopArea: ShopAreaKey;
   areaName: string;
   products: Tables<"products">[];
-  counts: ReturnType<typeof countProductsByShopCategory> | null;
+  visible: AreaCategory[];
+  counts: Record<string, number>;
+  assignments: AreaCategoryAssignment[];
+  storefrontLoading: boolean;
+  storefrontError: boolean;
+  onStorefrontRetry: () => void;
   filtered: Tables<"products">[];
   search: string;
-  selectedCategory: ShopCategoryId | null;
+  selectedCategory: AreaCategory | null;
   favoriteProductIds: Set<string>;
   rate: number | null;
   isLoading: boolean;
   isError: boolean;
   onRefetch: () => void;
-  onSelectCategory: (id: ShopCategoryId) => void;
+  onSelectCategory: (id: string) => void;
   onSearch: (term: string) => void;
   onClearCategory: () => void;
 }
@@ -191,7 +225,11 @@ interface GroupBuyCatalogProps {
 function GroupBuyCatalog({
   areaName,
   products,
+  visible,
   counts,
+  storefrontLoading,
+  storefrontError,
+  onStorefrontRetry,
   filtered,
   search,
   selectedCategory,
@@ -212,28 +250,41 @@ function GroupBuyCatalog({
           title="Katalog"
           description="Group-Buy-Preise. Kits, Mengenstaffeln und geteilte Bestellungen."
         />
-        {isLoading && (
+        {(isLoading || storefrontLoading) && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-[200px] w-full rounded-2xl" />
             ))}
           </div>
         )}
-        {isError && (
-          <ErrorState message="Produkte konnten nicht geladen werden." onRetry={onRefetch} />
+        {(isError || storefrontError) && (
+          <ErrorState
+            message="Produkte konnten nicht geladen werden."
+            onRetry={() => {
+              onRefetch();
+              onStorefrontRetry();
+            }}
+          />
         )}
-        {!isLoading && !isError && <ShopCategoryHub counts={counts} onSelect={onSelectCategory} />}
+        {!isLoading && !isError && !storefrontLoading && !storefrontError && visible.length === 0 && (
+          <EmptyState icon={PackageSearch} title="Aktuell sind keine Produkte verfügbar." />
+        )}
+        {!isLoading && !isError && !storefrontLoading && !storefrontError && visible.length > 0 && (
+          <ShopCategoryHub categories={visible} counts={counts} onSelect={onSelectCategory} />
+        )}
       </div>
     );
   }
 
-  const active = shopCategoryById(selectedCategory);
+  const tableCategoryId = isShopCategoryId(selectedCategory.category_key)
+    ? selectedCategory.category_key
+    : undefined;
 
   return (
     <div className="space-y-8">
       <PageHeader
         eyebrow={areaName}
-        title={active.label}
+        title={selectedCategory.label}
         description={`${filtered.length} Artikel · Menge wählen und in den Warenkorb legen.`}
         actions={
           <Button variant="ghost" size="sm" onClick={onClearCategory} className="gap-1.5">
@@ -244,19 +295,19 @@ function GroupBuyCatalog({
       />
 
       <div className="flex flex-wrap gap-2">
-        {SHOP_CATEGORIES.map((category) => (
+        {visible.map((category) => (
           <button
-            key={category.id}
+            key={category.category_key}
             type="button"
-            onClick={() => onSelectCategory(category.id)}
+            onClick={() => onSelectCategory(category.category_key)}
             className={cn(
               "rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] transition-colors",
-              category.id === selectedCategory
+              category.category_key === selectedCategory.category_key
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
             )}
           >
-            {category.headline}
+            {storefrontHeadline(category.label)}
           </button>
         ))}
       </div>
@@ -298,7 +349,8 @@ function GroupBuyCatalog({
               products={filtered}
               rate={rate}
               favoriteProductIds={favoriteProductIds}
-              categoryId={selectedCategory}
+              categoryId={tableCategoryId}
+              categoryLabel={selectedCategory.label}
               pricingProfile="group_buy"
             />
           </div>
@@ -307,7 +359,7 @@ function GroupBuyCatalog({
               products={filtered}
               rate={rate}
               favoriteProductIds={favoriteProductIds}
-              categoryId={selectedCategory}
+              categoryId={tableCategoryId}
               pricingProfile="group_buy"
             />
           </div>
@@ -317,7 +369,16 @@ function GroupBuyCatalog({
   );
 }
 
-function KitRequestsSection({ shopArea }: { shopArea: ShopAreaKey; areaName?: string }) {
+function KitRequestsSection({
+  shopArea,
+  categories,
+  assignments,
+}: {
+  shopArea: ShopAreaKey;
+  areaName?: string;
+  categories: AreaCategory[];
+  assignments: AreaCategoryAssignment[];
+}) {
   const productsQuery = useShopProducts(shopArea);
 
   const [tab, setTab] = React.useState("open");
@@ -335,14 +396,13 @@ function KitRequestsSection({ shopArea }: { shopArea: ShopAreaKey; areaName?: st
   const [cancelTarget, setCancelTarget] = React.useState<KitRequestCard | null>(null);
   const [myStatus, setMyStatus] = React.useState<string>("all");
 
-  const groups = React.useMemo(
-    () =>
-      shopGroupsForCategory(
-        productsQuery.data ?? [],
-        isShopCategoryId(category) ? category : null,
-      ),
-    [productsQuery.data, category],
-  );
+  const groups = React.useMemo(() => {
+    const catalog = productsQuery.data ?? [];
+    const scoped = category
+      ? productsInAreaCategory(catalog, assignments, category)
+      : catalog.filter((product) => assignments.some((row) => row.product_id === product.id));
+    return shopGroupsForCategory(scoped, null);
+  }, [assignments, category, productsQuery.data]);
 
   const filters: OpenKitRequestFilters = {
     search,
@@ -444,8 +504,8 @@ function KitRequestsSection({ shopArea }: { shopArea: ShopAreaKey; areaName?: st
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Alle Kategorien</SelectItem>
-                  {SHOP_CATEGORIES.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.category_key} value={cat.category_key}>
                       {cat.label}
                     </SelectItem>
                   ))}

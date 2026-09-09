@@ -553,9 +553,35 @@ export interface Database {
           product_id: string;
           is_active: boolean;
           updated_at: string;
+          vendor_name: string | null;
+          vendor_dosage: string | null;
+          vendor_raw: Record<string, unknown> | null;
+          imported_category_key: string | null;
+          manual_category_key: string | null;
         };
-        Insert: Database["public"]["Tables"]["shop_area_products"]["Row"];
+        Insert: Partial<Database["public"]["Tables"]["shop_area_products"]["Row"]> & {
+          shop_area_key: string;
+          product_id: string;
+        };
         Update: Partial<Database["public"]["Tables"]["shop_area_products"]["Row"]>;
+        Relationships: never[];
+      };
+      shop_area_categories: {
+        Row: {
+          shop_area_key: string;
+          category_key: string;
+          label: string;
+          sort_order: number;
+          is_active: boolean;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["shop_area_categories"]["Row"]> & {
+          shop_area_key: string;
+          category_key: string;
+          label: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["shop_area_categories"]["Row"]>;
         Relationships: never[];
       };
       shop_area_product_prices: {
@@ -563,9 +589,12 @@ export interface Database {
           shop_area_key: string;
           product_id: string;
           price_usd: number | null;
+          imported_price_usd: number | null;
+          manual_price_usd: number | null;
           bulk_price_usd: number | null;
           bulk_price_min_quantity: number | null;
           updated_at: string;
+          updated_by: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["shop_area_product_prices"]["Row"]> & {
           shop_area_key: string;
@@ -1481,9 +1510,8 @@ export interface Database {
       delete_order: { Args: { _order_id: string }; Returns: undefined };
       refresh_product_substance_prefix_mappings: { Args: Record<string, never>; Returns: number };
       /**
-       * Atomically replaces the vendor catalog for one shop area (migration 0056).
-       * Clears shop_area_products + shop_area_product_prices, then inserts the
-       * supplied rows. Returns { added, removed, skipped }.
+       * Atomically replaces the vendor catalog for one shop area (0056/0057).
+       * Also points shop_area_documents at the already-uploaded dealer file.
        */
       apply_area_vendor_catalog: {
         Args: {
@@ -1493,9 +1521,64 @@ export interface Database {
             price_usd: number;
             bulk_price_usd: number | null;
             bulk_price_min_quantity: number | null;
+            vendor_name?: string | null;
+            vendor_dosage?: string | null;
+            vendor_raw?: Record<string, unknown> | null;
+            imported_category_key?: string | null;
           }[];
+          _storage_path: string;
+          _file_name: string;
+          _keep_manual_overrides?: boolean;
         };
-        Returns: { added: number; removed: number; skipped: number };
+        Returns: {
+          added: number;
+          removed: number;
+          skipped: number;
+          kept_manuals: number;
+          kept_category_manuals: number;
+          storage_path: string;
+          file_name: string;
+        };
+      };
+      set_area_product_manual_price: {
+        Args: {
+          _area_key: string;
+          _product_id: string;
+          _manual_price_usd: number | null;
+        };
+        Returns: Database["public"]["Tables"]["shop_area_product_prices"]["Row"];
+      };
+      set_area_product_category: {
+        Args: { _area_key: string; _product_id: string; _category_key: string | null };
+        Returns: Database["public"]["Tables"]["shop_area_products"]["Row"];
+      };
+      set_shop_area_category_active: {
+        Args: { _area_key: string; _category_key: string; _is_active: boolean };
+        Returns: Database["public"]["Tables"]["shop_area_categories"]["Row"];
+      };
+      rename_shop_area_category: {
+        Args: { _area_key: string; _category_key: string; _label: string };
+        Returns: Database["public"]["Tables"]["shop_area_categories"]["Row"];
+      };
+      reorder_shop_area_categories: {
+        Args: { _area_key: string; _keys: string[] };
+        Returns: undefined;
+      };
+      create_shop_area_category: {
+        Args: { _area_key: string; _category_key: string; _label: string };
+        Returns: Database["public"]["Tables"]["shop_area_categories"]["Row"];
+      };
+      list_shop_area_storefront: {
+        Args: { _shop_area: string };
+        Returns: {
+          categories: Array<{
+            category_key: string;
+            label: string;
+            sort_order: number;
+            is_active: boolean;
+          }>;
+          assignments: Array<{ product_id: string; category_key: string }>;
+        };
       };
       /**
        * Returns true when a product has an explicit is_active=true row in

@@ -55,8 +55,6 @@ describe("hub admin navigation", () => {
         "/admin/orders",
         "/admin/products",
         "/admin/shop-areas",
-        "/admin/pdf-import",
-        "/admin/import-history",
         "/admin/users",
         "/admin/surcharges",
         "/admin/shipping-costs",
@@ -65,6 +63,8 @@ describe("hub admin navigation", () => {
         "/admin/research",
       ]),
     );
+    expect(destinations).not.toContain("/admin/pdf-import");
+    expect(destinations).not.toContain("/admin/import-history");
     expect(destinations).not.toContain("/admin/roles");
   });
 
@@ -81,8 +81,6 @@ describe("hub admin navigation", () => {
     expect(products?.items.map((item) => item.label)).toEqual([
       "Produktkatalog",
       "Verkaufsbereiche",
-      "Import",
-      "Import-Verlauf",
     ]);
     const users = ADMIN_NAV_GROUPS.find((group) => group.id === "users");
     expect(users?.items.map((item) => item.label)).toEqual([

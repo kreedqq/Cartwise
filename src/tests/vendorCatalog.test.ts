@@ -22,7 +22,9 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { matchVendorCatalogRows, diffVendorCatalog } from "@/lib/shop/vendorCatalog";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { matchVendorCatalogRows, diffVendorCatalog, normalizeVendorSku, VENDOR_PDF_UNREADABLE } from "@/lib/shop/vendorCatalog";
 import type { ParsedProductImportRow } from "@/lib/productImportRow";
 import type { Tables } from "@/types/database";
 
@@ -72,6 +74,7 @@ function makeImportRow(
     parsedIsActive: null,
     quality: "ok",
     qualityReason: null,
+    extraFields: null,
     ...overrides,
   };
 }
@@ -534,5 +537,99 @@ describe("Security: fail-closed checkout (0056)", () => {
     expect(entry.price_usd).toBe(65);
     expect(entry.bulk_price_usd).toBeNull();
     expect(entry.bulk_price_min_quantity).toBeNull();
+  });
+});
+
+describe("vendor catalog assortment source", () => {
+  it("normalizes SKUs by trim, collapsing spaces, and uppercase", () => {
+    expect(normalizeVendorSku(" sm5 ")).toBe("SM5");
+    expect(normalizeVendorSku("SM5")).toBe("SM5");
+    expect(normalizeVendorSku("Sm5")).toBe("SM5");
+    expect(normalizeVendorSku("S M 5")).toBe("SM5");
+  });
+
+  it("R01 – empty dealer file leaves Shop / GB1 / GB2 empty", () => {
+    const globals = [makeProduct("SM5"), makeProduct("OXO50"), makeProduct("Tadalafil")];
+    const empty = matchVendorCatalogRows([], globals);
+    expect(empty.matched).toEqual([]);
+    expect(empty.unmatched).toEqual([]);
+  });
+
+  it("R02 – 23 file SKUs stay exactly 23; extra globals never appear", () => {
+    const { matched } = matchVendorCatalogRows(EMMA_ROWS, [
+      ...EMMA_GLOBAL_PRODUCTS,
+      makeProduct("SM30"),
+      makeProduct("OXO50"),
+    ]);
+    expect(matched).toHaveLength(23);
+    expect(matched.map((row) => row.code)).not.toContain("SM30");
+    expect(matched.map((row) => row.code)).not.toContain("OXO50");
+  });
+
+  it("R03 – unmatched file SKUs are reported, never silently dropped", () => {
+    const { matched, unmatched, unmatchedCodes } = matchVendorCatalogRows(
+      [makeImportRow("SM5", 65), makeImportRow("UNKNOWN99", 10), makeImportRow(" sm 5 ", 70)],
+      [makeProduct("SM5")],
+    );
+    expect(matched).toHaveLength(1);
+    expect(unmatchedCodes).toEqual(["UNKNOWN99"]);
+    expect(unmatched).toEqual([
+      expect.objectContaining({ code: "UNKNOWN99", reason: "not_in_master" }),
+    ]);
+  });
+
+  it("R04 – rows without a vendor price are unmatched, not filled from products.price_usd", () => {
+    const { matched, unmatched } = matchVendorCatalogRows(
+      [makeImportRow("SM5", 0, { parsedPriceUsd: null })],
+      [makeProduct("SM5", { price_usd: 100 })],
+    );
+    expect(matched).toEqual([]);
+    expect(unmatched).toEqual([expect.objectContaining({ code: "SM5", reason: "no_price" })]);
+  });
+
+  it("R05 – extra file columns stay on vendor_raw and matching does not mutate products", () => {
+    const products = [makeProduct("SM5", { price_usd: 100 })];
+    const snapshot = structuredClone(products);
+    const { matched } = matchVendorCatalogRows(
+      [makeImportRow("SM5", 80, { extraFields: { Lieferant: "Emma", MOQ: "1" } })],
+      products,
+    );
+    expect(matched[0]?.price_usd).toBe(80);
+    expect(matched[0]?.vendor_raw.extraFields).toEqual({ Lieferant: "Emma", MOQ: "1" });
+    expect(products).toEqual(snapshot);
+  });
+
+  it("R06 – Shop and GB1 / GB1 and GB2 catalogs stay isolated", () => {
+    const products = [makeProduct("SM5"), makeProduct("SM10"), makeProduct("OXO50")];
+    const shop = matchVendorCatalogRows([makeImportRow("SM5", 80)], products);
+    const gb1 = matchVendorCatalogRows([makeImportRow("SM10", 70)], products);
+    const gb2 = matchVendorCatalogRows([makeImportRow("OXO50", 40)], products);
+    expect(shop.matched.map((row) => row.code)).toEqual(["SM5"]);
+    expect(gb1.matched.map((row) => row.code)).toEqual(["SM10"]);
+    expect(gb2.matched.map((row) => row.code)).toEqual(["OXO50"]);
+    expect(matchVendorCatalogRows([], products).matched).toEqual([]);
+  });
+});
+
+describe("vendor catalog SQL (0056 + 0057)", () => {
+  const sql0056 = readFileSync(resolve(process.cwd(), "supabase/migrations/0056_area_vendor_catalog.sql"), "utf8");
+  const sql0057 = readFileSync(resolve(process.cwd(), "supabase/migrations/0057_vendor_catalog_raw.sql"), "utf8");
+
+  it("keeps fail-closed create_order and does not skip foreign catalog items", () => {
+    expect(sql0056).toContain("Ein Produkt gehört nicht zum aktuellen Händlerkatalog.");
+    expect(sql0056).toMatch(/if not public\.product_visible_in_shop_area/);
+    expect(sql0056).toMatch(/raise exception 'Ein Produkt gehört nicht zum aktuellen Händlerkatalog\.'/);
+    expect(sql0056).not.toMatch(/update public\.products set price_usd/);
+  });
+
+  it("stores vendor raw fields without rewriting global products", () => {
+    expect(sql0057).toContain("vendor_raw jsonb");
+    expect(sql0057).toContain("vendor_name");
+    expect(sql0057).toContain("vendor_dosage");
+    expect(sql0057).toContain("apply_area_vendor_catalog");
+    expect(sql0057).toContain("shop_area_documents");
+    expect(sql0057).not.toMatch(/update public\.products/);
+    expect(sql0057).not.toMatch(/insert into public\.products/);
+    expect(VENDOR_PDF_UNREADABLE).toContain("Bitte CSV oder Excel verwenden");
   });
 });

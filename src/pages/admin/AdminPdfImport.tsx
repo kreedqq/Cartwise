@@ -180,17 +180,16 @@ export default function AdminPdfImportPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        title="Produktimport"
-        description={`Unterstützte Formate: ${ACCEPTED_IMPORT_LABEL}. Vor Übernahme zur Prüfung angezeigt.`}
+        title="Globaler Produkt-Master"
+        description="Schreibt nur in die zentrale products-Tabelle. Macht keine Artikel in Shop, Group Buy 1 oder Group Buy 2 sichtbar. Händlerkataloge liegen unter Verkaufsbereiche."
       />
       {stage === "upload" && (
         <Card>
           <CardHeader>
-            <CardTitle>Produktpreisliste importieren</CardTitle>
+            <CardTitle>Globalen Produkt-Master aktualisieren</CardTitle>
             <CardDescription>
-              Unterstützte Formate: {ACCEPTED_IMPORT_LABEL}. Maximal 10&nbsp;MB. Erkannte Spalten: CODE, Name,
-              Dosage / Vial, Normalpreis, Mengenpreis, Mengenpreis ab, Kategorie, Status. Alle Zeilen werden dir
-              vor dem Import zur Prüfung angezeigt - nichts wird automatisch übernommen.
+              Nur technische Stammdaten (SKU, Name, globale Felder). Dieser Import ersetzt keinen Händlerkatalog.
+              Sortiment pro Verkaufsbereich kommt ausschließlich aus der Händlerdatei unter Verkaufsbereiche.
             </CardDescription>
           </CardHeader>
           <CardContent>

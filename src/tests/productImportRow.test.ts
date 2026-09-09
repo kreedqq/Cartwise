@@ -292,6 +292,7 @@ describe("parseProductTable", () => {
     const result = parseProductTable([[...header, "Lieferant"], ["ART-1", "A", "", "10", "", "", "", "true", "ACME"]]);
     expect(result.unknownHeaders).toEqual(["Lieferant"]);
     expect(result.recognizedFields).toContain("code");
+    expect(result.rows[0].extraFields).toEqual({ Lieferant: "ACME" });
   });
 
   it("returns nothing when there is no usable header", () => {

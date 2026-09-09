@@ -33,6 +33,7 @@ import {
   type OpenKitRequestFilters,
 } from "@/hooks/useKitRequests";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
+import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { ShopAreaProvider } from "@/context/ShopAreaContext";
 import {
@@ -46,8 +47,8 @@ import {
   type KitRequestSort,
 } from "@/lib/kitRequests";
 import { shopGroupsForCategory } from "@/lib/shop/display";
+import { productsInAreaCategory, visibleStorefrontCategories } from "@/lib/shop/areaCategories";
 import { formatProductVariant } from "@/lib/shop/variantCoverage";
-import { SHOP_CATEGORIES, isShopCategoryId } from "@/lib/shopCategories";
 import type { KitRequestCard } from "@/services/kitRequests";
 
 const PAGE_SIZE = 20;
@@ -81,6 +82,7 @@ export default function KitRequestsPage() {
 
 function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaName: string }) {
   const productsQuery = useShopProducts(shopArea);
+  const storefrontQuery = useShopAreaStorefront(shopArea);
 
   const [tab, setTab] = React.useState("open");
   const [search, setSearch] = React.useState("");
@@ -97,14 +99,14 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
   const [cancelTarget, setCancelTarget] = React.useState<KitRequestCard | null>(null);
   const [myStatus, setMyStatus] = React.useState<string>("all");
 
-  const groups = React.useMemo(
-    () =>
-      shopGroupsForCategory(
-        productsQuery.data ?? [],
-        isShopCategoryId(category) ? category : null,
-      ),
-    [productsQuery.data, category],
-  );
+  const groups = React.useMemo(() => {
+    const catalog = productsQuery.data ?? [];
+    const assignments = storefrontQuery.data?.assignments ?? [];
+    const scoped = category
+      ? productsInAreaCategory(catalog, assignments, category)
+      : catalog.filter((product) => assignments.some((row) => row.product_id === product.id));
+    return shopGroupsForCategory(scoped, null);
+  }, [category, productsQuery.data, storefrontQuery.data?.assignments]);
 
   const filters: OpenKitRequestFilters = {
     search,
@@ -211,8 +213,15 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Alle Kategorien</SelectItem>
-                  {SHOP_CATEGORIES.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
+                  {(storefrontQuery.data
+                    ? visibleStorefrontCategories(
+                        storefrontQuery.data.categories,
+                        storefrontQuery.data.assignments,
+                        (productsQuery.data ?? []).map((product) => product.id),
+                      )
+                    : []
+                  ).map((cat) => (
+                    <SelectItem key={cat.category_key} value={cat.category_key}>
                       {cat.label}
                     </SelectItem>
                   ))}

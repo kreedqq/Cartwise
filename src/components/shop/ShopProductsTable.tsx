@@ -19,7 +19,7 @@ import { formatCatalogQuantity } from "@/lib/quantityFormat";
 import { shopPriceColumnLabels } from "@/lib/shop/priceLabels";
 import { isRetailPricing, type ShopPricingProfile } from "@/lib/shop/shopAreas";
 import type { ShopCategoryId } from "@/lib/shopCategories";
-import { shopCategoryById, shopCategoryIdFor } from "@/lib/shopCategories";
+import { shopCategoryIdFor } from "@/lib/shopCategories";
 import {
   groupAndSortShopProducts,
   shopQuantityOptions,
@@ -40,6 +40,7 @@ interface ShopProductsTableProps {
   rate: number | null;
   favoriteProductIds: Set<string>;
   categoryId?: ShopCategoryId;
+  categoryLabel?: string;
   pricingProfile?: ShopPricingProfile;
 }
 
@@ -48,6 +49,7 @@ export function ShopProductsTable({
   rate,
   favoriteProductIds,
   categoryId,
+  categoryLabel,
   pricingProfile = "group_buy",
 }: ShopProductsTableProps) {
   const groups = groupAndSortShopProducts(products);
@@ -93,6 +95,7 @@ export function ShopProductsTable({
               saleMode={saleMode}
               showBulkColumn={showBulkColumn}
               showKitShare={showKitShare}
+              categoryLabel={categoryLabel}
               onKitShare={({ group, initialProductId }) => setKitShareContext({ group, initialProductId })}
             />
           ))}
@@ -126,6 +129,7 @@ function ShopProductGroupTableRow({
   saleMode,
   showBulkColumn,
   showKitShare,
+  categoryLabel,
   onKitShare,
 }: {
   group: ShopProductGroup;
@@ -135,6 +139,7 @@ function ShopProductGroupTableRow({
   saleMode: "catalog" | "retail_unit";
   showBulkColumn: boolean;
   showKitShare: boolean;
+  categoryLabel?: string;
   onKitShare: (context: { group: ShopProductGroup; initialProductId: string }) => void;
 }) {
   const row = useShopProductGroupRow(group, rate, favoriteProductIds);
@@ -201,7 +206,9 @@ function ShopProductGroupTableRow({
           ) : null}
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-2">
-          <p className="text-[11px] text-muted-foreground">{shopCategoryById(shopCategoryIdFor(product)).label}</p>
+          {categoryLabel ? (
+            <p className="text-[11px] text-muted-foreground">{categoryLabel}</p>
+          ) : null}
           {showKitShare && (
           <KitShareButton
             group={group}
