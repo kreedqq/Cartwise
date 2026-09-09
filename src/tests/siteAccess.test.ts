@@ -66,8 +66,13 @@ describe("maintenance access", () => {
     expect(existsSync(resolve(process.cwd(), "public/maintenance-pause.jpg"))).toBe(true);
     const screen = read("src/components/maintenance/MaintenanceScreen.tsx");
     expect(screen).toContain("maintenance-pause.jpg");
-    expect(screen).toContain("object-contain");
-    expect(screen).not.toContain("object-cover");
+    expect(screen).toContain("fixed inset-0");
+    expect(screen).toContain("h-[100dvh]");
+    expect(screen).toContain("w-screen");
+    expect(screen).toContain("bg-cover");
+    expect(screen).toContain("bg-center");
+    expect(screen).toContain("bg-no-repeat");
+    expect(screen).not.toContain("max-w-[1200px]");
     expect(screen).not.toContain("PEPTIX macht gerade kurz Pause");
     expect(screen).not.toContain("Wartungsarbeiten laufen");
     expect(screen).not.toContain("Vielen Dank");

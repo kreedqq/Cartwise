@@ -1,26 +1,28 @@
-const ARTWORK_SRC = "/maintenance-pause.jpg";
+import { Button } from "@/components/ui/button";
+
+const MAINTENANCE_ART = "/maintenance-pause.jpg";
 
 interface MaintenanceScreenProps {
   allowAdminLogin?: boolean;
   onAdminLogin?: () => void;
 }
 
-export function MaintenanceScreen({ allowAdminLogin = false, onAdminLogin }: MaintenanceScreenProps) {
+export function MaintenanceScreen({
+  allowAdminLogin = false,
+  onAdminLogin,
+}: MaintenanceScreenProps) {
   return (
-    <div className="relative flex min-h-[100dvh] w-full items-center justify-center overflow-x-hidden bg-background">
-      <img
-        src={ARTWORK_SRC}
-        alt="KURZE PAUSE! Wir schrauben gerade an etwas Besserem für euch!"
-        width={1024}
-        height={576}
-        decoding="async"
-        draggable={false}
-        className="h-auto w-full max-w-[1200px] object-contain"
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden bg-black">
+      <div
+        className="pointer-events-none fixed inset-0 h-[100dvh] w-screen bg-black bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${MAINTENANCE_ART})` }}
+        role="img"
+        aria-label="Peptix"
       />
       {allowAdminLogin && onAdminLogin ? (
-        <button type="button" onClick={onAdminLogin} className="sr-only">
+        <Button type="button" variant="ghost" className="sr-only" onClick={onAdminLogin}>
           Admin
-        </button>
+        </Button>
       ) : null}
     </div>
   );
