@@ -26,15 +26,16 @@ export function shopAreaCatalogUnit(
   usesKitUnitPricing: boolean,
   factorPct = 100,
   kitDivisor = RETAIL_KIT_UNIT_DIVISOR,
+  quantityDiscountsEnabled = true,
 ): number {
   const factor = factorPct / 100;
   if (profile === "group_buy") {
-    return getEffectiveUnitPrice(product, quantity).unitPriceUsd * factor;
+    return getEffectiveUnitPrice(product, quantity, quantityDiscountsEnabled).unitPriceUsd * factor;
   }
   if (usesKitUnitPricing) {
     return (product.price_usd / kitDivisor) * factor;
   }
-  return getEffectiveUnitPrice(product, quantity).unitPriceUsd * factor;
+  return getEffectiveUnitPrice(product, quantity, quantityDiscountsEnabled).unitPriceUsd * factor;
 }
 
 export function shopAreaSellUnitPrice(
@@ -45,9 +46,18 @@ export function shopAreaSellUnitPrice(
   usesKitUnitPricing: boolean,
   factorPct = 100,
   kitDivisor = RETAIL_KIT_UNIT_DIVISOR,
+  quantityDiscountsEnabled = true,
 ): number {
   return applyRoleMarkup(
-    shopAreaCatalogUnit(product, quantity, profile, usesKitUnitPricing, factorPct, kitDivisor),
+    shopAreaCatalogUnit(
+      product,
+      quantity,
+      profile,
+      usesKitUnitPricing,
+      factorPct,
+      kitDivisor,
+      quantityDiscountsEnabled,
+    ),
     markupPercent,
   );
 }
@@ -100,6 +110,7 @@ export function shopAreaSellUnitPriceForProductRole(
   areaPriceOverrideUsd?: number | null,
   areaRoleMarkupPercent?: number | null,
   factorPct = 100,
+  quantityDiscountsEnabled = true,
 ): number {
   const catalog = {
     ...globalProduct,
@@ -112,5 +123,7 @@ export function shopAreaSellUnitPriceForProductRole(
     profile,
     usesKitUnitPricing,
     factorPct,
+    RETAIL_KIT_UNIT_DIVISOR,
+    quantityDiscountsEnabled,
   );
 }

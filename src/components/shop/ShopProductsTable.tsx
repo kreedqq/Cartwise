@@ -33,6 +33,7 @@ import {
   showsStandaloneVariantLabel,
 } from "@/lib/shop/variantCoverage";
 import { listKitShareMembers } from "@/services/kitShareMembers";
+import { useQuantityDiscountsEnabled } from "@/hooks/useAppPublicState";
 import type { Tables } from "@/types/database";
 
 interface ShopProductsTableProps {
@@ -52,6 +53,7 @@ export function ShopProductsTable({
   categoryLabel,
   pricingProfile = "group_buy",
 }: ShopProductsTableProps) {
+  const quantityDiscountsEnabled = useQuantityDiscountsEnabled();
   const groups = groupAndSortShopProducts(products);
   const priceLabels = shopPriceColumnLabels(
     categoryId ?? shopCategoryIdFor(products[0] ?? { category: null, name: "", code: "" }),
@@ -59,7 +61,7 @@ export function ShopProductsTable({
   );
   const saleMode = isRetailPricing(pricingProfile) ? "retail_unit" : "catalog";
   const showKitShare = !isRetailPricing(pricingProfile);
-  const showBulkColumn = !isRetailPricing(pricingProfile);
+  const showBulkColumn = !isRetailPricing(pricingProfile) && quantityDiscountsEnabled;
   const [kitShareContext, setKitShareContext] = React.useState<{
     group: ShopProductGroup;
     initialProductId: string;

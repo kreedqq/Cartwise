@@ -174,8 +174,8 @@ describe("OAuth client helpers", () => {
   });
 
   it("does not treat OAuth success as an admin landing page", () => {
-    expect(POST_LOGIN_PATH).toBe("/dashboard");
-    expect(OAUTH_SUCCESS_PATH).toBe("/shop");
+    expect(POST_LOGIN_PATH).toBe("/announcements");
+    expect(OAUTH_SUCCESS_PATH).toBe("/announcements");
     expect(OAUTH_PROVIDERS).toContain("discord");
     expect(OAUTH_PROVIDERS).toEqual(["discord", "custom:telegram"]);
   });
@@ -276,11 +276,11 @@ describe("OAuth UI surface", () => {
     expect(layout).not.toMatch(/BrandMark/);
   });
 
-  it("sends OAuth users to /shop after PKCE callback", () => {
+  it("sends OAuth users to announcements after PKCE callback", () => {
     const callback = readFileSync(resolve(process.cwd(), "src/pages/AuthCallback.tsx"), "utf8");
     expect(callback).toContain("OAUTH_SUCCESS_PATH");
     expect(callback).toContain("completeOAuthCallback");
-    expect(OAUTH_SUCCESS_PATH).toBe("/shop");
+    expect(OAUTH_SUCCESS_PATH).toBe("/announcements");
   });
 });
 

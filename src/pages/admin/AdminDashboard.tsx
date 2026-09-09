@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExchangeRateStatusCard } from "@/components/admin/ExchangeRateStatusCard";
 import { DataIssuesCard } from "@/components/admin/DataIssuesCard";
+import { QuantityDiscountsSwitch } from "@/components/admin/QuantityDiscountsSwitch";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { listAllProducts } from "@/services/products";
@@ -98,6 +99,8 @@ export default function AdminDashboardPage() {
         <QuickAction to="/admin/products" icon={Package} label="Produkte verwalten" />
         <QuickAction to="/admin/users" icon={Users} label="Benutzer verwalten" />
       </div>
+
+      <QuantityDiscountsSwitch />
 
       {/* Status cards */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

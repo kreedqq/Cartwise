@@ -1,8 +1,12 @@
 import { Outlet } from "react-router-dom";
 
 import { AdminNav, AdminSectionTabs } from "@/components/layout/AdminNav";
+import { EmergencyMaintenanceButton } from "@/components/admin/EmergencyMaintenanceButton";
+import { useResolvedSiteAccess } from "@/hooks/useAppPublicState";
 
 export default function AdminLayout() {
+  const access = useResolvedSiteAccess();
+
   return (
     <div
       data-admin=""
@@ -12,6 +16,7 @@ export default function AdminLayout() {
         <span className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Peptix&thinsp;/&thinsp;Admin
         </span>
+        {access.maintenanceMode ? <EmergencyMaintenanceButton /> : null}
       </div>
 
       <div className="mb-4 border-b border-border pb-3">

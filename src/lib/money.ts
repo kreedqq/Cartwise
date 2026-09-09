@@ -110,9 +110,10 @@ export function catalogBulkUnitPriceUsd(product: PricedProduct): number | null {
 export function getEffectiveUnitPrice(
   product: PricedProduct,
   quantity: number | null | undefined,
+  quantityDiscountsEnabled = true,
 ): EffectiveUnitPrice {
-  const bulkAvailable = hasBulkTier(product);
-  const bulkPriceUsd = catalogBulkUnitPriceUsd(product);
+  const bulkAvailable = quantityDiscountsEnabled && hasBulkTier(product);
+  const bulkPriceUsd = bulkAvailable ? catalogBulkUnitPriceUsd(product) : null;
   const bulkPriceMinQuantity = bulkAvailable ? (product.bulk_price_min_quantity as number) : null;
 
   const useBulk =
@@ -141,8 +142,16 @@ export function applyRoleMarkup(amount: number, markupPercent: number): number {
  * Catalog bulk-then-markup selling unit price. Server-side create_order
  * uses the SQL twin sell_unit_price; tests use this to lock the contract.
  */
-export function sellingUnitPrice(product: PricedProduct, quantity: number, markupPercent: number): number {
-  return applyRoleMarkup(getEffectiveUnitPrice(product, quantity).unitPriceUsd, markupPercent);
+export function sellingUnitPrice(
+  product: PricedProduct,
+  quantity: number,
+  markupPercent: number,
+  quantityDiscountsEnabled = true,
+): number {
+  return applyRoleMarkup(
+    getEffectiveUnitPrice(product, quantity, quantityDiscountsEnabled).unitPriceUsd,
+    markupPercent,
+  );
 }
 
 /** Split a money amount across n buckets. Remainder cents go to the last share. */

@@ -1,27 +1,19 @@
 import * as React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { RequireUsernameForm } from "@/components/auth/RequireUsernameDialog";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthProvider";
-import { safePostLoginPath, signOut } from "@/services/auth";
+import { POST_LOGIN_PATH, signOut } from "@/services/auth";
 import { shouldPromptForUsername } from "@/services/username";
-
-function returnPathFromState(state: unknown): string {
-  if (state && typeof state === "object" && "from" in state) {
-    return safePostLoginPath((state as { from: unknown }).from);
-  }
-  return safePostLoginPath(null);
-}
 
 export default function UsernameRequiredPage() {
   const { user, profile, loading } = useAuth();
-  const location = useLocation();
   const navigate = useNavigate();
   const needsUsername = shouldPromptForUsername({ loading, user, profile });
-  const destination = returnPathFromState(location.state);
+  const destination = POST_LOGIN_PATH;
 
   React.useEffect(() => {
     if (loading) return;

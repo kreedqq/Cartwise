@@ -7,9 +7,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import { UsernameGate } from "@/routes/UsernameGate";
 import { AdminRoute } from "@/routes/AdminRoute";
+import { MaintenanceGate } from "@/routes/MaintenanceGate";
+import { ConsentGate } from "@/routes/ConsentGate";
 import { AppShell } from "@/components/layout/AppShell";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import UsernameRequiredPage from "@/pages/UsernameRequired";
+import ConsentPage from "@/pages/Consent";
+import AnnouncementsPage from "@/pages/Announcements";
 
 import LoginPage from "@/pages/Login";
 import AuthCallbackPage from "@/pages/AuthCallback";
@@ -44,6 +48,7 @@ const AdminRolesPage = lazy(() => import("@/pages/admin/AdminRoles"));
 const AdminRoleSurchargesPage = lazy(() => import("@/pages/admin/AdminRoleSurcharges"));
 const AdminShippingPage = lazy(() => import("@/pages/admin/AdminShipping"));
 const AdminResearchPage = lazy(() => import("@/pages/admin/AdminResearch"));
+const AdminAnnouncementsPage = lazy(() => import("@/pages/admin/AdminAnnouncements"));
 const PeptideHubPage = lazy(() => import("@/pages/peptide/PeptideHub"));
 const PeptideCalculatorPage = lazy(() => import("@/pages/peptide/PeptideCalculator"));
 const PeptideLexiconPage = lazy(() => import("@/pages/peptide/PeptideLexicon"));
@@ -70,6 +75,7 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter basename={import.meta.env.BASE_URL}>
           <Routes>
+            <Route element={<MaintenanceGate />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -80,7 +86,10 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/username-required" element={<UsernameRequiredPage />} />
               <Route element={<UsernameGate />}>
+              <Route path="/consent" element={<ConsentPage />} />
+              <Route element={<ConsentGate />}>
               <Route element={<AppShell />}>
+                <Route path="/announcements" element={<AnnouncementsPage />} />
                 <Route path="/shop" element={<ShopHubPage />} />
                 <Route path="/shop/retail" element={<ShopRetailPage />} />
                 <Route path="/shop/group-buy-1" element={<GroupBuyPage />} />
@@ -150,14 +159,17 @@ export default function App() {
                     <Route path="users" element={<AdminUsersPage />} />
                     <Route path="audit-log" element={<AdminAuditLogPage />} />
                     <Route path="research" element={<AdminResearchPage />} />
+                    <Route path="announcements" element={<AdminAnnouncementsPage />} />
                   </Route>
                 </Route>
+              </Route>
               </Route>
               </Route>
             </Route>
 
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<NotFoundPage />} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </AuthProvider>

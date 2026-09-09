@@ -57,6 +57,7 @@ describe("registerSchema", () => {
     passwordConfirm: "supersecret1",
     displayName: "Test Nutzer",
     username: "TestNutzer",
+    researchConsent: true,
   };
 
   it("accepts a valid registration payload", () => {
@@ -75,6 +76,11 @@ describe("registerSchema", () => {
 
   it("rejects an invalid email address", () => {
     expect(registerSchema.safeParse({ ...base, email: "not-an-email" }).success).toBe(false);
+  });
+
+  it("rejects registration without research consent", () => {
+    expect(registerSchema.safeParse({ ...base, researchConsent: false }).success).toBe(false);
+    expect(registerSchema.safeParse({ ...base, researchConsent: undefined }).success).toBe(false);
   });
 });
 

@@ -84,6 +84,9 @@ export const registerSchema = z
     passwordConfirm: z.string(),
     displayName: displayNameSchema,
     username: usernameSchema,
+    researchConsent: z.literal(true, {
+      errorMap: () => ({ message: "Bitte bestätige die Forschungsnutzung, um fortzufahren." }),
+    }),
   })
   .refine((data) => data.password === data.passwordConfirm, {
     message: "Die Passwörter stimmen nicht überein.",

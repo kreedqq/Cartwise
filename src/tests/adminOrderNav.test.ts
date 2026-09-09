@@ -61,6 +61,7 @@ describe("hub admin navigation", () => {
         "/admin/order-summary",
         "/admin/audit-log",
         "/admin/research",
+        "/admin/announcements",
       ]),
     );
     expect(destinations).not.toContain("/admin/pdf-import");
@@ -91,7 +92,7 @@ describe("hub admin navigation", () => {
     expect(users?.items.map((item) => item.label)).not.toContain("Benutzer");
     expect(users?.items.map((item) => item.label)).not.toContain("Rollen & Preisaufschlag");
     const content = ADMIN_NAV_GROUPS.find((group) => group.id === "content");
-    expect(content?.items.map((item) => item.label)).toEqual(["Research"]);
+    expect(content?.items.map((item) => item.label)).toEqual(["Research", "Ankündigungen"]);
   });
 
   it("renders hub links globally and section tabs on the page, wrapping on small screens", () => {
@@ -121,6 +122,7 @@ describe("hub admin navigation", () => {
       'path="users"',
       'path="audit-log"',
       'path="research"',
+      'path="announcements"',
     ]) {
       expect(app).toContain(path);
     }

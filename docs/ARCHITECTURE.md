@@ -166,3 +166,7 @@ Node (not bundled as live client calls): `scripts/fetch-research-sources.mjs` (`
 - No service_role in `src/`
 - External HTML is not injected from connector payloads; public lexicon text is mapped from approved Postgres claims or exclusive curated JSON fallback
 - JSON-LD on lexicon detail is `WebPage` only (no fake ratings)
+
+## App settings, maintenance, consent, announcements (0061–0063)
+
+One `app_settings` table holds `maintenance_mode` (fail closed) and `quantity_discounts_enabled`. Quantity tiers stay in `getEffectiveUnitPrice` / SQL `sell_unit_price`; the flag only disables bulk. Area factor, retail ÷10, and `apply_role_markup` stay on. `MaintenanceGate` plus `assert_public_site_access` / `user_can_access_shop_area` block non-admins. Versioned `user_consents` (`research_terms` v1) is checked after username via `ConsentGate`. Published `announcements` are the post-login feed (`/announcements`). Admin CRUD is RLS `has_role(..., 'admin')`. Local migrations only; not applied to production from this change set.

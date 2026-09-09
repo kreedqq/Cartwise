@@ -1,4 +1,4 @@
-import { BookOpen, ClipboardList, LayoutGrid, ShoppingBag, UserCircle, type LucideIcon } from "lucide-react";
+import { BookOpen, ClipboardList, LayoutGrid, Newspaper, ShoppingBag, UserCircle, type LucideIcon } from "lucide-react";
 
 import type { MyShopArea } from "@/lib/shop/shopAreas";
 
@@ -15,6 +15,7 @@ export interface CustomerNavItem {
 export function buildCustomerNavItems(_areas: MyShopArea[]): CustomerNavItem[] {
   return [
     { to: "/dashboard", label: "Übersicht", icon: LayoutGrid },
+    { to: "/announcements", label: "Neuigkeiten", icon: Newspaper },
     { to: "/shop", label: "Shop", icon: ShoppingBag, end: true },
     { to: "/peptide", label: PEPTIDE_NAV_LABEL, icon: BookOpen },
     { to: "/orders", label: "Meine Bestellungen", icon: ClipboardList },

@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/toaster";
+import { RESEARCH_CONSENT_TEXT } from "@/lib/consent";
 import { registerSchema } from "@/lib/validation";
 import { mapAuthError, POST_LOGIN_PATH, signUp } from "@/services/auth";
+import { acceptResearchConsent } from "@/services/consents";
 import { claimUsername, mapUsernameError } from "@/services/username";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -25,6 +28,7 @@ export default function RegisterPage() {
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [loading, setLoading] = React.useState(false);
   const [done, setDone] = React.useState(false);
+  const [researchConsent, setResearchConsent] = React.useState(false);
 
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -38,6 +42,7 @@ export default function RegisterPage() {
       passwordConfirm: form.passwordConfirm,
       displayName: `${form.firstName} ${form.lastName}`.trim(),
       username: form.username,
+      researchConsent,
     });
     if (!result.success) {
       setErrors(Object.fromEntries(result.error.issues.map((i) => [i.path[0], i.message])));
@@ -61,6 +66,11 @@ export default function RegisterPage() {
           await claimUsername(result.data.username);
         } catch (usernameError) {
           toast.error(mapUsernameError(usernameError));
+        }
+        try {
+          await acceptResearchConsent();
+        } catch {
+          // ConsentGate asks again on the next login if this write fails.
         }
         navigate(POST_LOGIN_PATH, { replace: true });
       } else {
@@ -171,7 +181,19 @@ export default function RegisterPage() {
           />
           {errors.passwordConfirm && <p className="text-xs text-destructive">{errors.passwordConfirm}</p>}
         </div>
-        <Button type="submit" size="lg" className="h-10 w-full rounded-[10px]" loading={loading}>
+        <div className="flex items-start gap-3 rounded-lg border border-border p-3">
+          <Checkbox
+            id="researchConsent"
+            checked={researchConsent}
+            onCheckedChange={(value) => setResearchConsent(value === true)}
+            className="mt-0.5 h-5 w-5"
+          />
+          <Label htmlFor="researchConsent" className="text-sm font-normal leading-relaxed">
+            {RESEARCH_CONSENT_TEXT}
+          </Label>
+        </div>
+        {errors.researchConsent && <p className="text-xs text-destructive">{errors.researchConsent}</p>}
+        <Button type="submit" size="lg" className="h-10 w-full rounded-[10px]" loading={loading} disabled={!researchConsent}>
           <UserPlus /> Konto erstellen
         </Button>
       </form>

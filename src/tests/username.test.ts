@@ -77,6 +77,7 @@ describe("registerSchema username integration", () => {
     password: "supersecret1",
     passwordConfirm: "supersecret1",
     displayName: "Test Nutzer",
+    researchConsent: true,
   };
 
   it("rejects registration without a valid username", () => {

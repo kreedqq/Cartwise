@@ -632,6 +632,57 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["shop_area_documents"]["Row"]>;
         Relationships: never[];
       };
+      app_settings: {
+        Row: {
+          key: string;
+          value_bool: boolean;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["app_settings"]["Row"]> & {
+          key: string;
+          value_bool: boolean;
+        };
+        Update: Partial<Database["public"]["Tables"]["app_settings"]["Row"]>;
+        Relationships: never[];
+      };
+      user_consents: {
+        Row: {
+          id: string;
+          user_id: string;
+          consent_type: string;
+          consent_version: number;
+          accepted_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["user_consents"]["Row"]> & {
+          user_id: string;
+          consent_type: string;
+          consent_version: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["user_consents"]["Row"]>;
+        Relationships: never[];
+      };
+      announcements: {
+        Row: {
+          id: string;
+          title: string;
+          content: string;
+          published: boolean;
+          pinned: boolean;
+          image_url: string | null;
+          external_url: string | null;
+          created_at: string;
+          updated_at: string;
+          published_at: string | null;
+          created_by: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["announcements"]["Row"]> & {
+          title: string;
+          content: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["announcements"]["Row"]>;
+        Relationships: never[];
+      };
       substances: {
         Row: {
           id: string;
@@ -1292,6 +1343,30 @@ export interface Database {
     };
     Functions: {
       has_role: { Args: { _user_id: string; _role: string }; Returns: boolean };
+      get_site_access_state: {
+        Args: Record<string, never>;
+        Returns: {
+          maintenance_mode: boolean;
+          quantity_discounts_enabled: boolean;
+          caller_is_admin: boolean;
+          site_access_allowed: boolean;
+        };
+      };
+      admin_set_app_setting: {
+        Args: { _key: "maintenance_mode" | "quantity_discounts_enabled"; _value: boolean };
+        Returns: {
+          maintenance_mode: boolean;
+          quantity_discounts_enabled: boolean;
+          caller_is_admin: boolean;
+          site_access_allowed: boolean;
+        };
+      };
+      required_research_consent_version: { Args: Record<string, never>; Returns: number };
+      has_current_research_consent: { Args: Record<string, never>; Returns: boolean };
+      accept_research_consent: {
+        Args: Record<string, never>;
+        Returns: Database["public"]["Tables"]["user_consents"]["Row"];
+      };
       product_is_referenced: { Args: { _product_id: string }; Returns: boolean };
       set_active_cart: { Args: { _cart_id: string }; Returns: undefined };
       duplicate_cart: { Args: { _cart_id: string; _new_name: string }; Returns: string };

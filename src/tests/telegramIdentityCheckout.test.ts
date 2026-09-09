@@ -148,10 +148,10 @@ describe("checkout and auth race guards", () => {
     expect(route).toContain('to="/login"');
   });
 
-  it("login waits for session and honors a safe return path", () => {
+  it("login waits for session and honors the post-login announcements path", () => {
     const login = readSource("src/pages/Login.tsx");
-    expect(login).toContain("safePostLoginPath");
+    expect(login).toContain("POST_LOGIN_PATH");
     expect(login).toContain("awaitingSession");
-    expect(login).not.toMatch(/navigate\(POST_LOGIN_PATH/);
+    expect(login).toContain("navigate(destination");
   });
 });

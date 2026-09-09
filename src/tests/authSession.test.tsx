@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 
 const signIn = vi.fn();
@@ -20,6 +21,15 @@ vi.mock("@/context/AuthProvider", () => ({
   useAuth: () => authValue,
 }));
 
+vi.mock("@/services/appSettings", () => ({
+  getSiteAccessState: async () => ({
+    maintenanceMode: false,
+    quantityDiscountsEnabled: true,
+    callerIsAdmin: false,
+    siteAccessAllowed: true,
+  }),
+}));
+
 vi.mock("@/services/auth", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/services/auth")>();
   return {
@@ -37,15 +47,21 @@ const { resolve } = await import("node:path");
 const fakeSession = { user: { id: "user-1" } };
 
 function renderAuthRoutes(initialPath: string) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+  });
   return render(
-    <MemoryRouter initialEntries={[initialPath]}>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<div>Dashboard ready</div>} />
-        </Route>
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={[initialPath]}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/announcements" element={<div>Announcements ready</div>} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<div>Dashboard ready</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
@@ -57,7 +73,7 @@ describe("login session redirects", () => {
     authValue.loading = false;
   });
 
-  it("navigates to the dashboard after a successful password sign-in once the session is present", async () => {
+  it("navigates to announcements after a successful password sign-in once the session is present", async () => {
     const user = userEvent.setup();
     signIn.mockImplementation(async () => {
       authValue.session = fakeSession;
@@ -66,13 +82,13 @@ describe("login session redirects", () => {
     });
 
     renderAuthRoutes("/login");
-    await user.type(screen.getByLabelText("E-Mail-Adresse", { selector: "#email" }), "test@example.com");
+    await user.type(await screen.findByLabelText("E-Mail-Adresse", { selector: "#email" }), "test@example.com");
     await user.type(screen.getByLabelText("Passwort", { selector: "#password" }), "secret");
     await user.click(screen.getByRole("button", { name: "Anmelden" }));
 
     await waitFor(() => {
       expect(signIn).toHaveBeenCalledWith("test@example.com", "secret");
-      expect(screen.getByText("Dashboard ready")).toBeInTheDocument();
+      expect(screen.getByText("Announcements ready")).toBeInTheDocument();
       expect(screen.queryByText("LOGIN")).not.toBeInTheDocument();
     });
   });
@@ -85,12 +101,12 @@ describe("login session redirects", () => {
     expect(screen.queryByLabelText("E-Mail-Adresse")).not.toBeInTheDocument();
   });
 
-  it("redirects /login to the dashboard when a session already exists", async () => {
+  it("redirects /login to announcements when a session already exists", async () => {
     authValue.loading = false;
     authValue.session = fakeSession;
     renderAuthRoutes("/login");
     await waitFor(() => {
-      expect(screen.getByText("Dashboard ready")).toBeInTheDocument();
+      expect(screen.getByText("Announcements ready")).toBeInTheDocument();
     });
   });
 

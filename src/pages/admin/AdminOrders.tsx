@@ -27,6 +27,7 @@ import {
   orderTelegramUsername,
 } from "@/services/orders";
 import { formatShopAreaLabel, SHOP_AREA_KEYS } from "@/lib/shop/shopAreas";
+import { EmergencyMaintenanceButton } from "@/components/admin/EmergencyMaintenanceButton";
 import type { OrderStatus } from "@/types/database";
 
 const STATUS_FILTERS: Array<{ value: "all" | OrderStatus; label: string }> = [
@@ -141,9 +142,12 @@ export default function AdminOrdersPage() {
         title="Übersicht"
         description={`${filtered.length} ${filtered.length === 1 ? "Bestellung" : "Bestellungen"}${hasFilters ? " gefunden" : " gesamt"}`}
         actions={
-          <Button variant="outline" size="sm" onClick={handleExport} disabled={filtered.length === 0}>
-            <FileDown /> CSV-Export
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <EmergencyMaintenanceButton />
+            <Button variant="outline" size="sm" onClick={handleExport} disabled={filtered.length === 0}>
+              <FileDown /> CSV-Export
+            </Button>
+          </div>
         }
       />
 

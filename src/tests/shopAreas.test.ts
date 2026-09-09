@@ -54,6 +54,7 @@ describe("shop area domain", () => {
     const kundeItems = buildCustomerNavItems(kunde);
     expect(kundeItems.map((item) => item.label)).toEqual([
       "Übersicht",
+      "Neuigkeiten",
       "Shop",
       "Lexikon & Rechner",
       "Meine Bestellungen",
@@ -71,6 +72,7 @@ describe("shop area domain", () => {
     const gbItems = buildCustomerNavItems(groupBuy);
     expect(gbItems.map((item) => item.to)).toEqual([
       "/dashboard",
+      "/announcements",
       "/shop",
       "/peptide",
       "/orders",

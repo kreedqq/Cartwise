@@ -68,8 +68,11 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     id: "content",
     label: "Inhalte",
     to: "/admin/research",
-    match: (pathname) => pathname.startsWith("/admin/research"),
-    items: [{ to: "/admin/research", label: "Research" }],
+    match: (pathname) => pathname.startsWith("/admin/research") || pathname.startsWith("/admin/announcements"),
+    items: [
+      { to: "/admin/research", label: "Research" },
+      { to: "/admin/announcements", label: "Ankündigungen" },
+    ],
   },
 ];
 

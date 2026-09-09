@@ -53,4 +53,8 @@ export const QUERY_KEYS = {
   adminResearchDetail: (kind: string, id: string) => ["admin-research-detail", kind, id] as const,
   adminResearchMappings: (page: number) => ["admin-research-mappings", page] as const,
   adminResearchRuns: (page: number) => ["admin-research-runs", page] as const,
+  appPublicState: ["app-public-state"] as const,
+  researchConsent: (userId: string) => ["research-consent", userId] as const,
+  announcements: ["announcements"] as const,
+  adminAnnouncements: ["admin-announcements"] as const,
 };

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,30 +9,30 @@ import { toast } from "@/components/ui/toaster";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
+import { MaintenanceScreen } from "@/components/maintenance/MaintenanceScreen";
 import { useAuth } from "@/context/AuthProvider";
+import { useResolvedSiteAccess } from "@/hooks/useAppPublicState";
 import { loginSchema, magicLinkSchema } from "@/lib/validation";
-import { mapAuthError, safePostLoginPath, signIn, signInWithMagicLink } from "@/services/auth";
+import { mapAuthError, POST_LOGIN_PATH, signIn, signInWithMagicLink } from "@/services/auth";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { session, loading: authLoading } = useAuth();
-  const destination = safePostLoginPath(
-    location.state && typeof location.state === "object" && "from" in location.state
-      ? (location.state as { from: unknown }).from
-      : null,
-  );
+  const { session, loading: authLoading, isAdmin } = useAuth();
+  const access = useResolvedSiteAccess();
+  const destination = POST_LOGIN_PATH;
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [loading, setLoading] = React.useState(false);
   const [awaitingSession, setAwaitingSession] = React.useState(false);
   const [magicSent, setMagicSent] = React.useState(false);
+  const [showAdminLogin, setShowAdminLogin] = React.useState(false);
 
   React.useEffect(() => {
-    if (authLoading || !session) return;
+    if (authLoading || access.isLoading || !session) return;
+    if (!access.allowed && !isAdmin) return;
     navigate(destination, { replace: true });
-  }, [authLoading, session, navigate, destination]);
+  }, [authLoading, access.isLoading, access.allowed, session, isAdmin, navigate, destination]);
 
   async function handlePassword(e: React.FormEvent) {
     e.preventDefault();
@@ -73,8 +73,20 @@ export default function LoginPage() {
     }
   }
 
-  if (authLoading || session || awaitingSession) {
+  if (authLoading || access.isLoading) {
     return <FullScreenSpinner label="Anmeldung wird abgeschlossen …" />;
+  }
+
+  if (!access.allowed && session && !isAdmin) {
+    return <MaintenanceScreen />;
+  }
+
+  if (session || awaitingSession) {
+    return <FullScreenSpinner label="Anmeldung wird abgeschlossen …" />;
+  }
+
+  if (!access.allowed && !showAdminLogin) {
+    return <MaintenanceScreen allowAdminLogin onAdminLogin={() => setShowAdminLogin(true)} />;
   }
 
   return (
@@ -158,10 +170,16 @@ export default function LoginPage() {
       </div>
 
       <p className="mt-4 text-center text-sm text-muted-foreground">
-        Noch kein Konto?{" "}
-        <Link to="/register" className="font-semibold text-primary hover:underline">
-          Konto erstellen
-        </Link>
+        {access.maintenanceMode ? (
+          "Nur Administratoren können sich während der Wartung anmelden."
+        ) : (
+          <>
+            Noch kein Konto?{" "}
+            <Link to="/register" className="font-semibold text-primary hover:underline">
+              Konto erstellen
+            </Link>
+          </>
+        )}
       </p>
     </AuthLayout>
   );

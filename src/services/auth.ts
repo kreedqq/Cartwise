@@ -8,8 +8,8 @@ export const OAUTH_PROVIDERS = [DISCORD_OAUTH_PROVIDER, TELEGRAM_OAUTH_PROVIDER]
 export type OAuthProvider = (typeof OAUTH_PROVIDERS)[number];
 
 export const OAUTH_CALLBACK_PATH = "/auth/callback";
-export const POST_LOGIN_PATH = "/dashboard";
-export const OAUTH_SUCCESS_PATH = "/shop";
+export const POST_LOGIN_PATH = "/announcements";
+export const OAUTH_SUCCESS_PATH = "/announcements";
 
 const BLOCKED_POST_LOGIN_PREFIXES = [
   "/login",
@@ -19,6 +19,7 @@ const BLOCKED_POST_LOGIN_PREFIXES = [
   "/auth",
   "/403",
   "/username-required",
+  "/consent",
 ];
 
 /**
