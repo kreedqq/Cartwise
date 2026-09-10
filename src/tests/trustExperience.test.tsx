@@ -14,6 +14,7 @@ import {
   starCountLabel,
   validateFeedbackBody,
   validateFeedbackRating,
+  isPublicFeedbackStatus,
 } from "@/lib/feedback";
 import { isAllowedImageExtension, sniffImageMime } from "@/lib/mediaUpload";
 import { designHasVisibleBackground, EMPTY_SITE_DESIGN, parseSiteDesignConfig, resolvedDesignLayer } from "@/lib/siteDesign";
@@ -104,7 +105,7 @@ describe("verified order feedback", () => {
       ],
       ["a"],
     );
-    expect(eligible.map((row) => row.id)).toEqual(["c"]);
+    expect(eligible.map((row) => row.id)).toEqual(["b", "c"]);
     expect(matchesAdminFeedbackFilter({ status: "pending", image_path: null, rating: 5 }, "pending")).toBe(true);
     expect(matchesAdminFeedbackFilter({ status: "approved", image_path: "x", rating: 3 }, "with_image")).toBe(true);
     expect(matchesAdminFeedbackFilter({ status: "rejected", image_path: null, rating: 1 }, "stars_1")).toBe(true);
@@ -116,7 +117,6 @@ describe("verified order feedback", () => {
     const sql = read("supabase/migrations/0065_announcement_media_design_feedback.sql");
     expect(sql).toContain("constraint order_feedback_order_unique unique (order_id)");
     expect(sql).toContain("o.user_id = auth.uid()");
-    expect(sql).toContain("o.status in ('received', 'shipped', 'completed')");
     expect(sql).toContain("new.status := 'pending'");
     expect(sql).toContain("status = 'approved'");
     expect(sql).toContain("order_feedback_admin_update");
@@ -128,6 +128,51 @@ describe("verified order feedback", () => {
     expect(read("src/pages/Feedback.tsx")).toContain("image_consent");
     expect(read("src/pages/admin/AdminFeedback.tsx")).toContain("Freigeben");
     expect(read("src/App.tsx")).toContain('path="/feedback"');
+  });
+});
+
+describe("feedback is allowed for any own order", () => {
+  it("lets processing, submitted, shipped and completed orders be reviewed", () => {
+    const eligible = eligibleOrdersForFeedback(
+      [
+        { id: "processing", status: "processing" },
+        { id: "submitted", status: "submitted" },
+        { id: "shipped", status: "shipped" },
+        { id: "completed", status: "completed" },
+        { id: "arrived", status: "arrived" },
+      ],
+      [],
+    );
+    expect(eligible.map((row) => row.id)).toEqual([
+      "processing",
+      "submitted",
+      "shipped",
+      "completed",
+      "arrived",
+    ]);
+    expect(read("src/lib/feedback.ts")).not.toContain("FEEDBACK_ELIGIBLE_STATUSES");
+    expect(read("src/pages/Feedback.tsx")).toContain("feedbackOrderChoiceLabel");
+    expect(read("src/pages/Feedback.tsx")).not.toContain("Nur abgeschlossene");
+  });
+
+  it("rejects foreign orders server-side and keeps new reviews pending until admin approval", () => {
+    const policy = read("supabase/migrations/0066_feedback_any_own_order.sql");
+    expect(policy).toContain("order_feedback_insert_own");
+    expect(policy).toContain("o.user_id = auth.uid()");
+    expect(policy).not.toContain("o.status in");
+    expect(policy).not.toContain("received");
+    expect(read("src/services/feedback.ts")).toContain("user_id: userId");
+    expect(read("src/services/feedback.ts")).toContain('status: "pending"');
+    expect(read("src/services/feedback.ts")).toContain('.eq("status", "approved")');
+    expect(read("src/hooks/useTrustExperience.ts")).toContain("listApprovedFeedback");
+    expect(read("src/pages/admin/AdminFeedback.tsx")).toContain('status: "approved"');
+    const storage = read("supabase/migrations/0065_announcement_media_design_feedback.sql");
+    expect(storage).toContain("f.status = 'approved'");
+    expect(storage).toContain("feedback-media");
+    expect(isPublicFeedbackStatus("pending")).toBe(false);
+    expect(isPublicFeedbackStatus("approved")).toBe(true);
+    expect(isPublicFeedbackStatus("rejected")).toBe(false);
+    expect(isPublicFeedbackStatus("hidden")).toBe(false);
   });
 });
 

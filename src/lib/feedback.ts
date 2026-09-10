@@ -1,16 +1,14 @@
-import type { OrderStatus } from "@/types/database";
-
 export const FEEDBACK_BODY_MIN = 10;
 export const FEEDBACK_BODY_MAX = 2000;
 export const FEEDBACK_PAGE_SIZE = 12;
 export const FEEDBACK_DEFAULT_DISPLAY_NAME = "Verifizierter Kunde";
-export const FEEDBACK_ELIGIBLE_STATUSES: readonly OrderStatus[] = ["received", "shipped", "completed"];
 export const FEEDBACK_IMAGE_ASPECT = "4 / 3";
+export const PUBLIC_FEEDBACK_STATUS = "approved";
 
 export type FeedbackStatus = "pending" | "approved" | "rejected" | "hidden";
 
-export function isFeedbackEligibleStatus(status: string): boolean {
-  return (FEEDBACK_ELIGIBLE_STATUSES as readonly string[]).includes(status);
+export function isPublicFeedbackStatus(status: string): boolean {
+  return status === PUBLIC_FEEDBACK_STATUS;
 }
 
 export function validateFeedbackBody(body: string): string {
@@ -72,12 +70,18 @@ export function starCountLabel(rating: number): string {
   return `${rating} von 5 Sternen`;
 }
 
-export function eligibleOrdersForFeedback<T extends { id: string; status: string }>(
+export function eligibleOrdersForFeedback<T extends { id: string }>(
   orders: T[],
   existingByOrderId: Iterable<string>,
 ): T[] {
   const taken = new Set(existingByOrderId);
-  return orders.filter((order) => isFeedbackEligibleStatus(order.status) && !taken.has(order.id));
+  return orders.filter((order) => !taken.has(order.id));
+}
+
+export function feedbackOrderChoiceLabel(orderNumber: string, statusLabel: string): string {
+  const number = orderNumber.trim() || "Bestellung";
+  const status = statusLabel.trim();
+  return status ? `${number} · ${status}` : number;
 }
 
 export type AdminFeedbackFilter =

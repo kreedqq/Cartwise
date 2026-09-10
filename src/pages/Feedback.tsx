@@ -24,9 +24,12 @@ import {
   FEEDBACK_PAGE_SIZE,
   averageRating,
   eligibleOrdersForFeedback,
+  feedbackOrderChoiceLabel,
   formatAverageRating,
   ratingDistribution,
 } from "@/lib/feedback";
+import { ORDER_STATUS_LABELS } from "@/services/orders";
+import type { OrderStatus } from "@/types/database";
 
 export default function FeedbackPage() {
   const [page, setPage] = React.useState(0);
@@ -122,12 +125,12 @@ export default function FeedbackPage() {
           <div>
             <h2 className="text-lg font-semibold">Eigene Bestellung bewerten</h2>
             <p className="text-sm text-muted-foreground">
-              Nur abgeschlossene eigene Bestellungen. Eine Bewertung pro Bestellung.
+              Jede eigene Bestellung. Eine Bewertung pro Bestellung. Veröffentlichung erst nach Freigabe.
             </p>
           </div>
           {eligible.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Aktuell ist keine weitere abgeschlossene Bestellung zur Bewertung verfügbar.
+              Aktuell ist keine weitere eigene Bestellung zur Bewertung verfügbar.
             </p>
           ) : (
             <form className="space-y-4" onSubmit={(event) => void handleSubmit(event)}>
@@ -140,7 +143,10 @@ export default function FeedbackPage() {
                   <SelectContent>
                     {eligible.map((order) => (
                       <SelectItem key={order.id} value={order.id}>
-                        {order.order_number}
+                        {feedbackOrderChoiceLabel(
+                          order.order_number,
+                          ORDER_STATUS_LABELS[order.status as OrderStatus] ?? order.status,
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
