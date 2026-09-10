@@ -13,7 +13,8 @@
  * recomputed from the customer's current role.
  */
 
-import { calculateLineTotalUsd, convertUsdToEur, roundCurrency } from "@/lib/money";
+import { calculateLineTotalUsd, convertUsdToEur, formatDateTime, roundCurrency } from "@/lib/money";
+import { groupNameForOrder, membershipByOrderId } from "@/lib/orderGroups";
 
 export interface RoleSurchargeSnapshotLine {
   order_id: string;
@@ -201,4 +202,122 @@ export function buildRoleSurchargeCsv(report: RoleSurchargeReport): string {
   );
   rows.push(["Gesamt", report.totalSurchargeUsd, report.totalSurchargeEur ?? "", report.includedOrderCount, report.includedLineCount].join(";"));
   return [header.join(";"), ...rows].join("\n");
+}
+
+export interface OrderRoleSurchargeDetail {
+  orderId: string;
+  roleName: string;
+  surchargeUsd: number;
+  surchargeEur: number | null;
+}
+
+/** Per-order surcharge from frozen snapshots. Current role/price are ignored. */
+export function listOrderRoleSurchargeDetails(
+  lines: RoleSurchargeSnapshotLine[],
+  orders: RoleSurchargeOrderRef[],
+  orderIds: string[],
+): OrderRoleSurchargeDetail[] {
+  const orderById = new Map(orders.map((order) => [order.id, order]));
+  const linesByOrder = new Map<string, RoleSurchargeSnapshotLine[]>();
+  for (const line of lines) {
+    const list = linesByOrder.get(line.order_id) ?? [];
+    list.push(line);
+    linesByOrder.set(line.order_id, list);
+  }
+
+  const details: OrderRoleSurchargeDetail[] = [];
+  for (const orderId of [...new Set(orderIds)]) {
+    const order = orderById.get(orderId);
+    const orderLines = linesByOrder.get(orderId) ?? [];
+    if (orderLines.length === 0) continue;
+    if (order?.status === "cancelled") continue;
+    const byRole = new Map<string, { surchargeUsd: number; surchargeEur: number; eurMissing: boolean }>();
+    for (const line of orderLines) {
+      const name = roleLabel(line.customer_role_name_snapshot);
+      const bucket = byRole.get(name) ?? { surchargeUsd: 0, surchargeEur: 0, eurMissing: false };
+      bucket.surchargeUsd += line.surcharge_usd;
+      const eur = convertUsdToEur(line.surcharge_usd, order?.exchange_rate ?? null);
+      if (eur == null) bucket.eurMissing = true;
+      else bucket.surchargeEur += eur;
+      byRole.set(name, bucket);
+    }
+    for (const [roleName, bucket] of byRole) {
+      details.push({
+        orderId,
+        roleName,
+        surchargeUsd: roundCurrency(bucket.surchargeUsd),
+        surchargeEur: bucket.eurMissing ? null : roundCurrency(bucket.surchargeEur),
+      });
+    }
+  }
+  return details;
+}
+
+export interface OrderGroupSurchargeCsvRow {
+  groupName: string;
+  orderNumber: string;
+  submittedAt: string;
+  telegramUsername: string;
+  roleName: string;
+  surchargeUsd: number;
+  surchargeEur: number | null;
+}
+
+export function collectOrderGroupSurchargeCsvRows(input: {
+  groups: Array<{ id: string; name: string }>;
+  memberships: Array<{ group_id: string; order_id: string }>;
+  orders: Array<{
+    id: string;
+    order_number: string;
+    submitted_at: string;
+    telegram_username_snapshot: string | null;
+    status: string;
+    exchange_rate: number | null;
+    total_usd: number;
+  }>;
+  lines: RoleSurchargeSnapshotLine[];
+}): OrderGroupSurchargeCsvRow[] {
+  const membership = membershipByOrderId(input.memberships);
+  const details = listOrderRoleSurchargeDetails(
+    input.lines,
+    input.orders,
+    input.orders.map((order) => order.id),
+  );
+  const orderById = new Map(input.orders.map((order) => [order.id, order]));
+  return details.map((detail) => {
+    const order = orderById.get(detail.orderId);
+    return {
+      groupName: groupNameForOrder(detail.orderId, membership, input.groups),
+      orderNumber: order?.order_number ?? detail.orderId,
+      submittedAt: formatDateTime(order?.submitted_at),
+      telegramUsername: order?.telegram_username_snapshot?.trim() || "Nicht verfügbar",
+      roleName: detail.roleName,
+      surchargeUsd: detail.surchargeUsd,
+      surchargeEur: detail.surchargeEur,
+    };
+  });
+}
+
+export function buildOrderGroupSurchargeCsv(rows: OrderGroupSurchargeCsvRow[]): string {
+  const header = [
+    "Bestellgruppe",
+    "Bestellnummer",
+    "Bestelldatum",
+    "Telegram Benutzername",
+    "Rolle",
+    "Aufschlag USD",
+    "Aufschlag EUR",
+  ];
+  const body = rows.map((row) =>
+    [
+      row.groupName,
+      row.orderNumber,
+      row.submittedAt,
+      row.telegramUsername,
+      row.roleName,
+      row.surchargeUsd,
+      row.surchargeEur ?? "",
+    ].join(";"),
+  );
+  return [header.join(";"), ...body].join("\n");
 }

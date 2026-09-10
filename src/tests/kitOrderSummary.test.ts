@@ -1199,7 +1199,7 @@ describe("order summary PDF download", () => {
     expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("Dosis");
     expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("Wer hat was bestellt und in welcher Menge");
     expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("downloadProcessingOrderSummaryPdf");
-    expect(read("src/lib/orderSummaryExport.ts")).toContain('downloadPdf("Bestell-Zusammenfassung.pdf"');
+    expect(read("src/lib/orderSummaryExport.ts")).toContain('filename = "Bestell-Zusammenfassung.pdf"');
     expect(read("src/lib/orderSummaryExport.ts")).not.toContain("window.print");
     const empty = buildProcessingOrderSummary([], [], []);
     expect(empty.orderCount).toBe(0);

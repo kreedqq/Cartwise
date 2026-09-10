@@ -76,6 +76,7 @@ describe("hub admin navigation", () => {
     expect(orders?.items.map((item) => item.label)).toEqual([
       "Übersicht",
       "Bestell Zusammenfassung",
+      "Rollenaufschläge",
       "Versandkosten",
     ]);
     expect(orders?.items.map((item) => item.label)).not.toContain("Versand");
@@ -88,7 +89,6 @@ describe("hub admin navigation", () => {
     const users = ADMIN_NAV_GROUPS.find((group) => group.id === "users");
     expect(users?.items.map((item) => item.label)).toEqual([
       "Benutzer & Rollen",
-      "Rollenaufschläge",
       "Audit-Log",
     ]);
     expect(users?.items.map((item) => item.label)).not.toContain("Benutzer");

@@ -136,13 +136,19 @@ export function kitProcessingQuantity(
   kitShareId: string,
   participants: KitShareContextParticipant[],
   ordersById: Map<string, { status: string }>,
+  eligibleOrderIds?: ReadonlySet<string>,
 ): number {
   let filled = 0;
   for (const participant of participants) {
     if (participant.kit_share_id !== kitShareId) continue;
     if (!participant.order_id) continue;
     const order = ordersById.get(participant.order_id);
-    if (order?.status !== PROCESSING_STATUS) continue;
+    if (!order) continue;
+    if (eligibleOrderIds) {
+      if (!eligibleOrderIds.has(participant.order_id)) continue;
+    } else if (order.status !== PROCESSING_STATUS) {
+      continue;
+    }
     filled += asQuantity(participant.quantity);
   }
   return filled;

@@ -3,17 +3,24 @@ import { useNavigate } from "react-router-dom";
 import { FileDown, Search } from "lucide-react";
 
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminOrderGroups } from "@/components/admin/AdminOrderGroups";
 import { AdminSection } from "@/components/admin/AdminSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
 import { ShippingProgressSelect } from "@/components/orders/ShippingProgressSelect";
 import { useAdminOrderItems, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
+import { useOrderGroupMemberships, useOrderGroups } from "@/hooks/useOrderGroups";
+import { useQuery } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/lib/constants";
+import { membershipByOrderId, ungroupedOrders } from "@/lib/orderGroups";
+import { listRoleSurchargeLines } from "@/services/roleSurcharge";
 import { useAdminOrderProgressMap } from "@/hooks/useOrderProgress";
 import { resolveOrderProgress } from "@/lib/orderProgress";
 import { buildAdminOrderItemsCsv, downloadOrdersListCsv } from "@/lib/orderExport";
@@ -55,10 +62,19 @@ export default function AdminOrdersPage() {
   const itemsQuery = useAdminOrderItems();
   const progressQuery = useAdminOrderProgressMap();
   const directoryQuery = useAdminUserDirectory();
+  const groupsQuery = useOrderGroups();
+  const membershipQuery = useOrderGroupMemberships();
+  const surchargeQuery = useQuery({ queryKey: QUERY_KEYS.adminRoleSurcharges, queryFn: listRoleSurchargeLines });
   const [search, setSearch] = React.useState("");
   const [status, setStatus] = React.useState<"all" | OrderStatus>("all");
   const [payment, setPayment] = React.useState("all");
   const [shopArea, setShopArea] = React.useState("all");
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
+
+  const membership = React.useMemo(
+    () => membershipByOrderId(membershipQuery.data ?? []),
+    [membershipQuery.data],
+  );
 
   const filtered = React.useMemo(() => {
     const orders = ordersQuery.data ?? [];
@@ -89,6 +105,17 @@ export default function AdminOrdersPage() {
       );
     });
   }, [ordersQuery.data, itemsQuery.data, directoryQuery.data, search, status, payment, shopArea]);
+
+  const ungrouped = React.useMemo(() => ungroupedOrders(filtered, membership), [filtered, membership]);
+
+  function toggleSelected(orderId: string, checked: boolean) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (checked) next.add(orderId);
+      else next.delete(orderId);
+      return next;
+    });
+  }
 
   function handleExport() {
     const items = itemsQuery.data ?? [];
@@ -135,6 +162,21 @@ export default function AdminOrdersPage() {
   }
 
   const hasFilters = search.trim() !== "" || status !== "all" || payment !== "all" || shopArea !== "all";
+  const allOrders = ordersQuery.data ?? [];
+  const groups = groupsQuery.data ?? [];
+  const allUngroupedSelected = ungrouped.length > 0 && ungrouped.every((order) => selectedIds.has(order.id));
+  const someUngroupedSelected = ungrouped.some((order) => selectedIds.has(order.id));
+
+  function toggleUngroupedSelection(checked: boolean) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      for (const order of ungrouped) {
+        if (checked) next.add(order.id);
+        else next.delete(order.id);
+      }
+      return next;
+    });
+  }
 
   return (
     <div className="space-y-4">
@@ -205,7 +247,7 @@ export default function AdminOrdersPage() {
       {ordersQuery.isError && (
         <ErrorState message="Bestellungen konnten nicht geladen werden." onRetry={() => ordersQuery.refetch()} />
       )}
-      {!ordersQuery.isLoading && !ordersQuery.isError && filtered.length === 0 && (
+      {!ordersQuery.isLoading && !ordersQuery.isError && allOrders.length === 0 && groups.length === 0 && (
         <EmptyState
           title="Keine Bestellungen gefunden"
           description={
@@ -216,62 +258,165 @@ export default function AdminOrdersPage() {
         />
       )}
 
-      {/* Table — desktop */}
-      {filtered.length > 0 && (
-        <AdminSection>
-          <div className="hidden md:block">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="pl-4">Bestellung</TableHead>
-                  <TableHead>Telegram Benutzername</TableHead>
-                  <TableHead>Datum</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Zahlung</TableHead>
-                  <TableHead className="pr-4 text-right">Gesamt</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((order) => (
-                  <TableRow
-                    key={order.id}
-                    className="cursor-pointer"
-                    onClick={() => navigate(`/admin/orders/${order.id}`)}
-                  >
-                    <TableCell className="pl-4">
-                      <p className="font-mono text-xs font-semibold">{order.order_number}</p>
-                      <p className="mt-0.5 text-[11px] text-muted-foreground">{formatShopAreaLabel(order.shop_area)}</p>
-                    </TableCell>
-                    <TableCell className="text-sm font-medium">
-                      {formatOrderTelegramSnapshot(order)}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
-                      {formatDateTime(order.submitted_at)}
-                    </TableCell>
-                    <TableCell onClick={(event) => event.stopPropagation()}>
-                      <div className="min-w-[10rem] max-w-[14rem] space-y-1.5">
-                        <ShippingProgressSelect
-                          orderId={order.id}
-                          storedStatusKey={progressQuery.data?.get(order.id)?.status_key}
-                          disabled={order.status === "cancelled"}
+      {!ordersQuery.isLoading && !ordersQuery.isError && (
+        <div className="min-w-0 space-y-4 overflow-x-hidden">
+          <AdminOrderGroups
+            groups={groups}
+            memberships={membershipQuery.data ?? []}
+            orders={allOrders}
+            items={itemsQuery.data ?? []}
+            surchargeLines={surchargeQuery.data ?? []}
+            selectedIds={selectedIds}
+            onToggle={toggleSelected}
+            onAssigned={() => setSelectedIds(new Set())}
+          />
+
+          {ungrouped.length === 0 && (allOrders.length > 0 || groups.length > 0) && (
+            <p className="text-sm text-muted-foreground">
+              {hasFilters
+                ? "Keine nicht gruppierten Bestellungen für diesen Filter."
+                : "Keine nicht gruppierten Bestellungen."}
+            </p>
+          )}
+
+          {ungrouped.length > 0 && (
+            <AdminSection title="Nicht gruppiert" description={`${ungrouped.length} ${ungrouped.length === 1 ? "Bestellung" : "Bestellungen"}`}>
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-10 pl-4">
+                        <Checkbox
+                          checked={allUngroupedSelected ? true : someUngroupedSelected ? "indeterminate" : false}
+                          onCheckedChange={(value) => toggleUngroupedSelection(value === true)}
+                          aria-label="Nicht gruppierte Bestellungen auswählen"
                         />
-                        <p className="text-[11px] tabular-nums text-muted-foreground">
-                          {
-                            resolveOrderProgress(
-                              order.status,
-                              progressQuery.data?.get(order.id),
-                              order.submitted_at,
-                            ).progressPercent
-                          }{" "}
-                          %
-                        </p>
+                      </TableHead>
+                      <TableHead>Bestellung</TableHead>
+                      <TableHead>Telegram Benutzername</TableHead>
+                      <TableHead>Datum</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Zahlung</TableHead>
+                      <TableHead className="pr-4 text-right">Gesamt</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {ungrouped.map((order) => (
+                      <TableRow
+                        key={order.id}
+                        className="cursor-pointer"
+                        onClick={() => navigate(`/admin/orders/${order.id}`)}
+                      >
+                        <TableCell className="pl-4" onClick={(event) => event.stopPropagation()}>
+                          <Checkbox
+                            checked={selectedIds.has(order.id)}
+                            onCheckedChange={(value) => toggleSelected(order.id, value === true)}
+                            aria-label={order.order_number}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <p className="font-mono text-xs font-semibold">{order.order_number}</p>
+                          <p className="mt-0.5 text-[11px] text-muted-foreground">{formatShopAreaLabel(order.shop_area)}</p>
+                        </TableCell>
+                        <TableCell className="text-sm font-medium">
+                          {formatOrderTelegramSnapshot(order)}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                          {formatDateTime(order.submitted_at)}
+                        </TableCell>
+                        <TableCell onClick={(event) => event.stopPropagation()}>
+                          <div className="min-w-[10rem] max-w-[14rem] space-y-1.5">
+                            <ShippingProgressSelect
+                              orderId={order.id}
+                              storedStatusKey={progressQuery.data?.get(order.id)?.status_key}
+                              disabled={order.status === "cancelled"}
+                            />
+                            <p className="text-[11px] tabular-nums text-muted-foreground">
+                              {
+                                resolveOrderProgress(
+                                  order.status,
+                                  progressQuery.data?.get(order.id),
+                                  order.submitted_at,
+                                ).progressPercent
+                              }{" "}
+                              %
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <PaymentMethodBadge paymentMethod={order.payment_method} />
+                        </TableCell>
+                        <TableCell className="pr-4 text-right">
+                          <p className="tabular-nums text-sm font-semibold">
+                            {
+                              summarizeOrderCharges({
+                                productUsd: order.total_usd,
+                                productEur: order.total_eur,
+                                chinaAmount: order.china_shipping_amount,
+                                chinaCurrency: order.china_shipping_currency,
+                                deAmount: order.de_shipping_amount,
+                                deCurrency: order.de_shipping_currency,
+                                usdToEurRate: order.exchange_rate,
+                              }).grandDisplay
+                            }
+                          </p>
+                          <p className="tabular-nums text-[11px] text-muted-foreground">
+                            {formatUsd(order.total_usd)}
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div className="space-y-3 p-3 md:hidden">
+                {ungrouped.map((order) => (
+                  <div
+                    key={order.id}
+                    className="w-full min-w-0 space-y-2 rounded-lg border border-border bg-background p-3 text-left"
+                  >
+                    <div className="flex items-start gap-3">
+                      <Checkbox
+                        checked={selectedIds.has(order.id)}
+                        onCheckedChange={(value) => toggleSelected(order.id, value === true)}
+                        aria-label={order.order_number}
+                      />
+                      <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
+                        <button
+                          type="button"
+                          className="min-w-0 text-left"
+                          onClick={() => navigate(`/admin/orders/${order.id}`)}
+                        >
+                          <p className="font-mono text-sm font-semibold">{order.order_number}</p>
+                          <p className="mt-0.5 text-xs text-muted-foreground">
+                            Telegram: {formatOrderTelegramSnapshot(order)}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">{formatShopAreaLabel(order.shop_area)}</p>
+                        </button>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <PaymentMethodBadge paymentMethod={order.payment_method} />
-                    </TableCell>
-                    <TableCell className="pr-4 text-right">
-                      <p className="tabular-nums text-sm font-semibold">
+                    </div>
+                    <div className="min-w-0 space-y-1.5">
+                      <ShippingProgressSelect
+                        orderId={order.id}
+                        storedStatusKey={progressQuery.data?.get(order.id)?.status_key}
+                        disabled={order.status === "cancelled"}
+                      />
+                      <p className="text-[11px] tabular-nums text-muted-foreground">
+                        {
+                          resolveOrderProgress(order.status, progressQuery.data?.get(order.id), order.submitted_at)
+                            .progressPercent
+                        }{" "}
+                        %
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between gap-3 text-left text-xs text-muted-foreground"
+                      onClick={() => navigate(`/admin/orders/${order.id}`)}
+                    >
+                      <span>{formatDateTime(order.submitted_at)}</span>
+                      <span className="tabular-nums font-semibold text-foreground">
                         {
                           summarizeOrderCharges({
                             productUsd: order.total_usd,
@@ -283,75 +428,15 @@ export default function AdminOrdersPage() {
                             usdToEurRate: order.exchange_rate,
                           }).grandDisplay
                         }
-                      </p>
-                      <p className="tabular-nums text-[11px] text-muted-foreground">
-                        {formatUsd(order.total_usd)}
-                      </p>
-                    </TableCell>
-                  </TableRow>
+                      </span>
+                    </button>
+                    <PaymentMethodBadge paymentMethod={order.payment_method} />
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
-          </div>
-
-          <div className="space-y-3 p-3 md:hidden">
-            {filtered.map((order) => (
-              <div
-                key={order.id}
-                className="w-full space-y-2 rounded-lg border border-border bg-background p-3 text-left"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <button
-                    type="button"
-                    className="min-w-0 text-left"
-                    onClick={() => navigate(`/admin/orders/${order.id}`)}
-                  >
-                    <p className="font-mono text-sm font-semibold">{order.order_number}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      Telegram: {formatOrderTelegramSnapshot(order)}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground">{formatShopAreaLabel(order.shop_area)}</p>
-                  </button>
-                </div>
-                <div className="min-w-0 space-y-1.5">
-                  <ShippingProgressSelect
-                    orderId={order.id}
-                    storedStatusKey={progressQuery.data?.get(order.id)?.status_key}
-                    disabled={order.status === "cancelled"}
-                  />
-                  <p className="text-[11px] tabular-nums text-muted-foreground">
-                    {
-                      resolveOrderProgress(order.status, progressQuery.data?.get(order.id), order.submitted_at)
-                        .progressPercent
-                    }{" "}
-                    %
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between gap-3 text-left text-xs text-muted-foreground"
-                  onClick={() => navigate(`/admin/orders/${order.id}`)}
-                >
-                  <span>{formatDateTime(order.submitted_at)}</span>
-                  <span className="tabular-nums font-semibold text-foreground">
-                    {
-                      summarizeOrderCharges({
-                        productUsd: order.total_usd,
-                        productEur: order.total_eur,
-                        chinaAmount: order.china_shipping_amount,
-                        chinaCurrency: order.china_shipping_currency,
-                        deAmount: order.de_shipping_amount,
-                        deCurrency: order.de_shipping_currency,
-                        usdToEurRate: order.exchange_rate,
-                      }).grandDisplay
-                    }
-                  </span>
-                </button>
-                <PaymentMethodBadge paymentMethod={order.payment_method} />
               </div>
-            ))}
-          </div>
-        </AdminSection>
+            </AdminSection>
+          )}
+        </div>
       )}
     </div>
   );

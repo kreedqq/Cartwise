@@ -683,6 +683,36 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["announcements"]["Row"]>;
         Relationships: never[];
       };
+      order_groups: {
+        Row: {
+          id: string;
+          name: string;
+          note: string | null;
+          archived_at: string | null;
+          created_at: string;
+          updated_at: string;
+          created_by: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["order_groups"]["Row"]> & {
+          name: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["order_groups"]["Row"]>;
+        Relationships: never[];
+      };
+      order_group_orders: {
+        Row: {
+          group_id: string;
+          order_id: string;
+          added_at: string;
+          added_by: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["order_group_orders"]["Row"]> & {
+          group_id: string;
+          order_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["order_group_orders"]["Row"]>;
+        Relationships: never[];
+      };
       substances: {
         Row: {
           id: string;

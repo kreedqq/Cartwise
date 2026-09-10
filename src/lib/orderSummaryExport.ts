@@ -119,10 +119,14 @@ export function buildProcessingOrderSummaryPdf(
   return buildPeptixOrderSummaryPdf(summary, exportedAt);
 }
 
-export function downloadProcessingOrderSummaryPdf(summary: ProcessingOrderSummary, exportedAt: string): Uint8Array | null {
+export function downloadProcessingOrderSummaryPdf(
+  summary: ProcessingOrderSummary,
+  exportedAt: string,
+  filename = "Bestell-Zusammenfassung.pdf",
+): Uint8Array | null {
   if (summary.orderCount === 0) return null;
   const bytes = buildProcessingOrderSummaryPdf(summary, exportedAt);
-  downloadPdf("Bestell-Zusammenfassung.pdf", bytes);
+  downloadPdf(filename, bytes);
   return bytes;
 }
 

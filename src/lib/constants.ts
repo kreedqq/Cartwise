@@ -57,4 +57,6 @@ export const QUERY_KEYS = {
   researchConsent: (userId: string) => ["research-consent", userId] as const,
   announcements: ["announcements"] as const,
   adminAnnouncements: ["admin-announcements"] as const,
+  adminOrderGroups: ["admin-order-groups"] as const,
+  adminOrderGroupOrders: ["admin-order-group-orders"] as const,
 };

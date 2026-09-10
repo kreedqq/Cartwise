@@ -35,10 +35,12 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     match: (pathname) =>
       pathname.startsWith("/admin/orders") ||
       pathname.startsWith("/admin/shipping") ||
-      pathname.startsWith("/admin/order-summary"),
+      pathname.startsWith("/admin/order-summary") ||
+      pathname.startsWith("/admin/surcharges"),
     items: [
       { to: "/admin/orders", label: "Übersicht", matchPrefix: true },
       { to: "/admin/order-summary", label: "Bestell Zusammenfassung" },
+      { to: "/admin/surcharges", label: "Rollenaufschläge" },
       { to: "/admin/shipping-costs", label: "Versandkosten" },
     ],
   },
@@ -63,11 +65,9 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     match: (pathname) =>
       pathname.startsWith("/admin/users") ||
       pathname.startsWith("/admin/roles") ||
-      pathname.startsWith("/admin/surcharges") ||
       pathname.startsWith("/admin/audit-log"),
     items: [
       { to: "/admin/users", label: "Benutzer & Rollen" },
-      { to: "/admin/surcharges", label: "Rollenaufschläge" },
       { to: "/admin/audit-log", label: "Audit-Log" },
     ],
   },

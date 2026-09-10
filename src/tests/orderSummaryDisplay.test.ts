@@ -14,7 +14,8 @@ describe("admin Bestell Zusammenfassung", () => {
     expect(nav).toContain('label: "Übersicht"');
     expect(nav).not.toContain('label: "Versand"');
     expect(nav.indexOf('label: "Übersicht"')).toBeLessThan(nav.indexOf('label: "Bestell Zusammenfassung"'));
-    expect(nav.indexOf('label: "Bestell Zusammenfassung"')).toBeLessThan(nav.indexOf('label: "Versandkosten"'));
+    expect(nav.indexOf('label: "Bestell Zusammenfassung"')).toBeLessThan(nav.indexOf('label: "Rollenaufschläge"'));
+    expect(nav.indexOf('label: "Rollenaufschläge"')).toBeLessThan(nav.indexOf('label: "Versandkosten"'));
     expect(nav).toContain('label: "Versandkosten"');
     expect(nav).toContain('to: "/admin/shipping-costs"');
     expect(read("src/App.tsx")).toContain('path="order-summary"');
@@ -22,15 +23,18 @@ describe("admin Bestell Zusammenfassung", () => {
     expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("Als PDF exportieren");
   });
 
-  it("builds the list only from processing orders and existing snapshots", () => {
+  it("builds persistent group summaries from assigned orders, not only processing", () => {
     const page = read("src/pages/admin/AdminOrderSummary.tsx");
     expect(page).toContain("buildProcessingOrderSummary");
     expect(page).toContain("useAdminOrders");
-    expect(page).toContain("Keine Bestellungen in Bearbeitung");
+    expect(page).toContain("useOrderGroups");
     expect(page).toContain("disabled={summary.orderCount === 0}");
     expect(page).toContain("if (summary.orderCount === 0) return");
     expect(page).toContain("downloadProcessingOrderSummaryPdf");
     expect(page).toContain("useAdminKitOrderContext");
+    expect(page).toContain("UNGROUPED_ORDER_GROUP_NAME");
+    expect(page).not.toContain("Nur Bestellungen mit dem Status");
+    expect(page).not.toContain("Keine Bestellungen in Bearbeitung");
     expect(read("src/lib/orderSummaryExport.ts")).toContain("if (summary.orderCount === 0) return");
     expect(read("src/lib/orderSummaryExport.ts")).toContain("downloadPdf");
     expect(read("src/lib/orderSummaryExport.ts")).toContain("buildProcessingOrderSummaryPdf");
@@ -42,6 +46,7 @@ describe("admin Bestell Zusammenfassung", () => {
     expect(read("src/lib/orderSummary.ts")).toContain('PROCESSING_ORDER_STATUS: OrderStatus = "processing"');
     expect(read("src/lib/orderSummary.ts")).toContain("formatOrderTelegramSnapshot");
     expect(read("src/lib/orderSummary.ts")).not.toContain("from(\"profiles\")");
+    expect(read("src/lib/orderSummary.ts")).toContain("includedOrderIds");
   });
 
   it("keeps the inbox order number and shows shipping progress as the list status", () => {

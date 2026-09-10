@@ -230,15 +230,18 @@ function isKitFullyComplete(progress: { completeKits: number; remainderVials: nu
   return Boolean(progress && progress.completeKits > 0 && progress.remainderVials === 0);
 }
 
-/** Merchant buy list from frozen order_items of processing orders only. */
+/** Merchant buy list from frozen order_items. Default: processing orders only. Pass includedOrderIds for a persistent order group (any status). */
 export function buildProcessingOrderSummary(
   orders: Tables<"orders">[],
   items: Tables<"order_items">[],
   catalog: CatalogCategoryHint[] = [],
   kitContext?: KitShareOrderContext | null,
+  includedOrderIds?: ReadonlySet<string> | null,
 ): ProcessingOrderSummary {
   const resolvedKitInput = resolveKitContext(kitContext);
-  const processing = orders.filter(isProcessingOrder);
+  const processing = includedOrderIds
+    ? orders.filter((order) => includedOrderIds.has(order.id))
+    : orders.filter(isProcessingOrder);
   const processingIds = new Set(processing.map((order) => order.id));
   const processingItems = items.filter((item) => processingIds.has(item.order_id));
 
@@ -279,7 +282,12 @@ export function buildProcessingOrderSummary(
     }
   >();
   for (const kit of resolvedKitInput.kits) {
-    const fromParticipants = kitProcessingQuantity(kit.id, participants, ordersById);
+    const fromParticipants = kitProcessingQuantity(
+      kit.id,
+      participants,
+      ordersById,
+      includedOrderIds ? processingIds : undefined,
+    );
     const fromItems = (kitItemsByShare.get(kit.id) ?? []).reduce((sum, item) => sum + asQuantity(item.quantity), 0);
     // Same kit_share_id: use processing lines even if a participant row is missing from the admin fetch.
     const processingQuantity = Math.max(fromParticipants, fromItems);
