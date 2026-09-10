@@ -65,14 +65,17 @@ describe("maintenance access", () => {
     expect(read("src/components/admin/EmergencyMaintenanceButton.tsx")).toContain("Maintenance aktivieren");
     expect(existsSync(resolve(process.cwd(), "public/maintenance-pause.jpg"))).toBe(true);
     expect(existsSync(resolve(process.cwd(), "public/maintenance-pause-4k.jpg"))).toBe(true);
+    expect(existsSync(resolve(process.cwd(), "public/maintenance-pause-mobile.jpg"))).toBe(true);
     expect(statSync(resolve(process.cwd(), "public/maintenance-pause-4k.jpg")).size).toBeGreaterThan(500_000);
     const screen = read("src/components/maintenance/MaintenanceScreen.tsx");
     const css = read("src/components/maintenance/maintenanceScreen.css");
     const layout = read("src/lib/maintenanceArt.ts");
     expect(screen).toContain("maintenanceArtLayout");
     expect(layout).toContain("/maintenance-pause-4k.jpg");
+    expect(layout).toContain("/maintenance-pause-mobile.jpg");
     expect(layout).toContain("3840");
     expect(layout).toContain("2160");
+    expect(layout).toContain("MAINTENANCE_MOBILE_MAX_WIDTH");
     expect(css).toContain("100dvh");
     expect(css).toContain("overflow: hidden");
     expect(screen).not.toContain("max-w-[1200px]");

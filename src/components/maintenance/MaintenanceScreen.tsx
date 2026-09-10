@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { MAINTENANCE_ART_SRC, maintenanceArtLayout } from "@/lib/maintenanceArt";
+import { maintenanceArtLayout } from "@/lib/maintenanceArt";
 
 import "./maintenanceScreen.css";
 
@@ -45,6 +45,7 @@ export function MaintenanceScreen({
           className="cw-maint__ambience"
           aria-hidden="true"
           data-active={layout.useAmbience ? "true" : "false"}
+          style={{ backgroundImage: `url(${layout.ambienceSrc})` }}
         />
         <div
           className="cw-maint__art"
@@ -52,7 +53,7 @@ export function MaintenanceScreen({
           aria-label="Peptix"
           data-mode={layout.mode}
           style={{
-            backgroundImage: `url(${MAINTENANCE_ART_SRC})`,
+            backgroundImage: `url(${layout.src})`,
             backgroundSize: layout.backgroundSize,
             backgroundPosition: layout.backgroundPosition,
           }}
