@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -64,15 +64,19 @@ describe("maintenance access", () => {
     expect(read("src/components/admin/EmergencyMaintenanceButton.tsx")).toContain("Notfallmodus aktivieren?");
     expect(read("src/components/admin/EmergencyMaintenanceButton.tsx")).toContain("Maintenance aktivieren");
     expect(existsSync(resolve(process.cwd(), "public/maintenance-pause.jpg"))).toBe(true);
+    expect(existsSync(resolve(process.cwd(), "public/maintenance-pause-4k.jpg"))).toBe(true);
+    expect(statSync(resolve(process.cwd(), "public/maintenance-pause-4k.jpg")).size).toBeGreaterThan(500_000);
     const screen = read("src/components/maintenance/MaintenanceScreen.tsx");
-    expect(screen).toContain("maintenance-pause.jpg");
-    expect(screen).toContain("fixed inset-0");
-    expect(screen).toContain("h-[100dvh]");
-    expect(screen).toContain("w-screen");
-    expect(screen).toContain("bg-cover");
-    expect(screen).toContain("bg-center");
-    expect(screen).toContain("bg-no-repeat");
+    const css = read("src/components/maintenance/maintenanceScreen.css");
+    const layout = read("src/lib/maintenanceArt.ts");
+    expect(screen).toContain("maintenanceArtLayout");
+    expect(layout).toContain("/maintenance-pause-4k.jpg");
+    expect(layout).toContain("3840");
+    expect(layout).toContain("2160");
+    expect(css).toContain("100dvh");
+    expect(css).toContain("overflow: hidden");
     expect(screen).not.toContain("max-w-[1200px]");
+    expect(css).not.toContain("max-w-[1200px]");
     expect(screen).not.toContain("PEPTIX macht gerade kurz Pause");
     expect(screen).not.toContain("Wartungsarbeiten laufen");
     expect(screen).not.toContain("Vielen Dank");

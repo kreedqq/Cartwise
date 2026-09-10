@@ -1,0 +1,49 @@
+.cw-maint {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+.cw-maint__stage {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #000;
+}
+
+.cw-maint__ambience {
+  position: absolute;
+  inset: -14%;
+  background-color: #000;
+  background-image: url("/maintenance-pause.jpg");
+  background-repeat: no-repeat;
+  background-position: center 42%;
+  background-size: cover;
+  filter: blur(36px) saturate(1.18) brightness(0.36);
+  transform: scale(1.08);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.cw-maint__ambience[data-active="true"] {
+  opacity: 1;
+}
+
+.cw-maint__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center 46%;
+  background-size: cover;
+}
