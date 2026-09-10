@@ -2,12 +2,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@/lib/constants";
 import {
+  clearAnnouncementImage,
   createAnnouncement,
   deleteAnnouncement,
   listAllAnnouncements,
   listPublishedAnnouncements,
+  replaceAnnouncementImage,
   setAnnouncementPublished,
   updateAnnouncement,
+  type Announcement,
   type AnnouncementInput,
 } from "@/services/announcements";
 
@@ -60,7 +63,24 @@ export function useSetAnnouncementPublished() {
 export function useDeleteAnnouncement() {
   const invalidate = useInvalidateAnnouncements();
   return useMutation({
-    mutationFn: (id: string) => deleteAnnouncement(id),
+    mutationFn: (row: Announcement) => deleteAnnouncement(row),
+    onSuccess: invalidate,
+  });
+}
+
+export function useReplaceAnnouncementImage() {
+  const invalidate = useInvalidateAnnouncements();
+  return useMutation({
+    mutationFn: ({ row, file, focalX, focalY }: { row: Announcement; file: File; focalX: number; focalY: number }) =>
+      replaceAnnouncementImage(row, file, focalX, focalY),
+    onSuccess: invalidate,
+  });
+}
+
+export function useClearAnnouncementImage() {
+  const invalidate = useInvalidateAnnouncements();
+  return useMutation({
+    mutationFn: (row: Announcement) => clearAnnouncementImage(row),
     onSuccess: invalidate,
   });
 }

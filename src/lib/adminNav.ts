@@ -22,6 +22,20 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: [],
   },
   {
+    id: "design",
+    label: "Design",
+    to: "/admin/design",
+    match: (pathname) => pathname === "/admin/design" || pathname.startsWith("/admin/design/"),
+    items: [],
+  },
+  {
+    id: "feedback",
+    label: "Feedback",
+    to: "/admin/feedback",
+    match: (pathname) => pathname === "/admin/feedback" || pathname.startsWith("/admin/feedback/"),
+    items: [],
+  },
+  {
     id: "overview",
     label: "Übersicht",
     to: "/admin",

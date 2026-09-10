@@ -37,6 +37,8 @@ describe("hub admin navigation", () => {
   it("exposes Ankündigungen first, then the existing admin hubs", () => {
     expect(ADMIN_NAV_GROUPS.map((group) => group.label)).toEqual([
       "Ankündigungen",
+      "Design",
+      "Feedback",
       "Übersicht",
       "Bestellungen",
       "Produkte",
@@ -64,6 +66,8 @@ describe("hub admin navigation", () => {
         "/admin/audit-log",
         "/admin/research",
         "/admin/announcements",
+        "/admin/design",
+        "/admin/feedback",
       ]),
     );
     expect(destinations).not.toContain("/admin/pdf-import");
@@ -126,6 +130,8 @@ describe("hub admin navigation", () => {
       'path="audit-log"',
       'path="research"',
       'path="announcements"',
+      'path="design"',
+      'path="feedback"',
     ]) {
       expect(app).toContain(path);
     }

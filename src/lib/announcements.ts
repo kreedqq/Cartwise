@@ -5,6 +5,9 @@ export interface AnnouncementFeedItem {
   published: boolean;
   pinned: boolean;
   image_url: string | null;
+  image_path: string | null;
+  image_focal_x?: number;
+  image_focal_y?: number;
   external_url: string | null;
   created_at: string;
   updated_at: string;
@@ -37,4 +40,21 @@ export function isSafeExternalUrl(url: string | null | undefined): boolean {
   } catch {
     return false;
   }
+}
+
+export function announcementImageSrc(
+  item: Pick<AnnouncementFeedItem, "image_path" | "image_url">,
+  publicUrlForPath?: (path: string) => string | null,
+): string | null {
+  if (item.image_path && publicUrlForPath) {
+    return publicUrlForPath(item.image_path);
+  }
+  if (isSafeExternalUrl(item.image_url)) return item.image_url;
+  return null;
+}
+
+export function announcementFocalPosition(item: Pick<AnnouncementFeedItem, "image_focal_x" | "image_focal_y">): string {
+  const x = item.image_focal_x ?? 50;
+  const y = item.image_focal_y ?? 50;
+  return `${x}% ${y}%`;
 }

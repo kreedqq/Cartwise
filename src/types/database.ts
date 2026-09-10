@@ -670,6 +670,9 @@ export interface Database {
           published: boolean;
           pinned: boolean;
           image_url: string | null;
+          image_path: string | null;
+          image_focal_x: number;
+          image_focal_y: number;
           external_url: string | null;
           created_at: string;
           updated_at: string;
@@ -682,6 +685,53 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["announcements"]["Row"]>;
         Relationships: never[];
+      };
+      site_design_settings: {
+        Row: {
+          id: boolean;
+          enabled: boolean;
+          config: Record<string, unknown>;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["site_design_settings"]["Row"]> & {
+          id?: boolean;
+        };
+        Update: Partial<Database["public"]["Tables"]["site_design_settings"]["Row"]>;
+        Relationships: never[];
+      };
+      order_feedback: {
+        Row: {
+          id: string;
+          order_id: string;
+          user_id: string | null;
+          rating: number;
+          body: string;
+          image_path: string | null;
+          image_consent: boolean;
+          status: "pending" | "approved" | "rejected" | "hidden";
+          display_name: string | null;
+          is_featured: boolean;
+          created_at: string;
+          updated_at: string;
+          approved_at: string | null;
+          approved_by: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["order_feedback"]["Row"]> & {
+          order_id: string;
+          rating: number;
+          body: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["order_feedback"]["Row"]>;
+        Relationships: [
+          {
+            foreignKeyName: "order_feedback_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: true;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       order_groups: {
         Row: {

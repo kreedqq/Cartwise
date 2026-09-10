@@ -3,8 +3,14 @@ export const BRAND_NAME = "Peptix";
 export const BRAND_TAGLINE = "B2B Bestellplattform";
 
 export const PDF_IMPORT_BUCKET = "pdf-imports";
+export const ANNOUNCEMENT_MEDIA_BUCKET = "announcement-media";
+export const SITE_DESIGN_BUCKET = "site-design";
+export const FEEDBACK_MEDIA_BUCKET = "feedback-media";
 export const MAX_PDF_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+export const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+export const MAX_DESIGN_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
 export const ALLOWED_PDF_MIME_TYPES = ["application/pdf"];
+export const ALLOWED_IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 
 export const EXCHANGE_RATE_CACHE_MINUTES = 60;
 export const EXCHANGE_RATE_STALE_WARNING_HOURS = 26;
@@ -59,4 +65,10 @@ export const QUERY_KEYS = {
   adminAnnouncements: ["admin-announcements"] as const,
   adminOrderGroups: ["admin-order-groups"] as const,
   adminOrderGroupOrders: ["admin-order-group-orders"] as const,
+  siteDesign: ["site-design"] as const,
+  approvedFeedback: (page: number) => ["approved-feedback", page] as const,
+  myFeedback: ["my-feedback"] as const,
+  adminFeedback: (filters: unknown) => ["admin-feedback", filters] as const,
+  feedbackStats: ["feedback-stats"] as const,
+  feedbackImage: (path: string) => ["feedback-image", path] as const,
 };

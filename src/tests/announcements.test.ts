@@ -56,6 +56,7 @@ describe("announcements", () => {
       "Ankündigungen",
       "Übersicht",
       "Shop",
+      "Feedback",
       "Lexikon & Rechner",
       "Meine Bestellungen",
       "Profil",

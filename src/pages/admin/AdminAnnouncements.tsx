@@ -5,6 +5,7 @@ import { AdminSection } from "@/components/admin/AdminSection";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
+import { ImageDropzone } from "@/components/media/ImageDropzone";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -13,13 +14,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   useAdminAnnouncements,
+  useClearAnnouncementImage,
   useCreateAnnouncement,
   useDeleteAnnouncement,
+  useReplaceAnnouncementImage,
   useSetAnnouncementPublished,
   useUpdateAnnouncement,
 } from "@/hooks/useAnnouncements";
-import { formatAnnouncementDate } from "@/lib/announcements";
+import { announcementFocalPosition, announcementImageSrc, formatAnnouncementDate } from "@/lib/announcements";
 import type { Announcement, AnnouncementInput } from "@/services/announcements";
+import { announcementPublicUrl } from "@/services/announcements";
 import { toast } from "@/components/ui/toaster";
 
 const EMPTY_FORM: AnnouncementInput = {
@@ -28,6 +32,9 @@ const EMPTY_FORM: AnnouncementInput = {
   published: false,
   pinned: false,
   image_url: "",
+  image_path: null,
+  image_focal_x: 50,
+  image_focal_y: 50,
   external_url: "",
 };
 
@@ -37,37 +44,64 @@ export default function AdminAnnouncementsPage() {
   const updateMutation = useUpdateAnnouncement();
   const publishMutation = useSetAnnouncementPublished();
   const deleteMutation = useDeleteAnnouncement();
+  const replaceImage = useReplaceAnnouncementImage();
+  const clearImage = useClearAnnouncementImage();
   const [form, setForm] = React.useState<AnnouncementInput>(EMPTY_FORM);
-  const [editingId, setEditingId] = React.useState<string | null>(null);
-  const [deleteId, setDeleteId] = React.useState<string | null>(null);
+  const [editing, setEditing] = React.useState<Announcement | null>(null);
+  const [deleteRow, setDeleteRow] = React.useState<Announcement | null>(null);
+  const [pendingFile, setPendingFile] = React.useState<File | null>(null);
+  const [pendingPreview, setPendingPreview] = React.useState<string | null>(null);
+  const [removeExistingImage, setRemoveExistingImage] = React.useState(false);
+
+  React.useEffect(() => {
+    return () => {
+      if (pendingPreview) URL.revokeObjectURL(pendingPreview);
+    };
+  }, [pendingPreview]);
 
   function startEdit(item: Announcement) {
-    setEditingId(item.id);
+    setEditing(item);
     setForm({
       title: item.title,
       content: item.content,
       published: item.published,
       pinned: item.pinned,
       image_url: item.image_url ?? "",
+      image_path: item.image_path,
+      image_focal_x: item.image_focal_x ?? 50,
+      image_focal_y: item.image_focal_y ?? 50,
       external_url: item.external_url ?? "",
     });
+    setPendingFile(null);
+    setPendingPreview(null);
+    setRemoveExistingImage(false);
   }
 
   function resetForm() {
-    setEditingId(null);
+    setEditing(null);
     setForm(EMPTY_FORM);
+    setPendingFile(null);
+    setPendingPreview(null);
+    setRemoveExistingImage(false);
   }
 
   async function handleSave(event: React.FormEvent) {
     event.preventDefault();
     try {
-      if (editingId) {
-        await updateMutation.mutateAsync({ id: editingId, input: form });
-        toast.success("Ankündigung gespeichert.");
-      } else {
-        await createMutation.mutateAsync(form);
-        toast.success("Ankündigung erstellt.");
+      const saved = editing
+        ? await updateMutation.mutateAsync({ id: editing.id, input: form })
+        : await createMutation.mutateAsync(form);
+      if (pendingFile) {
+        await replaceImage.mutateAsync({
+          row: saved,
+          file: pendingFile,
+          focalX: form.image_focal_x ?? 50,
+          focalY: form.image_focal_y ?? 50,
+        });
+      } else if (editing && removeExistingImage && editing.image_path) {
+        await clearImage.mutateAsync(editing);
       }
+      toast.success(editing ? "Ankündigung gespeichert." : "Ankündigung erstellt.");
       resetForm();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Speichern fehlgeschlagen.");
@@ -75,12 +109,15 @@ export default function AdminAnnouncementsPage() {
   }
 
   const items = listQuery.data ?? [];
+  const previewUrl =
+    pendingPreview ??
+    (removeExistingImage ? null : announcementImageSrc(editing ?? { image_path: form.image_path ?? null, image_url: form.image_url ?? null }, announcementPublicUrl));
 
   return (
     <div className="space-y-4">
-      <AdminPageHeader title="Ankündigungen" description="Veröffentlichte Einträge erscheinen im Kundenbereich." />
+      <AdminPageHeader title="Ankündigungen" description="Veröffentlichte Einträge erscheinen im Kundenbereich. Bilder optional im 16:9-Rahmen." />
 
-      <AdminSection title={editingId ? "Ankündigung bearbeiten" : "Neue Ankündigung"}>
+      <AdminSection title={editing ? "Ankündigung bearbeiten" : "Neue Ankündigung"}>
         <form className="space-y-3 p-4" onSubmit={(event) => void handleSave(event)}>
           <div className="space-y-1.5">
             <Label htmlFor="announcement-title">Titel</Label>
@@ -103,23 +140,63 @@ export default function AdminAnnouncementsPage() {
               rows={6}
             />
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="announcement-image">Bild-URL (optional)</Label>
-              <Input
-                id="announcement-image"
-                value={form.image_url ?? ""}
-                onChange={(event) => setForm((current) => ({ ...current, image_url: event.target.value }))}
-              />
+          <div className="space-y-1.5">
+            <Label>Ankündigungsbild (optional, 16:9)</Label>
+            <ImageDropzone
+              previewUrl={previewUrl}
+              objectPosition={announcementFocalPosition({
+                image_focal_x: form.image_focal_x,
+                image_focal_y: form.image_focal_y,
+              })}
+              onFile={(file) => {
+                if (pendingPreview) URL.revokeObjectURL(pendingPreview);
+                setPendingFile(file);
+                setPendingPreview(URL.createObjectURL(file));
+                setRemoveExistingImage(false);
+              }}
+              onRemove={() => {
+                if (pendingPreview) URL.revokeObjectURL(pendingPreview);
+                setPendingFile(null);
+                setPendingPreview(null);
+                setRemoveExistingImage(true);
+              }}
+            />
+          </div>
+          {previewUrl ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="announcement-focal-x">Bildfokus X ({form.image_focal_x ?? 50}%)</Label>
+                <input
+                  id="announcement-focal-x"
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={form.image_focal_x ?? 50}
+                  onChange={(event) => setForm((current) => ({ ...current, image_focal_x: Number(event.target.value) }))}
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="announcement-focal-y">Bildfokus Y ({form.image_focal_y ?? 50}%)</Label>
+                <input
+                  id="announcement-focal-y"
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={form.image_focal_y ?? 50}
+                  onChange={(event) => setForm((current) => ({ ...current, image_focal_y: Number(event.target.value) }))}
+                  className="w-full"
+                />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="announcement-link">Link (optional)</Label>
-              <Input
-                id="announcement-link"
-                value={form.external_url ?? ""}
-                onChange={(event) => setForm((current) => ({ ...current, external_url: event.target.value }))}
-              />
-            </div>
+          ) : null}
+          <div className="space-y-1.5">
+            <Label htmlFor="announcement-link">Link (optional)</Label>
+            <Input
+              id="announcement-link"
+              value={form.external_url ?? ""}
+              onChange={(event) => setForm((current) => ({ ...current, external_url: event.target.value }))}
+            />
           </div>
           <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2 text-sm">
@@ -138,10 +215,10 @@ export default function AdminAnnouncementsPage() {
             </label>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button type="submit" loading={createMutation.isPending || updateMutation.isPending}>
-              {editingId ? "Speichern" : "Erstellen"}
+            <Button type="submit" loading={createMutation.isPending || updateMutation.isPending || replaceImage.isPending}>
+              {editing ? "Speichern" : "Erstellen"}
             </Button>
-            {editingId ? (
+            {editing ? (
               <Button type="button" variant="outline" onClick={resetForm}>
                 Abbrechen
               </Button>
@@ -172,6 +249,7 @@ export default function AdminAnnouncementsPage() {
                 <p className="text-xs text-muted-foreground">
                   {item.published ? "Veröffentlicht" : "Entwurf"}
                   {item.pinned ? " · Gepinnt" : ""}
+                  {item.image_path || item.image_url ? " · Mit Bild" : ""}
                   {item.published_at ? ` · ${formatAnnouncementDate(item.published_at)}` : ""}
                 </p>
               </div>
@@ -188,7 +266,7 @@ export default function AdminAnnouncementsPage() {
                 >
                   {item.published ? "Zurücknehmen" : "Veröffentlichen"}
                 </Button>
-                <Button type="button" size="sm" variant="destructive" onClick={() => setDeleteId(item.id)}>
+                <Button type="button" size="sm" variant="destructive" onClick={() => setDeleteRow(item)}>
                   Löschen
                 </Button>
               </div>
@@ -198,19 +276,19 @@ export default function AdminAnnouncementsPage() {
       </AdminSection>
 
       <ConfirmDialog
-        open={deleteId != null}
+        open={deleteRow != null}
         onOpenChange={(open) => {
-          if (!open) setDeleteId(null);
+          if (!open) setDeleteRow(null);
         }}
         title="Ankündigung löschen?"
-        description="Die Ankündigung wird dauerhaft entfernt."
+        description="Die Ankündigung und das zugehörige Bild werden dauerhaft entfernt."
         confirmLabel="Löschen"
         variant="destructive"
         loading={deleteMutation.isPending}
         onConfirm={async () => {
-          if (!deleteId) return;
-          await deleteMutation.mutateAsync(deleteId);
-          setDeleteId(null);
+          if (!deleteRow) return;
+          await deleteMutation.mutateAsync(deleteRow);
+          setDeleteRow(null);
         }}
       />
     </div>
