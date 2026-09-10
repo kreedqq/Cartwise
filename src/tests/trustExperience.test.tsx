@@ -15,6 +15,10 @@ import {
   validateFeedbackBody,
   validateFeedbackRating,
   isPublicFeedbackStatus,
+  resolveFeedbackOrderId,
+  isVerifiedOrderFeedback,
+  feedbackProvenanceLabel,
+  FEEDBACK_NO_ORDER_VALUE,
 } from "@/lib/feedback";
 import { isAllowedImageExtension, sniffImageMime } from "@/lib/mediaUpload";
 import { designHasVisibleBackground, EMPTY_SITE_DESIGN, parseSiteDesignConfig, resolvedDesignLayer } from "@/lib/siteDesign";
@@ -143,7 +147,8 @@ describe("verified order feedback", () => {
     expect(sql).not.toContain("update public.orders");
     expect(read("src/services/feedback.ts")).toContain('.eq("status", "approved")');
     expect(read("src/services/feedback.ts")).toContain("status: \"pending\"");
-    expect(read("src/components/feedback/FeedbackCard.tsx")).toContain("Verifizierte Bestellung");
+    expect(read("src/components/feedback/FeedbackCard.tsx")).toContain("feedbackProvenanceLabel");
+    expect(read("src/lib/feedback.ts")).toContain("Verifizierte Bestellung");
     expect(read("src/pages/Feedback.tsx")).toContain("image_consent");
     expect(read("src/pages/admin/AdminFeedback.tsx")).toContain("Freigeben");
     expect(read("src/App.tsx")).toContain('path="/feedback"');
@@ -256,6 +261,69 @@ describe("responsive trust surfaces", () => {
     expect(read("src/pages/admin/AdminDesign.tsx")).not.toContain("compact");
     expect(read("src/services/feedback.ts")).toContain('status: "pending"');
     expect(read("src/lib/feedback.ts")).not.toContain("FEEDBACK_ELIGIBLE_STATUSES");
+  });
+});
+
+describe("optional order feedback", () => {
+  it("treats missing order as null and still blocks a second review of the same order", () => {
+    expect(resolveFeedbackOrderId(FEEDBACK_NO_ORDER_VALUE)).toBeNull();
+    expect(resolveFeedbackOrderId("")).toBeNull();
+    expect(resolveFeedbackOrderId("   ")).toBeNull();
+    expect(resolveFeedbackOrderId("order-a")).toBe("order-a");
+    expect(isVerifiedOrderFeedback(null)).toBe(false);
+    expect(isVerifiedOrderFeedback("order-a")).toBe(true);
+    expect(feedbackProvenanceLabel(null)).toBe("Allgemeine Bewertung");
+    expect(feedbackProvenanceLabel("order-a")).toBe("Verifizierte Bestellung");
+    const eligible = eligibleOrdersForFeedback(
+      [
+        { id: "a" },
+        { id: "b" },
+      ],
+      ["a", null, undefined],
+    );
+    expect(eligible.map((row) => row.id)).toEqual(["b"]);
+  });
+
+  it("allows unlimited general reviews while keeping one review per concrete order", () => {
+    const sql = read("supabase/migrations/0067_feedback_optional_order.sql");
+    expect(sql).toContain("alter column order_id drop not null");
+    expect(sql).toContain("drop constraint if exists order_feedback_order_unique");
+    expect(sql).toContain("where order_id is not null");
+    expect(sql).toContain("order_id is null");
+    expect(sql).toContain("o.user_id = auth.uid()");
+    expect(sql).not.toContain("o.status in");
+    expect(sql).not.toContain("update public.orders");
+    expect(sql).not.toContain("update public.order_items");
+    expect(read("src/services/feedback.ts")).toContain("resolveFeedbackOrderId(input.order_id)");
+    expect(read("src/services/feedback.ts")).toContain('status: "pending"');
+    expect(read("src/services/feedback.ts")).toContain('.eq("status", "approved")');
+  });
+
+  it("keeps verified badges only for linked orders and the same moderation path", () => {
+    const page = read("src/pages/Feedback.tsx");
+    const card = read("src/components/feedback/FeedbackCard.tsx");
+    const admin = read("src/pages/admin/AdminFeedback.tsx");
+    expect(page).toContain("Bestellung (optional)");
+    expect(page).toContain("Keine Bestellung angeben");
+    expect(page).toContain("FEEDBACK_NO_ORDER_VALUE");
+    expect(page).toContain("resolveFeedbackOrderId(orderId)");
+    expect(page).not.toContain("disabled={!orderId");
+    expect(page).not.toContain("eligible.length === 0");
+    expect(page).toContain("compact");
+    expect(page).toContain("flex flex-wrap items-center gap-x-4");
+    expect(card).toContain("feedbackProvenanceLabel");
+    expect(card).toContain("isVerifiedOrderFeedback(item.order_id)");
+    expect(read("src/lib/feedback.ts")).toContain("Verifizierte Bestellung");
+    expect(read("src/lib/feedback.ts")).toContain("Allgemeine Bewertung");
+    expect(admin).toContain("Keine Bestellung verknüpft");
+    expect(admin).toContain("Bestellung:");
+    expect(admin).toContain('status: "approved"');
+    expect(read("supabase/migrations/0065_announcement_media_design_feedback.sql")).toContain("new.status := 'pending'");
+    expect(read("supabase/migrations/0065_announcement_media_design_feedback.sql")).toContain("f.status = 'approved'");
+    expect(isPublicFeedbackStatus("pending")).toBe(false);
+    expect(isPublicFeedbackStatus("approved")).toBe(true);
+    expect(isPublicFeedbackStatus("rejected")).toBe(false);
+    expect(isPublicFeedbackStatus("hidden")).toBe(false);
   });
 });
 

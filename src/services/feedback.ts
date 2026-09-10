@@ -1,5 +1,5 @@
 import { FEEDBACK_MEDIA_BUCKET } from "@/lib/constants";
-import { validateFeedbackBody, validateFeedbackRating } from "@/lib/feedback";
+import { resolveFeedbackOrderId, validateFeedbackBody, validateFeedbackRating } from "@/lib/feedback";
 import { removeStorageObject, signedMediaUrl, uploadPrivateOrPublicImage } from "@/services/mediaStorage";
 import { supabase } from "@/lib/supabaseClient";
 import type { Tables } from "@/types/database";
@@ -7,7 +7,7 @@ import type { Tables } from "@/types/database";
 export type OrderFeedback = Tables<"order_feedback">;
 
 export interface FeedbackInput {
-  order_id: string;
+  order_id: string | null;
   rating: number;
   body: string;
   image_consent: boolean;
@@ -69,7 +69,7 @@ export async function createOrderFeedback(input: FeedbackInput & { imageFile?: F
   const { data, error } = await supabase
     .from("order_feedback")
     .insert({
-      order_id: input.order_id,
+      order_id: resolveFeedbackOrderId(input.order_id),
       user_id: userId,
       rating: validateFeedbackRating(input.rating),
       body: validateFeedbackBody(input.body),

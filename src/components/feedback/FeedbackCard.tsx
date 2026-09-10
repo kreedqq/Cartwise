@@ -6,7 +6,7 @@ import { StarRating } from "@/components/media/StarRating";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useFeedbackImage } from "@/hooks/useTrustExperience";
-import { formatFeedbackMonth, publicDisplayName } from "@/lib/feedback";
+import { formatFeedbackMonth, feedbackProvenanceLabel, isVerifiedOrderFeedback, publicDisplayName } from "@/lib/feedback";
 import type { OrderFeedback } from "@/services/feedback";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -61,8 +61,10 @@ export function FeedbackCard({
         ) : null}
         <div className="space-y-1 text-xs text-muted-foreground">
           <p className="inline-flex items-center gap-1 font-medium text-foreground">
-            <BadgeCheck className="h-3.5 w-3.5 text-primary" aria-hidden />
-            Verifizierte Bestellung
+            {isVerifiedOrderFeedback(item.order_id) ? (
+              <BadgeCheck className="h-3.5 w-3.5 text-primary" aria-hidden />
+            ) : null}
+            {feedbackProvenanceLabel(item.order_id)}
           </p>
           {item.image_path ? <p>✓ Echtes Kundenfoto</p> : null}
           <p>

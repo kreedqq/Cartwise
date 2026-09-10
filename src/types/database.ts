@@ -703,7 +703,7 @@ export interface Database {
       order_feedback: {
         Row: {
           id: string;
-          order_id: string;
+          order_id: string | null;
           user_id: string | null;
           rating: number;
           body: string;
@@ -718,7 +718,7 @@ export interface Database {
           approved_by: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["order_feedback"]["Row"]> & {
-          order_id: string;
+          order_id?: string | null;
           rating: number;
           body: string;
         };
@@ -727,7 +727,7 @@ export interface Database {
           {
             foreignKeyName: "order_feedback_order_id_fkey";
             columns: ["order_id"];
-            isOneToOne: true;
+            isOneToOne: false;
             referencedRelation: "orders";
             referencedColumns: ["id"];
           },

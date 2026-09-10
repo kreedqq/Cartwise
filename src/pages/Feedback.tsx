@@ -21,12 +21,14 @@ import {
   FEEDBACK_BODY_MAX,
   FEEDBACK_BODY_MIN,
   FEEDBACK_DEFAULT_DISPLAY_NAME,
+  FEEDBACK_NO_ORDER_VALUE,
   FEEDBACK_PAGE_SIZE,
   averageRating,
   eligibleOrdersForFeedback,
   feedbackOrderChoiceLabel,
   formatAverageRating,
   ratingDistribution,
+  resolveFeedbackOrderId,
 } from "@/lib/feedback";
 import { ORDER_STATUS_LABELS } from "@/services/orders";
 import type { OrderStatus } from "@/types/database";
@@ -39,7 +41,7 @@ export default function FeedbackPage() {
   const ordersQuery = useMyOrders();
   const createMutation = useCreateFeedback();
 
-  const [orderId, setOrderId] = React.useState("");
+  const [orderId, setOrderId] = React.useState(FEEDBACK_NO_ORDER_VALUE);
   const [rating, setRating] = React.useState(5);
   const [body, setBody] = React.useState("");
   const [displayName, setDisplayName] = React.useState("");
@@ -66,7 +68,7 @@ export default function FeedbackPage() {
     event.preventDefault();
     try {
       await createMutation.mutateAsync({
-        order_id: orderId,
+        order_id: resolveFeedbackOrderId(orderId),
         rating,
         body,
         image_consent: imageFile ? consent : false,
@@ -80,7 +82,7 @@ export default function FeedbackPage() {
       setImageFile(null);
       if (imagePreview) URL.revokeObjectURL(imagePreview);
       setImagePreview(null);
-      setOrderId("");
+      setOrderId(FEEDBACK_NO_ORDER_VALUE);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Bewertung konnte nicht gespeichert werden.");
     }
@@ -91,7 +93,7 @@ export default function FeedbackPage() {
       <PageHeader
         eyebrow="PEPTIX"
         title="Feedback"
-        description="Echte Erfahrungen. Echte Bestellungen."
+        description="Echte Erfahrungen. Veröffentlichung nach Freigabe."
       />
 
       <Card className="bg-card/95">
@@ -103,7 +105,7 @@ export default function FeedbackPage() {
               <span className="font-display text-3xl font-semibold">{formatAverageRating(average)}</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Basierend auf {ratings.length} verifizierten Bewertungen
+              Basierend auf {ratings.length} Bewertungen
             </p>
           </div>
           <ul className="space-y-1.5" aria-label="Sterneverteilung">
@@ -123,24 +125,21 @@ export default function FeedbackPage() {
       <Card className="bg-card/95">
         <CardContent className="space-y-4 p-5">
           <div>
-            <h2 className="text-lg font-semibold">Eigene Bestellung bewerten</h2>
+            <h2 className="text-lg font-semibold">Bewertung abgeben</h2>
             <p className="text-sm text-muted-foreground">
-              Jede eigene Bestellung. Eine Bewertung pro Bestellung. Veröffentlichung erst nach Freigabe.
+              Bestellung optional. Eine Bewertung pro Bestellung. Allgemeine Bewertungen ohne Bestellung sind möglich.
+              Veröffentlichung erst nach Freigabe.
             </p>
           </div>
-          {eligible.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Aktuell ist keine weitere eigene Bestellung zur Bewertung verfügbar.
-            </p>
-          ) : (
-            <form className="space-y-3" onSubmit={(event) => void handleSubmit(event)}>
+          <form className="space-y-3" onSubmit={(event) => void handleSubmit(event)}>
               <div className="space-y-1.5">
-                <Label htmlFor="feedback-order">Bestellung</Label>
+                <Label htmlFor="feedback-order">Bestellung (optional)</Label>
                 <Select value={orderId} onValueChange={setOrderId}>
                   <SelectTrigger id="feedback-order" aria-label="Bestellung auswählen">
-                    <SelectValue placeholder="Bestellung wählen" />
+                    <SelectValue placeholder="Keine Bestellung angeben" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value={FEEDBACK_NO_ORDER_VALUE}>Keine Bestellung angeben</SelectItem>
                     {eligible.map((order) => (
                       <SelectItem key={order.id} value={order.id}>
                         {feedbackOrderChoiceLabel(
@@ -218,11 +217,10 @@ export default function FeedbackPage() {
                   </label>
                 ) : null}
               </div>
-              <Button type="submit" loading={createMutation.isPending} disabled={!orderId || (Boolean(imageFile) && !consent)}>
+              <Button type="submit" loading={createMutation.isPending} disabled={Boolean(imageFile) && !consent}>
                 Bewertung senden
               </Button>
             </form>
-          )}
         </CardContent>
       </Card>
 

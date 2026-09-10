@@ -64,7 +64,7 @@ export default function AdminFeedbackPage() {
 
   return (
     <div className="space-y-4">
-      <AdminPageHeader title="Feedback" description="Verifizierte Bestellbewertungen moderieren. Keine Bestellungen werden verändert." />
+      <AdminPageHeader title="Feedback" description="Bestellbewertungen und allgemeine Bewertungen moderieren. Keine Bestellungen werden verändert." />
 
       <AdminSection title="Filter" padded>
         <div className="flex flex-wrap gap-2">
@@ -103,7 +103,9 @@ export default function AdminFeedbackPage() {
               <div className="space-y-3 border-t border-border pt-3">
                 <p className="text-xs text-muted-foreground">
                   Status: {STATUS_LABEL[row.status] ?? row.status}
-                  {row.orders?.order_number ? ` · ${row.orders.order_number}` : ""}
+                  {row.order_id
+                    ? ` · Bestellung: ${row.orders?.order_number ?? row.order_id}`
+                    : " · Allgemeine Bewertung · Keine Bestellung verknüpft"}
                 </p>
                 {editingId === row.id ? (
                   <div className="space-y-2">

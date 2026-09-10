@@ -2,8 +2,23 @@ export const FEEDBACK_BODY_MIN = 10;
 export const FEEDBACK_BODY_MAX = 2000;
 export const FEEDBACK_PAGE_SIZE = 12;
 export const FEEDBACK_DEFAULT_DISPLAY_NAME = "Verifizierter Kunde";
+export const FEEDBACK_NO_ORDER_VALUE = "none";
 export const FEEDBACK_IMAGE_ASPECT = "4 / 3";
 export const PUBLIC_FEEDBACK_STATUS = "approved";
+
+export function resolveFeedbackOrderId(value: string | null | undefined): string | null {
+  const trimmed = value?.trim() ?? "";
+  if (!trimmed || trimmed === FEEDBACK_NO_ORDER_VALUE) return null;
+  return trimmed;
+}
+
+export function isVerifiedOrderFeedback(orderId: string | null | undefined): boolean {
+  return Boolean(resolveFeedbackOrderId(orderId));
+}
+
+export function feedbackProvenanceLabel(orderId: string | null | undefined): string {
+  return isVerifiedOrderFeedback(orderId) ? "Verifizierte Bestellung" : "Allgemeine Bewertung";
+}
 
 export type FeedbackStatus = "pending" | "approved" | "rejected" | "hidden";
 
@@ -72,9 +87,11 @@ export function starCountLabel(rating: number): string {
 
 export function eligibleOrdersForFeedback<T extends { id: string }>(
   orders: T[],
-  existingByOrderId: Iterable<string>,
+  existingByOrderId: Iterable<string | null | undefined>,
 ): T[] {
-  const taken = new Set(existingByOrderId);
+  const taken = new Set(
+    [...existingByOrderId].filter((id): id is string => Boolean(id)),
+  );
   return orders.filter((order) => !taken.has(order.id));
 }
 
