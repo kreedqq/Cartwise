@@ -41,7 +41,7 @@ export function StarRating({
             role="radio"
             aria-checked={value === star}
             aria-label={starCountLabel(star)}
-            className="min-h-11 min-w-11 rounded-md p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="min-h-11 min-w-11 rounded-md p-2 transition-colors hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={() => onChange?.(star)}
           >
             <Star

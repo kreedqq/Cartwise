@@ -52,7 +52,7 @@ export function Topbar() {
   const initials = accountInitials(profile?.username);
 
   return (
-    <header className="sticky top-0 z-30 flex min-h-[4.5rem] items-center justify-between gap-3 border-b border-border/80 bg-background/90 px-4 py-2 backdrop-blur-md sm:px-6 lg:min-h-24">
+    <header className="sticky top-0 z-30 flex min-h-[4.5rem] items-center justify-between gap-3 border-b border-border/80 bg-background/90 px-4 py-2 backdrop-blur-md sm:px-6 lg:min-h-24 [[data-site-background=on]_&]:bg-background/50 [[data-site-background=on]_&]:backdrop-saturate-125">
       <div className="min-w-0 flex-1 lg:hidden">
         <BrandMark />
       </div>

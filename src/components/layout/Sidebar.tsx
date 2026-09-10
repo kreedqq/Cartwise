@@ -16,6 +16,7 @@ export function Sidebar() {
     <aside
       className={cn(
         "relative z-10 hidden shrink-0 bg-sidebar text-sidebar-foreground transition-[width] duration-200 lg:flex lg:flex-col",
+        "[[data-site-background=on]_&]:border-r [[data-site-background=on]_&]:border-border/40 [[data-site-background=on]_&]:bg-sidebar/50 [[data-site-background=on]_&]:backdrop-blur-md [[data-site-background=on]_&]:backdrop-saturate-125",
         sidebarCollapsed ? "w-0 overflow-hidden opacity-0" : "w-[15.5rem] opacity-100",
       )}
     >

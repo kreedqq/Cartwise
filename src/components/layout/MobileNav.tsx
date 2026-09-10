@@ -10,7 +10,7 @@ export function MobileNav() {
   const { items } = useCustomerNavItems();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex bg-sidebar pb-[env(safe-area-inset-bottom)] text-sidebar-foreground lg:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 flex bg-sidebar pb-[env(safe-area-inset-bottom)] text-sidebar-foreground lg:hidden [[data-site-background=on]_&]:bg-sidebar/55 [[data-site-background=on]_&]:backdrop-blur-md">
       {items.map((item) => (
         <NavLink
           key={item.to}

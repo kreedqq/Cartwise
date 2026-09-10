@@ -13,6 +13,7 @@ export function ImageDropzone({
   label = "Bild hinzufügen",
   hint = "JPG, PNG oder WEBP. Drag & Drop oder Datei wählen.",
   aspect = "video",
+  compact = false,
   objectPosition,
 }: {
   previewUrl: string | null;
@@ -22,6 +23,7 @@ export function ImageDropzone({
   label?: string;
   hint?: string;
   aspect?: "video" | "photo";
+  compact?: boolean;
   objectPosition?: string;
 }) {
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -68,8 +70,12 @@ export function ImageDropzone({
         }}
         onClick={() => inputRef.current?.click()}
         className={cn(
-          "relative w-full cursor-pointer overflow-hidden rounded-xl border border-dashed border-input bg-muted/40 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          aspect === "video" ? "aspect-video" : "aspect-[4/3]",
+          "relative w-full cursor-pointer overflow-hidden rounded-xl border border-dashed border-input bg-muted/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          compact
+            ? previewUrl
+              ? "mx-auto aspect-[4/3] max-h-44 w-full max-w-[15rem]"
+              : "max-h-44 text-left"
+            : cn("text-center", aspect === "video" ? "aspect-video" : "aspect-[4/3]"),
           dragOver && "border-primary bg-primary/5",
           disabled && "pointer-events-none opacity-60",
         )}
@@ -82,10 +88,17 @@ export function ImageDropzone({
             style={{ objectPosition: objectPosition ?? "50% 50%" }}
           />
         ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-2 px-4 text-muted-foreground">
-            <ImagePlus className="h-6 w-6" aria-hidden />
-            <p className="text-sm font-medium text-foreground">{label}</p>
-            <p className="text-xs">{hint}</p>
+          <div
+            className={cn(
+              "flex h-full items-center justify-center gap-3 px-4 text-muted-foreground",
+              compact ? "flex-row flex-wrap py-4 sm:py-5" : "flex-col gap-2",
+            )}
+          >
+            <ImagePlus className={cn("shrink-0", compact ? "h-5 w-5" : "h-6 w-6")} aria-hidden />
+            <div className={cn(compact ? "min-w-0 space-y-0.5" : "space-y-1")}>
+              <p className="text-sm font-medium text-foreground">{label}</p>
+              <p className="text-xs">{hint}</p>
+            </div>
           </div>
         )}
         <input

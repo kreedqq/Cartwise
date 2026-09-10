@@ -84,6 +84,25 @@ describe("site design", () => {
     expect(read("src/lib/maintenanceArt.ts")).toContain("maintenance-pause-4k.jpg");
     expect(read("src/lib/maintenanceArt.ts")).toContain("maintenance-pause-mobile.jpg");
   });
+
+  it("places the existing site background behind header, sidebar and content chrome", () => {
+    const shell = read("src/components/layout/AppShell.tsx");
+    const background = read("src/components/layout/SiteBackground.tsx");
+    const preview = read("src/components/design/SitePreview.tsx");
+    expect(shell).toContain('data-site-background={designOn ? "on" : undefined}');
+    expect(shell).toContain("<SiteBackground />");
+    expect(shell).toContain('designOn ? "bg-transparent" : "bg-background"');
+    expect(background).toContain("fixed inset-0 z-0");
+    expect(read("src/components/layout/Sidebar.tsx")).toContain("[[data-site-background=on]_&]:bg-sidebar/50");
+    expect(read("src/components/layout/Topbar.tsx")).toContain("[[data-site-background=on]_&]:bg-background/50");
+    expect(read("src/components/layout/MobileNav.tsx")).toContain("[[data-site-background=on]_&]:bg-sidebar/55");
+    expect(preview).toContain("bg-sidebar/40");
+    expect(preview).toContain("bg-background/40");
+    expect(read("src/pages/Login.tsx")).toContain("MaintenanceScreen");
+    expect(read("src/pages/Login.tsx")).not.toContain("SiteBackground");
+    expect(read("src/components/maintenance/MaintenanceScreen.tsx")).not.toContain("SiteBackground");
+    expect(read("src/components/maintenance/MaintenanceScreen.tsx")).not.toContain("useSiteDesign");
+  });
 });
 
 describe("verified order feedback", () => {
@@ -219,4 +238,24 @@ describe("responsive trust surfaces", () => {
     expect(read("src/services/auth.ts")).toContain('POST_LOGIN_PATH = "/announcements"');
     expect(read("src/components/media/MediaFrame.tsx")).toContain("aspect-[4/3]");
   });
+
+  it("keeps the feedback form compact without changing upload or rating behavior", () => {
+    const page = read("src/pages/Feedback.tsx");
+    const dropzone = read("src/components/media/ImageDropzone.tsx");
+    expect(page).toContain("flex flex-wrap items-center gap-x-4");
+    expect(page).toContain(">Sterne</Label>");
+    expect(page).toContain("<StarRating value={rating} onChange={setRating} />");
+    expect(page).toContain("compact");
+    expect(page).toContain("image_consent");
+    expect(page).toContain("Zeige anderen deine Bestellung");
+    expect(dropzone).toContain("compact?: boolean");
+    expect(dropzone).toContain("max-w-[15rem]");
+    expect(dropzone).toContain("aspect-[4/3]");
+    expect(dropzone).toContain("validateImageFile");
+    expect(read("src/pages/admin/AdminAnnouncements.tsx")).not.toContain("compact");
+    expect(read("src/pages/admin/AdminDesign.tsx")).not.toContain("compact");
+    expect(read("src/services/feedback.ts")).toContain('status: "pending"');
+    expect(read("src/lib/feedback.ts")).not.toContain("FEEDBACK_ELIGIBLE_STATUSES");
+  });
 });
+

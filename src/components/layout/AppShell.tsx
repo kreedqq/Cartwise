@@ -18,7 +18,10 @@ export function AppShell() {
 
   return (
     <NavShellProvider>
-      <div className={cn("relative flex min-h-screen", designOn ? "bg-transparent" : "bg-background")}>
+      <div
+        data-site-background={designOn ? "on" : undefined}
+        className={cn("relative flex min-h-screen", designOn ? "bg-transparent" : "bg-background")}
+      >
         <SiteBackground />
         <Sidebar />
         <div className="relative z-10 flex min-w-0 flex-1 flex-col">

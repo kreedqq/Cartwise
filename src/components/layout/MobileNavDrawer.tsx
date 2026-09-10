@@ -22,7 +22,7 @@ export function MobileNavDrawer() {
         aria-label="Navigation schließen"
         onClick={closeMobileNav}
       />
-      <aside className="relative flex h-full w-[min(18rem,88vw)] flex-col bg-sidebar text-sidebar-foreground shadow-xl">
+      <aside className="relative flex h-full w-[min(18rem,88vw)] flex-col bg-sidebar text-sidebar-foreground shadow-xl [[data-site-background=on]_&]:bg-sidebar/70 [[data-site-background=on]_&]:backdrop-blur-md">
         <div className="flex h-16 items-center justify-end px-4">
           <Button variant="ghost" size="icon" onClick={closeMobileNav} aria-label="Navigation schließen">
             <X className="h-5 w-5" />

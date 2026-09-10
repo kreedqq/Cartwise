@@ -29,19 +29,24 @@ function PreviewChrome({
         {visible && layer.overlay ? (
           <div className="absolute inset-0 bg-background" style={{ opacity: layer.overlayOpacity / 100 }} />
         ) : null}
-        <div className="relative z-10 flex h-full flex-col">
-          <div className="flex items-center gap-2 border-b border-border/60 bg-sidebar/90 px-3 py-2">
-            <img src="/peptix-logo.png" alt="PEPTIX" className="h-6 w-auto object-contain" />
-          </div>
-          <div className="flex-1 p-3">
-            <Card className="bg-card/95">
-              <CardContent className="space-y-2 p-3">
-                <p className="text-xs font-semibold">Lesbarkeit prüfen</p>
-                <p className="text-[11px] leading-relaxed text-muted-foreground">
-                  Karten, Logo und Navigation müssen vor dem Artwork klar bleiben.
-                </p>
-              </CardContent>
-            </Card>
+        <div className="relative z-10 flex h-full min-h-0">
+          {viewport !== "mobile" ? (
+            <div className="w-14 shrink-0 border-r border-border/50 bg-sidebar/40 backdrop-blur-sm" aria-hidden />
+          ) : null}
+          <div className="flex min-w-0 flex-1 flex-col">
+            <div className="flex items-center gap-2 border-b border-border/60 bg-background/40 px-3 py-2 backdrop-blur-sm">
+              <img src="/peptix-logo.png" alt="PEPTIX" className="h-6 w-auto object-contain" />
+            </div>
+            <div className="flex-1 p-3">
+              <Card className="bg-card/95">
+                <CardContent className="space-y-2 p-3">
+                  <p className="text-xs font-semibold">Lesbarkeit prüfen</p>
+                  <p className="text-[11px] leading-relaxed text-muted-foreground">
+                    Karten, Logo und Navigation müssen vor dem Artwork klar bleiben.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>

@@ -133,7 +133,7 @@ export default function FeedbackPage() {
               Aktuell ist keine weitere eigene Bestellung zur Bewertung verfügbar.
             </p>
           ) : (
-            <form className="space-y-4" onSubmit={(event) => void handleSubmit(event)}>
+            <form className="space-y-3" onSubmit={(event) => void handleSubmit(event)}>
               <div className="space-y-1.5">
                 <Label htmlFor="feedback-order">Bestellung</Label>
                 <Select value={orderId} onValueChange={setOrderId}>
@@ -152,8 +152,8 @@ export default function FeedbackPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1.5">
-                <Label>Sterne</Label>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                <Label className="m-0 shrink-0 leading-none">Sterne</Label>
                 <StarRating value={rating} onChange={setRating} />
               </div>
               <div className="space-y-1.5">
@@ -187,13 +187,15 @@ export default function FeedbackPage() {
               </div>
               <div className="space-y-2">
                 <Label>Bestellfoto (optional)</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Dein Foto wird nach Freigabe zusammen mit deiner Bewertung öffentlich angezeigt.
                 </p>
                 <ImageDropzone
                   aspect="photo"
+                  compact
                   previewUrl={imagePreview}
-                  label="Zeige anderen Kunden deine Bestellung"
+                  hint="JPG, PNG oder WEBP. Datei wählen oder per Drag & Drop."
+                  label="Zeige anderen deine Bestellung"
                   onFile={(file) => {
                     if (imagePreview) URL.revokeObjectURL(imagePreview);
                     setImageFile(file);
