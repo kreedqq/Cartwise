@@ -10,12 +10,18 @@ import {
   maintenanceArtLayout,
 } from "@/lib/maintenanceArt";
 
-const DESKTOP = [
+const DESKTOP_16_9 = [
   [1366, 768],
-  [1440, 900],
   [1536, 864],
+  [1600, 900],
   [1920, 1080],
   [2560, 1440],
+] as const;
+
+const DESKTOP_TALLER = [
+  [1440, 900],
+  [1920, 1200],
+  [2560, 1600],
 ] as const;
 
 const MOBILE = [
@@ -39,14 +45,48 @@ describe("maintenanceArtLayout", () => {
     expect(MAINTENANCE_MOBILE_ART_AR).toBeCloseTo(9 / 16, 3);
   });
 
-  it.each(DESKTOP)("fills %i×%i with the 4K landscape artwork", (width, height) => {
+  it.each(DESKTOP_16_9)("shows the full 4K artwork on %i×%i without cropping", (width, height) => {
     const layout = maintenanceArtLayout(width, height);
     expect(layout.src).toBe("/maintenance-pause-4k.jpg");
-    expect(layout.mode).toBe("cover");
+    expect(layout.mode).toBe("contain");
+    expect(layout.visibleWidthFraction).toBe(1);
+    expect(layout.visibleHeightFraction).toBe(1);
+    expect(layout.backgroundSize).not.toBe("cover");
+    expect(layout.backgroundPosition).toBe("center center");
+    expect(["100% auto", "auto 100%"]).toContain(layout.backgroundSize);
+  });
+
+  it("fits 1920×1080 to the full 16:9 artwork", () => {
+    const layout = maintenanceArtLayout(1920, 1080);
+    expect(layout.src).toBe("/maintenance-pause-4k.jpg");
+    expect(layout.mode).toBe("contain");
+    expect(layout.backgroundSize).toBe("100% auto");
     expect(layout.useAmbience).toBe(false);
-    expect(layout.visibleWidthFraction).toBeGreaterThanOrEqual(0.85);
-    expect(layout.visibleHeightFraction).toBeGreaterThanOrEqual(0.85);
-    expect(layout.backgroundSize).toBe("cover");
+    expect(layout.visibleWidthFraction).toBe(1);
+    expect(layout.visibleHeightFraction).toBe(1);
+  });
+
+  it.each(DESKTOP_TALLER)("keeps the full 4K artwork on taller %i×%i and fills gaps with ambience", (width, height) => {
+    const layout = maintenanceArtLayout(width, height);
+    const drawnHeight = width / MAINTENANCE_ART_AR;
+    expect(layout.src).toBe("/maintenance-pause-4k.jpg");
+    expect(layout.mode).toBe("contain");
+    expect(layout.backgroundSize).toBe("100% auto");
+    expect(layout.backgroundPosition).toBe("center center");
+    expect(layout.visibleWidthFraction).toBe(1);
+    expect(layout.visibleHeightFraction).toBe(1);
+    expect(layout.useAmbience).toBe(drawnHeight < height - 4);
+    expect(drawnHeight).toBeLessThan(height);
+  });
+
+  it("letterboxes a wider-than-16:9 desktop viewport instead of cropping height", () => {
+    const layout = maintenanceArtLayout(2560, 1080);
+    expect(layout.src).toBe("/maintenance-pause-4k.jpg");
+    expect(layout.mode).toBe("contain");
+    expect(layout.backgroundSize).toBe("auto 100%");
+    expect(layout.useAmbience).toBe(true);
+    expect(layout.visibleWidthFraction).toBe(1);
+    expect(layout.visibleHeightFraction).toBe(1);
   });
 
   it.each(MOBILE)("uses the portrait artwork full-width on %i×%i", (width, height) => {
