@@ -34,14 +34,16 @@ describe("customer and admin order navigation", () => {
 });
 
 describe("hub admin navigation", () => {
-  it("exposes only five main admin areas", () => {
+  it("exposes Ankündigungen first, then the existing admin hubs", () => {
     expect(ADMIN_NAV_GROUPS.map((group) => group.label)).toEqual([
+      "Ankündigungen",
       "Übersicht",
       "Bestellungen",
       "Produkte",
       "Benutzer & Rollen",
       "Inhalte",
     ]);
+    expect(ADMIN_NAV_GROUPS[0]?.to).toBe("/admin/announcements");
   });
 
   it("keeps every existing admin destination as a hub or inner tab", () => {
@@ -92,7 +94,8 @@ describe("hub admin navigation", () => {
     expect(users?.items.map((item) => item.label)).not.toContain("Benutzer");
     expect(users?.items.map((item) => item.label)).not.toContain("Rollen & Preisaufschlag");
     const content = ADMIN_NAV_GROUPS.find((group) => group.id === "content");
-    expect(content?.items.map((item) => item.label)).toEqual(["Research", "Ankündigungen"]);
+    expect(content?.items.map((item) => item.label)).toEqual(["Research"]);
+    expect(content?.items.map((item) => item.to)).not.toContain("/admin/announcements");
   });
 
   it("renders hub links globally and section tabs on the page, wrapping on small screens", () => {

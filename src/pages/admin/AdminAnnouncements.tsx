@@ -78,7 +78,7 @@ export default function AdminAnnouncementsPage() {
 
   return (
     <div className="space-y-4">
-      <AdminPageHeader title="Ankündigungen" description="News für den Kunden-Feed nach Login." />
+      <AdminPageHeader title="Ankündigungen" description="Veröffentlichte Einträge erscheinen im Kundenbereich." />
 
       <AdminSection title={editingId ? "Ankündigung bearbeiten" : "Neue Ankündigung"}>
         <form className="space-y-3 p-4" onSubmit={(event) => void handleSave(event)}>

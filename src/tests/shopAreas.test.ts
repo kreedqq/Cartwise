@@ -53,8 +53,8 @@ describe("shop area domain", () => {
     ];
     const kundeItems = buildCustomerNavItems(kunde);
     expect(kundeItems.map((item) => item.label)).toEqual([
+      "Ankündigungen",
       "Übersicht",
-      "Neuigkeiten",
       "Shop",
       "Lexikon & Rechner",
       "Meine Bestellungen",
@@ -71,8 +71,8 @@ describe("shop area domain", () => {
     // Nav is the same regardless of which areas the user has access to (single Shop entry)
     const gbItems = buildCustomerNavItems(groupBuy);
     expect(gbItems.map((item) => item.to)).toEqual([
-      "/dashboard",
       "/announcements",
+      "/dashboard",
       "/shop",
       "/peptide",
       "/orders",

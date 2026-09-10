@@ -14,8 +14,8 @@ export interface CustomerNavItem {
 
 export function buildCustomerNavItems(_areas: MyShopArea[]): CustomerNavItem[] {
   return [
+    { to: "/announcements", label: "Ankündigungen", icon: Newspaper },
     { to: "/dashboard", label: "Übersicht", icon: LayoutGrid },
-    { to: "/announcements", label: "Neuigkeiten", icon: Newspaper },
     { to: "/shop", label: "Shop", icon: ShoppingBag, end: true },
     { to: "/peptide", label: PEPTIDE_NAV_LABEL, icon: BookOpen },
     { to: "/orders", label: "Meine Bestellungen", icon: ClipboardList },

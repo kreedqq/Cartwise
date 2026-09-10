@@ -15,6 +15,13 @@ export interface AdminNavGroup {
 
 export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
+    id: "announcements",
+    label: "Ankündigungen",
+    to: "/admin/announcements",
+    match: (pathname) => pathname === "/admin/announcements" || pathname.startsWith("/admin/announcements/"),
+    items: [],
+  },
+  {
     id: "overview",
     label: "Übersicht",
     to: "/admin",
@@ -68,10 +75,9 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     id: "content",
     label: "Inhalte",
     to: "/admin/research",
-    match: (pathname) => pathname.startsWith("/admin/research") || pathname.startsWith("/admin/announcements"),
+    match: (pathname) => pathname.startsWith("/admin/research"),
     items: [
       { to: "/admin/research", label: "Research" },
-      { to: "/admin/announcements", label: "Ankündigungen" },
     ],
   },
 ];

@@ -16,7 +16,7 @@ export default function AnnouncementsPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <PageHeader eyebrow="PEPTIX" title="Was gibt's Neues?" description="Kurze Updates aus der Plattform — neueste zuerst." />
+      <PageHeader eyebrow="PEPTIX" title="Ankündigungen" description="Kurze Updates aus der Plattform — neueste zuerst." />
 
       {feedQuery.isLoading && (
         <div className="space-y-3">
@@ -27,11 +27,11 @@ export default function AnnouncementsPage() {
       )}
 
       {feedQuery.isError && (
-        <ErrorState message="Neuigkeiten konnten nicht geladen werden." onRetry={() => feedQuery.refetch()} />
+        <ErrorState message="Ankündigungen konnten nicht geladen werden." onRetry={() => feedQuery.refetch()} />
       )}
 
       {feedQuery.data && items.length === 0 && (
-        <EmptyState title="Noch keine Neuigkeiten" description="Sobald es etwas zu berichten gibt, erscheint es hier." />
+        <EmptyState title="Keine Ankündigungen vorhanden." />
       )}
 
       <div className="space-y-4">
