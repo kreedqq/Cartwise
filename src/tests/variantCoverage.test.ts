@@ -46,6 +46,23 @@ describe("parseVariantColumn", () => {
       "10x 5 mg Vials",
     );
   });
+
+  it("parses dealer-file variants like 30mg*10vials without a coverage CSV row", () => {
+    expect(parseVariantColumn("30mg*10vials")).toEqual({
+      vialStrength: "30 mg",
+      kitSizeVials: 10,
+    });
+    expect(parseVariantColumn("3ml*10vials")).toEqual({
+      vialStrength: "3 ml",
+      kitSizeVials: 10,
+    });
+    expect(formatVialVariant({ code: "KP30", name: "KPV", dosage_vial: "30mg*10vials" })).toBe("10x 30 mg Vials");
+    expect(formatVialVariant({ code: "KP50", name: "KPV", dosage_vial: "50mg*10vials" })).toBe("10x 50 mg Vials");
+    expect(formatVialVariant({ code: "BA3", name: "BAC Water", dosage_vial: "3ml*10vials" })).toBe("10x 3 ml Vials");
+    expect(formatVialVariant({ code: "BA10", name: "BAC Water", dosage_vial: "10ml*10vials" })).toBe("10x 10 ml Vials");
+    expect(formatVialVariant({ code: "KP30", name: "KPV", dosage_vial: null })).toBe("Standard");
+    expect(kitSizeVialsForProduct({ code: "KP30", dosage_vial: "30mg*10vials" })).toBe(10);
+  });
 });
 
 describe("variantMetaForCode from uploaded product file", () => {

@@ -9,7 +9,7 @@
  * No database calls. Used by AdminShopAreas and unit tests.
  */
 
-import type { ParsedProductImportRow } from "@/lib/productImportRow";
+import { matchImportField, type ParsedProductImportRow } from "@/lib/productImportRow";
 import {
   parseImportedCategoryKey,
   type AreaCategory,
@@ -57,7 +57,7 @@ export function buildVendorRaw(row: ParsedProductImportRow): Record<string, unkn
     rawText: row.rawText,
     code: row.parsedCode,
     name: row.parsedName,
-    dosageVial: row.parsedDosageVial,
+    dosageVial: vendorDosageFromRow(row),
     description: row.parsedDescription,
     category: row.parsedCategory,
     priceUsd: row.parsedPriceUsd,
@@ -82,6 +82,20 @@ export function forwardFillVendorNames(rows: ParsedProductImportRow[]): ParsedPr
     if (!lastName || !row.parsedCode) return row;
     return { ...row, parsedName: lastName };
   });
+}
+
+/** Dealer-file variant/dosage. Never invents a value from the global master. */
+export function vendorDosageFromRow(row: ParsedProductImportRow): string | null {
+  const direct = row.parsedDosageVial?.trim() || null;
+  if (direct) return direct;
+  if (!row.extraFields) return null;
+  for (const [key, value] of Object.entries(row.extraFields)) {
+    if (matchImportField(key) === "dosageVial") {
+      const trimmed = value.trim();
+      if (trimmed) return trimmed;
+    }
+  }
+  return null;
 }
 
 /**
@@ -129,7 +143,7 @@ export function matchVendorCatalogRows(
       product_id: product?.id ?? null,
       code,
       name: row.parsedName ?? product?.name ?? null,
-      dosage_vial: row.parsedDosageVial ?? product?.dosage_vial ?? null,
+      dosage_vial: vendorDosageFromRow(row),
       price_usd: row.parsedPriceUsd,
       bulk_price_usd: row.parsedBulkPriceUsd ?? null,
       bulk_price_min_quantity: row.parsedBulkPriceMinQuantity ?? null,

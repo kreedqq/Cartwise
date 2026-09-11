@@ -82,7 +82,21 @@ export const IMPORT_FIELD_TITLES: Record<ImportField, string> = {
 const HEADER_ALIASES: Record<ImportField, string[]> = {
   code: ["code", "artikelcode", "artikelnummer", "artnr", "artikelnr", "sku", "itemcode", "articlecode", "artikel"],
   name: ["name", "bezeichnung", "produkt", "produktname", "artikelname", "productname", "item"],
-  dosageVial: ["dosagevial", "dosage", "vial", "dosierung", "dosis", "strength", "staerke", "dosageprovial"],
+  dosageVial: [
+    "dosagevial",
+    "dosage",
+    "vial",
+    "dosierung",
+    "dosis",
+    "strength",
+    "staerke",
+    "dosageprovial",
+    "variante",
+    "variant",
+    "variants",
+    "specification",
+    "spec",
+  ],
   priceUsd: [
     "priceusd",
     "price",

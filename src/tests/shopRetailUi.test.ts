@@ -92,6 +92,10 @@ describe("admin Verkaufsbereiche", () => {
     expect(page).toContain("applyVendorCatalogFromFile");
     expect(page).toContain("parseVendorCatalogFile");
     expect(page).toContain("ohne globale Produktverknüpfung");
+    expect(page).toContain("vendor_name: entry.name");
+    expect(page).toContain("vendor_dosage: entry.dosage_vial");
+    expect(page).toContain("row.vendor_dosage ?? product?.dosage_vial");
+    expect(page).not.toContain("variant: product?.dosage_vial ?? row.vendor_dosage");
     expect(page).toContain("Aktuelle Händlerdatei (angewendet)");
     expect(page).toContain('value="haendlerkatalog"');
     expect(page).toContain('value="produkte"');

@@ -82,6 +82,14 @@ describe("area display categories", () => {
     expect(productsInAreaCategory([{ id: "nad" }], gb2, "injectable-oils")).toHaveLength(1);
   });
 
+  it("uncategorized product_id NULL rows still match by vendor_code", () => {
+    const products = [{ id: "sap-kp30", code: "KP30" }];
+    const assignments = [{ product_id: "sap-kp30", vendor_code: "KP30", category_key: "peptides" }];
+    expect(productsInAreaCategory(products, assignments, "peptides")).toHaveLength(1);
+    expect(effectiveAreaCategoryKey(null, "peptides")).toBe("peptides");
+    expect(effectiveAreaCategoryKey("reconstitution-water", null)).toBe("reconstitution-water");
+  });
+
   it("4 – global products.category is never the storefront grouping source", () => {
     const nad = product("nad", "NAD10", "INJECTABLES-OILS");
     const shown = productsInAreaCategory([nad], [{ product_id: "nad", category_key: "peptides" }], "peptides");

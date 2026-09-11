@@ -9,7 +9,7 @@ export interface ProductVariantMeta {
   rawVariant: string;
 }
 
-const KIT_VIALS_RE = /x\s*(\d+)\s*vials?\b/i;
+const KIT_VIALS_RE = /(?:\*|x|×)\s*(\d+)\s*vials?\b/i;
 const VIAL_STRENGTH_RE =
   /^([\d.,]+\s*(?:mg|mcg|µg|ug|iu|ui|ml))\b(?:\s*\/\s*vial)?/i;
 const CAPSULE_TABLET_RE = /\bx\s*\d+\s*(?:capsule|tablet)/i;
@@ -214,7 +214,12 @@ export function vialStrengthForProduct(
   return null;
 }
 
-export function kitSizeVialsForProduct(product: { code: string }): number | null {
+export function kitSizeVialsForProduct(product: {
+  code: string;
+  dosage_vial?: string | null;
+}): number | null {
+  const fromDosage = parseVariantColumn(product.dosage_vial ?? "").kitSizeVials;
+  if (fromDosage != null) return fromDosage;
   return variantMetaForCode(product.code)?.kitSizeVials ?? null;
 }
 

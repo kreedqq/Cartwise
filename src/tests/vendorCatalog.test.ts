@@ -587,6 +587,26 @@ describe("vendor catalog assortment source", () => {
     expect(unmatched).toEqual([expect.objectContaining({ code: "SM5", reason: "no_price" })]);
   });
 
+  it("R04b – vendor_dosage comes from the dealer file, never from products.dosage_vial", () => {
+    const { matched } = matchVendorCatalogRows(
+      [
+        makeImportRow("SM5", 65, { parsedName: "Semax", parsedDosageVial: "5mg*10vials" }),
+        makeImportRow("KP30", 118, { parsedName: "KPV", parsedDosageVial: "30mg*10vials" }),
+      ],
+      [makeProduct("SM5", { name: "MASTER-NAME", dosage_vial: "MASTER-DOSAGE" })],
+    );
+    expect(matched.find((row) => row.code === "SM5")).toMatchObject({
+      product_id: "id-sm5",
+      name: "Semax",
+      dosage_vial: "5mg*10vials",
+    });
+    expect(matched.find((row) => row.code === "KP30")).toMatchObject({
+      product_id: null,
+      name: "KPV",
+      dosage_vial: "30mg*10vials",
+    });
+  });
+
   it("R05 – extra file columns stay on vendor_raw and matching does not mutate products", () => {
     const products = [makeProduct("SM5", { price_usd: 100 })];
     const snapshot = structuredClone(products);

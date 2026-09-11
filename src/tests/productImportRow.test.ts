@@ -38,6 +38,8 @@ describe("normalizeHeader / matchImportField", () => {
     expect(matchImportField("Mengenpreis ab")).toBe("bulkPriceMinQuantity");
     expect(matchImportField("Kategorie")).toBe("category");
     expect(matchImportField("Status")).toBe("isActive");
+    expect(matchImportField("Variante")).toBe("dosageVial");
+    expect(matchImportField("Variant")).toBe("dosageVial");
   });
 
   it("returns null for an unknown column instead of guessing", () => {
@@ -251,6 +253,24 @@ describe("parseProductTable", () => {
       parsedIsActive: true,
       quality: "ok",
     });
+  });
+
+  it("maps a dealer Variante column onto dosage, not onto extraFields", () => {
+    const result = parseProductTable([
+      ["Code", "Produkt", "Variante", "Preis USD"],
+      ["KP30", "KPV", "30mg*10vials", 118],
+      ["KP50", "", "50mg*10vials", 150],
+    ]);
+    expect(result.recognizedFields).toEqual(expect.arrayContaining(["code", "name", "dosageVial", "priceUsd"]));
+    expect(result.unknownHeaders).toEqual([]);
+    expect(result.rows[0]).toMatchObject({
+      parsedCode: "KP30",
+      parsedName: "KPV",
+      parsedDosageVial: "30mg*10vials",
+      parsedPriceUsd: 118,
+    });
+    expect(result.rows[0]?.extraFields).toBeNull();
+    expect(result.rows[1]?.parsedDosageVial).toBe("50mg*10vials");
   });
 
   it("does not care about column order", () => {

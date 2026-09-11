@@ -7,6 +7,9 @@ import {
   matchVendorCatalogRows,
   normalizeVendorSku,
 } from "@/lib/shop/vendorCatalog";
+import { groupAndSortShopProducts, variantLabelForProduct } from "@/lib/shop/display";
+import { formatVialVariant } from "@/lib/shop/variantCoverage";
+import { effectiveAreaCategoryKey, parseImportedCategoryKey } from "@/lib/shop/areaCategories";
 import type { ParsedProductImportRow } from "@/lib/productImportRow";
 import type { Tables } from "@/types/database";
 import { parseVendorCatalogFile } from "@/services/vendorCatalogImport";
@@ -126,6 +129,26 @@ describe("vendor variants stay separate", () => {
     expect(matched.find((row) => row.code === "BA10")?.product_id).toBe("id-ba10");
   });
 
+  it("recovers Variante from extraFields when parsedDosageVial is empty", () => {
+    const { matched } = matchVendorCatalogRows(
+      [
+        makeImportRow("KP30", 118, {
+          parsedName: "KPV",
+          parsedDosageVial: null,
+          extraFields: { Variante: "30mg*10vials" },
+        }),
+      ],
+      [],
+    );
+    expect(matched[0]).toMatchObject({
+      code: "KP30",
+      product_id: null,
+      name: "KPV",
+      dosage_vial: "30mg*10vials",
+    });
+    expect(matched[0]?.vendor_raw.dosageVial).toBe("30mg*10vials");
+  });
+
   it("does not invent rows without a code or without a price", () => {
     const { matched, unmatched } = matchVendorCatalogRows(
       [
@@ -173,6 +196,61 @@ describe("Emma Group Buy 1 dealer file", () => {
 
     const water = result.matched.filter((row) => ["BA3", "BA10"].includes(row.code));
     expect(water).toHaveLength(2);
+    expect(result.matched.find((row) => row.code === "KP10")).toMatchObject({
+      name: "KPV",
+      dosage_vial: "10mg*10vials",
+      price_usd: 60.85,
+    });
+    expect(result.matched.find((row) => row.code === "KP30")).toMatchObject({
+      product_id: null,
+      name: "KPV",
+      dosage_vial: "30mg*10vials",
+      price_usd: 118,
+    });
+    expect(result.matched.find((row) => row.code === "KP50")).toMatchObject({
+      product_id: null,
+      name: "KPV",
+      dosage_vial: "50mg*10vials",
+      price_usd: 150,
+    });
+    expect(result.matched.find((row) => row.code === "BA3")).toMatchObject({
+      name: "BAC Water",
+      dosage_vial: "3ml*10vials",
+    });
+    expect(result.matched.find((row) => row.code === "BA10")).toMatchObject({
+      name: "BAC Water",
+      dosage_vial: "10ml*10vials",
+    });
+    expect(result.matched.every((row) => row.dosage_vial)).toBe(true);
+
+    const byName = new Map<string, string[]>();
+    for (const row of result.matched) {
+      const name = (row.name ?? "").trim();
+      if (!name) continue;
+      byName.set(name, [...(byName.get(name) ?? []), row.code]);
+    }
+    const multiVariant = [...byName.entries()].filter(([, codes]) => codes.length > 1);
+    expect(multiVariant.length).toBeGreaterThan(0);
+    for (const [, codes] of multiVariant) {
+      const unique = new Set(codes);
+      expect(unique.size).toBe(codes.length);
+    }
+  });
+
+  it("keeps Excel Variante when the SKU has no master and does not copy products.dosage_vial", async () => {
+    const buffer = readFileSync(EMMA_XLSX);
+    const file = new File([buffer], "Emma_Group_Buy_1_Haendlerkatalog_bereinigt.xlsx", {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const parsed = await parseVendorCatalogFile(file);
+    const master = [
+      makeProduct("KP10"),
+      { ...makeProduct("KP30"), dosage_vial: "MASTER-SHOULD-NOT-WIN" },
+    ];
+    const result = matchVendorCatalogRows(parsed.rows, master);
+    expect(result.matched.find((row) => row.code === "KP10")?.dosage_vial).toBe("10mg*10vials");
+    expect(result.matched.find((row) => row.code === "KP30")?.dosage_vial).toBe("30mg*10vials");
+    expect(result.matched.find((row) => row.code === "KP30")?.product_id).toBe("id-kp30");
   });
 
   it("links only SKUs that exist in the global master and still imports the rest", async () => {
@@ -191,6 +269,85 @@ describe("Emma Group Buy 1 dealer file", () => {
     expect(result.unlinkedCodes).toHaveLength(result.matched.filter((row) => row.product_id == null).length);
     expect(result.matched.filter((row) => row.product_id != null).map((row) => row.code).sort()).toEqual(
       ["BA10", "KP10", "SM5"].filter((code) => result.matched.some((row) => row.code === code)).sort(),
+    );
+  });
+
+  it("never treats a missing global SKU as an import error", async () => {
+    const buffer = readFileSync(EMMA_XLSX);
+    const file = new File([buffer], "Emma_Group_Buy_1_Haendlerkatalog_bereinigt.xlsx", {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const parsed = await parseVendorCatalogFile(file);
+    const result = matchVendorCatalogRows(parsed.rows, [makeProduct("KP10")]);
+    expect(result.unmatched.every((row) => row.reason === "no_price")).toBe(true);
+    expect(JSON.stringify(result)).not.toMatch(/not_in_master/);
+    expect(result.matched).toHaveLength(136);
+  });
+
+  it("keeps every Excel variant after a second parse/match (reimport)", async () => {
+    const buffer = readFileSync(EMMA_XLSX);
+    const file = new File([buffer], "Emma_Group_Buy_1_Haendlerkatalog_bereinigt.xlsx", {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const first = matchVendorCatalogRows((await parseVendorCatalogFile(file)).rows, [makeProduct("KP10")]);
+    const second = matchVendorCatalogRows((await parseVendorCatalogFile(file)).rows, [makeProduct("KP10")]);
+    expect(second.matched).toHaveLength(first.matched.length);
+    expect(second.matched.map((row) => `${row.code}|${row.name}|${row.dosage_vial}|${row.price_usd}`)).toEqual(
+      first.matched.map((row) => `${row.code}|${row.name}|${row.dosage_vial}|${row.price_usd}`),
+    );
+    expect(second.matched.find((row) => row.code === "KP30")?.dosage_vial).toBe("30mg*10vials");
+    expect(second.matched.find((row) => row.code === "BA3")?.dosage_vial).toBe("3ml*10vials");
+  });
+
+  it("storefront labels use vendor_dosage so unlinked variants stay distinct", async () => {
+    const buffer = readFileSync(EMMA_XLSX);
+    const file = new File([buffer], "Emma_Group_Buy_1_Haendlerkatalog_bereinigt.xlsx", {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const parsed = await parseVendorCatalogFile(file);
+    const result = matchVendorCatalogRows(parsed.rows, [makeProduct("KP10"), makeProduct("BA10")]);
+    const catalog = result.matched
+      .filter((row) => ["KP10", "KP30", "KP50", "BA3", "BA10"].includes(row.code))
+      .map((row) => ({
+        ...makeProduct(row.code),
+        id: row.product_id ?? `sap-${row.code.toLowerCase()}`,
+        name: row.name ?? row.code,
+        dosage_vial: row.dosage_vial,
+        category: "PEPTIDES",
+      }));
+    const groups = groupAndSortShopProducts(catalog);
+    const kpv = groups.find((group) => group.variants.some((row) => row.code.startsWith("KP")));
+    const water = groups.find((group) => group.variants.some((row) => row.code.startsWith("BA")));
+    expect(kpv?.variants.map((row) => row.code).sort()).toEqual(["KP10", "KP30", "KP50"]);
+    expect(kpv?.variants.map((row) => variantLabelForProduct(row)).sort()).toEqual([
+      "10x 10 mg Vials",
+      "10x 30 mg Vials",
+      "10x 50 mg Vials",
+    ]);
+    expect(water?.variants.map((row) => row.code).sort()).toEqual(["BA10", "BA3"]);
+    expect(formatVialVariant(catalog.find((row) => row.code === "KP30")!)).toBe("10x 30 mg Vials");
+    expect(formatVialVariant(catalog.find((row) => row.code === "KP50")!)).toBe("10x 50 mg Vials");
+    expect(formatVialVariant(catalog.find((row) => row.code === "BA3")!)).toBe("10x 3 ml Vials");
+    expect(formatVialVariant(catalog.find((row) => row.code === "BA10")!)).toBe("10x 10 ml Vials");
+  });
+
+  it("keeps an area category without a global product_id", () => {
+    const { matched } = matchVendorCatalogRows(
+      [
+        makeImportRow("BA3", 5, {
+          parsedName: "BAC Water",
+          parsedDosageVial: "3ml*10vials",
+          parsedCategory: "Water",
+        }),
+      ],
+      [],
+      [{ category_key: "reconstitution-water", label: "Reconstitution Water" }],
+    );
+    expect(matched[0]?.product_id).toBeNull();
+    expect(matched[0]?.imported_category_key).toBe("reconstitution-water");
+    expect(effectiveAreaCategoryKey(matched[0]?.imported_category_key, null)).toBe("reconstitution-water");
+    expect(parseImportedCategoryKey("Water", [{ category_key: "reconstitution-water", label: "Reconstitution Water" }])).toBe(
+      "reconstitution-water",
     );
   });
 });
@@ -229,6 +386,14 @@ describe("migration 0068 vendor-first catalog", () => {
     expect(sql).toContain("coalesce(sap.product_id, sap.id)");
     expect(sql).not.toMatch(/inner join public\.products/i);
     expect(sql).toContain("shop_area_products_linked_product_uidx");
+  });
+
+  it("resolver prefers vendor_name and vendor_dosage over the global master", () => {
+    expect(sql).toContain("_out.dosage_vial := btrim(_sap.vendor_dosage)");
+    expect(sql).toContain("_out.name := btrim(_sap.vendor_name)");
+    expect(sql).toContain("_out.dosage_vial := _sap.vendor_dosage");
+    expect(sql).toContain("dosage_vial_snapshot");
+    expect(sql).toContain("_product.dosage_vial");
   });
 
   it("does not rewrite historical orders or the global product master", () => {
