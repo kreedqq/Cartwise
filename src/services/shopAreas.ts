@@ -94,13 +94,29 @@ export async function listAdminShopAreaProducts(shopAreaKey: ShopAreaKey) {
   return data ?? [];
 }
 
+async function vendorCodeForAreaProduct(shopAreaKey: ShopAreaKey, productId: string): Promise<string> {
+  const { data, error } = await supabase
+    .from("shop_area_products")
+    .select("vendor_code")
+    .eq("shop_area_key", shopAreaKey)
+    .eq("product_id", productId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data?.vendor_code) {
+    throw new Error("Artikel gehört nicht zum Händlerkatalog dieses Bereichs.");
+  }
+  return data.vendor_code;
+}
+
 export async function setAdminShopAreaProductActive(
   shopAreaKey: ShopAreaKey,
   productId: string,
   isActive: boolean,
 ): Promise<void> {
+  const vendorCode = await vendorCodeForAreaProduct(shopAreaKey, productId);
   const { error } = await supabase.from("shop_area_products").upsert({
     shop_area_key: shopAreaKey,
+    vendor_code: vendorCode,
     product_id: productId,
     is_active: isActive,
     updated_at: new Date().toISOString(),
@@ -132,8 +148,10 @@ export async function upsertAdminShopAreaProductPrice(
     bulk_price_min_quantity: number | null;
   },
 ): Promise<void> {
+  const vendorCode = await vendorCodeForAreaProduct(shopAreaKey, productId);
   const { error } = await supabase.from("shop_area_product_prices").upsert({
     shop_area_key: shopAreaKey,
+    vendor_code: vendorCode,
     product_id: productId,
     price_usd: patch.price_usd,
     bulk_price_usd: patch.bulk_price_usd,
@@ -233,7 +251,8 @@ export async function signedAdminShopAreaDocumentUrl(storagePath: string): Promi
 
 /** Payload for one product entry in the area vendor catalog. */
 export interface VendorCatalogRow {
-  product_id: string;
+  vendor_code: string;
+  product_id: string | null;
   price_usd: number;
   bulk_price_usd: number | null;
   bulk_price_min_quantity: number | null;
@@ -296,12 +315,12 @@ export async function applyVendorCatalogFromFile(
 
 export async function setAdminShopAreaManualPrice(
   shopAreaKey: ShopAreaKey,
-  productId: string,
+  vendorCode: string,
   manualPriceUsd: number | null,
 ): Promise<Tables<"shop_area_product_prices">> {
-  const { data, error } = await supabase.rpc("set_area_product_manual_price", {
+  const { data, error } = await supabase.rpc("set_area_vendor_manual_price", {
     _area_key: shopAreaKey,
-    _product_id: productId,
+    _vendor_code: vendorCode,
     _manual_price_usd: manualPriceUsd,
   });
   if (error) throw error;
@@ -330,12 +349,12 @@ export async function listShopAreaStorefront(shopArea: ShopAreaKey): Promise<Sho
 
 export async function setAdminShopAreaProductCategory(
   shopAreaKey: ShopAreaKey,
-  productId: string,
+  vendorCode: string,
   categoryKey: string | null,
 ): Promise<Tables<"shop_area_products">> {
-  const { data, error } = await supabase.rpc("set_area_product_category", {
+  const { data, error } = await supabase.rpc("set_area_vendor_category", {
     _area_key: shopAreaKey,
-    _product_id: productId,
+    _vendor_code: vendorCode,
     _category_key: categoryKey,
   });
   if (error) throw error;

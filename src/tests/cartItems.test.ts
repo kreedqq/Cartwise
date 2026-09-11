@@ -43,6 +43,7 @@ function makeItem(overrides: Partial<Tables<"cart_items">>): Tables<"cart_items"
     cart_id: "cart-1",
     position: 0,
     product_id: "prod-1",
+    vendor_code: "ART-1",
     product_code_input: "ART-1",
     product_code_snapshot: "ART-1",
     product_name_snapshot: "Testprodukt",

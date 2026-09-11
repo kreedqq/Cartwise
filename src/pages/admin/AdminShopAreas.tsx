@@ -317,6 +317,7 @@ function VendorCatalogPanel({
     setBusy(true);
     try {
       const rows = pending.result.matched.map((entry) => ({
+        vendor_code: entry.code,
         product_id: entry.product_id,
         price_usd: entry.price_usd,
         bulk_price_usd: entry.bulk_price_usd,
@@ -357,7 +358,7 @@ function VendorCatalogPanel({
       <CardHeader>
         <CardTitle className="text-base">Händlerkatalog {SHOP_AREA_LABELS[areaKey]}</CardTitle>
         <CardDescription>
-          Nur Artikel aus der Händlerdatei. Globale Produkte ohne SKU in der Datei erscheinen nicht.
+          Nur Artikel aus der Händlerdatei. SKUs ohne globales Produkt werden trotzdem übernommen.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -375,15 +376,27 @@ function VendorCatalogPanel({
           <div className="space-y-3 rounded-lg border border-border bg-secondary/20 p-4">
             <p className="text-sm font-medium">Vorschau: {pending.file.name}</p>
             <p className="text-sm">
-              {pending.result.matched.length} Artikel erkannt · {pending.result.matched.length} zugeordnet ·{" "}
-              {pending.result.unmatched.length} nicht zugeordnet
+              {pending.result.matched.length} Artikel erkannt · {pending.result.matched.length} importierbar
+              {pending.result.unlinkedCodes.length > 0
+                ? ` · ${pending.result.unlinkedCodes.length} ohne globale Produktverknüpfung`
+                : ""}
+              {pending.result.unmatched.length > 0 ? ` · ${pending.result.unmatched.length} nicht importierbar` : ""}
             </p>
+            {pending.result.unlinkedCodes.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                {pending.result.unlinkedCodes.length} Artikel sind nicht mit dem globalen Produktmaster verknüpft. Sie
+                werden trotzdem als Händlerartikel übernommen.
+                {pending.result.unlinkedCodes.length <= 20
+                  ? ` (${pending.result.unlinkedCodes.join(", ")})`
+                  : ` (${pending.result.unlinkedCodes.slice(0, 20).join(", ")} …)`}
+              </p>
+            )}
             {pending.result.unmatched.length > 0 && (
               <p className="text-xs text-muted-foreground">
-                Nicht zugeordnet:{" "}
+                Nicht importierbar:{" "}
                 {pending.result.unmatched
                   .slice(0, 20)
-                  .map((row) => `${row.code} (${row.reason === "no_price" ? "kein Preis" : "nicht im Master"})`)
+                  .map((row) => `${row.code} (${row.reason === "no_price" ? "kein Preis" : "unklar"})`)
                   .join(", ")}
                 {pending.result.unmatched.length > 20 ? " …" : ""}
               </p>
@@ -478,19 +491,26 @@ function VendorProductsPanel({
 
   const categories = categoriesQuery.data ?? [];
   const rows = React.useMemo(() => {
-    const priceById = new Map((pricesQuery.data ?? []).map((row) => [row.product_id, row]));
+    const priceByCode = new Map(
+      (pricesQuery.data ?? [])
+        .filter((row) => row.vendor_code)
+        .map((row) => [row.vendor_code, row] as const),
+    );
     const productById = new Map(products.map((product) => [product.id, product]));
     return (catalogQuery.data ?? []).map((row) => {
-      const product = productById.get(row.product_id);
-      const price = priceById.get(row.product_id);
+      const product = row.product_id ? productById.get(row.product_id) : undefined;
+      const price = priceByCode.get(row.vendor_code) ?? (row.product_id ? priceByCode.get(row.product_id) : undefined);
       const imported = price?.imported_price_usd ?? price?.price_usd ?? null;
       const manual = price?.manual_price_usd ?? null;
-      const kitBasis = usesKitNoun(shopCategoryIdFor(product ?? { category: null, name: row.vendor_name, code: null }));
+      const kitBasis = usesKitNoun(
+        shopCategoryIdFor(product ?? { category: row.imported_category_key, name: row.vendor_name, code: row.vendor_code }),
+      );
       const importedCategory = row.imported_category_key;
       const manualCategory = row.manual_category_key;
       return {
+        vendorCode: row.vendor_code,
         productId: row.product_id,
-        code: product?.code ?? "—",
+        code: row.vendor_code || product?.code || "—",
         name: row.vendor_name ?? product?.name ?? "—",
         variant: row.vendor_dosage ?? product?.dosage_vial ?? "—",
         imported,
@@ -502,6 +522,7 @@ function VendorProductsPanel({
         manualCategory,
         effectiveCategory: effectiveAreaCategoryKey(importedCategory, manualCategory),
         categorySource: areaCategorySource(importedCategory, manualCategory),
+        masterLinked: Boolean(row.product_id),
       };
     });
   }, [catalogQuery.data, pricesQuery.data, products]);
@@ -542,7 +563,7 @@ function VendorProductsPanel({
                 <TableBody>
                   {rows.map((row) => (
                     <VendorPriceRow
-                      key={`${row.productId}|${row.effective}|${row.source}|${row.effectiveCategory}|${row.categorySource}`}
+                      key={`${row.vendorCode}|${row.effective}|${row.source}|${row.effectiveCategory}|${row.categorySource}`}
                       areaKey={areaKey}
                       profile={profile}
                       categories={categories}
@@ -696,7 +717,8 @@ function VendorPriceRow({
   profile: ShopPricingProfile;
   categories: AreaCategory[];
   row: {
-    productId: string;
+    vendorCode: string;
+    productId: string | null;
     code: string;
     name: string;
     variant: string;
@@ -709,6 +731,7 @@ function VendorPriceRow({
     manualCategory: string | null;
     effectiveCategory: string | null;
     categorySource: "manual" | "vendor_file" | "none";
+    masterLinked: boolean;
   };
   onChanged: () => Promise<void>;
 }) {
@@ -718,7 +741,7 @@ function VendorPriceRow({
   async function save(manual: number | null) {
     setSaving(true);
     try {
-      await setAdminShopAreaManualPrice(areaKey, row.productId, manual);
+      await setAdminShopAreaManualPrice(areaKey, row.vendorCode, manual);
       toast.success(`${row.code} gespeichert.`);
       await onChanged();
     } catch (error) {
@@ -731,7 +754,7 @@ function VendorPriceRow({
   async function saveCategory(categoryKey: string | null) {
     setSaving(true);
     try {
-      await setAdminShopAreaProductCategory(areaKey, row.productId, categoryKey);
+      await setAdminShopAreaProductCategory(areaKey, row.vendorCode, categoryKey);
       toast.success(`${row.code} Kategorie gespeichert.`);
       await onChanged();
     } catch (error) {
@@ -743,7 +766,12 @@ function VendorPriceRow({
 
   return (
     <TableRow>
-      <TableCell className="font-mono text-xs">{row.code}</TableCell>
+      <TableCell className="font-mono text-xs">
+        {row.code}
+        {!row.masterLinked ? (
+          <span className="mt-1 block text-[10px] font-sans text-muted-foreground">ohne Master</span>
+        ) : null}
+      </TableCell>
       <TableCell>{row.name}</TableCell>
       <TableCell>{row.variant}</TableCell>
       <TableCell>

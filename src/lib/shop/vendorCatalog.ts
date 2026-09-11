@@ -2,8 +2,9 @@
  * Vendor catalog matching logic.
  *
  * Each shop area is an independent vendor. The uploaded dealer file is the
- * only assortment source. This module maps parsed file rows onto the global
- * product master by normalized SKU — it never falls back to "all active products".
+ * only assortment source. Global `products` is an optional SKU link, never a
+ * gate: a valid dealer row is imported even when its SKU is absent from the
+ * master. Matching is exact after trim+uppercase — never by name or dosage.
  *
  * No database calls. Used by AdminShopAreas and unit tests.
  */
@@ -16,7 +17,7 @@ import {
 import type { Tables } from "@/types/database";
 
 export interface VendorCatalogEntry {
-  product_id: string;
+  product_id: string | null;
   code: string;
   name: string | null;
   dosage_vial: string | null;
@@ -27,7 +28,7 @@ export interface VendorCatalogEntry {
   imported_category_key: string | null;
 }
 
-export type VendorUnmatchedReason = "not_in_master" | "no_price";
+export type VendorUnmatchedReason = "no_price";
 
 export interface VendorCatalogUnmatched {
   code: string;
@@ -36,9 +37,13 @@ export interface VendorCatalogUnmatched {
 }
 
 export interface VendorCatalogMatchResult {
+  /** Every valid dealer row (code + price). Includes rows without a master product. */
   matched: VendorCatalogEntry[];
+  /** Rows that cannot be imported (currently: missing/invalid price). */
   unmatched: VendorCatalogUnmatched[];
-  /** Convenience: unique unmatched codes (not_in_master). */
+  /** Dealer SKUs imported without a global products row. Informational, not an error. */
+  unlinkedCodes: string[];
+  /** @deprecated Use unlinkedCodes. Kept as an alias so older tests can migrate. */
   unmatchedCodes: string[];
 }
 
@@ -63,14 +68,32 @@ export function buildVendorRaw(row: ParsedProductImportRow): Record<string, unkn
 }
 
 /**
- * Matches parsed dealer-file rows against the global product master by SKU.
- * Global products that are not in the file never appear in `matched`.
+ * Carries a product name forward when later variant rows leave the name cell empty.
+ * Does not invent names for leading rows that never had one.
+ */
+export function forwardFillVendorNames(rows: ParsedProductImportRow[]): ParsedProductImportRow[] {
+  let lastName: string | null = null;
+  return rows.map((row) => {
+    const name = row.parsedName?.trim() || null;
+    if (name) {
+      lastName = name;
+      return row;
+    }
+    if (!lastName || !row.parsedCode) return row;
+    return { ...row, parsedName: lastName };
+  });
+}
+
+/**
+ * Maps parsed dealer-file rows onto optional global products by SKU.
+ * Rows without a master match stay in `matched` with `product_id: null`.
  */
 export function matchVendorCatalogRows(
   rows: ParsedProductImportRow[],
   globalProducts: Tables<"products">[],
   areaCategories: readonly Pick<AreaCategory, "category_key" | "label">[] = [],
 ): VendorCatalogMatchResult {
+  const filled = forwardFillVendorNames(rows);
   const productsByCode = new Map<string, Tables<"products">>();
   for (const product of globalProducts) {
     productsByCode.set(normalizeVendorSku(product.code), product);
@@ -78,23 +101,16 @@ export function matchVendorCatalogRows(
 
   const matched: VendorCatalogEntry[] = [];
   const unmatched: VendorCatalogUnmatched[] = [];
-  const seenProductIds = new Set<string>();
+  const seenCodes = new Set<string>();
   const seenUnmatched = new Set<string>();
+  const unlinkedCodes: string[] = [];
 
-  for (const row of rows) {
+  for (const row of filled) {
     const rawCode = row.parsedCode?.trim();
     if (!rawCode) continue;
 
     const code = normalizeVendorSku(rawCode);
-    const product = productsByCode.get(code);
-
-    if (!product) {
-      if (!seenUnmatched.has(code)) {
-        seenUnmatched.add(code);
-        unmatched.push({ code, reason: "not_in_master", rawText: row.rawText });
-      }
-      continue;
-    }
+    const product = productsByCode.get(code) ?? null;
 
     if (row.parsedPriceUsd == null || row.parsedPriceUsd <= 0) {
       if (!seenUnmatched.has(code)) {
@@ -104,14 +120,16 @@ export function matchVendorCatalogRows(
       continue;
     }
 
-    if (seenProductIds.has(product.id)) continue;
-    seenProductIds.add(product.id);
+    if (seenCodes.has(code)) continue;
+    seenCodes.add(code);
+
+    if (!product) unlinkedCodes.push(code);
 
     matched.push({
-      product_id: product.id,
-      code: product.code,
-      name: row.parsedName ?? product.name,
-      dosage_vial: row.parsedDosageVial ?? product.dosage_vial,
+      product_id: product?.id ?? null,
+      code,
+      name: row.parsedName ?? product?.name ?? null,
+      dosage_vial: row.parsedDosageVial ?? product?.dosage_vial ?? null,
       price_usd: row.parsedPriceUsd,
       bulk_price_usd: row.parsedBulkPriceUsd ?? null,
       bulk_price_min_quantity: row.parsedBulkPriceMinQuantity ?? null,
@@ -123,35 +141,41 @@ export function matchVendorCatalogRows(
   return {
     matched,
     unmatched,
-    unmatchedCodes: unmatched.filter((row) => row.reason === "not_in_master").map((row) => row.code),
+    unlinkedCodes,
+    unmatchedCodes: unlinkedCodes,
   };
 }
 
 export interface CatalogSnapshot {
-  entries: Array<{ product_id: string; price_usd: number }>;
+  entries: Array<{ product_id: string | null; vendor_code?: string; price_usd: number }>;
 }
 
 export function diffVendorCatalog(
   current: CatalogSnapshot,
   next: VendorCatalogMatchResult,
 ): { added: string[]; removed: string[] } {
-  const currentIds = new Set(current.entries.map((entry) => entry.product_id));
-  const nextIds = new Set(next.matched.map((entry) => entry.product_id));
+  const currentCodes = new Set(
+    current.entries.map((entry) => normalizeVendorSku(entry.vendor_code ?? entry.product_id ?? "")).filter(Boolean),
+  );
+  const nextCodes = new Set(next.matched.map((entry) => entry.code));
 
   return {
-    added: next.matched.filter((entry) => !currentIds.has(entry.product_id)).map((entry) => entry.code),
-    removed: current.entries.filter((entry) => !nextIds.has(entry.product_id)).map((entry) => entry.product_id),
+    added: next.matched.filter((entry) => !currentCodes.has(entry.code)).map((entry) => entry.code),
+    removed: current.entries
+      .map((entry) => normalizeVendorSku(entry.vendor_code ?? ""))
+      .filter((code) => code && !nextCodes.has(code)),
   };
 }
 
 export interface VendorManualOverride {
-  product_id: string;
+  product_id: string | null;
+  vendor_code?: string;
   imported_price_usd: number | null;
   manual_price_usd: number | null;
 }
 
 export interface VendorOverrideConflict {
-  product_id: string;
+  product_id: string | null;
   code: string;
   newImportedUsd: number;
   currentImportedUsd: number | null;
@@ -163,9 +187,16 @@ export function vendorOverrideConflicts(
   matched: VendorCatalogEntry[],
   currentPrices: VendorManualOverride[],
 ): VendorOverrideConflict[] {
-  const byId = new Map(currentPrices.map((row) => [row.product_id, row]));
+  const byCode = new Map<string, VendorManualOverride>();
+  for (const row of currentPrices) {
+    const code = row.vendor_code ? normalizeVendorSku(row.vendor_code) : "";
+    if (code) byCode.set(code, row);
+  }
+  const byId = new Map(
+    currentPrices.filter((row) => row.product_id).map((row) => [row.product_id as string, row]),
+  );
   return matched.flatMap((entry) => {
-    const current = byId.get(entry.product_id);
+    const current = byCode.get(entry.code) ?? (entry.product_id ? byId.get(entry.product_id) : undefined);
     if (current?.manual_price_usd == null || current.manual_price_usd <= 0) return [];
     return [
       {

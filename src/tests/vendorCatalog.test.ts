@@ -380,8 +380,8 @@ describe("diffVendorCatalog", () => {
   it("returns added/removed sets correctly", () => {
     const current = {
       entries: [
-        { product_id: "id-sm5",  price_usd: 65 },
-        { product_id: "id-sm10", price_usd: 70 },
+        { product_id: "id-sm5", vendor_code: "SM5", price_usd: 65 },
+        { product_id: "id-sm10", vendor_code: "SM10", price_usd: 70 },
       ],
     };
     const next = matchVendorCatalogRows(
@@ -390,7 +390,7 @@ describe("diffVendorCatalog", () => {
     );
     const { added, removed } = diffVendorCatalog(current, next);
     expect(added).toContain("TR10");
-    expect(removed).toContain("id-sm5");
+    expect(removed).toContain("SM5");
     expect(added).not.toContain("SM5");
   });
 });
@@ -566,16 +566,16 @@ describe("vendor catalog assortment source", () => {
     expect(matched.map((row) => row.code)).not.toContain("OXO50");
   });
 
-  it("R03 – unmatched file SKUs are reported, never silently dropped", () => {
-    const { matched, unmatched, unmatchedCodes } = matchVendorCatalogRows(
+  it("R03 – unknown master SKUs stay in the vendor catalog with product_id null", () => {
+    const { matched, unmatched, unmatchedCodes, unlinkedCodes } = matchVendorCatalogRows(
       [makeImportRow("SM5", 65), makeImportRow("UNKNOWN99", 10), makeImportRow(" sm 5 ", 70)],
       [makeProduct("SM5")],
     );
-    expect(matched).toHaveLength(1);
+    expect(matched.map((row) => row.code)).toEqual(["SM5", "UNKNOWN99"]);
+    expect(matched.find((row) => row.code === "UNKNOWN99")?.product_id).toBeNull();
+    expect(unlinkedCodes).toEqual(["UNKNOWN99"]);
     expect(unmatchedCodes).toEqual(["UNKNOWN99"]);
-    expect(unmatched).toEqual([
-      expect.objectContaining({ code: "UNKNOWN99", reason: "not_in_master" }),
-    ]);
+    expect(unmatched).toEqual([]);
   });
 
   it("R04 – rows without a vendor price are unmatched, not filled from products.price_usd", () => {

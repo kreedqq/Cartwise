@@ -13,6 +13,7 @@ export interface AreaCategory {
 
 export interface AreaCategoryAssignment {
   product_id: string;
+  vendor_code?: string;
   category_key: string;
 }
 
@@ -145,16 +146,24 @@ export function parseImportedCategoryKey(
 export function assignmentMap(
   assignments: readonly AreaCategoryAssignment[],
 ): Map<string, string> {
-  return new Map(assignments.map((row) => [row.product_id, row.category_key]));
+  const map = new Map<string, string>();
+  for (const row of assignments) {
+    map.set(row.product_id, row.category_key);
+    if (row.vendor_code) map.set(row.vendor_code, row.category_key);
+  }
+  return map;
 }
 
-export function productsInAreaCategory<T extends { id: string }>(
+export function productsInAreaCategory<T extends { id: string; code?: string }>(
   products: readonly T[],
   assignments: readonly AreaCategoryAssignment[],
   categoryKey: string,
 ): T[] {
-  const byId = assignmentMap(assignments);
-  return products.filter((product) => byId.get(product.id) === categoryKey);
+  const byKey = assignmentMap(assignments);
+  return products.filter((product) => {
+    const assigned = byKey.get(product.id) ?? (product.code ? byKey.get(product.code) : undefined);
+    return assigned === categoryKey;
+  });
 }
 
 export function countProductsByAreaCategory(

@@ -91,7 +91,7 @@ describe("admin Verkaufsbereiche", () => {
     expect(page).toContain("Katalog anwenden");
     expect(page).toContain("applyVendorCatalogFromFile");
     expect(page).toContain("parseVendorCatalogFile");
-    expect(page).toContain("Nicht zugeordnet");
+    expect(page).toContain("ohne globale Produktverknüpfung");
     expect(page).toContain("Aktuelle Händlerdatei (angewendet)");
     expect(page).toContain('value="haendlerkatalog"');
     expect(page).toContain('value="produkte"');
@@ -118,8 +118,8 @@ describe("admin Verkaufsbereiche", () => {
     const service = read("src/services/shopAreas.ts");
     expect(service.indexOf("uploadNewFile")).toBeLessThan(service.indexOf("applyCatalog"));
     expect(service).toContain("_keep_manual_overrides");
-    expect(service).toContain("set_area_product_manual_price");
-    expect(service).toContain("set_area_product_category");
+    expect(service).toContain("set_area_vendor_manual_price");
+    expect(service).toContain("set_area_vendor_category");
     expect(service).toContain("list_shop_area_storefront");
   });
 });

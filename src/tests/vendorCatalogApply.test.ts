@@ -129,8 +129,8 @@ describe("runVendorCatalogApply order", () => {
     const products = [makeProduct("SM5", 100), makeProduct("SM10", 200), makeProduct("TR10", 50)];
     const previous = {
       entries: [
-        { product_id: "id-sm5", price_usd: 65 },
-        { product_id: "id-sm10", price_usd: 70 },
+        { product_id: "id-sm5", vendor_code: "SM5", price_usd: 65 },
+        { product_id: "id-sm10", vendor_code: "SM10", price_usd: 70 },
       ],
     };
     const next = matchVendorCatalogRows(
@@ -139,7 +139,7 @@ describe("runVendorCatalogApply order", () => {
     );
     const { added, removed } = diffVendorCatalog(previous, next);
     expect(added).toEqual(["TR10"]);
-    expect(removed).toEqual(["id-sm5"]);
+    expect(removed).toEqual(["SM5"]);
     expect(next.matched.find((row) => row.code === "SM10")?.price_usd).toBe(55);
     expect(next.matched.find((row) => row.code === "TR10")?.price_usd).toBe(40);
     expect(next.matched.map((row) => row.code)).not.toContain("SM5");

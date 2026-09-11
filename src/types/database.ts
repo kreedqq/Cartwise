@@ -144,6 +144,7 @@ export interface Database {
           cart_id: string;
           position: number;
           product_id: string | null;
+          vendor_code: string | null;
           product_code_input: string;
           product_code_snapshot: string | null;
           product_name_snapshot: string | null;
@@ -550,7 +551,9 @@ export interface Database {
       shop_area_products: {
         Row: {
           shop_area_key: string;
-          product_id: string;
+          product_id: string | null;
+          id: string;
+          vendor_code: string;
           is_active: boolean;
           updated_at: string;
           vendor_name: string | null;
@@ -561,7 +564,7 @@ export interface Database {
         };
         Insert: Partial<Database["public"]["Tables"]["shop_area_products"]["Row"]> & {
           shop_area_key: string;
-          product_id: string;
+          vendor_code: string;
         };
         Update: Partial<Database["public"]["Tables"]["shop_area_products"]["Row"]>;
         Relationships: never[];
@@ -587,7 +590,8 @@ export interface Database {
       shop_area_product_prices: {
         Row: {
           shop_area_key: string;
-          product_id: string;
+          product_id: string | null;
+          vendor_code: string;
           price_usd: number | null;
           imported_price_usd: number | null;
           manual_price_usd: number | null;
@@ -598,7 +602,7 @@ export interface Database {
         };
         Insert: Partial<Database["public"]["Tables"]["shop_area_product_prices"]["Row"]> & {
           shop_area_key: string;
-          product_id: string;
+          vendor_code: string;
         };
         Update: Partial<Database["public"]["Tables"]["shop_area_product_prices"]["Row"]>;
         Relationships: never[];
@@ -1672,7 +1676,8 @@ export interface Database {
         Args: {
           _area_key: string;
           _rows: {
-            product_id: string;
+            vendor_code: string;
+            product_id: string | null;
             price_usd: number;
             bulk_price_usd: number | null;
             bulk_price_min_quantity: number | null;
@@ -1703,8 +1708,20 @@ export interface Database {
         };
         Returns: Database["public"]["Tables"]["shop_area_product_prices"]["Row"];
       };
+      set_area_vendor_manual_price: {
+        Args: {
+          _area_key: string;
+          _vendor_code: string;
+          _manual_price_usd: number | null;
+        };
+        Returns: Database["public"]["Tables"]["shop_area_product_prices"]["Row"];
+      };
       set_area_product_category: {
         Args: { _area_key: string; _product_id: string; _category_key: string | null };
+        Returns: Database["public"]["Tables"]["shop_area_products"]["Row"];
+      };
+      set_area_vendor_category: {
+        Args: { _area_key: string; _vendor_code: string; _category_key: string | null };
         Returns: Database["public"]["Tables"]["shop_area_products"]["Row"];
       };
       set_shop_area_category_active: {
@@ -1732,7 +1749,7 @@ export interface Database {
             sort_order: number;
             is_active: boolean;
           }>;
-          assignments: Array<{ product_id: string; category_key: string }>;
+          assignments: Array<{ product_id: string; vendor_code?: string; category_key: string }>;
         };
       };
       /**

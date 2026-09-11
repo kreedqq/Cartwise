@@ -70,12 +70,14 @@ export async function addCartItem(
 
   const product = resolution.product!;
   const snapshot = buildSnapshot(product, quantity, currentRate);
+  const { data: master } = await supabase.from("products").select("id").eq("id", product.id).maybeSingle();
 
   const { data, error } = await supabase
     .from("cart_items")
     .insert({
       ...base,
-      product_id: product.id,
+      product_id: master?.id ?? null,
+      vendor_code: product.code,
       product_code_snapshot: snapshot.productCodeSnapshot,
       product_name_snapshot: snapshot.productNameSnapshot,
       ...snapshotToColumns(snapshot),
@@ -111,7 +113,9 @@ export async function reresolveCartItemCode(
     // A new code means a new price structure, so the tier is re-selected for
     // the quantity this line already has.
     const snapshot = buildSnapshot(product, item.quantity, currentRate);
-    patch.product_id = product.id;
+    const { data: master } = await supabase.from("products").select("id").eq("id", product.id).maybeSingle();
+    patch.product_id = master?.id ?? null;
+    patch.vendor_code = product.code;
     patch.resolution_status = resolution.status === "inactive" ? "inactive" : "resolved";
     patch.product_code_snapshot = snapshot.productCodeSnapshot;
     patch.product_name_snapshot = snapshot.productNameSnapshot;
@@ -224,6 +228,12 @@ export async function addCartItemsBulk(
     lines.map((l) => l.code),
     shopArea,
   );
+  const catalogIds = Array.from(new Set([...productMap.values()].map((product) => product.id).filter(Boolean)));
+  const masterIds = new Set<string>();
+  if (catalogIds.length > 0) {
+    const { data: masters } = await supabase.from("products").select("id").in("id", catalogIds);
+    for (const row of masters ?? []) masterIds.add(row.id);
+  }
 
   const rows: Database["public"]["Tables"]["cart_items"]["Insert"][] = lines.map((line, index) => {
     const product = productMap.get(line.code);
@@ -240,7 +250,8 @@ export async function addCartItemsBulk(
     const snapshot = buildSnapshot(product, line.quantity, currentRate);
     return {
       ...base,
-      product_id: product.id,
+      product_id: masterIds.has(product.id) ? product.id : null,
+      vendor_code: product.code,
       resolution_status: product.is_active ? "resolved" : "inactive",
       product_code_snapshot: snapshot.productCodeSnapshot,
       product_name_snapshot: snapshot.productNameSnapshot,

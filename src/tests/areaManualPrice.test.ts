@@ -124,6 +124,35 @@ describe("area grundpreis overrides", () => {
       [],
     );
   });
+
+  it("keeps a manual override for a vendor SKU without a global product_id", () => {
+    const matched: VendorCatalogEntry[] = [
+      {
+        product_id: null,
+        code: "KP30",
+        name: "KPV",
+        dosage_vial: "30mg*10vials",
+        price_usd: 120,
+        bulk_price_usd: null,
+        bulk_price_min_quantity: null,
+        vendor_raw: {},
+        imported_category_key: null,
+      },
+    ];
+    expect(
+      vendorOverrideConflicts(matched, [
+        { product_id: null, vendor_code: "KP30", imported_price_usd: 118, manual_price_usd: 125 },
+      ]),
+    ).toEqual([
+      {
+        product_id: null,
+        code: "KP30",
+        newImportedUsd: 120,
+        currentImportedUsd: 118,
+        currentManualUsd: 125,
+      },
+    ]);
+  });
 });
 
 describe("0058 area manual prices SQL", () => {
