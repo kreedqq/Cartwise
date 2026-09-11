@@ -175,7 +175,8 @@ describe("feedback is allowed for any own order", () => {
       "arrived",
     ]);
     expect(read("src/lib/feedback.ts")).not.toContain("FEEDBACK_ELIGIBLE_STATUSES");
-    expect(read("src/pages/Feedback.tsx")).toContain("feedbackOrderChoiceLabel");
+    expect(read("src/lib/feedback.ts")).toContain("feedbackOrderChoiceLabel");
+    expect(read("src/pages/Feedback.tsx")).not.toContain("feedbackOrderChoiceLabel");
     expect(read("src/pages/Feedback.tsx")).not.toContain("Nur abgeschlossene");
   });
 
@@ -303,14 +304,17 @@ describe("optional order feedback", () => {
     const page = read("src/pages/Feedback.tsx");
     const card = read("src/components/feedback/FeedbackCard.tsx");
     const admin = read("src/pages/admin/AdminFeedback.tsx");
-    expect(page).toContain("Bestellung (optional)");
-    expect(page).toContain("Keine Bestellung angeben");
-    expect(page).toContain("FEEDBACK_NO_ORDER_VALUE");
-    expect(page).toContain("resolveFeedbackOrderId(orderId)");
-    expect(page).not.toContain("disabled={!orderId");
-    expect(page).not.toContain("eligible.length === 0");
+    expect(page).not.toContain("Bestellung (optional)");
+    expect(page).not.toContain("Keine Bestellung angeben");
+    expect(page).not.toContain("FEEDBACK_NO_ORDER_VALUE");
+    expect(page).not.toContain("eligibleOrdersForFeedback");
+    expect(page).not.toContain("useMyOrders");
+    expect(page).not.toContain("SelectItem");
+    expect(page).toContain("order_id: null");
+    expect(page).toContain("Allgemeines Feedback zu PEPTIX");
     expect(page).toContain("compact");
     expect(page).toContain("flex flex-wrap items-center gap-x-4");
+    expect(page).toContain("image_consent");
     expect(card).toContain("feedbackProvenanceLabel");
     expect(card).toContain("isVerifiedOrderFeedback(item.order_id)");
     expect(read("src/lib/feedback.ts")).toContain("Verifizierte Bestellung");

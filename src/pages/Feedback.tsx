@@ -11,37 +11,27 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toaster";
-import { useMyOrders } from "@/hooks/useOrders";
 import { useApprovedFeedback, useCreateFeedback, useFeedbackStats, useMyFeedback } from "@/hooks/useTrustExperience";
 import {
   FEEDBACK_BODY_MAX,
   FEEDBACK_BODY_MIN,
   FEEDBACK_DEFAULT_DISPLAY_NAME,
-  FEEDBACK_NO_ORDER_VALUE,
   FEEDBACK_PAGE_SIZE,
   averageRating,
-  eligibleOrdersForFeedback,
-  feedbackOrderChoiceLabel,
   formatAverageRating,
   ratingDistribution,
-  resolveFeedbackOrderId,
 } from "@/lib/feedback";
-import { ORDER_STATUS_LABELS } from "@/services/orders";
-import type { OrderStatus } from "@/types/database";
 
 export default function FeedbackPage() {
   const [page, setPage] = React.useState(0);
   const feedQuery = useApprovedFeedback(page);
   const statsQuery = useFeedbackStats();
   const myFeedbackQuery = useMyFeedback();
-  const ordersQuery = useMyOrders();
   const createMutation = useCreateFeedback();
 
-  const [orderId, setOrderId] = React.useState(FEEDBACK_NO_ORDER_VALUE);
   const [rating, setRating] = React.useState(5);
   const [body, setBody] = React.useState("");
   const [displayName, setDisplayName] = React.useState("");
@@ -59,16 +49,12 @@ export default function FeedbackPage() {
   const average = averageRating(ratings);
   const distribution = ratingDistribution(ratings);
   const visibleFeed = feedQuery.data ?? [];
-  const eligible = eligibleOrdersForFeedback(
-    ordersQuery.data ?? [],
-    (myFeedbackQuery.data ?? []).map((row) => row.order_id),
-  );
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     try {
       await createMutation.mutateAsync({
-        order_id: resolveFeedbackOrderId(orderId),
+        order_id: null,
         rating,
         body,
         image_consent: imageFile ? consent : false,
@@ -82,7 +68,6 @@ export default function FeedbackPage() {
       setImageFile(null);
       if (imagePreview) URL.revokeObjectURL(imagePreview);
       setImagePreview(null);
-      setOrderId(FEEDBACK_NO_ORDER_VALUE);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Bewertung konnte nicht gespeichert werden.");
     }
@@ -127,100 +112,80 @@ export default function FeedbackPage() {
           <div>
             <h2 className="text-lg font-semibold">Bewertung abgeben</h2>
             <p className="text-sm text-muted-foreground">
-              Bestellung optional. Eine Bewertung pro Bestellung. Allgemeine Bewertungen ohne Bestellung sind möglich.
-              Veröffentlichung erst nach Freigabe.
+              Allgemeines Feedback zu PEPTIX. Veröffentlichung erst nach Freigabe.
             </p>
           </div>
           <form className="space-y-3" onSubmit={(event) => void handleSubmit(event)}>
-              <div className="space-y-1.5">
-                <Label htmlFor="feedback-order">Bestellung (optional)</Label>
-                <Select value={orderId} onValueChange={setOrderId}>
-                  <SelectTrigger id="feedback-order" aria-label="Bestellung auswählen">
-                    <SelectValue placeholder="Keine Bestellung angeben" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={FEEDBACK_NO_ORDER_VALUE}>Keine Bestellung angeben</SelectItem>
-                    {eligible.map((order) => (
-                      <SelectItem key={order.id} value={order.id}>
-                        {feedbackOrderChoiceLabel(
-                          order.order_number,
-                          ORDER_STATUS_LABELS[order.status as OrderStatus] ?? order.status,
-                        )}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                <Label className="m-0 shrink-0 leading-none">Sterne</Label>
-                <StarRating value={rating} onChange={setRating} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="feedback-body">Deine Erfahrung</Label>
-                <Textarea
-                  id="feedback-body"
-                  value={body}
-                  onChange={(event) => setBody(event.target.value)}
-                  minLength={FEEDBACK_BODY_MIN}
-                  maxLength={FEEDBACK_BODY_MAX}
-                  rows={5}
-                  required
-                />
-                <p className="text-xs text-muted-foreground">
-                  {body.trim().length} / {FEEDBACK_BODY_MAX} Zeichen (mindestens {FEEDBACK_BODY_MIN})
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="feedback-name">Anzeigename (optional)</Label>
-                <Input
-                  id="feedback-name"
-                  value={displayName}
-                  onChange={(event) => setDisplayName(event.target.value)}
-                  maxLength={40}
-                  placeholder={FEEDBACK_DEFAULT_DISPLAY_NAME}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Ohne Angabe erscheint öffentlich „{FEEDBACK_DEFAULT_DISPLAY_NAME}“. E-Mail, Adresse und Telegram
-                  werden nicht angezeigt.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label>Bestellfoto (optional)</Label>
-                <p className="text-xs text-muted-foreground">
-                  Dein Foto wird nach Freigabe zusammen mit deiner Bewertung öffentlich angezeigt.
-                </p>
-                <ImageDropzone
-                  aspect="photo"
-                  compact
-                  previewUrl={imagePreview}
-                  hint="JPG, PNG oder WEBP. Datei wählen oder per Drag & Drop."
-                  label="Zeige anderen deine Bestellung"
-                  onFile={(file) => {
-                    if (imagePreview) URL.revokeObjectURL(imagePreview);
-                    setImageFile(file);
-                    setImagePreview(URL.createObjectURL(file));
-                  }}
-                  onRemove={() => {
-                    if (imagePreview) URL.revokeObjectURL(imagePreview);
-                    setImageFile(null);
-                    setImagePreview(null);
-                    setConsent(false);
-                  }}
-                />
-                {imageFile ? (
-                  <label className="flex items-start gap-2 text-sm">
-                    <Checkbox checked={consent} onCheckedChange={(value) => setConsent(value === true)} />
-                    <span>
-                      Ich bin damit einverstanden, dass mein hochgeladenes Foto zusammen mit meiner Bewertung auf PEPTIX
-                      veröffentlicht wird.
-                    </span>
-                  </label>
-                ) : null}
-              </div>
-              <Button type="submit" loading={createMutation.isPending} disabled={Boolean(imageFile) && !consent}>
-                Bewertung senden
-              </Button>
-            </form>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <Label className="m-0 shrink-0 leading-none">Sterne</Label>
+              <StarRating value={rating} onChange={setRating} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="feedback-body">Deine Erfahrung</Label>
+              <Textarea
+                id="feedback-body"
+                value={body}
+                onChange={(event) => setBody(event.target.value)}
+                minLength={FEEDBACK_BODY_MIN}
+                maxLength={FEEDBACK_BODY_MAX}
+                rows={5}
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                {body.trim().length} / {FEEDBACK_BODY_MAX} Zeichen (mindestens {FEEDBACK_BODY_MIN})
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="feedback-name">Anzeigename (optional)</Label>
+              <Input
+                id="feedback-name"
+                value={displayName}
+                onChange={(event) => setDisplayName(event.target.value)}
+                maxLength={40}
+                placeholder={FEEDBACK_DEFAULT_DISPLAY_NAME}
+              />
+              <p className="text-xs text-muted-foreground">
+                Ohne Angabe erscheint öffentlich „{FEEDBACK_DEFAULT_DISPLAY_NAME}“. E-Mail, Adresse und Telegram
+                werden nicht angezeigt.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label>Bestellfoto (optional)</Label>
+              <p className="text-xs text-muted-foreground">
+                Dein Foto wird nach Freigabe zusammen mit deiner Bewertung öffentlich angezeigt.
+              </p>
+              <ImageDropzone
+                aspect="photo"
+                compact
+                previewUrl={imagePreview}
+                hint="JPG, PNG oder WEBP. Datei wählen oder per Drag & Drop."
+                label="Zeige anderen deine Bestellung"
+                onFile={(file) => {
+                  if (imagePreview) URL.revokeObjectURL(imagePreview);
+                  setImageFile(file);
+                  setImagePreview(URL.createObjectURL(file));
+                }}
+                onRemove={() => {
+                  if (imagePreview) URL.revokeObjectURL(imagePreview);
+                  setImageFile(null);
+                  setImagePreview(null);
+                  setConsent(false);
+                }}
+              />
+              {imageFile ? (
+                <label className="flex items-start gap-2 text-sm">
+                  <Checkbox checked={consent} onCheckedChange={(value) => setConsent(value === true)} />
+                  <span>
+                    Ich bin damit einverstanden, dass mein hochgeladenes Foto zusammen mit meiner Bewertung auf PEPTIX
+                    veröffentlicht wird.
+                  </span>
+                </label>
+              ) : null}
+            </div>
+            <Button type="submit" loading={createMutation.isPending} disabled={Boolean(imageFile) && !consent}>
+              Bewertung senden
+            </Button>
+          </form>
         </CardContent>
       </Card>
 
