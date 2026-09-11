@@ -1,4 +1,4 @@
-import { BookOpen, ClipboardList, ShoppingBag, ShoppingBasket, Star } from "lucide-react";
+import { BookOpen, ClipboardList, ShoppingBag, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,8 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { CreateCartDialog } from "@/components/cart/CreateCartDialog";
 import { CartCard } from "@/components/cart/CartCard";
 import { PageHeader } from "@/components/common/PageHeader";
-import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QuickOrderCard } from "@/components/shop/QuickOrderCard";
 import { OrderTemplatesCard } from "@/components/shop/OrderTemplatesCard";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { useCarts } from "@/hooks/useCarts";
@@ -74,51 +72,51 @@ export default function DashboardPage() {
         />
       </div>
 
-      <section className="space-y-3">
-        <div>
-          <h2 className="text-lg font-semibold tracking-tight">Warenkörbe</h2>
-          <p className="text-sm text-muted-foreground">Der aktive Warenkorb ist hervorgehoben. Nicht benötigte Entwürfe können gelöscht werden.</p>
-        </div>
-
-        {cartsQuery.isLoading && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-56 w-full" />
-            ))}
+      <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <div className="min-w-0 space-y-3">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-lg font-semibold tracking-tight">Warenkörbe</h2>
+              <p className="text-sm text-muted-foreground">
+                Übersicht der vorhandenen Warenkörbe. Zum Öffnen eine Karte antippen.
+              </p>
+            </div>
+            <CreateCartDialog />
           </div>
-        )}
 
-        {cartsQuery.isError && (
-          <ErrorState message="Warenkörbe konnten nicht geladen werden." onRetry={() => cartsQuery.refetch()} />
-        )}
+          {cartsQuery.isLoading && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <Skeleton key={i} className="h-[5.5rem] w-full" />
+              ))}
+            </div>
+          )}
 
-        {cartsQuery.data && openCarts.length === 0 && (
-          <EmptyState
-            icon={ShoppingBasket}
-            title="Noch keine Warenkörbe"
-            description="Erstelle deinen ersten Warenkorb, oder starte direkt im Shop."
-            action={
-              <div className="flex flex-wrap justify-center gap-2">
-                <Button asChild variant="outline">
+          {cartsQuery.isError && (
+            <ErrorState message="Warenkörbe konnten nicht geladen werden." onRetry={() => cartsQuery.refetch()} />
+          )}
+
+          {cartsQuery.data && openCarts.length === 0 && (
+            <div className="rounded-xl border border-border/70 bg-card p-4">
+              <p className="text-sm text-muted-foreground">Noch keine Warenkörbe vorhanden.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button asChild variant="outline" size="sm">
                   <Link to="/shop">Zum Shop</Link>
                 </Button>
-                <CreateCartDialog />
               </div>
-            }
-          />
-        )}
+            </div>
+          )}
 
-        {cartsQuery.data && openCarts.length > 0 && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {openCarts.map((cart) => (
-              <CartCard key={cart.id} cart={cart} summary={summariesQuery.data?.get(cart.id)} />
-            ))}
-          </div>
-        )}
-      </section>
+          {cartsQuery.data && openCarts.length > 0 && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2">
+              {openCarts.map((cart) => (
+                <CartCard key={cart.id} cart={cart} summary={summariesQuery.data?.get(cart.id)} />
+              ))}
+            </div>
+          )}
+        </div>
 
-      <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className="space-y-3">
+        <div className="min-w-0 space-y-3">
           <div className="flex items-end justify-between gap-3">
             <h2 className="text-lg font-semibold tracking-tight">Letzte Bestellungen</h2>
             <Link to="/orders" className="text-sm font-medium text-primary hover:underline">
@@ -135,16 +133,16 @@ export default function DashboardPage() {
                 <Link
                   key={order.id}
                   to={`/orders/${order.id}`}
-                  className="flex items-center justify-between gap-3 py-3 transition-colors hover:bg-secondary/40"
+                  className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 py-3 transition-colors hover:bg-secondary/40"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <OrderIdentity
                       orderNumber={order.order_number}
                       telegramSnapshot={order.telegram_username_snapshot}
                     />
                     <p className="text-xs text-muted-foreground">{formatDateTime(order.submitted_at)}</p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex shrink-0 items-center gap-3">
                     <span className="text-sm font-medium tabular-nums">
                       {
                         summarizeOrderCharges({
@@ -165,11 +163,9 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
-        <div className="space-y-4">
-          <QuickOrderCard currentRate={rateQuery.data?.rate ?? null} />
-          <OrderTemplatesCard currentRate={rateQuery.data?.rate ?? null} />
-        </div>
       </section>
+
+      <OrderTemplatesCard currentRate={rateQuery.data?.rate ?? null} />
     </div>
   );
 }

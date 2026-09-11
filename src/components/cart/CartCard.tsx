@@ -1,8 +1,8 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
-import { Archive, Copy, MoreVertical, Pin, PinOff, Trash2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Archive, Copy, MoreVertical, Pin, PinOff, ShoppingBasket, Trash2 } from "lucide-react";
 
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,10 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CartStatusBadge } from "@/components/cart/CartStatusBadge";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { useCartMutations } from "@/hooks/useCarts";
-import { formatDateTime, formatEur, formatQuantity, formatUsd } from "@/lib/money";
+import { formatUsd } from "@/lib/money";
+import { cn } from "@/lib/utils";
 import { isOpenCart } from "@/services/carts";
 import { toast } from "@/components/ui/toaster";
 import type { CartSummaryRow, Tables } from "@/types/database";
@@ -24,12 +24,22 @@ interface CartCardProps {
   summary?: CartSummaryRow;
 }
 
+function positionLabel(count: number): string {
+  return count === 1 ? "1 Position" : `${count} Positionen`;
+}
+
 export function CartCard({ cart, summary }: CartCardProps) {
   const navigate = useNavigate();
   const { duplicate, activate, archive, remove } = useCartMutations();
 
   const [archiveOpen, setArchiveOpen] = React.useState(false);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const itemCount = summary?.item_count ?? 0;
+  const cartHref = `/carts/${cart.id}`;
+
+  function openCart() {
+    navigate(cartHref);
+  }
 
   async function handleDuplicate() {
     try {
@@ -76,100 +86,78 @@ export function CartCard({ cart, summary }: CartCardProps) {
   return (
     <>
       <Card
-        className={
-          cart.is_active_cart
-            ? "border-primary/40 shadow-md ring-1 ring-primary/15 transition-transform duration-150 hover:-translate-y-0.5"
-            : "transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-md"
-        }
+        className={cn(
+          "transition-colors hover:border-primary/50 hover:bg-secondary/30",
+          cart.is_active_cart && "border-primary/40 ring-1 ring-primary/15",
+        )}
       >
-        <CardHeader className="flex-row items-start justify-between gap-2 space-y-0">
-          <div
-            className="min-w-0 flex-1 cursor-pointer"
-            onClick={() => navigate(`/carts/${cart.id}`)}
-          >
-            <div className="flex items-center gap-2">
-              {cart.is_active_cart && <Pin className="h-3.5 w-3.5 shrink-0 text-primary" />}
-              <h3 className="truncate text-sm font-semibold">{cart.name}</h3>
-            </div>
-            <div className="mt-1.5 flex items-center gap-2">
-              <CartStatusBadge status={cart.status} />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-start gap-3 p-4">
+          <Link to={cartHref} className="flex min-w-0 flex-1 cursor-pointer items-start gap-3" aria-label={`Warenkorb ${cart.name} öffnen`}>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-secondary text-foreground">
+              <ShoppingBasket className="h-4 w-4" aria-hidden />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold text-foreground">{cart.name}</span>
+              <span className="mt-1 block text-xs text-muted-foreground">{positionLabel(itemCount)}</span>
+              <span className="mt-0.5 block text-sm font-medium tabular-nums text-foreground">
+                {formatUsd(summary?.total_usd ?? 0)}
+              </span>
+              {cart.is_active_cart ? (
+                <span className="mt-1 block text-xs font-medium text-primary">Aktiver Warenkorb</span>
+              ) : null}
+              {(summary?.unresolved_count ?? 0) > 0 ? (
+                <span className="mt-1 block text-xs font-medium text-warning">
+                  {summary!.unresolved_count} Artikel nicht gefunden
+                </span>
+              ) : null}
+            </span>
+          </Link>
+          <div className="flex shrink-0 items-center gap-1">
             {isOpenCart(cart.status) && (
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-muted-foreground hover:text-destructive"
                 aria-label="Warenkorb löschen"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDeleteOpen(true);
-                }}
+                onClick={() => setDeleteOpen(true)}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
             )}
             <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigate(`/carts/${cart.id}`)}>Öffnen</DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDuplicate}>
-                <Copy /> Duplizieren
-              </DropdownMenuItem>
-              {isOpenCart(cart.status) && (
-                <DropdownMenuItem onClick={handleToggleActive}>
-                  {cart.is_active_cart ? <PinOff /> : <Pin />}
-                  {cart.is_active_cart ? "Als aktiv entfernen" : "Als aktiv markieren"}
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Warenkorb-Aktionen">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={openCart}>Öffnen</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDuplicate}>
+                  <Copy /> Duplizieren
                 </DropdownMenuItem>
-              )}
-              {isOpenCart(cart.status) && (
-                <>
-                  <DropdownMenuSeparator />
-                  {cart.status !== "archived" && (
-                    <DropdownMenuItem onClick={() => setArchiveOpen(true)}>
-                      <Archive /> Archivieren
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
-                    <Trash2 /> Löschen
+                {isOpenCart(cart.status) && (
+                  <DropdownMenuItem onClick={handleToggleActive}>
+                    {cart.is_active_cart ? <PinOff /> : <Pin />}
+                    {cart.is_active_cart ? "Als aktiv entfernen" : "Als aktiv markieren"}
                   </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                )}
+                {isOpenCart(cart.status) && (
+                  <>
+                    <DropdownMenuSeparator />
+                    {cart.status !== "archived" && (
+                      <DropdownMenuItem onClick={() => setArchiveOpen(true)}>
+                        <Archive /> Archivieren
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
+                      <Trash2 /> Löschen
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-        </CardHeader>
-
-        <CardContent className="cursor-pointer" onClick={() => navigate(`/carts/${cart.id}`)}>
-          <dl className="grid grid-cols-2 gap-y-2 text-sm">
-            <dt className="text-muted-foreground">Artikel</dt>
-            <dd className="text-right font-medium">{summary?.item_count ?? 0}</dd>
-            <dt className="text-muted-foreground">Gesamtmenge</dt>
-            <dd className="text-right font-medium">{formatQuantity(summary?.total_quantity ?? 0)}</dd>
-            <dt className="text-muted-foreground">Summe USD</dt>
-            <dd className="text-right font-medium tabular-nums">{formatUsd(summary?.total_usd ?? 0)}</dd>
-            <dt className="text-muted-foreground">Summe EUR</dt>
-            <dd className="text-right font-medium tabular-nums">
-              {summary?.total_eur != null ? formatEur(summary.total_eur) : "—"}
-            </dd>
-          </dl>
-          {(summary?.unresolved_count ?? 0) > 0 && (
-            <p className="mt-3 rounded-md bg-warning/10 px-2.5 py-1.5 text-xs font-medium text-warning">
-              {summary!.unresolved_count} Artikel nicht gefunden
-            </p>
-          )}
-        </CardContent>
-
-        <CardFooter className="justify-between text-xs text-muted-foreground">
-          <span>Erstellt: {formatDateTime(cart.created_at)}</span>
-          <span>Geändert: {formatDateTime(cart.updated_at)}</span>
-        </CardFooter>
+        </div>
       </Card>
 
       <ConfirmDialog
