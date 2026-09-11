@@ -290,6 +290,10 @@ describe("formatUsd / formatEur", () => {
   it("formats finite numbers as currency strings", () => {
     expect(formatUsd(19.9)).toContain("19,90");
     expect(formatEur(19.9)).toContain("19,90");
+    expect(formatEur(10.24)).toMatch(/10,24/);
+    expect(formatEur(10.24)).toContain("€");
+    expect(formatUsd(11.88)).toMatch(/11,88/);
+    expect(formatUsd(11.88)).toContain("USD");
   });
 });
 

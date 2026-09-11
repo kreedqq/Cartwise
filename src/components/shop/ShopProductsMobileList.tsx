@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/select";
 import { KitShareButton, KitShareDialog } from "@/components/shop/KitShareDialog";
 import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
-import { convertUsdToEur, formatEur, formatQuantity, formatUsd, hasBulkTier } from "@/lib/money";
+import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
+import { formatQuantity, hasBulkTier } from "@/lib/money";
 import { formatCatalogQuantity } from "@/lib/quantityFormat";
 import { shopPriceColumnLabels } from "@/lib/shop/priceLabels";
 import { isRetailPricing, type ShopPricingProfile } from "@/lib/shop/shopAreas";
@@ -202,17 +203,14 @@ function ShopProductGroupCard({
         <div className={showBulkColumn ? "grid grid-cols-2 gap-2 rounded-md bg-secondary/50 p-2.5 text-sm" : "rounded-md bg-secondary/50 p-2.5 text-sm"}>
           <div>
             <p className="text-[11px] text-muted-foreground">{priceLabels.unitPrice}</p>
-            <p className="text-base font-semibold tabular-nums tracking-tight">{formatUsd(product.price_usd)}</p>
-            <p className="text-[11px] tabular-nums text-muted-foreground">
-              {formatEur(convertUsdToEur(product.price_usd, rate))}
-            </p>
+            <DualCurrencyPrice usd={product.price_usd} rate={rate} />
           </div>
           {showBulkColumn ? (
           <div className="text-right">
             <p className="text-[11px] text-muted-foreground">{priceLabels.bulkPrice}</p>
             {bulk ? (
               <>
-                <p className="text-base font-semibold tabular-nums tracking-tight">{formatUsd(product.bulk_price_usd)}</p>
+                <DualCurrencyPrice usd={product.bulk_price_usd} rate={rate} align="right" />
               </>
             ) : (
               <p className="text-xs text-muted-foreground">Keiner</p>

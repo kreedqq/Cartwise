@@ -193,10 +193,10 @@ describe("shop unit price mapping", () => {
   it("renders catalog unit price, not bulk, as the shop unit price", () => {
     const desktop = readFileSync(resolve(process.cwd(), "src/components/shop/ShopProductsTable.tsx"), "utf8");
     const mobile = readFileSync(resolve(process.cwd(), "src/components/shop/ShopProductsMobileList.tsx"), "utf8");
-    expect(desktop).toContain("formatUsd(product.price_usd)");
-    expect(desktop).toContain("formatUsd(product.bulk_price_usd)");
-    expect(mobile).toContain("formatUsd(product.price_usd)");
-    expect(mobile).toContain("formatUsd(product.bulk_price_usd)");
-    expect(desktop.indexOf("formatUsd(product.price_usd)")).toBeLessThan(desktop.indexOf("formatUsd(product.bulk_price_usd)"));
+    expect(desktop).toContain("usd={product.price_usd}");
+    expect(desktop).toContain("usd={product.bulk_price_usd}");
+    expect(mobile).toContain("usd={product.price_usd}");
+    expect(mobile).toContain("usd={product.bulk_price_usd}");
+    expect(desktop.indexOf("usd={product.price_usd}")).toBeLessThan(desktop.indexOf("usd={product.bulk_price_usd}"));
   });
 });

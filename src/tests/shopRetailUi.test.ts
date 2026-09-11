@@ -65,6 +65,8 @@ describe("retail shop UI", () => {
     expect(page).toContain("useLeaveKitRequest");
     expect(page).toContain("ShopProductsTable");
     expect(page).toContain("ShopCategoryHub");
+    expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("DualCurrencyPrice");
+    expect(read("src/components/shop/ShopProductsMobileList.tsx")).toContain("DualCurrencyPrice");
   });
 });
 

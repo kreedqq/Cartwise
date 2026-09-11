@@ -21,7 +21,8 @@ import { SaveStatusIndicator } from "@/components/common/SaveStatusIndicator";
 import { ResolutionStatusBadge } from "@/components/cart/ResolutionStatusBadge";
 import { EditKitShareButton } from "@/components/shop/EditKitShareButton";
 import { useCartItemRow } from "@/hooks/useCartItemRow";
-import { formatDateTime, formatEur, formatRate, formatUsd } from "@/lib/money";
+import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
+import { formatDateTime, formatRate, formatUsd } from "@/lib/money";
 import {
   cartItemDisplayName,
   cartItemQuantityLabel,
@@ -49,9 +50,8 @@ export function CartItemsTable({ items, cartId, currentRate, nextPosition, readO
           <TableHead className="min-w-[180px]">Artikelname</TableHead>
           <TableHead className="w-24 text-right">Menge</TableHead>
           <TableHead className="w-28 text-right">Einzelpreis USD</TableHead>
-          <TableHead className="w-28 text-right">Gesamt USD</TableHead>
+          <TableHead className="w-28 text-right">Gesamt</TableHead>
           <TableHead className="w-24 text-right">Kurs</TableHead>
-          <TableHead className="w-28 text-right">Gesamt EUR</TableHead>
           <TableHead className="w-36">Preisstand</TableHead>
           <TableHead className="min-w-[140px]">Notiz</TableHead>
           <TableHead className="w-16 text-right">Aktionen</TableHead>
@@ -165,12 +165,11 @@ function CartItemRowDesktop({
           </span>
         )}
       </TableCell>
-      <TableCell className="text-right tabular-nums text-sm font-medium">{formatUsd(item.totalUsd)}</TableCell>
+      <TableCell className="text-right">
+        <DualCurrencyPrice usd={item.totalUsd} eur={item.totalEur} size="compact" align="right" />
+      </TableCell>
       <TableCell className="text-right tabular-nums text-xs text-muted-foreground">
         {formatRate(item.exchange_rate_snapshot)}
-      </TableCell>
-      <TableCell className="text-right tabular-nums text-sm font-medium text-primary">
-        {item.totalEur != null ? formatEur(item.totalEur) : "—"}
       </TableCell>
       <TableCell className="text-xs text-muted-foreground">{formatDateTime(item.price_snapshot_at)}</TableCell>
       <TableCell>

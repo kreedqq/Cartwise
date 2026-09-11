@@ -4,7 +4,8 @@ import { AlertTriangle, Clock, RefreshCw, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { formatDateTime, formatEur, formatQuantity, formatRate, formatUsd } from "@/lib/money";
+import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
+import { formatDateTime, formatQuantity, formatRate } from "@/lib/money";
 import type { CartTotals } from "@/lib/money";
 import type { ExchangeRateResult } from "@/services/exchangeRate";
 import type { CartStatus } from "@/types/database";
@@ -36,14 +37,11 @@ export function CartSummaryPanel({
   return (
     <div className="space-y-5">
       <div className="rounded-2xl border border-border/70 bg-secondary/40 px-4 py-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Produktsumme USD</p>
-        <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight text-primary">{formatUsd(totals.totalUsd)}</p>
-        <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Produktsumme EUR</p>
-        {totals.totalEur != null ? (
-          <p className="mt-1 text-xl font-semibold tabular-nums tracking-tight">{formatEur(totals.totalEur)}</p>
-        ) : (
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Produktsumme</p>
+        <DualCurrencyPrice usd={totals.totalUsd} eur={totals.totalEur} size="summary" className="mt-1" />
+        {totals.totalEur == null ? (
           <p className="mt-1 text-sm font-medium text-muted-foreground">Kein Wechselkurs verfügbar</p>
-        )}
+        ) : null}
         <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
           Versand aus China und Versand aus Deutschland werden nach der Bestellung zugeordnet. Der Gesamt Endpreis inkl. Versand erscheint in der Bestellung.
         </p>

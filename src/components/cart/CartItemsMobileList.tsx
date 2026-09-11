@@ -14,7 +14,8 @@ import { SaveStatusIndicator } from "@/components/common/SaveStatusIndicator";
 import { ResolutionStatusBadge } from "@/components/cart/ResolutionStatusBadge";
 import { EditKitShareButton } from "@/components/shop/EditKitShareButton";
 import { useCartItemRow } from "@/hooks/useCartItemRow";
-import { formatDateTime, formatEur, formatUsd } from "@/lib/money";
+import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
+import { formatDateTime, formatUsd } from "@/lib/money";
 import {
   cartItemDisplayName,
   cartItemQuantityLabel,
@@ -146,25 +147,17 @@ function CartItemCardMobile({
           <SaveStatusIndicator status={row.quantityStatus} />
         </div>
 
-        <div className="grid grid-cols-2 gap-2 rounded-md bg-secondary/50 p-2.5 text-sm">
-          <div>
-            <p className="text-[11px] text-muted-foreground">
-              Gesamt USD
-              {item.applied_price_tier === "bulk" && (
-                <span className="ml-1 font-medium text-primary">· Mengenpreis</span>
-              )}
-            </p>
-            <p className="font-semibold tabular-nums">{formatUsd(item.totalUsd)}</p>
-            <p className="text-[10px] text-muted-foreground">
-              {formatUsd(item.unit_price_usd_snapshot)} / Stück
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-[11px] text-muted-foreground">Gesamt EUR</p>
-            <p className="font-semibold tabular-nums text-primary">
-              {item.totalEur != null ? formatEur(item.totalEur) : "—"}
-            </p>
-          </div>
+        <div className="rounded-md bg-secondary/50 p-2.5 text-sm">
+          <p className="text-[11px] text-muted-foreground">
+            Gesamt
+            {item.applied_price_tier === "bulk" && (
+              <span className="ml-1 font-medium text-primary">· Mengenpreis</span>
+            )}
+          </p>
+          <DualCurrencyPrice usd={item.totalUsd} eur={item.totalEur} />
+          <p className="mt-1 text-[10px] text-muted-foreground">
+            {formatUsd(item.unit_price_usd_snapshot)} / Stück
+          </p>
         </div>
 
         <div className="space-y-1">

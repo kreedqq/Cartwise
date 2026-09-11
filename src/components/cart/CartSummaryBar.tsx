@@ -4,7 +4,7 @@ import { ChevronUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CartSummaryPanel } from "@/components/cart/CartSummaryPanel";
-import { formatEur, formatUsd } from "@/lib/money";
+import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import type { CartTotals } from "@/lib/money";
 import type { ExchangeRateResult } from "@/services/exchangeRate";
 import type { CartStatus } from "@/types/database";
@@ -43,10 +43,7 @@ export function CartSummaryBar(props: CartSummaryBarProps) {
       >
         <div>
           <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Gesamt</p>
-          <p className="text-base font-bold tabular-nums leading-tight">{formatUsd(props.totals.totalUsd)}</p>
-          <p className="text-xs font-medium tabular-nums text-primary">
-            {props.totals.totalEur != null ? formatEur(props.totals.totalEur) : "Kein Kurs verfügbar"}
-          </p>
+          <DualCurrencyPrice usd={props.totals.totalUsd} eur={props.totals.totalEur} size="compact" />
         </div>
         <span className="flex items-center gap-1 text-xs font-medium text-primary">
           Details <ChevronUp className="h-4 w-4" />

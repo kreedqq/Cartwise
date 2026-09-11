@@ -21,7 +21,8 @@ import { useCarts } from "@/hooks/useCarts";
 import { useCartItems } from "@/hooks/useCartItems";
 import { useCartComputed } from "@/hooks/useCartComputed";
 import { useCreateOrder } from "@/hooks/useOrders";
-import { calculateCartTotals, formatEur, formatUsd, summarizeOrderCharges } from "@/lib/money";
+import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
+import { calculateCartTotals, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import {
   PAYMENT_METHOD_REQUIRED_MESSAGE,
   type PaymentMethod,
@@ -203,8 +204,7 @@ export default function CheckoutPage() {
                     <TableHead className="text-right">Menge</TableHead>
                     <TableHead className="text-right">Einzelpreis</TableHead>
                     <TableHead className="hidden sm:table-cell">Preisart</TableHead>
-                    <TableHead className="text-right">Gesamt USD</TableHead>
-                    <TableHead className="hidden xs:table-cell text-right">Gesamt EUR</TableHead>
+                    <TableHead className="text-right">Gesamt</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -231,9 +231,8 @@ export default function CheckoutPage() {
                           {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normal"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right tabular-nums font-medium">{formatUsd(item.totalUsd)}</TableCell>
-                      <TableCell className="hidden xs:table-cell text-right tabular-nums text-primary">
-                        {item.totalEur != null ? formatEur(item.totalEur) : "—"}
+                      <TableCell className="text-right">
+                        <DualCurrencyPrice usd={item.totalUsd} eur={item.totalEur} size="compact" align="right" />
                       </TableCell>
                     </TableRow>
                   ))}
