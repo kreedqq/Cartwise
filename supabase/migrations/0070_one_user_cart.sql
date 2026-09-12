@@ -20,12 +20,14 @@ create index if not exists cart_items_submitted_order_idx
   on public.cart_items (submitted_order_id)
   where submitted_order_id is not null;
 
-create or replace function public.cart_item_shop_area(_item public.cart_items, _cart_area text)
+drop function if exists public.cart_item_shop_area(public.cart_items, text);
+
+create or replace function public.cart_item_shop_area(_item_area text, _cart_area text)
 returns text
 language sql
 immutable
 as $$
-  select coalesce(nullif(btrim(coalesce(_item.shop_area, '')), ''), nullif(btrim(coalesce(_cart_area, '')), ''), 'shop');
+  select coalesce(nullif(btrim(coalesce(_item_area, '')), ''), nullif(btrim(coalesce(_cart_area, '')), ''), 'shop');
 $$;
 
 create or replace function public.cart_items_assign_shop_area()
@@ -257,7 +259,7 @@ begin
       and resolution_status = 'resolved'
       and submitted_order_id is null
   loop
-    _area := public.cart_item_shop_area(_item, _cart_area);
+    _area := public.cart_item_shop_area(_item.shop_area, _cart_area);
     _code := coalesce(
       nullif(btrim(coalesce(_item.vendor_code, '')), ''),
       nullif(btrim(coalesce(_item.product_code_snapshot, '')), ''),
@@ -332,21 +334,30 @@ $$;
 
 revoke all on function public.refresh_cart_selling_prices_for_user(uuid, uuid) from public, anon, authenticated;
 
-create or replace function public.cart_item_merge_key(_item public.cart_items)
+drop function if exists public.cart_item_merge_key(public.cart_items);
+
+create or replace function public.cart_item_merge_key(
+  _kit_share_id uuid,
+  _shop_area text,
+  _vendor_code text,
+  _product_code_snapshot text,
+  _product_code_input text,
+  _product_id uuid
+)
 returns text
 language sql
 immutable
 as $$
   select case
-    when _item.kit_share_id is not null then 'kit:' || _item.kit_share_id::text
+    when _kit_share_id is not null then 'kit:' || _kit_share_id::text
     else
-      coalesce(nullif(btrim(coalesce(_item.shop_area, '')), ''), 'shop')
+      coalesce(nullif(btrim(coalesce(_shop_area, '')), ''), 'shop')
       || '|'
       || upper(btrim(coalesce(
-        nullif(btrim(coalesce(_item.vendor_code, '')), ''),
-        nullif(btrim(coalesce(_item.product_code_snapshot, '')), ''),
-        nullif(btrim(coalesce(_item.product_code_input, '')), ''),
-        coalesce(_item.product_id::text, '')
+        nullif(btrim(coalesce(_vendor_code, '')), ''),
+        nullif(btrim(coalesce(_product_code_snapshot, '')), ''),
+        nullif(btrim(coalesce(_product_code_input, '')), ''),
+        coalesce(_product_id::text, '')
       )))
   end;
 $$;
@@ -413,11 +424,17 @@ begin
       end if;
 
       select * into _dst
-      from public.cart_items
-      where cart_id = _canonical.id
-        and kit_share_id is null
-        and public.cart_item_merge_key(cart_items) = public.cart_item_merge_key(_src)
-      order by position, id
+      from public.cart_items ci
+      where ci.cart_id = _canonical.id
+        and ci.kit_share_id is null
+        and public.cart_item_merge_key(
+              ci.kit_share_id, ci.shop_area, ci.vendor_code,
+              ci.product_code_snapshot, ci.product_code_input, ci.product_id
+            ) = public.cart_item_merge_key(
+              _src.kit_share_id, _src.shop_area, _src.vendor_code,
+              _src.product_code_snapshot, _src.product_code_input, _src.product_id
+            )
+      order by ci.position, ci.id
       limit 1;
 
       if found then
@@ -610,7 +627,7 @@ begin
   where ci.cart_id = _cart_id
     and ci.quantity > 0
     and ci.submitted_order_id is null
-    and public.cart_item_shop_area(ci, _cart.shop_area) = _area
+    and public.cart_item_shop_area(ci.shop_area, _cart.shop_area) = _area
     and (
       ci.kit_share_id is not null
       or exists (
@@ -665,10 +682,10 @@ begin
     where ci.cart_id = _cart_id
       and ci.quantity > 0
       and ci.submitted_order_id is null
-      and public.cart_item_shop_area(ci, _cart.shop_area) = _area
+      and public.cart_item_shop_area(ci.shop_area, _cart.shop_area) = _area
     order by ci.position
   loop
-    _item_area := public.cart_item_shop_area(_item, _cart.shop_area);
+    _item_area := public.cart_item_shop_area(_item.shop_area, _cart.shop_area);
     _code := coalesce(
       nullif(btrim(coalesce(_item.vendor_code, '')), ''),
       nullif(btrim(coalesce(_item.product_code_snapshot, '')), ''),
@@ -961,7 +978,7 @@ begin
     raise exception 'Dieser Warenkorb wurde bereits bestellt oder ist archiviert.' using errcode = 'P0001';
   end if;
 
-  select array_agg(distinct public.cart_item_shop_area(ci, _cart.shop_area) order by public.cart_item_shop_area(ci, _cart.shop_area))
+  select array_agg(distinct public.cart_item_shop_area(ci.shop_area, _cart.shop_area) order by public.cart_item_shop_area(ci.shop_area, _cart.shop_area))
   into _areas
   from public.cart_items ci
   where ci.cart_id = _cart_id
