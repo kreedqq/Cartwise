@@ -23,6 +23,7 @@ import {
 import { toast } from "@/components/ui/toaster";
 import { QUERY_KEYS } from "@/lib/constants";
 import { useAuth } from "@/context/AuthProvider";
+import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import { variantLabelForProduct, type ShopProductGroup } from "@/lib/shop/display";
 import {
@@ -102,6 +103,7 @@ export function KitShareDialog({
   onCartSynced: _onCartSynced,
 }: KitShareDialogProps) {
   const { user } = useAuth();
+  const rateQuery = useExchangeRate();
   const queryClient = useQueryClient();
   const shareableVariants = React.useMemo(
     () => (group ? kitShareableVariants(group.variants) : []),
@@ -609,7 +611,7 @@ export function KitShareDialog({
 
               <div className="rounded-lg bg-secondary/40 p-3">
                 <p className="text-xs text-muted-foreground">Dein Anteil (nur für dich sichtbar)</p>
-                <DualCurrencyPrice usd={kitView.myPriceUsd} size="summary" />
+                <DualCurrencyPrice usd={kitView.myPriceUsd} rate={rateQuery.data?.rate ?? null} size="summary" />
               </div>
             </>
           )}

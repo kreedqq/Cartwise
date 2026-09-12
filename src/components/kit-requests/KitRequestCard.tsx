@@ -1,4 +1,5 @@
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
+import { useExchangeRate } from "@/hooks/useExchangeRate";
 import {
   kitRequestCustomerStatusLabel,
   kitRequestProgressPercent,
@@ -41,6 +42,7 @@ export function KitRequestCardView({
   onRetryCart,
   joining,
 }: KitRequestCardViewProps) {
+  const rateQuery = useExchangeRate();
   const categoryId = requestCategoryId(request.category);
   const percent = kitRequestProgressPercent(request.allocatedTotal, request.kitSizeVials);
   const canJoin =
@@ -107,7 +109,7 @@ export function KitRequestCardView({
             <p className="text-xs text-muted-foreground">
               {request.isParticipant || request.isCreator ? "Dein Anteil" : "Preis pro Anteil"}
             </p>
-            <DualCurrencyPrice usd={sharePriceUsd} size="catalog" />
+            <DualCurrencyPrice usd={sharePriceUsd} rate={rateQuery.data?.rate ?? null} size="catalog" />
           </div>
         ) : null}
 

@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toaster";
+import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { useJoinKitRequest } from "@/hooks/useKitRequests";
 import { remainingQuantityOptions } from "@/lib/kitRequests";
 import { formatKitQuantity } from "@/lib/shop/kitUnits";
@@ -37,6 +38,7 @@ function JoinKitRequestDialogBody({
   onOpenChange: (open: boolean) => void;
 }) {
   const joinMutation = useJoinKitRequest();
+  const rateQuery = useExchangeRate();
   const options = remainingQuantityOptions(request.remainingVials);
   const [quantity, setQuantity] = React.useState(options[0] ?? 1);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
@@ -120,7 +122,7 @@ function JoinKitRequestDialogBody({
             <div className="rounded-lg bg-secondary/40 p-4">
               <p className="text-xs text-muted-foreground">Dein Anteil</p>
               {liveTotal != null ? (
-                <DualCurrencyPrice usd={liveTotal} size="summary" />
+                <DualCurrencyPrice usd={liveTotal} rate={rateQuery.data?.rate ?? null} size="summary" />
               ) : (
                 <p className="text-sm text-muted-foreground">Preis erscheint nach der Bestätigung.</p>
               )}
@@ -157,10 +159,10 @@ function JoinKitRequestDialogBody({
             {previewPrice != null ? (
               <div>
                 <p className="text-xs text-muted-foreground">Dein Anteil</p>
-                <DualCurrencyPrice usd={previewPrice} size="summary" />
+                <DualCurrencyPrice usd={previewPrice} rate={rateQuery.data?.rate ?? null} size="summary" />
               </div>
             ) : previewUnit != null ? (
-              <DualCurrencyPrice usd={previewUnit * quantity} size="summary" />
+              <DualCurrencyPrice usd={previewUnit * quantity} rate={rateQuery.data?.rate ?? null} size="summary" />
             ) : null}
           </div>
         }
