@@ -39,17 +39,97 @@ export const EMPTY_AREA_THEME: AreaThemeConfig = {
 
 export const AREA_THEME_PRESETS: Record<string, Partial<AreaThemeTokens>> = {
   "peptix-default": {},
-  midnight: { primary: "#d4af37", accent: "#1e3a5f", background: "#070b14" },
-  "midnight-blue": { primary: "#d4af37", accent: "#152a4a", background: "#070b16" },
-  "midnight-violet": { primary: "#d4af37", accent: "#3b1d4a", background: "#120814" },
-  "dark-luxury": { primary: "#c9a227", accent: "#1a1a1a", background: "#0a0a0a" },
-  "gold-luxury": { primary: "#e0c068", accent: "#3a2a0a", background: "#0c0a06" },
-  science: { primary: "#7dd3c0", accent: "#12332e", background: "#06110f" },
-  accessories: { primary: "#d4af37", accent: "#1a3d2a", background: "#07140d" },
-  labor: { primary: "#8ab4f8", accent: "#1a2744", background: "#070b14" },
-  minimal: { primary: "#e8e4dc", accent: "#2a2a2a", background: "#0e0e0e" },
-  futuristic: { primary: "#67e8f9", accent: "#0b1f2a", background: "#05080c" },
+  midnight: { primary: "#d4af37", accent: "#1e3a5f", background: "#070b14", surface: "#101826", text: "#e8e4dc", heading: "#f5f0e6", price: "#d4af37", button: "#d4af37", buttonText: "#1a1408", border: "#2a3344" },
+  "midnight-blue": { primary: "#d4af37", accent: "#152a4a", background: "#070b16", surface: "#101828", text: "#e8e4dc", heading: "#f5f0e6", price: "#d4af37", button: "#d4af37", buttonText: "#1a1408", border: "#243044" },
+  "midnight-violet": { primary: "#d4af37", accent: "#3b1d4a", background: "#120814", surface: "#1c1022", text: "#eee6f2", heading: "#f7f0fb", price: "#d4af37", button: "#d4af37", buttonText: "#1a1408", border: "#3a2744" },
+  "dark-luxury": { primary: "#c9a227", accent: "#1a1a1a", background: "#0a0a0a", surface: "#141414", text: "#e8e4dc", heading: "#f3efe6", price: "#c9a227", button: "#c9a227", buttonText: "#1a1408", border: "#2a2a2a" },
+  "gold-luxury": { primary: "#e0c068", accent: "#3a2a0a", background: "#0c0a06", surface: "#16130c", text: "#f0e6c8", heading: "#f7efd4", price: "#e0c068", button: "#e0c068", buttonText: "#1a1408", border: "#3a3018" },
+  science: { primary: "#7dd3c0", accent: "#12332e", background: "#06110f", surface: "#0d1c19", text: "#dceee9", heading: "#eef8f4", price: "#7dd3c0", button: "#7dd3c0", buttonText: "#06201a", border: "#1d3a34" },
+  accessories: { primary: "#d4af37", accent: "#1a3d2a", background: "#07140d", surface: "#102018", text: "#e6efe8", heading: "#f2f7f3", price: "#d4af37", button: "#d4af37", buttonText: "#1a1408", border: "#244433" },
+  labor: { primary: "#8ab4f8", accent: "#1a2744", background: "#070b14", surface: "#10182a", text: "#dce4f5", heading: "#eef3fb", price: "#8ab4f8", button: "#8ab4f8", buttonText: "#071018", border: "#24344f" },
+  minimal: { primary: "#e8e4dc", accent: "#2a2a2a", background: "#0e0e0e", surface: "#171717", text: "#e8e4dc", heading: "#f4f1ea", price: "#e8e4dc", button: "#e8e4dc", buttonText: "#111111", border: "#2e2e2e" },
+  futuristic: { primary: "#67e8f9", accent: "#0b1f2a", background: "#05080c", surface: "#0c141c", text: "#d7eef3", heading: "#e8f8fb", price: "#67e8f9", button: "#67e8f9", buttonText: "#041018", border: "#1a3340" },
 };
+
+export const AREA_THEME_PRESET_LABELS: Record<string, string> = {
+  "peptix-default": "PEPTIX Default",
+  midnight: "Midnight",
+  "midnight-blue": "Midnight Blue",
+  "midnight-violet": "Midnight Violet",
+  "dark-luxury": "Dark Luxury",
+  "gold-luxury": "Gold Luxury",
+  science: "Science",
+  accessories: "Accessories",
+  labor: "Labor",
+  minimal: "Minimal",
+  futuristic: "Futuristic",
+};
+
+export const COLOR_FIELD_USAGE: Record<keyof AreaThemeTokens, string> = {
+  primary: "Buttons, aktive Elemente, Highlights",
+  secondary: "Sekundäre Flächen",
+  accent: "Icons und Akzente",
+  background: "Seitenhintergrund",
+  surface: "Karten und Tabellen",
+  text: "Fließtext",
+  heading: "Überschriften",
+  price: "EUR-Preis",
+  border: "Rahmen und Trenner",
+  button: "Primärbutton",
+  buttonText: "Button-Beschriftung",
+  mutedText: "Hinweise und Untertitel",
+};
+
+function clampByte(value: number): number {
+  return Math.max(0, Math.min(255, Math.round(value)));
+}
+
+export function normalizeHexColor(value: string | undefined): string | null {
+  if (!value) return null;
+  const match = value.trim().match(/^#?([0-9a-f]{6})$/i);
+  return match ? `#${match[1].toLowerCase()}` : null;
+}
+
+function mixHex(hex: string, toward: string, amount: number): string {
+  const a = normalizeHexColor(hex);
+  const b = normalizeHexColor(toward);
+  if (!a || !b) return hex;
+  const parse = (h: string) => Number.parseInt(h.slice(1), 16);
+  const left = parse(a);
+  const right = parse(b);
+  const mix = (shift: number) =>
+    clampByte((((left >> shift) & 255) * (1 - amount) + ((right >> shift) & 255) * amount));
+  return `#${[16, 8, 0].map((shift) => mix(shift).toString(16).padStart(2, "0")).join("")}`;
+}
+
+/** Deterministic dark premium palette from one primary color. */
+export function paletteFromPrimary(hex: string): Partial<AreaThemeTokens> {
+  const primary = normalizeHexColor(hex) ?? "#d4af37";
+  return {
+    primary,
+    accent: mixHex(primary, "#0b1a14", 0.72),
+    background: mixHex(primary, "#05080c", 0.92),
+    surface: mixHex(primary, "#10141a", 0.82),
+    text: "#e8e4dc",
+    heading: "#f5f0e6",
+    price: primary,
+    border: mixHex(primary, "#1c2430", 0.7),
+    button: primary,
+    buttonText: "#1a1408",
+    mutedText: "#b8b2a6",
+    secondary: mixHex(primary, "#1a1a1a", 0.75),
+  };
+}
+
+export function improveThemeContrast(theme: AreaThemeConfig): AreaThemeConfig {
+  const button = theme.tokens.button || theme.tokens.primary || "#d4af37";
+  const lum = relativeLuminance(button);
+  const buttonText = lum != null && lum > 0.4 ? "#1a1408" : "#f7f4ee";
+  return {
+    ...theme,
+    tokens: { ...theme.tokens, button, buttonText },
+  };
+}
 
 function asString(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;

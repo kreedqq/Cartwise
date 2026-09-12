@@ -31,9 +31,9 @@ describe("defaultCartName", () => {
     expect(defaultCartName("testuser", [])).toBe("testuser");
   });
 
-  it("numbers a second cart instead of storing Warenkorb", () => {
-    expect(defaultCartName("testuser", ["testuser"])).toBe("testuser – Warenkorb 2");
-    expect(defaultCartName("testuser", ["testuser", "testuser – Warenkorb 2"])).toBe("testuser – Warenkorb 3");
+  it("keeps a single user cart title even if older names exist", () => {
+    expect(defaultCartName("testuser", ["testuser"])).toBe("testuser");
+    expect(defaultCartName("testuser", ["testuser", "testuser – Warenkorb 2"])).toBe("testuser");
   });
 
   it("does not invent a name from an email address", () => {
@@ -45,12 +45,12 @@ describe("defaultCartName", () => {
 describe("cartTitleFromOrdinal", () => {
   it("keeps ordinal 1 as the bare Telegram handle", () => {
     expect(cartTitleFromOrdinal("testuser", 1)).toBe("testuser");
-    expect(cartTitleFromOrdinal("testuser", 2)).toBe("testuser – Warenkorb 2");
-    expect(cartTitleFromOrdinal("testuser", 3)).toBe("testuser – Warenkorb 3");
+    expect(cartTitleFromOrdinal("testuser", 2)).toBe("testuser");
+    expect(cartTitleFromOrdinal("testuser", 3)).toBe("testuser");
   });
 
-  it("does not change ordinals when the handle changes", () => {
+  it("does not invent Warenkorb numbers when the handle changes", () => {
     expect(cartTitleFromOrdinal("newhandle", 1)).toBe("newhandle");
-    expect(cartTitleFromOrdinal("newhandle", 3)).toBe("newhandle – Warenkorb 3");
+    expect(cartTitleFromOrdinal("newhandle", 3)).toBe("newhandle");
   });
 });

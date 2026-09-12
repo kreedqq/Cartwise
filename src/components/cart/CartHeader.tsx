@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Archive, Copy, Pin, PinOff, Trash2 } from "lucide-react";
+import { ArrowLeft, Pin, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +14,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CartStatusBadge, CART_STATUS_LABELS } from "@/components/cart/CartStatusBadge";
@@ -24,11 +23,13 @@ import { isOpenCart } from "@/services/carts";
 import { toast } from "@/components/ui/toaster";
 import type { CartStatus, Tables } from "@/types/database";
 
-const EDITABLE_STATUSES = (Object.keys(CART_STATUS_LABELS) as CartStatus[]).filter((status) => status !== "ordered");
+const EDITABLE_STATUSES = (Object.keys(CART_STATUS_LABELS) as CartStatus[]).filter(
+  (status) => status === "draft" || status === "ready",
+);
 
 export function CartHeader({ cart }: { cart: Tables<"carts"> }) {
   const navigate = useNavigate();
-  const { updateStatus, activate, duplicate, remove } = useCartMutations();
+  const { updateStatus, remove } = useCartMutations();
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const open = isOpenCart(cart.status);
 
@@ -38,17 +39,6 @@ export function CartHeader({ cart }: { cart: Tables<"carts"> }) {
     } catch (error) {
       console.error("Warenkorb-Status ändern fehlgeschlagen:", error);
       toast.error("Status konnte nicht geändert werden.");
-    }
-  }
-
-  async function handleDuplicate() {
-    try {
-      const newId = await duplicate.mutateAsync(cart.id);
-      toast.success("Warenkorb dupliziert.");
-      navigate(`/carts/${newId}`);
-    } catch (error) {
-      console.error("Warenkorb duplizieren fehlgeschlagen:", error);
-      toast.error("Duplizieren fehlgeschlagen.");
     }
   }
 
@@ -108,26 +98,9 @@ export function CartHeader({ cart }: { cart: Tables<"carts"> }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {open && (
-                <DropdownMenuItem onClick={() => activate.mutate(cart.id)}>
-                  {cart.is_active_cart ? <PinOff /> : <Pin />}
-                  {cart.is_active_cart ? "Als aktiv entfernen" : "Als aktiv markieren"}
+                <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
+                  <Trash2 /> Löschen
                 </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={handleDuplicate}>
-                <Copy /> Duplizieren
-              </DropdownMenuItem>
-              {open && (
-                <DropdownMenuItem onClick={() => handleStatusChange("archived")}>
-                  <Archive /> Archivieren
-                </DropdownMenuItem>
-              )}
-              {open && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
-                    <Trash2 /> Löschen
-                  </DropdownMenuItem>
-                </>
               )}
             </DropdownMenuContent>
           </DropdownMenu>

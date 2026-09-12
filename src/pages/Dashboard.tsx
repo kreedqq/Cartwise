@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { CreateCartDialog } from "@/components/cart/CreateCartDialog";
 import { CartCard } from "@/components/cart/CartCard";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -43,8 +42,7 @@ export default function DashboardPage() {
       <PageHeader
         eyebrow="Übersicht"
         title={`Willkommen, ${greetingName}`}
-        description="Warenkörbe, Bestellungen und Schnellzugriff auf den Katalog – in einer Ansicht."
-        actions={<CreateCartDialog />}
+        description="Warenkorb, Bestellungen und Schnellzugriff auf den Katalog – in einer Ansicht."
       />
 
       <div className="flex flex-wrap items-center gap-2">
@@ -76,12 +74,11 @@ export default function DashboardPage() {
         <div className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="min-w-0">
-              <h2 className="text-lg font-semibold tracking-tight">Warenkörbe</h2>
+              <h2 className="text-lg font-semibold tracking-tight">Warenkorb</h2>
               <p className="text-sm text-muted-foreground">
-                Übersicht der vorhandenen Warenkörbe. Zum Öffnen eine Karte antippen.
+                Dein Warenkorb. Zum Öffnen die Karte antippen.
               </p>
             </div>
-            <CreateCartDialog />
           </div>
 
           {cartsQuery.isLoading && (
@@ -98,7 +95,7 @@ export default function DashboardPage() {
 
           {cartsQuery.data && openCarts.length === 0 && (
             <div className="rounded-xl border border-border/70 bg-card p-4">
-              <p className="text-sm text-muted-foreground">Noch keine Warenkörbe vorhanden.</p>
+              <p className="text-sm text-muted-foreground">Noch kein Warenkorb vorhanden.</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button asChild variant="outline" size="sm">
                   <Link to="/shop">Zum Shop</Link>

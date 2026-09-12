@@ -10,30 +10,15 @@ export function cartTitleFromOrdinal(
   ordinal: number,
 ): string {
   const base = username?.trim();
-  const n = Number.isFinite(ordinal) && ordinal >= 1 ? Math.floor(ordinal) : 1;
-  if (!base) {
-    return n <= 1 ? GENERIC_CART_NAME : `${GENERIC_CART_NAME} – ${GENERIC_CART_NAME} ${n}`;
-  }
-  if (n <= 1) return base;
-  return `${base} – ${GENERIC_CART_NAME} ${n}`;
+  void ordinal;
+  if (!base) return GENERIC_CART_NAME;
+  return base;
 }
 
 /** Next title if the caller only knows existing names (client preview / tests). */
 export function defaultCartName(
   username: string | null | undefined,
-  existingNames: readonly string[] = [],
+  _existingNames: readonly string[] = [],
 ): string {
-  const base = username?.trim();
-  if (!base) return GENERIC_CART_NAME;
-
-  const taken = new Set(existingNames.map((name) => name.trim()).filter(Boolean));
-  if (!taken.has(base)) return cartTitleFromOrdinal(base, 1);
-
-  let index = 2;
-  let candidate = cartTitleFromOrdinal(base, index);
-  while (taken.has(candidate)) {
-    index += 1;
-    candidate = cartTitleFromOrdinal(base, index);
-  }
-  return candidate;
+  return cartTitleFromOrdinal(username, 1);
 }

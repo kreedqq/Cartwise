@@ -127,6 +127,7 @@ export default function AdminShopAreasPage() {
         open={createOpen}
         onOpenChange={setCreateOpen}
         areas={areasQuery.data ?? []}
+        products={productsQuery.data ?? []}
         onCreated={(key) => {
           setAreaKey(key);
           void invalidate();

@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom";
+import * as React from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -8,17 +9,28 @@ import { useCustomerNavItems } from "@/hooks/useCustomerNavItems";
 export function MobileNav() {
   const { isAdmin } = useAuth();
   const { items } = useCustomerNavItems();
+  const location = useLocation();
+  const scrollerRef = React.useRef<HTMLElement | null>(null);
+
+  React.useEffect(() => {
+    const active = scrollerRef.current?.querySelector<HTMLElement>("[data-active=true]");
+    active?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+  }, [location.pathname]);
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex bg-sidebar pb-[env(safe-area-inset-bottom)] text-sidebar-foreground lg:hidden [[data-site-background=on]_&]:bg-sidebar/55 [[data-site-background=on]_&]:backdrop-blur-md">
+    <nav
+      ref={scrollerRef}
+      className="fixed inset-x-0 bottom-0 z-40 flex snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain bg-sidebar pb-[env(safe-area-inset-bottom)] text-sidebar-foreground [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:hidden [[data-site-background=on]_&]:bg-sidebar/55 [[data-site-background=on]_&]:backdrop-blur-md"
+    >
       {items.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
           end={item.end}
+          data-active={location.pathname === item.to || (!item.end && location.pathname.startsWith(`${item.to}/`)) || undefined}
           className={({ isActive }) =>
             cn(
-              "flex min-h-[3.25rem] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-0.5 py-2 text-[9px] font-medium leading-tight tracking-wide",
+              "flex min-h-12 w-[4.75rem] shrink-0 snap-start flex-col items-center justify-center gap-0.5 px-1 py-2 text-[11px] font-medium leading-tight tracking-wide",
               isActive ? "text-primary" : "text-sidebar-muted",
             )
           }
@@ -30,9 +42,10 @@ export function MobileNav() {
       {isAdmin && (
         <NavLink
           to="/admin"
+          data-active={location.pathname.startsWith("/admin") || undefined}
           className={({ isActive }) =>
             cn(
-              "flex min-h-[3.25rem] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-0.5 py-2 text-[9px] font-medium leading-tight tracking-wide",
+              "flex min-h-12 w-[4.75rem] shrink-0 snap-start flex-col items-center justify-center gap-0.5 px-1 py-2 text-[11px] font-medium leading-tight tracking-wide",
               isActive ? "text-primary" : "text-sidebar-muted",
             )
           }

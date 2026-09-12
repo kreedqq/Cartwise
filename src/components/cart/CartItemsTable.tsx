@@ -145,7 +145,7 @@ function CartItemRowDesktop({
         />
         {row.quantityError && <p className="mt-1 text-[11px] text-destructive">{row.quantityError}</p>}
         <SaveStatusIndicator status={row.quantityStatus} className="mt-1 justify-end" />
-        <p className="mt-1 text-[11px] text-muted-foreground">{cartItemQuantityLabel({ ...item, shop_area: shopArea })}</p>
+        <p className="mt-1 text-[11px] text-muted-foreground">{cartItemQuantityLabel({ ...item, shop_area: item.shop_area ?? shopArea })}</p>
       </TableCell>
       <TableCell className="text-right">
         <DualCurrencyPrice

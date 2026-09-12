@@ -132,8 +132,14 @@ export default function CheckoutPage() {
         paymentMethod,
         shipping: address,
       });
-      toast.success(`Bestellung ${result.orderNumber} wurde übermittelt.`);
-      navigate(`/orders/${result.orderId}`);
+      const extraOrders = Array.isArray(result.orders) ? result.orders.length : 1;
+      if (extraOrders > 1) {
+        toast.success(`${extraOrders} Bestellungen wurden übermittelt.`);
+        navigate("/orders");
+      } else {
+        toast.success(`Bestellung ${result.orderNumber} wurde übermittelt.`);
+        navigate(`/orders/${result.orderId}`);
+      }
     } catch (error) {
       console.error("Bestellung absenden fehlgeschlagen:", error);
       const message = error instanceof Error ? error.message : "Bestellung konnte nicht übermittelt werden.";
@@ -223,7 +229,7 @@ export default function CheckoutPage() {
                         )}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {cartItemQuantityLabel({ ...item, shop_area: cart.shop_area })}
+                        {cartItemQuantityLabel({ ...item, shop_area: item.shop_area ?? cart.shop_area })}
                       </TableCell>
                       <TableCell className="text-right">
                         <DualCurrencyPrice

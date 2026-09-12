@@ -19,14 +19,11 @@ export async function getCart(id: string): Promise<Tables<"carts"> | null> {
   return data;
 }
 
-export async function createCart(userId: string, note?: string): Promise<Tables<"carts">> {
-  const { data, error } = await supabase
-    .from("carts")
-    .insert({ user_id: userId, name: "Warenkorb", note: note || null })
-    .select()
-    .single();
+export async function createCart(_userId: string, note?: string): Promise<Tables<"carts">> {
+  const { data, error } = await supabase.rpc("get_or_create_user_cart");
   if (error) throw error;
-  return data;
+  if (!note) return data;
+  return updateCartNote(data.id, data.version, note);
 }
 
 export async function updateCartNote(id: string, expectedVersion: number, note: string): Promise<Tables<"carts">> {
@@ -35,6 +32,11 @@ export async function updateCartNote(id: string, expectedVersion: number, note: 
 
 export function isOpenCart(status: CartStatus): boolean {
   return status !== "ordered";
+}
+
+/** One editable user cart: draft or ready, never archived leftovers. */
+export function isActiveUserCart(status: CartStatus): boolean {
+  return status === "draft" || status === "ready";
 }
 
 /** Active cart for shop/topbar: must belong to the user and stay editable under RLS. */
@@ -49,7 +51,7 @@ export function pickActiveOpenCart(
         cart.user_id === userId &&
         cart.is_active_cart &&
         !cart.deleted_at &&
-        isOpenCart(cart.status),
+        isActiveUserCart(cart.status),
     ) ?? null
   );
 }

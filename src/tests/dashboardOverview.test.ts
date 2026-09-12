@@ -9,12 +9,12 @@ function read(path: string): string {
 describe("customer dashboard cart overview", () => {
   it("shows compact clickable carts beside recent orders and removes quick order", () => {
     const page = read("src/pages/Dashboard.tsx");
-    expect(page).toContain('filter((cart) => isOpenCart(cart.status))');
+    expect(page).toContain("isOpenCart");
     expect(page).toContain("md:grid-cols-2");
     expect(page).toContain("Letzte Bestellungen");
-    expect(page).toContain("CreateCartDialog");
+    expect(page).not.toContain("CreateCartDialog");
     expect(page).toContain("Zum Shop");
-    expect(page).toContain("Noch keine Warenkörbe vorhanden.");
+    expect(page).toContain("Noch kein Warenkorb vorhanden.");
     expect(page).not.toContain("QuickOrderCard");
     expect(page).not.toContain("Schnellbestellung");
     expect(page).not.toContain("Alle hinzufügen");

@@ -25,7 +25,8 @@ export async function listCartItems(cartId: string): Promise<Tables<"cart_items"
   return data ?? [];
 }
 
-async function shopAreaForCart(cartId: string): Promise<ShopAreaKey> {
+async function shopAreaForCart(cartId: string, preferred?: ShopAreaKey | null): Promise<ShopAreaKey> {
+  if (preferred && isShopAreaKey(preferred)) return preferred;
   const cart = await getCart(cartId);
   return isShopAreaKey(cart?.shop_area) ? cart.shop_area : DEFAULT_SHOP_AREA;
 }
@@ -47,8 +48,9 @@ export async function addCartItem(
   quantity: number,
   nextPosition: number,
   currentRate: number | null,
+  shopAreaKey?: ShopAreaKey | null,
 ): Promise<Tables<"cart_items">> {
-  const shopArea = await shopAreaForCart(cartId);
+  const shopArea = await shopAreaForCart(cartId, shopAreaKey);
   const resolution = await resolveProductByCode(productCodeInput, shopArea);
 
   const base = {
@@ -56,6 +58,7 @@ export async function addCartItem(
     position: nextPosition,
     product_code_input: productCodeInput,
     quantity,
+    shop_area: shopArea,
   };
 
   if (resolution.status === "not_found") {
@@ -98,7 +101,7 @@ export async function reresolveCartItemCode(
   newCode: string,
   currentRate: number | null,
 ): Promise<Tables<"cart_items">> {
-  const shopArea = await shopAreaForCart(item.cart_id);
+  const shopArea = await shopAreaForCart(item.cart_id, isShopAreaKey(item.shop_area) ? item.shop_area : null);
   const resolution = await resolveProductByCode(newCode, shopArea);
   const patch: Partial<Tables<"cart_items">> = { product_code_input: newCode };
 
@@ -220,10 +223,11 @@ export async function addCartItemsBulk(
   lines: BulkImportLine[],
   startPosition: number,
   currentRate: number | null,
+  shopAreaKey?: ShopAreaKey | null,
 ): Promise<Tables<"cart_items">[]> {
   if (lines.length === 0) return [];
 
-  const shopArea = await shopAreaForCart(cartId);
+  const shopArea = await shopAreaForCart(cartId, shopAreaKey);
   const productMap = await resolveProductsByCodes(
     lines.map((l) => l.code),
     shopArea,
@@ -243,6 +247,7 @@ export async function addCartItemsBulk(
       product_code_input: line.code,
       quantity: line.quantity,
       resolution_status: "not_found",
+      shop_area: shopArea,
     };
 
     if (!product) return base;

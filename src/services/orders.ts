@@ -114,6 +114,8 @@ export interface CreateOrderResult {
   orderId: string;
   orderNumber: string;
   totalUsd: number;
+  shopArea?: string;
+  orders?: { orderId: string; orderNumber: string; totalUsd: number; shopArea?: string }[];
 }
 
 /**

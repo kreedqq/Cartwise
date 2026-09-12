@@ -131,7 +131,7 @@ function CartItemCardMobile({
               inputMode="decimal"
               className="h-9 text-right tabular-nums"
             />
-            <p className="text-[11px] text-muted-foreground">{cartItemQuantityLabel({ ...item, shop_area: shopArea })}</p>
+            <p className="text-[11px] text-muted-foreground">{cartItemQuantityLabel({ ...item, shop_area: item.shop_area ?? shopArea })}</p>
           </div>
         </div>
         {row.quantityError && <p className="text-xs text-destructive">{row.quantityError}</p>}

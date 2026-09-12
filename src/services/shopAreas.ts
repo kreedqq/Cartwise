@@ -59,6 +59,12 @@ export async function ensureShopAreaCart(shopArea: ShopAreaKey): Promise<Tables<
   return data;
 }
 
+export async function getOrCreateUserCart(): Promise<Tables<"carts">> {
+  const { data, error } = await supabase.rpc("get_or_create_user_cart");
+  if (error) throw error;
+  return data;
+}
+
 export async function listAdminShopAreas(): Promise<Tables<"shop_areas">[]> {
   const { data, error } = await supabase.from("shop_areas").select("*").order("sort_order");
   if (error) throw error;

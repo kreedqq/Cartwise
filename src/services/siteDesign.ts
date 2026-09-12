@@ -25,6 +25,23 @@ export async function saveSiteDesignSettings(input: { enabled: boolean; config: 
   if (error) throw error;
 }
 
+export async function uploadAreaDesignImage(
+  areaKey: string,
+  kind: "background" | "hero" | "hub" | "banner" | "mobile",
+  file: File,
+): Promise<string> {
+  const ext = file.name.split(".").pop()?.toLowerCase() === "png" ? "png" : file.name.toLowerCase().endsWith(".webp") ? "webp" : "jpg";
+  const path = `areas/${areaKey}/${kind}-${crypto.randomUUID()}.${ext}`;
+  return uploadPrivateOrPublicImage({
+    bucket: SITE_DESIGN_BUCKET,
+    path,
+    file,
+    maxBytes: 8 * 1024 * 1024,
+    minWidth: 320,
+    minHeight: 180,
+  });
+}
+
 export async function uploadSiteDesignImage(device: "desktop" | "tablet" | "mobile", file: File): Promise<string> {
   const ext = file.name.split(".").pop()?.toLowerCase() === "png" ? "png" : file.name.toLowerCase().endsWith(".webp") ? "webp" : "jpg";
   const path = `${device}/${crypto.randomUUID()}.${ext}`;

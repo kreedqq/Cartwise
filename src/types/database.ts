@@ -162,6 +162,8 @@ export interface Database {
           resolution_status: ResolutionStatus;
           note: string | null;
           kit_share_id: string | null;
+          shop_area: string | null;
+          submitted_order_id: string | null;
           version: number;
           created_at: string;
           updated_at: string;
@@ -1506,7 +1508,21 @@ export interface Database {
           _shipping_packstation_number?: string | null;
           _shipping_post_number?: string | null;
         };
-        Returns: { orderId: string; orderNumber: string; totalUsd: number };
+        Returns: {
+          orderId: string;
+          orderNumber: string;
+          totalUsd: number;
+          shopArea?: string;
+          orders?: { orderId: string; orderNumber: string; totalUsd: number; shopArea?: string }[];
+        };
+      };
+      get_or_create_user_cart: {
+        Args: Record<string, never>;
+        Returns: Database["public"]["Tables"]["carts"]["Row"];
+      };
+      admin_merge_open_user_carts: {
+        Args: { _user_id?: string | null };
+        Returns: { users: number; results: unknown[] };
       };
       list_kit_share_members: {
         Args: Record<string, never>;

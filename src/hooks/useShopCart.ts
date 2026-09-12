@@ -12,8 +12,8 @@ import { ensureShopAreaCart } from "@/services/shopAreas";
 import type { Tables } from "@/types/database";
 
 /**
- * Resolves the cart for a shop area (creating + activating if needed).
- * Shop add-to-cart always uses the area from ShopAreaProvider, not a mixed cart.
+ * Resolves the single user cart (creating if needed). New lines store the
+ * current ShopAreaProvider area on the item, not a second cart.
  */
 export function useShopCart(shopArea?: ShopAreaKey) {
   const { user } = useAuth();
@@ -24,14 +24,6 @@ export function useShopCart(shopArea?: ShopAreaKey) {
   const [ensuring, setEnsuring] = React.useState(false);
 
   const activeCart = pickActiveOpenCart(cartsQuery.data, user?.id);
-  const areaCart =
-    cartsQuery.data?.find(
-      (cart) =>
-        cart.user_id === user?.id &&
-        cart.shop_area === area &&
-        !cart.deleted_at &&
-        cart.status !== "ordered",
-    ) ?? null;
 
   async function ensureActiveCartId(): Promise<string> {
     if (!user) throw new Error("Nicht angemeldet.");
@@ -69,7 +61,7 @@ export function useShopCart(shopArea?: ShopAreaKey) {
     rate: number | null,
   ): Promise<Tables<"cart_items">> {
     const cartId = await ensureActiveCartId();
-    const item = await addCartItem(cartId, productCode, quantity, nextPositionFor(cartId), rate);
+    const item = await addCartItem(cartId, productCode, quantity, nextPositionFor(cartId), rate, area);
     await invalidateAfterAdd(cartId);
     return item;
   }
@@ -79,13 +71,13 @@ export function useShopCart(shopArea?: ShopAreaKey) {
     rate: number | null,
   ): Promise<Tables<"cart_items">[]> {
     const cartId = await ensureActiveCartId();
-    const items = await addCartItemsBulk(cartId, lines, nextPositionFor(cartId), rate);
+    const items = await addCartItemsBulk(cartId, lines, nextPositionFor(cartId), rate, area);
     await invalidateAfterAdd(cartId);
     return items;
   }
 
   return {
-    activeCart: areaCart ?? activeCart,
+    activeCart,
     cartsLoading: cartsQuery.isLoading,
     ensuring,
     addToActiveCart,
