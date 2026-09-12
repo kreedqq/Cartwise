@@ -29,13 +29,15 @@ export default function DashboardPage() {
   const ordersQuery = useMyOrders();
   const favoritesQuery = useFavorites();
   const rateQuery = useExchangeRate();
-  const { customerRoleName, profile } = useAuth();
+  const { customerRoleName, profile, user } = useAuth();
   const greetingName = visibleAccountLabel(profile, "dort");
   const recentOrders = (ordersQuery.data ?? []).slice(0, 4);
   const favoriteCount = favoritesQuery.data?.length ?? 0;
   // Submitted carts have already become an order (visible under "Meine Bestellungen")
   // and must not linger in the active "Warenkörbe" overview.
-  const openCarts = (cartsQuery.data ?? []).filter((cart) => isOpenCart(cart.status));
+  const openCarts = (cartsQuery.data ?? [])
+    .filter((cart) => isOpenCart(cart.status))
+    .filter((cart) => !user?.id || cart.user_id === user.id);
 
   return (
     <div className="space-y-10">

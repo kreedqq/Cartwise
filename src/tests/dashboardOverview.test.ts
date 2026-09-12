@@ -10,6 +10,7 @@ describe("customer dashboard cart overview", () => {
   it("shows compact clickable carts beside recent orders and removes quick order", () => {
     const page = read("src/pages/Dashboard.tsx");
     expect(page).toContain("isOpenCart");
+    expect(page).toContain("cart.user_id === user.id");
     expect(page).toContain("md:grid-cols-2");
     expect(page).toContain("Letzte Bestellungen");
     expect(page).not.toContain("CreateCartDialog");
