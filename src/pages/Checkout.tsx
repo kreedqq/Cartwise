@@ -22,7 +22,7 @@ import { useCartItems } from "@/hooks/useCartItems";
 import { useCartComputed } from "@/hooks/useCartComputed";
 import { useCreateOrder } from "@/hooks/useOrders";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
-import { calculateCartTotals, formatUsd, summarizeOrderCharges } from "@/lib/money";
+import { calculateCartTotals, summarizeOrderCharges } from "@/lib/money";
 import {
   PAYMENT_METHOD_REQUIRED_MESSAGE,
   type PaymentMethod,
@@ -324,7 +324,15 @@ export default function CheckoutPage() {
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title="Bestellung jetzt absenden?"
-        description={`Du bestellst ${eligible.length} Position(en) im Gesamtwert von ${formatUsd(eligibleTotals.totalUsd)}. Lieferart, Lieferadresse und Telegram Benutzername werden mit der Bestellung gespeichert. Diese Aktion kann nicht rückgängig gemacht werden.`}
+        description={
+          <div className="space-y-3 text-left">
+            <p>Du bestellst {eligible.length} Position(en).</p>
+            <DualCurrencyPrice usd={eligibleTotals.totalUsd} eur={eligibleTotals.totalEur} size="summary" />
+            <p className="text-sm text-muted-foreground">
+              Lieferart, Lieferadresse und Telegram Benutzername werden mit der Bestellung gespeichert. Diese Aktion kann nicht rückgängig gemacht werden.
+            </p>
+          </div>
+        }
         confirmLabel="Verbindlich bestellen"
         loading={createOrder.isPending}
         onConfirm={handleSubmit}

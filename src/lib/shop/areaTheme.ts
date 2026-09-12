@@ -15,6 +15,47 @@ export interface AreaThemeTokens {
   mutedText: string;
 }
 
+export interface AreaBackgroundConfig {
+  mode: "global" | "color" | "gradient" | "image";
+  color: string;
+  gradient: string;
+  desktopImage: string;
+  tabletImage: string;
+  mobileImage: string;
+  overlay: boolean;
+  overlayStrength: number;
+  position: string;
+  scale: "cover" | "contain";
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  blur: number;
+  attachment: "scroll" | "fixed";
+}
+
+export interface AreaHeroConfig {
+  enabled: boolean;
+  desktopImage: string;
+  mobileImage: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  buttonText: string;
+  buttonHref: string;
+  alignment: "left" | "center" | "right";
+  variant: "centered" | "left" | "right" | "split" | "minimal";
+  overlayStrength: number;
+  height: "compact" | "standard" | "tall";
+}
+
+export interface AreaBannerConfig {
+  enabled: boolean;
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonHref: string;
+}
+
 export interface AreaThemeConfig {
   enabled: boolean;
   density: "compact" | "balanced" | "spacious";
@@ -24,7 +65,58 @@ export interface AreaThemeConfig {
   emptyTitle: string;
   emptyDescription: string;
   tokens: Partial<AreaThemeTokens>;
+  background: AreaBackgroundConfig;
+  hero: AreaHeroConfig;
+  banner: AreaBannerConfig;
+  hub: { title: string; description: string; image: string };
+  categories: { display: "pills" | "tabs" | "cards" | "buttons" | "minimal" };
+  products: { layout: "table" | "cards" | "hybrid"; radius: "sm" | "md" | "lg"; shadow: boolean };
+  cards: { radius: "sm" | "md" | "lg"; border: boolean; shadow: boolean };
+  buttons: { radius: "sm" | "md" | "lg" | "full" };
+  typography: { scale: "sm" | "md" | "lg" };
+  mobile: { heroHeight: "compact" | "standard" };
 }
+
+export const EMPTY_AREA_BACKGROUND: AreaBackgroundConfig = {
+  mode: "global",
+  color: "",
+  gradient: "",
+  desktopImage: "",
+  tabletImage: "",
+  mobileImage: "",
+  overlay: true,
+  overlayStrength: 40,
+  position: "center",
+  scale: "cover",
+  brightness: 100,
+  contrast: 100,
+  saturation: 100,
+  blur: 0,
+  attachment: "scroll",
+};
+
+export const EMPTY_AREA_HERO: AreaHeroConfig = {
+  enabled: false,
+  desktopImage: "",
+  mobileImage: "",
+  title: "",
+  subtitle: "",
+  description: "",
+  buttonText: "",
+  buttonHref: "",
+  alignment: "left",
+  variant: "minimal",
+  overlayStrength: 45,
+  height: "standard",
+};
+
+export const EMPTY_AREA_BANNER: AreaBannerConfig = {
+  enabled: false,
+  title: "",
+  description: "",
+  buttonText: "",
+  buttonHref: "",
+};
 
 export const EMPTY_AREA_THEME: AreaThemeConfig = {
   enabled: false,
@@ -35,6 +127,16 @@ export const EMPTY_AREA_THEME: AreaThemeConfig = {
   emptyTitle: "",
   emptyDescription: "",
   tokens: {},
+  background: EMPTY_AREA_BACKGROUND,
+  hero: EMPTY_AREA_HERO,
+  banner: EMPTY_AREA_BANNER,
+  hub: { title: "", description: "", image: "" },
+  categories: { display: "pills" },
+  products: { layout: "hybrid", radius: "md", shadow: false },
+  cards: { radius: "md", border: true, shadow: false },
+  buttons: { radius: "md" },
+  typography: { scale: "md" },
+  mobile: { heroHeight: "compact" },
 };
 
 export const AREA_THEME_PRESETS: Record<string, Partial<AreaThemeTokens>> = {
@@ -135,6 +237,60 @@ function asString(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+}
+
+function asNumber(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function parseBackground(raw: unknown): AreaBackgroundConfig {
+  const row = asRecord(raw);
+  const mode =
+    row.mode === "color" || row.mode === "gradient" || row.mode === "image" ? row.mode : "global";
+  return {
+    ...EMPTY_AREA_BACKGROUND,
+    mode,
+    color: asString(row.color),
+    gradient: asString(row.gradient),
+    desktopImage: asString(row.desktopImage),
+    tabletImage: asString(row.tabletImage),
+    mobileImage: asString(row.mobileImage),
+    overlay: row.overlay !== false,
+    overlayStrength: asNumber(row.overlayStrength, EMPTY_AREA_BACKGROUND.overlayStrength),
+    position: asString(row.position, "center"),
+    scale: row.scale === "contain" ? "contain" : "cover",
+    brightness: asNumber(row.brightness, 100),
+    contrast: asNumber(row.contrast, 100),
+    saturation: asNumber(row.saturation, 100),
+    blur: asNumber(row.blur, 0),
+    attachment: row.attachment === "fixed" ? "fixed" : "scroll",
+  };
+}
+
+function parseHero(raw: unknown): AreaHeroConfig {
+  const row = asRecord(raw);
+  return {
+    ...EMPTY_AREA_HERO,
+    enabled: row.enabled === true,
+    desktopImage: asString(row.desktopImage),
+    mobileImage: asString(row.mobileImage),
+    title: asString(row.title),
+    subtitle: asString(row.subtitle),
+    description: asString(row.description),
+    buttonText: asString(row.buttonText),
+    buttonHref: asString(row.buttonHref),
+    alignment: row.alignment === "center" || row.alignment === "right" ? row.alignment : "left",
+    variant:
+      row.variant === "centered" || row.variant === "left" || row.variant === "right" || row.variant === "split"
+        ? row.variant
+        : "minimal",
+    overlayStrength: asNumber(row.overlayStrength, EMPTY_AREA_HERO.overlayStrength),
+    height: row.height === "compact" || row.height === "tall" ? row.height : "standard",
+  };
+}
+
 export function parseAreaTheme(raw: unknown): AreaThemeConfig {
   const row = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
   const tokensRaw = row.tokens && typeof row.tokens === "object" ? (row.tokens as Record<string, unknown>) : {};
@@ -145,6 +301,14 @@ export function parseAreaTheme(raw: unknown): AreaThemeConfig {
       : "standard";
   const priceEmphasis =
     row.priceEmphasis === "prominent" || row.priceEmphasis === "luxury" ? row.priceEmphasis : "standard";
+  const hub = asRecord(row.hub);
+  const categories = asRecord(row.categories);
+  const products = asRecord(row.products);
+  const cards = asRecord(row.cards);
+  const buttons = asRecord(row.buttons);
+  const typography = asRecord(row.typography);
+  const mobile = asRecord(row.mobile);
+  const banner = asRecord(row.banner);
   return {
     enabled: row.enabled === true,
     density,
@@ -167,7 +331,73 @@ export function parseAreaTheme(raw: unknown): AreaThemeConfig {
       buttonText: asString(tokensRaw.buttonText),
       mutedText: asString(tokensRaw.mutedText),
     },
+    background: parseBackground(row.background),
+    hero: parseHero(row.hero),
+    banner: {
+      enabled: banner.enabled === true,
+      title: asString(banner.title),
+      description: asString(banner.description),
+      buttonText: asString(banner.buttonText),
+      buttonHref: asString(banner.buttonHref),
+    },
+    hub: {
+      title: asString(hub.title),
+      description: asString(hub.description),
+      image: asString(hub.image),
+    },
+    categories: {
+      display:
+        categories.display === "tabs" ||
+        categories.display === "cards" ||
+        categories.display === "buttons" ||
+        categories.display === "minimal"
+          ? categories.display
+          : "pills",
+    },
+    products: {
+      layout: products.layout === "table" || products.layout === "cards" ? products.layout : "hybrid",
+      radius: products.radius === "sm" || products.radius === "lg" ? products.radius : "md",
+      shadow: products.shadow === true,
+    },
+    cards: {
+      radius: cards.radius === "sm" || cards.radius === "lg" ? cards.radius : "md",
+      border: cards.border !== false,
+      shadow: cards.shadow === true,
+    },
+    buttons: {
+      radius:
+        buttons.radius === "sm" || buttons.radius === "lg" || buttons.radius === "full" ? buttons.radius : "md",
+    },
+    typography: {
+      scale: typography.scale === "sm" || typography.scale === "lg" ? typography.scale : "md",
+    },
+    mobile: {
+      heroHeight: mobile.heroHeight === "standard" ? "standard" : "compact",
+    },
   };
+}
+
+export function areaBackgroundStyle(theme: AreaThemeConfig, viewport: "desktop" | "tablet" | "mobile" = "desktop"): CSSProperties {
+  if (!theme.enabled || theme.background.mode === "global") return {};
+  const bg = theme.background;
+  const image =
+    viewport === "mobile"
+      ? bg.mobileImage || bg.tabletImage || bg.desktopImage
+      : viewport === "tablet"
+        ? bg.tabletImage || bg.desktopImage
+        : bg.desktopImage;
+  const style: CSSProperties = {};
+  if (bg.mode === "color" && bg.color) style.background = bg.color;
+  if (bg.mode === "gradient" && bg.gradient) style.backgroundImage = bg.gradient;
+  if (bg.mode === "image" && image) {
+    style.backgroundImage = `url(${image.startsWith("http") || image.startsWith("data:") || image.startsWith("/") ? image : image})`;
+    style.backgroundSize = bg.scale;
+    style.backgroundPosition = bg.position || "center";
+    style.backgroundAttachment = bg.attachment;
+    style.backgroundRepeat = "no-repeat";
+    style.filter = `brightness(${bg.brightness}%) contrast(${bg.contrast}%) saturate(${bg.saturation}%) blur(${bg.blur}px)`;
+  }
+  return style;
 }
 
 /** Converts #rrggbb (or existing "H S% L%") into the shadcn HSL channel triple. */

@@ -23,7 +23,7 @@ import {
 import { toast } from "@/components/ui/toaster";
 import { QUERY_KEYS } from "@/lib/constants";
 import { useAuth } from "@/context/AuthProvider";
-import { formatUsd } from "@/lib/money";
+import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import { variantLabelForProduct, type ShopProductGroup } from "@/lib/shop/display";
 import {
   KIT_INVALID_TOTAL_MESSAGE,
@@ -608,8 +608,8 @@ export function KitShareDialog({
               </div>
 
               <div className="rounded-lg bg-secondary/40 p-3">
-                <p className="text-xs text-muted-foreground">Mein Preis (nur für dich sichtbar)</p>
-                <p className="text-lg font-semibold tabular-nums">{formatUsd(kitView.myPriceUsd)}</p>
+                <p className="text-xs text-muted-foreground">Dein Anteil (nur für dich sichtbar)</p>
+                <DualCurrencyPrice usd={kitView.myPriceUsd} size="summary" />
               </div>
             </>
           )}

@@ -105,9 +105,9 @@ export function CreateKitRequestDialog({ open, onOpenChange, shopArea }: CreateK
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Kit-Gesuch erstellen</DialogTitle>
+          <DialogTitle>Kit gemeinsam teilen</DialogTitle>
           <DialogDescription>
-            Du reservierst deinen eigenen Anteil. Andere Benutzer können die restlichen Einheiten übernehmen.
+            Wähle Produkt, Variante und deinen Anteil. Andere Kunden können die restlichen Einheiten übernehmen.
           </DialogDescription>
         </DialogHeader>
 
@@ -190,9 +190,18 @@ export function CreateKitRequestDialog({ open, onOpenChange, shopArea }: CreateK
             </div>
           </div>
 
-          <p className="text-sm text-muted-foreground">
-            Gesucht: {formatKitQuantity(kitSize - creatorQuantity, categoryId, kitSize)}
-          </p>
+          {selectedProduct ? (
+            <div className="rounded-lg bg-secondary/40 p-3 text-sm">
+              <p className="font-medium">Vorschau</p>
+              <p>Kit: {formatKitQuantity(kitSize, categoryId, kitSize)}</p>
+              <p>Mein Anteil: {formatKitQuantity(creatorQuantity, categoryId, kitSize)}</p>
+              <p>Noch verfügbar danach: {formatKitQuantity(kitSize - creatorQuantity, categoryId, kitSize)}</p>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Gesucht: {formatKitQuantity(kitSize - creatorQuantity, categoryId, kitSize)}
+            </p>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="kit-request-note">Hinweis (optional)</Label>
@@ -221,7 +230,7 @@ export function CreateKitRequestDialog({ open, onOpenChange, shopArea }: CreateK
             Abbrechen
           </Button>
           <Button className="w-full sm:w-auto" onClick={() => void handleSubmit()} disabled={createMutation.isPending}>
-            {createMutation.isPending ? "Wird erstellt …" : "Gesuch erstellen"}
+            {createMutation.isPending ? "Wird erstellt …" : "Kit erstellen"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,3 +1,4 @@
+import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import {
   formatEur,
   formatMoney,
@@ -44,9 +45,9 @@ export function OrderChargeSummary({
         </>
       )}
 
-      <div className="flex justify-between">
+      <div className="flex items-start justify-between gap-3">
         <span>Produktsumme</span>
-        <span className="tabular-nums">{formatUsd(charges.productUsd)}</span>
+        <DualCurrencyPrice usd={charges.productUsd} eur={charges.productEur} size="compact" align="right" />
       </div>
 
       <div className="flex justify-between">

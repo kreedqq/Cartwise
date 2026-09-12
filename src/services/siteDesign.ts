@@ -27,7 +27,7 @@ export async function saveSiteDesignSettings(input: { enabled: boolean; config: 
 
 export async function uploadAreaDesignImage(
   areaKey: string,
-  kind: "background" | "hero" | "hub" | "banner" | "mobile",
+  kind: "background" | "hero" | "hub" | "banner" | "mobile" | "background-tablet" | "background-mobile" | "hero-mobile",
   file: File,
 ): Promise<string> {
   const ext = file.name.split(".").pop()?.toLowerCase() === "png" ? "png" : file.name.toLowerCase().endsWith(".webp") ? "webp" : "jpg";

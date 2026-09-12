@@ -24,6 +24,7 @@ import {
   type AreaThemeTokens,
 } from "@/lib/shop/areaTheme";
 import { updateAdminShopArea } from "@/services/shopAreas";
+import { deleteSiteDesignImage, siteDesignImageUrl, uploadAreaDesignImage } from "@/services/siteDesign";
 import type { Tables } from "@/types/database";
 
 const VIEWPORTS = [
@@ -35,9 +36,20 @@ const VIEWPORTS = [
 const SECTIONS = [
   { id: "identity", title: "Identität" },
   { id: "colors", title: "Farben" },
+  { id: "background", title: "Hintergrund" },
+  { id: "hero", title: "Hero" },
+  { id: "header", title: "Header" },
+  { id: "categories", title: "Kategorien" },
+  { id: "products", title: "Produkte" },
+  { id: "price", title: "Preise" },
+  { id: "buttons", title: "Buttons" },
+  { id: "cards", title: "Karten" },
+  { id: "banner", title: "Banner" },
+  { id: "typography", title: "Typografie" },
   { id: "layout", title: "Layout" },
+  { id: "mobile", title: "Mobile" },
+  { id: "assets", title: "Assets" },
   { id: "search", title: "Suche & Leerstand" },
-  { id: "price", title: "Preis" },
 ] as const;
 
 export function AreaDesignPanel({
@@ -128,6 +140,8 @@ function AreaDesignForm({
           <div className="flex flex-wrap gap-2 pt-1 text-[11px]">
             <StatusChip ok={draft.enabled} on="Theme aktiv" off="PEPTIX Standard" />
             <StatusChip ok={tokenCount > 0} on={`${tokenCount} Farben`} off="Keine Farben" />
+            <StatusChip ok={draft.background.mode !== "global"} on="Background gesetzt" off="Background Standard" />
+            <StatusChip ok={draft.hero.enabled} on="Hero aktiv" off="Kein Hero" />
             <StatusChip ok={Boolean(draft.searchPlaceholder)} on="Suche gesetzt" off="Suche Standard" />
           </div>
         </CardHeader>
@@ -164,6 +178,25 @@ function AreaDesignForm({
                           ))}
                         </SelectContent>
                       </Select>
+                    </Field>
+                    <Field label="Hub Titel" hint="Optionaler Titel auf der Shop-Übersicht.">
+                      <Input
+                        value={draft.hub.title}
+                        onChange={(event) =>
+                          setDraft((current) => ({ ...current, hub: { ...current.hub, title: event.target.value } }))
+                        }
+                      />
+                    </Field>
+                    <Field label="Hub Beschreibung" className="sm:col-span-2">
+                      <Input
+                        value={draft.hub.description}
+                        onChange={(event) =>
+                          setDraft((current) => ({
+                            ...current,
+                            hub: { ...current.hub, description: event.target.value },
+                          }))
+                        }
+                      />
                     </Field>
                   </div>
                 ) : null}
@@ -238,6 +271,388 @@ function AreaDesignForm({
                       </div>
                     ) : null}
                   </div>
+                ) : null}
+                {section.id === "background" ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Field label="Hintergrund" hint="Overlay legt fest, wie stark das Bild abgedunkelt wird.">
+                      <Select
+                        value={draft.background.mode}
+                        onValueChange={(value) =>
+                          setDraft((current) => ({
+                            ...current,
+                            background: { ...current.background, mode: value as AreaThemeConfig["background"]["mode"] },
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="global">PEPTIX Standard</SelectItem>
+                          <SelectItem value="color">Eigene Farbe</SelectItem>
+                          <SelectItem value="gradient">Eigener Gradient</SelectItem>
+                          <SelectItem value="image">Eigenes Bild</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <ColorField
+                      label="Hintergrundfarbe"
+                      usage="Seitenhintergrund, wenn keine globale Vorlage gilt"
+                      value={draft.background.color || draft.tokens.background || ""}
+                      onChange={(value) =>
+                        setDraft((current) => ({ ...current, background: { ...current.background, color: value } }))
+                      }
+                    />
+                    <Field label="Gradient CSS" className="sm:col-span-2">
+                      <Input
+                        value={draft.background.gradient}
+                        onChange={(event) =>
+                          setDraft((current) => ({
+                            ...current,
+                            background: { ...current.background, gradient: event.target.value },
+                          }))
+                        }
+                        placeholder="linear-gradient(180deg, #070b14, #101826)"
+                      />
+                    </Field>
+                    <ImageField
+                      label="Desktop Bild"
+                      areaKey={area.key}
+                      kind="background"
+                      value={draft.background.desktopImage}
+                      onChange={(value) =>
+                        setDraft((current) => ({
+                          ...current,
+                          background: { ...current.background, desktopImage: value },
+                        }))
+                      }
+                    />
+                    <ImageField
+                      label="Tablet Bild"
+                      areaKey={area.key}
+                      kind="background-tablet"
+                      value={draft.background.tabletImage}
+                      onChange={(value) =>
+                        setDraft((current) => ({
+                          ...current,
+                          background: { ...current.background, tabletImage: value },
+                        }))
+                      }
+                    />
+                    <ImageField
+                      label="Mobile Bild"
+                      areaKey={area.key}
+                      kind="background-mobile"
+                      value={draft.background.mobileImage}
+                      onChange={(value) =>
+                        setDraft((current) => ({
+                          ...current,
+                          background: { ...current.background, mobileImage: value },
+                        }))
+                      }
+                    />
+                    <Field label="Overlay Stärke">
+                      <Input
+                        type="number"
+                        min={0}
+                        max={90}
+                        value={draft.background.overlayStrength}
+                        onChange={(event) =>
+                          setDraft((current) => ({
+                            ...current,
+                            background: { ...current.background, overlayStrength: Number(event.target.value) },
+                          }))
+                        }
+                      />
+                    </Field>
+                  </div>
+                ) : null}
+                {section.id === "hero" ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="flex items-center justify-between gap-3 sm:col-span-2">
+                      <Label>Hero aktiv</Label>
+                      <Switch
+                        checked={draft.hero.enabled}
+                        onCheckedChange={(value) =>
+                          setDraft((current) => ({ ...current, hero: { ...current.hero, enabled: value } }))
+                        }
+                      />
+                    </div>
+                    <Field label="Titel">
+                      <Input
+                        value={draft.hero.title}
+                        onChange={(event) =>
+                          setDraft((current) => ({ ...current, hero: { ...current.hero, title: event.target.value } }))
+                        }
+                      />
+                    </Field>
+                    <Field label="Untertitel">
+                      <Input
+                        value={draft.hero.subtitle}
+                        onChange={(event) =>
+                          setDraft((current) => ({ ...current, hero: { ...current.hero, subtitle: event.target.value } }))
+                        }
+                      />
+                    </Field>
+                    <Field label="Beschreibung" className="sm:col-span-2">
+                      <Input
+                        value={draft.hero.description}
+                        onChange={(event) =>
+                          setDraft((current) => ({ ...current, hero: { ...current.hero, description: event.target.value } }))
+                        }
+                      />
+                    </Field>
+                    <Field label="Button Text">
+                      <Input
+                        value={draft.hero.buttonText}
+                        onChange={(event) =>
+                          setDraft((current) => ({ ...current, hero: { ...current.hero, buttonText: event.target.value } }))
+                        }
+                      />
+                    </Field>
+                    <Field label="Button Ziel">
+                      <Input
+                        value={draft.hero.buttonHref}
+                        onChange={(event) =>
+                          setDraft((current) => ({ ...current, hero: { ...current.hero, buttonHref: event.target.value } }))
+                        }
+                        placeholder="/shop"
+                      />
+                    </Field>
+                    <Field label="Variante">
+                      <Select
+                        value={draft.hero.variant}
+                        onValueChange={(value) =>
+                          setDraft((current) => ({
+                            ...current,
+                            hero: { ...current.hero, variant: value as AreaThemeConfig["hero"]["variant"] },
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="minimal">Minimal</SelectItem>
+                          <SelectItem value="centered">Centered</SelectItem>
+                          <SelectItem value="left">Left</SelectItem>
+                          <SelectItem value="right">Right</SelectItem>
+                          <SelectItem value="split">Split</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <ImageField
+                      label="Desktop Hero"
+                      areaKey={area.key}
+                      kind="hero"
+                      value={draft.hero.desktopImage}
+                      onChange={(value) =>
+                        setDraft((current) => ({ ...current, hero: { ...current.hero, desktopImage: value } }))
+                      }
+                    />
+                    <ImageField
+                      label="Mobile Hero"
+                      areaKey={area.key}
+                      kind="hero-mobile"
+                      value={draft.hero.mobileImage}
+                      onChange={(value) =>
+                        setDraft((current) => ({ ...current, hero: { ...current.hero, mobileImage: value } }))
+                      }
+                    />
+                  </div>
+                ) : null}
+                {section.id === "header" ? (
+                  <p className="text-xs text-muted-foreground">
+                    Titel, Untertitel und Badge kommen aus der Identität. Die globale Navigation bleibt unverändert.
+                  </p>
+                ) : null}
+                {section.id === "categories" ? (
+                  <Field label="Darstellung" hint="Nur Optik. Die Kategorie-Logik bleibt unverändert.">
+                    <Select
+                      value={draft.categories.display}
+                      onValueChange={(value) =>
+                        setDraft((current) => ({
+                          ...current,
+                          categories: { display: value as AreaThemeConfig["categories"]["display"] },
+                        }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pills">Pills</SelectItem>
+                        <SelectItem value="tabs">Tabs</SelectItem>
+                        <SelectItem value="cards">Cards</SelectItem>
+                        <SelectItem value="buttons">Buttons</SelectItem>
+                        <SelectItem value="minimal">Minimal</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                ) : null}
+                {section.id === "products" ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Field label="Produkt Layout">
+                      <Select
+                        value={draft.products.layout}
+                        onValueChange={(value) =>
+                          setDraft((current) => ({
+                            ...current,
+                            products: { ...current.products, layout: value as AreaThemeConfig["products"]["layout"] },
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="hybrid">Hybrid</SelectItem>
+                          <SelectItem value="table">Tabelle</SelectItem>
+                          <SelectItem value="cards">Karten</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Field label="Kartenradius">
+                      <Select
+                        value={draft.products.radius}
+                        onValueChange={(value) =>
+                          setDraft((current) => ({
+                            ...current,
+                            products: { ...current.products, radius: value as AreaThemeConfig["products"]["radius"] },
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="sm">Klein</SelectItem>
+                          <SelectItem value="md">Mittel</SelectItem>
+                          <SelectItem value="lg">Groß</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  </div>
+                ) : null}
+                {section.id === "buttons" ? (
+                  <Field label="Button Radius">
+                    <Select
+                      value={draft.buttons.radius}
+                      onValueChange={(value) =>
+                        setDraft((current) => ({
+                          ...current,
+                          buttons: { radius: value as AreaThemeConfig["buttons"]["radius"] },
+                        }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sm">Klein</SelectItem>
+                        <SelectItem value="md">Mittel</SelectItem>
+                        <SelectItem value="lg">Groß</SelectItem>
+                        <SelectItem value="full">Rund</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                ) : null}
+                {section.id === "cards" ? (
+                  <div className="flex items-center justify-between gap-3">
+                    <Label>Schatten</Label>
+                    <Switch
+                      checked={draft.cards.shadow}
+                      onCheckedChange={(value) =>
+                        setDraft((current) => ({ ...current, cards: { ...current.cards, shadow: value } }))
+                      }
+                    />
+                  </div>
+                ) : null}
+                {section.id === "banner" ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="flex items-center justify-between gap-3 sm:col-span-2">
+                      <Label>Banner aktiv</Label>
+                      <Switch
+                        checked={draft.banner.enabled}
+                        onCheckedChange={(value) =>
+                          setDraft((current) => ({ ...current, banner: { ...current.banner, enabled: value } }))
+                        }
+                      />
+                    </div>
+                    <Field label="Titel">
+                      <Input
+                        value={draft.banner.title}
+                        onChange={(event) =>
+                          setDraft((current) => ({ ...current, banner: { ...current.banner, title: event.target.value } }))
+                        }
+                      />
+                    </Field>
+                    <Field label="Beschreibung">
+                      <Input
+                        value={draft.banner.description}
+                        onChange={(event) =>
+                          setDraft((current) => ({
+                            ...current,
+                            banner: { ...current.banner, description: event.target.value },
+                          }))
+                        }
+                      />
+                    </Field>
+                  </div>
+                ) : null}
+                {section.id === "typography" ? (
+                  <Field label="Schriftgröße">
+                    <Select
+                      value={draft.typography.scale}
+                      onValueChange={(value) =>
+                        setDraft((current) => ({
+                          ...current,
+                          typography: { scale: value as AreaThemeConfig["typography"]["scale"] },
+                        }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sm">Klein</SelectItem>
+                        <SelectItem value="md">Standard</SelectItem>
+                        <SelectItem value="lg">Groß</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                ) : null}
+                {section.id === "mobile" ? (
+                  <Field label="Mobile Hero Höhe">
+                    <Select
+                      value={draft.mobile.heroHeight}
+                      onValueChange={(value) =>
+                        setDraft((current) => ({
+                          ...current,
+                          mobile: { heroHeight: value as AreaThemeConfig["mobile"]["heroHeight"] },
+                        }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="compact">Kompakt</SelectItem>
+                        <SelectItem value="standard">Standard</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                ) : null}
+                {section.id === "assets" ? (
+                  <ImageField
+                    label="Hub Bild"
+                    areaKey={area.key}
+                    kind="hub"
+                    value={draft.hub.image}
+                    onChange={(value) =>
+                      setDraft((current) => ({ ...current, hub: { ...current.hub, image: value } }))
+                    }
+                  />
                 ) : null}
                 {section.id === "layout" ? (
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -377,9 +792,9 @@ function AreaDesignForm({
             >
               <div className="border-b border-border px-4 py-3">
                 <p className="text-sm font-semibold" style={{ color: draft.tokens.heading || undefined }}>
-                  {area.name}
+                  {draft.hero.title || area.name}
                 </p>
-                <p className="text-xs text-muted-foreground">{subtitle || "Bereichsvorschau"}</p>
+                <p className="text-xs text-muted-foreground">{draft.hero.subtitle || subtitle || "Bereichsvorschau"}</p>
                 {badge ? (
                   <span className="mt-1 inline-flex rounded-full bg-primary/15 px-2 py-0.5 text-[10px] text-primary">
                     {badge}
@@ -387,6 +802,16 @@ function AreaDesignForm({
                 ) : null}
               </div>
               <div className="space-y-3 p-4">
+                {draft.hero.enabled ? (
+                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-xs">
+                    Hero: {draft.hero.variant} · {draft.hero.buttonText || "ohne Button"}
+                  </div>
+                ) : null}
+                {draft.banner.enabled ? (
+                  <div className="rounded-lg border border-border px-3 py-2 text-xs">
+                    {draft.banner.title || "Banner"}
+                  </div>
+                ) : null}
                 <Input readOnly value={draft.searchPlaceholder || "Artikel suchen …"} />
                 {[
                   { name: "Semaglutide", variant: "5 mg", usd: 11.88 },
@@ -410,6 +835,18 @@ function AreaDesignForm({
                     </div>
                   </div>
                 ))}
+                <div className="rounded-lg border border-border p-3" style={{ background: draft.tokens.surface || undefined }}>
+                  <p className="text-sm font-medium">KPV · 30 mg</p>
+                  <p className="text-xs text-muted-foreground">5 von 10 belegt · Noch 5 frei</p>
+                  <div className="my-2 h-2 overflow-hidden rounded-full bg-secondary">
+                    <div className="h-full w-1/2 bg-primary" />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Dein Anteil</p>
+                  <DualCurrencyPrice usd={45.85} rate={0.862} size="compact" />
+                  <Button type="button" size="sm" className="mt-2">
+                    Mitmachen
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground">
                   {draft.emptyTitle || "Dieser Bereich wird gerade vorbereitet."}
                 </p>
@@ -471,7 +908,71 @@ function ColorField({
       </div>
       <p className="text-[11px] text-muted-foreground">Verwendet für: {usage}</p>
       {hint ? <p className="text-[11px] text-muted-foreground">{hint}</p> : null}
+      <p className="text-[10px] text-muted-foreground">Hex optional · RGB/HSL nur Anzeige</p>
     </div>
+  );
+}
+
+function ImageField({
+  label,
+  areaKey,
+  kind,
+  value,
+  onChange,
+}: {
+  label: string;
+  areaKey: string;
+  kind: Parameters<typeof uploadAreaDesignImage>[1];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const [busy, setBusy] = React.useState(false);
+  const preview = value
+    ? value.startsWith("http") || value.startsWith("data:") || value.startsWith("/")
+      ? value
+      : siteDesignImageUrl(value)
+    : null;
+
+  async function onFile(file: File | undefined) {
+    if (!file) return;
+    setBusy(true);
+    try {
+      const previous = value;
+      const path = await uploadAreaDesignImage(areaKey, kind, file);
+      onChange(path);
+      if (previous && previous !== path && !previous.startsWith("http")) {
+        await deleteSiteDesignImage(previous);
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Bild konnte nicht hochgeladen werden.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Field label={label} hint="JPG, PNG oder WEBP. Nur Darstellung.">
+      {preview ? <img src={preview} alt="" className="mb-2 h-16 w-full rounded-md object-cover" /> : null}
+      <Input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        disabled={busy}
+        onChange={(event) => void onFile(event.target.files?.[0])}
+      />
+      {value ? (
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={() => {
+            if (value && !value.startsWith("http")) void deleteSiteDesignImage(value);
+            onChange("");
+          }}
+        >
+          Bild entfernen
+        </Button>
+      ) : null}
+    </Field>
   );
 }
 

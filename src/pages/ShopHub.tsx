@@ -7,7 +7,9 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
 import { AreaGlyph } from "@/lib/shop/areaIcons";
+import { parseAreaTheme } from "@/lib/shop/areaTheme";
 import { isGroupBuyPricing, type MyShopArea } from "@/lib/shop/shopAreas";
+import { siteDesignImageUrl } from "@/services/siteDesign";
 
 export default function ShopHubPage() {
   const areasQuery = useMyShopAreas();
@@ -41,32 +43,44 @@ export default function ShopHubPage() {
 }
 
 function ShopAreaCard({ area }: { area: MyShopArea }) {
+  const theme = parseAreaTheme(area.theme);
   const subtitle =
+    theme.hub.description ||
     area.subtitle ||
     (isGroupBuyPricing(area.pricing_profile)
       ? "Gemeinsamer Einkauf · Kits · Anteile"
       : "Einzelverkauf · Vials · Packungen");
+  const hubImage = theme.hub.image
+    ? theme.hub.image.startsWith("http") || theme.hub.image.startsWith("/")
+      ? theme.hub.image
+      : siteDesignImageUrl(theme.hub.image)
+    : null;
 
   return (
     <Link
       to={area.path}
-      className="group flex flex-col gap-3 rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/60 hover:bg-card/80"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-colors hover:border-primary/60 hover:bg-card/80"
     >
-      <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <AreaGlyph iconKey={area.icon_key} className="h-5 w-5" />
-        </span>
-        <p className="text-base font-semibold">{area.name}</p>
+      {hubImage ? <img src={hubImage} alt="" className="h-28 w-full object-cover" /> : null}
+      <div className="flex flex-col gap-3 p-6">
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <AreaGlyph iconKey={area.icon_key} className="h-5 w-5" />
+          </span>
+          <p className="text-base font-semibold">{theme.hub.title || area.name}</p>
+        </div>
+        <p className="text-sm text-muted-foreground">{subtitle}</p>
+        {area.badge_text ? (
+          <Badge variant="secondary" className="w-fit">
+            {area.badge_text}
+          </Badge>
+        ) : null}
+        {area.status === "coming_soon" ? (
+          <p className="text-xs font-medium text-primary">Bald verfügbar</p>
+        ) : (
+          <p className="text-xs font-medium text-primary">Entdecken</p>
+        )}
       </div>
-      <p className="text-sm text-muted-foreground">{subtitle}</p>
-      {area.badge_text ? (
-        <Badge variant="secondary" className="w-fit">
-          {area.badge_text}
-        </Badge>
-      ) : null}
-      {area.status === "coming_soon" ? (
-        <p className="text-xs font-medium text-primary">Bald verfügbar</p>
-      ) : null}
     </Link>
   );
 }

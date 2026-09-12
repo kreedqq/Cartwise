@@ -79,4 +79,14 @@ describe("customer dual-currency surfaces", () => {
     expect(read("src/pages/Checkout.tsx")).toContain("usd={item.unit_price_usd_snapshot}");
     expect(read("src/pages/admin/AdminShopAreas.tsx")).not.toContain("DualCurrencyPrice");
   });
+
+  it("uses DualCurrencyPrice for customer kit prices", () => {
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("DualCurrencyPrice");
+    expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("DualCurrencyPrice");
+    expect(read("src/components/shop/KitShareDialog.tsx")).toContain("DualCurrencyPrice");
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).not.toContain("formatUsd");
+    expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).not.toContain("formatUsd");
+    expect(read("src/components/shop/KitShareDialog.tsx")).not.toContain("formatUsd(");
+    expect(read("src/pages/Checkout.tsx")).not.toContain("formatUsd(eligibleTotals");
+  });
 });

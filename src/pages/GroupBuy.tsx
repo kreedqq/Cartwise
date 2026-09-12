@@ -4,6 +4,7 @@ import { ArrowLeft, Layers, PackageSearch, Plus, Search } from "lucide-react";
 
 import { ShopProductsTable } from "@/components/shop/ShopProductsTable";
 import { ShopProductsMobileList } from "@/components/shop/ShopProductsMobileList";
+import { AreaStorefrontChrome } from "@/components/shop/AreaStorefrontChrome";
 import { ShopCategoryHub } from "@/components/shop/ShopCategoryHub";
 import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitRequestDialog";
 import { JoinKitRequestDialog } from "@/components/kit-requests/JoinKitRequestDialog";
@@ -145,24 +146,25 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
 
   return (
     <div className={areaDensityClass(theme)} data-shop-area={shopArea}>
+      <AreaStorefrontChrome theme={theme} areaName={areaName}>
       <PageHeader
         eyebrow={areaName}
         title={areaName}
-        description="Group-Buy-Katalog, Kits und gemeinsamer Einkauf."
+        description="Gemeinsam bestellen: Katalog oder Kit mit anderen Kunden teilen."
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant={activeSection === "catalog" ? "default" : "outline"}
               onClick={() => setActiveSection("catalog")}
             >
-              Produktkatalog
+              Produkte
             </Button>
             <Button
               variant={activeSection === "kits" ? "default" : "outline"}
               onClick={() => setActiveSection("kits")}
             >
               <Layers className="mr-1.5 h-4 w-4" />
-              Kit Gesuche
+              Kit Gesuche ansehen
             </Button>
           </div>
         }
@@ -194,13 +196,22 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
       )}
 
       {activeSection === "kits" && (
-        <KitRequestsSection
-          shopArea={shopArea}
-          areaName={areaName}
-          categories={visible}
-          assignments={assignments}
-        />
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+            <h2 className="text-lg font-semibold">Kit gemeinsam kaufen</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Ein Kit enthält mehrere Vials. Wenn du nicht alle brauchst, kannst du dir das Kit mit anderen Kunden teilen.
+            </p>
+          </div>
+          <KitRequestsSection
+            shopArea={shopArea}
+            areaName={areaName}
+            categories={visible}
+            assignments={assignments}
+          />
+        </div>
       )}
+      </AreaStorefrontChrome>
     </div>
   );
 }
@@ -461,22 +472,22 @@ function KitRequestsSection({
   return (
     <div className="min-w-0 space-y-8">
       <div className="flex justify-end">
-        <Button className="w-full sm:w-auto" onClick={() => setCreateOpen(true)}>
+        <Button className="min-h-11 w-full sm:w-auto" onClick={() => setCreateOpen(true)}>
           <Plus className="h-4 w-4" />
-          Gesuch erstellen
+          Kit teilen
         </Button>
       </div>
 
       <Tabs value={tab} onValueChange={setTab} className="min-w-0">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
           <TabsTrigger value="open" className="flex-1 sm:flex-none">
-            Offene Gesuche
+            Offene Kit Gesuche
           </TabsTrigger>
           <TabsTrigger value="mine" className="flex-1 sm:flex-none">
-            Meine Gesuche
+            Von mir erstellt
           </TabsTrigger>
           <TabsTrigger value="joined" className="flex-1 sm:flex-none">
-            Meine Teilnahmen
+            Meine Kit Beteiligungen
           </TabsTrigger>
         </TabsList>
 
@@ -687,7 +698,7 @@ function KitRequestsSection({
             <ErrorState message="Deine Gesuche konnten nicht geladen werden." onRetry={() => void mineQuery.refetch()} />
           ) : null}
           {mineQuery.data && myRequests.length === 0 ? (
-            <EmptyState icon={Layers} title="Noch keine eigenen Gesuche" description="Erstelle ein Kit-Gesuch, um Teilnehmer zu finden." />
+            <EmptyState icon={Layers} title="Noch kein eigenes Kit" description="Teile ein Kit, um andere Kunden einzuladen." />
           ) : null}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {myRequests.map((item) => (
@@ -711,7 +722,7 @@ function KitRequestsSection({
             />
           ) : null}
           {joinedQuery.data && myParticipations.length === 0 ? (
-            <EmptyState icon={Layers} title="Keine Teilnahmen" description="Tritt einem offenen Gesuch bei, um hier zu erscheinen." />
+            <EmptyState icon={Layers} title="Keine Kit Beteiligungen" description="Mach bei einem offenen Kit mit, um hier zu erscheinen." />
           ) : null}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {myParticipations.map((item) => (
@@ -732,9 +743,9 @@ function KitRequestsSection({
       <ConfirmDialog
         open={leaveTarget != null}
         onOpenChange={(next) => !next && setLeaveTarget(null)}
-        title="Teilnahme stornieren"
-        description="Deine reservierten Vials werden wieder freigegeben. Das Gesuch bleibt offen."
-        confirmLabel="Stornieren"
+        title="Möchtest du dieses Kit wirklich verlassen?"
+        description="Dein Anteil wird wieder freigegeben. Andere Kunden können ihn übernehmen."
+        confirmLabel="Verlassen"
         variant="destructive"
         loading={leaveMutation.isPending}
         onConfirm={async () => {
@@ -752,9 +763,9 @@ function KitRequestsSection({
       <ConfirmDialog
         open={cancelTarget != null}
         onOpenChange={(next) => !next && setCancelTarget(null)}
-        title="Gesuch stornieren"
-        description="Das offene Gesuch wird geschlossen. Bereits reservierte Anteile anderer Teilnehmer werden freigegeben. Es werden keine Warenkörbe erzeugt."
-        confirmLabel="Gesuch stornieren"
+        title="Kit stornieren"
+        description="Das offene Kit wird geschlossen. Anteile anderer Teilnehmer werden freigegeben. Es werden keine Warenkörbe erzeugt."
+        confirmLabel="Kit stornieren"
         variant="destructive"
         loading={cancelMutation.isPending}
         onConfirm={async () => {

@@ -36,6 +36,7 @@ import { useMyShopAreas } from "@/hooks/useMyShopAreas";
 import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { ShopAreaProvider } from "@/context/ShopAreaContext";
+import { parseAreaTheme } from "@/lib/shop/areaTheme";
 import {
   isGroupBuyPricing,
   type ShopAreaKey,
@@ -73,7 +74,7 @@ export default function KitRequestsPage() {
   if (!current) return <Navigate to="/403" replace />;
 
   return (
-    <ShopAreaProvider shopArea={current.key} pricingProfile="group_buy">
+    <ShopAreaProvider shopArea={current.key} pricingProfile="group_buy" theme={parseAreaTheme(current.theme)}>
       <KitRequestsContent shopArea={current.key} areaName={current.name} />
     </ShopAreaProvider>
   );
@@ -159,11 +160,11 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
       <PageHeader
         eyebrow={areaName}
         title={areaName}
-        description="Bestehende Group-Buy-Struktur: Kits, Anteile, Teilnehmer, Join und Leave. Kein Einzelverkauf."
+        description="Finde andere Kunden, die dasselbe Kit bestellen möchten."
         actions={
-          <Button className="w-full sm:w-auto" onClick={() => setCreateOpen(true)}>
+          <Button className="min-h-11 w-full sm:w-auto" onClick={() => setCreateOpen(true)}>
             <Plus className="h-4 w-4" />
-            Gesuch erstellen
+            Kit teilen
           </Button>
         }
       />
@@ -171,13 +172,13 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
       <Tabs value={tab} onValueChange={setTab} className="min-w-0">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
           <TabsTrigger value="open" className="flex-1 sm:flex-none">
-            Offene Gesuche
+            Offene Kit Gesuche
           </TabsTrigger>
           <TabsTrigger value="mine" className="flex-1 sm:flex-none">
-            Meine Gesuche
+            Von mir erstellt
           </TabsTrigger>
           <TabsTrigger value="joined" className="flex-1 sm:flex-none">
-            Meine Teilnahmen
+            Meine Kit Beteiligungen
           </TabsTrigger>
         </TabsList>
 
@@ -345,8 +346,8 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
           {openQuery.data && openQuery.data.items.length === 0 ? (
             <EmptyState
               icon={Layers}
-              title="Keine offenen Gesuche"
-              description="Erstelle ein Gesuch, wenn du ein Kit teilen möchtest, ohne bereits alle Teilnehmer zu kennen."
+              title="Keine offenen Kit Gesuche"
+              description="Teile ein Kit, wenn du nicht das ganze Kit allein brauchst."
             />
           ) : null}
 
@@ -440,9 +441,9 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
       <ConfirmDialog
         open={leaveTarget != null}
         onOpenChange={(next) => !next && setLeaveTarget(null)}
-        title="Teilnahme stornieren"
-        description="Deine reservierten Vials werden wieder freigegeben. Das Gesuch bleibt offen."
-        confirmLabel="Stornieren"
+        title="Möchtest du dieses Kit wirklich verlassen?"
+        description="Dein Anteil wird wieder freigegeben. Andere Kunden können ihn übernehmen."
+        confirmLabel="Verlassen"
         variant="destructive"
         loading={leaveMutation.isPending}
         onConfirm={async () => {
@@ -460,9 +461,9 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
       <ConfirmDialog
         open={cancelTarget != null}
         onOpenChange={(next) => !next && setCancelTarget(null)}
-        title="Gesuch stornieren"
-        description="Das offene Gesuch wird geschlossen. Bereits reservierte Anteile anderer Teilnehmer werden freigegeben. Es werden keine Warenkörbe erzeugt."
-        confirmLabel="Gesuch stornieren"
+        title="Kit stornieren"
+        description="Das offene Kit wird geschlossen. Anteile anderer Teilnehmer werden freigegeben. Es werden keine Warenkörbe erzeugt."
+        confirmLabel="Kit stornieren"
         variant="destructive"
         loading={cancelMutation.isPending}
         onConfirm={async () => {

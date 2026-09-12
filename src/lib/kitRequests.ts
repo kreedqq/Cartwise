@@ -5,11 +5,17 @@ export type KitRequestStatus = (typeof KIT_REQUEST_STATUSES)[number];
 
 export const KIT_REQUEST_STATUS_LABELS: Record<KitRequestStatus, string> = {
   open: "Offen",
-  full: "Vollständig",
+  full: "Voll",
   cancelled: "Storniert",
   expired: "Abgelaufen",
   ordered: "Bestellt",
 };
+
+/** Customer-facing status. "Fast voll" is presentation only — the server status stays open. */
+export function kitRequestCustomerStatusLabel(status: string, remainingVials = Number.POSITIVE_INFINITY): string {
+  if (status === "open" && remainingVials > 0 && remainingVials <= 2) return "Fast voll";
+  return kitRequestStatusLabel(status);
+}
 
 export const KIT_REQUEST_SORTS = ["newest", "fewest_remaining", "most_remaining"] as const;
 export type KitRequestSort = (typeof KIT_REQUEST_SORTS)[number];

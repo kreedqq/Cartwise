@@ -27,6 +27,10 @@ describe("sales area designer", () => {
     expect(panel).toContain("width: 768");
     expect(panel).toContain("width: 390");
     expect(panel).toContain("DualCurrencyPrice");
+    expect(panel).toContain("Hintergrund");
+    expect(panel).toContain("Hero aktiv");
+    expect(panel).toContain("uploadAreaDesignImage");
+    expect(panel).toContain("Mitmachen");
     expect(panel).not.toContain("from(\"carts\")");
   });
 
@@ -54,5 +58,7 @@ describe("sales area designer", () => {
     });
     expect(improved.tokens.buttonText).toBe("#1a1408");
     expect(parseAreaTheme({ enabled: true, tokens: { primary: "#d4af37" } }).tokens.primary).toBe("#d4af37");
+    expect(parseAreaTheme({}).background.mode).toBe("global");
+    expect(parseAreaTheme({ hero: { enabled: true, title: "Zubehör" } }).hero.title).toBe("Zubehör");
   });
 });

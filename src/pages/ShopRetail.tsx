@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ShopProductsTable } from "@/components/shop/ShopProductsTable";
 import { ShopProductsMobileList } from "@/components/shop/ShopProductsMobileList";
+import { AreaStorefrontChrome } from "@/components/shop/AreaStorefrontChrome";
 import { ShopCategoryHub } from "@/components/shop/ShopCategoryHub";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ShopAreaProvider } from "@/context/ShopAreaContext";
@@ -113,6 +114,7 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
         data-shop-area={area.key}
         style={areaThemeCssVars(theme)}
       >
+        <AreaStorefrontChrome theme={theme} areaName={area.name}>
         <PageHeader
           eyebrow={area.name}
           title="Katalog"
@@ -144,6 +146,7 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
         {productsQuery.data && storefrontQuery.data && visible.length > 0 && (
           <ShopCategoryHub categories={visible} counts={counts} onSelect={selectCategory} />
         )}
+        </AreaStorefrontChrome>
       </div>
     );
   }
@@ -152,6 +155,7 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
 
   return (
     <div className={areaDensityClass(theme)} data-shop-area={area.key} style={areaThemeCssVars(theme)}>
+      <AreaStorefrontChrome theme={theme} areaName={area.name}>
       <PageHeader
         eyebrow={area.name}
         title={selected.label}
@@ -235,6 +239,7 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
           </div>
         </>
       )}
+      </AreaStorefrontChrome>
     </div>
   );
 }

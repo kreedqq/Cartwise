@@ -4,6 +4,7 @@ import {
   assertKitRequestPricePrivacy,
   isValidCreatorQuantity,
   kitRequestProgressPercent,
+  kitRequestCustomerStatusLabel,
   kitRequestStatusLabel,
   remainingQuantityOptions,
 } from "@/lib/kitRequests";
@@ -11,7 +12,9 @@ import {
 describe("kit request helpers", () => {
   it("translates canonical statuses", () => {
     expect(kitRequestStatusLabel("open")).toBe("Offen");
-    expect(kitRequestStatusLabel("full")).toBe("Vollständig");
+    expect(kitRequestStatusLabel("full")).toBe("Voll");
+    expect(kitRequestCustomerStatusLabel("open", 2)).toBe("Fast voll");
+    expect(kitRequestCustomerStatusLabel("open", 5)).toBe("Offen");
     expect(kitRequestStatusLabel("cancelled")).toBe("Storniert");
     expect(kitRequestStatusLabel("expired")).toBe("Abgelaufen");
   });
