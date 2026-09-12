@@ -522,8 +522,22 @@ export interface Database {
       shop_areas: {
         Row: {
           key: string;
+          slug: string;
           name: string;
+          short_name: string | null;
+          subtitle: string | null;
+          description: string | null;
+          icon_key: string;
+          badge_text: string | null;
+          badge_color: string | null;
           is_active: boolean;
+          status: string;
+          hub_visible: boolean;
+          is_system: boolean;
+          starts_at: string | null;
+          ends_at: string | null;
+          theme: Record<string, unknown>;
+          options: Record<string, unknown>;
           pricing_profile: string;
           retail_price_factor: number;
           kit_unit_divisor: number;
@@ -1625,12 +1639,50 @@ export interface Database {
         Args: Record<string, never>;
         Returns: {
           key: string;
+          slug: string;
           name: string;
+          short_name: string;
+          subtitle: string | null;
+          description: string | null;
+          icon_key: string;
+          badge_text: string | null;
+          badge_color: string | null;
+          status: string;
           pricing_profile: string;
           sort_order: number;
           path: string;
           base_price_factor_pct: number;
+          theme: Record<string, unknown>;
+          options: Record<string, unknown>;
+          purchasable: boolean;
         }[];
+      };
+      admin_create_shop_area: {
+        Args: {
+          _name: string;
+          _template?: string;
+          _source_key?: string | null;
+          _copy_categories?: boolean;
+          _copy_roles?: boolean;
+          _copy_design?: boolean;
+        };
+        Returns: Database["public"]["Tables"]["shop_areas"]["Row"];
+      };
+      admin_set_shop_area_inactive: {
+        Args: { _area_key: string };
+        Returns: Database["public"]["Tables"]["shop_areas"]["Row"];
+      };
+      admin_delete_shop_area: {
+        Args: { _area_key: string };
+        Returns: undefined;
+      };
+      admin_preview_open_cart_price_refresh: {
+        Args: Record<string, never>;
+        Returns: { carts: number; items: number };
+      };
+      admin_refresh_open_cart_prices: {
+        Args: Record<string, never>;
+        Returns: { carts: number; items: number };
       };
       ensure_shop_area_cart: {
         Args: { _shop_area: string };

@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@/lib/constants";
-import { SHOP_AREA_KEYS } from "@/lib/shop/shopAreas";
 import { adminSetAppSetting, type AppSettingKey } from "@/services/appSettings";
 
 export function useSetAppSetting() {
@@ -11,9 +10,7 @@ export function useSetAppSetting() {
     onSuccess: (state) => {
       queryClient.setQueryData(QUERY_KEYS.appPublicState, state);
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.appPublicState });
-      for (const area of SHOP_AREA_KEYS) {
-        void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.shopProducts(area) });
-      }
+      void queryClient.invalidateQueries({ queryKey: ["shop-products"] });
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myShopAreas });
     },
   });

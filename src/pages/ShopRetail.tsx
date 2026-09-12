@@ -26,30 +26,39 @@ import {
   storefrontHeadline,
   visibleStorefrontCategories,
 } from "@/lib/shop/areaCategories";
-import { DEFAULT_SHOP_AREA } from "@/lib/shop/shopAreas";
+import { DEFAULT_SHOP_AREA, type MyShopArea } from "@/lib/shop/shopAreas";
+import { areaDensityClass, areaThemeCssVars, parseAreaTheme } from "@/lib/shop/areaTheme";
+import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { isShopCategoryId } from "@/lib/shopCategories";
 
-export default function ShopRetailPage() {
+export default function ShopRetailPage({ area }: { area?: MyShopArea }) {
   const areasQuery = useMyShopAreas();
-  const allowed = areasQuery.data?.some((area) => area.key === DEFAULT_SHOP_AREA) ?? false;
-  const currentArea = areasQuery.data?.find((area) => area.key === DEFAULT_SHOP_AREA);
+  const allowed = area
+    ? true
+    : (areasQuery.data?.some((item) => item.key === DEFAULT_SHOP_AREA) ?? false);
+  const currentArea = area ?? areasQuery.data?.find((item) => item.key === DEFAULT_SHOP_AREA);
 
-  if (areasQuery.isLoading) return <FullScreenSpinner label="Shop wird geladen …" />;
-  if (areasQuery.isError) {
+  if (!area && areasQuery.isLoading) return <FullScreenSpinner label="Shop wird geladen …" />;
+  if (!area && areasQuery.isError) {
     return <ErrorState message="Shop-Bereiche konnten nicht geladen werden." onRetry={() => areasQuery.refetch()} />;
   }
-  if (!allowed) return <Navigate to="/403" replace />;
+  if (!allowed || !currentArea) return <Navigate to="/403" replace />;
 
   return (
-    <ShopAreaProvider shopArea={DEFAULT_SHOP_AREA} pricingProfile="retail">
-      <ShopCatalog areaName={currentArea?.name ?? "Shop"} />
+    <ShopAreaProvider
+      shopArea={currentArea.key}
+      pricingProfile={currentArea.pricing_profile}
+      theme={parseAreaTheme(currentArea.theme)}
+    >
+      <ShopCatalog area={currentArea} />
     </ShopAreaProvider>
   );
 }
 
-function ShopCatalog({ areaName }: { areaName: string }) {
-  const productsQuery = useShopProducts(DEFAULT_SHOP_AREA);
-  const storefrontQuery = useShopAreaStorefront(DEFAULT_SHOP_AREA);
+function ShopCatalog({ area }: { area: MyShopArea }) {
+  const productsQuery = useShopProducts(area.key);
+  const storefrontQuery = useShopAreaStorefront(area.key);
+  const { theme } = useShopAreaContext();
   const favoritesQuery = useFavorites();
   const rateQuery = useExchangeRate();
   const [params, setParams] = useSearchParams();
@@ -99,9 +108,13 @@ function ShopCatalog({ areaName }: { areaName: string }) {
 
   if (!selected) {
     return (
-      <div className="space-y-10">
+      <div
+        className={areaDensityClass(theme)}
+        data-shop-area={area.key}
+        style={areaThemeCssVars(theme)}
+      >
         <PageHeader
-          eyebrow={areaName}
+          eyebrow={area.name}
           title="Katalog"
           description="Einzelverkauf. Peptide, Water und Oils als Vials, Orals als Packungen. Keine Kits, keine Mengenstaffeln."
         />
@@ -122,7 +135,11 @@ function ShopCatalog({ areaName }: { areaName: string }) {
           />
         )}
         {productsQuery.data && storefrontQuery.data && visible.length === 0 && (
-          <EmptyState icon={PackageSearch} title="Aktuell sind keine Produkte verfügbar." />
+          <EmptyState
+            icon={PackageSearch}
+            title={theme.emptyTitle || "Aktuell sind keine Produkte verfügbar."}
+            description={theme.emptyDescription || undefined}
+          />
         )}
         {productsQuery.data && storefrontQuery.data && visible.length > 0 && (
           <ShopCategoryHub categories={visible} counts={counts} onSelect={selectCategory} />
@@ -134,9 +151,9 @@ function ShopCatalog({ areaName }: { areaName: string }) {
   const tableCategoryId = isShopCategoryId(selected.category_key) ? selected.category_key : undefined;
 
   return (
-    <div className="space-y-8">
+    <div className={areaDensityClass(theme)} data-shop-area={area.key} style={areaThemeCssVars(theme)}>
       <PageHeader
-        eyebrow={areaName}
+        eyebrow={area.name}
         title={selected.label}
         description={`${filtered.length} Artikel · Einzelmenge wählen und in den Warenkorb legen.`}
         actions={
@@ -170,7 +187,7 @@ function ShopCatalog({ areaName }: { areaName: string }) {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Produktname suchen …"
+          placeholder={theme.searchPlaceholder || "Produktname suchen …"}
           className="pl-8"
         />
       </div>
@@ -204,7 +221,7 @@ function ShopCatalog({ areaName }: { areaName: string }) {
               favoriteProductIds={favoriteProductIds}
               categoryId={tableCategoryId}
               categoryLabel={selected.label}
-              pricingProfile="retail"
+              pricingProfile={area.pricing_profile}
             />
           </div>
           <div className="lg:hidden">
@@ -213,7 +230,7 @@ function ShopCatalog({ areaName }: { areaName: string }) {
               rate={rateQuery.data?.rate ?? null}
               favoriteProductIds={favoriteProductIds}
               categoryId={tableCategoryId}
-              pricingProfile="retail"
+              pricingProfile={area.pricing_profile}
             />
           </div>
         </>

@@ -5,15 +5,15 @@ type DualCurrencySize = "catalog" | "compact" | "summary";
 
 const SIZE_CLASSES: Record<DualCurrencySize, { eur: string; usd: string }> = {
   catalog: {
-    eur: "text-base font-semibold tabular-nums tracking-tight leading-tight",
+    eur: "text-base font-semibold tabular-nums tracking-tight leading-tight [color:var(--area-price,inherit)]",
     usd: "text-xs tabular-nums leading-tight text-muted-foreground",
   },
   compact: {
-    eur: "text-sm font-semibold tabular-nums tracking-tight leading-tight",
+    eur: "text-sm font-semibold tabular-nums tracking-tight leading-tight [color:var(--area-price,inherit)]",
     usd: "text-[11px] tabular-nums leading-tight text-muted-foreground",
   },
   summary: {
-    eur: "text-3xl font-semibold tabular-nums tracking-tight leading-tight text-primary",
+    eur: "text-3xl font-semibold tabular-nums tracking-tight leading-tight text-primary [color:var(--area-price,inherit)]",
     usd: "mt-1 text-sm tabular-nums leading-tight text-muted-foreground",
   },
 };

@@ -7,6 +7,7 @@ import { shopAreaCatalogUnit, shopAreaSellUnitPrice } from "@/lib/shop/shopAreaP
 import {
   DEFAULT_SHOP_AREA,
   formatShopAreaLabel,
+  isShopAreaKey,
   saleModeForShopArea,
   shopAreaFromPath,
   type MyShopArea,
@@ -31,6 +32,14 @@ describe("shop area domain", () => {
     expect(shopAreaFromPath("/shop/group-buy-2")).toBe("group_buy_2");
     expect(DEFAULT_SHOP_AREA).toBe("shop");
     expect(formatShopAreaLabel(null)).toBe("Nicht angegeben");
+  });
+
+  it("accepts new area slugs without a hardcoded allow-list", () => {
+    expect(shopAreaFromPath("/shop/zubehoer")).toBe("zubehoer");
+    expect(shopAreaFromPath("/shop/accessories")).toBe("accessories");
+    expect(isShopAreaKey("accessories")).toBe(true);
+    expect(isShopAreaKey("shop")).toBe(true);
+    expect(isShopAreaKey("SHOP")).toBe(false);
   });
 
   it("uses retail quantity nouns only for the shop area snapshot", () => {

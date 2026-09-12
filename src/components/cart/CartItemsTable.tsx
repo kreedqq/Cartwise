@@ -49,7 +49,7 @@ export function CartItemsTable({ items, cartId, currentRate, nextPosition, readO
           <TableHead className="w-36">Artikelcode</TableHead>
           <TableHead className="min-w-[180px]">Artikelname</TableHead>
           <TableHead className="w-24 text-right">Menge</TableHead>
-          <TableHead className="w-28 text-right">Einzelpreis USD</TableHead>
+          <TableHead className="w-28 text-right">Einzelpreis</TableHead>
           <TableHead className="w-28 text-right">Gesamt</TableHead>
           <TableHead className="w-24 text-right">Kurs</TableHead>
           <TableHead className="w-36">Preisstand</TableHead>
@@ -147,8 +147,13 @@ function CartItemRowDesktop({
         <SaveStatusIndicator status={row.quantityStatus} className="mt-1 justify-end" />
         <p className="mt-1 text-[11px] text-muted-foreground">{cartItemQuantityLabel({ ...item, shop_area: shopArea })}</p>
       </TableCell>
-      <TableCell className="text-right tabular-nums text-sm">
-        {formatUsd(item.unit_price_usd_snapshot)}
+      <TableCell className="text-right">
+        <DualCurrencyPrice
+          usd={item.unit_price_usd_snapshot}
+          rate={item.exchange_rate_snapshot}
+          size="compact"
+          align="right"
+        />
         {/* Makes the two-tier price rule self-explanatory: why 55 and not 60. */}
         {item.applied_price_tier === "bulk" && (
           <span

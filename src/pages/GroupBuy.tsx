@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, Layers, PackageSearch, Plus, Search } from "lucide-react";
 
 import { ShopProductsTable } from "@/components/shop/ShopProductsTable";
@@ -40,12 +40,13 @@ import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
-import { ShopAreaProvider } from "@/context/ShopAreaContext";
+import { ShopAreaProvider, useShopAreaContext } from "@/context/ShopAreaContext";
 import {
-  isGroupBuyAreaKey,
-  SHOP_AREA_LABELS,
+  isGroupBuyPricing,
+  type MyShopArea,
   type ShopAreaKey,
 } from "@/lib/shop/shopAreas";
+import { areaDensityClass, parseAreaTheme } from "@/lib/shop/areaTheme";
 import { kitRequestStatusLabel, type KitRequestSort } from "@/lib/kitRequests";
 import { shopGroupsForCategory, productMatchesShopSearch } from "@/lib/shop/display";
 import { formatProductVariant } from "@/lib/shop/variantCoverage";
@@ -64,30 +65,35 @@ import type { Tables } from "@/types/database";
 
 const PAGE_SIZE = 20;
 
-export default function GroupBuyPage() {
-  const location = useLocation();
+export default function GroupBuyPage({ area }: { area?: MyShopArea }) {
+  const { slug } = useParams<{ slug: string }>();
   const areasQuery = useMyShopAreas();
 
-  if (areasQuery.isLoading) return <FullScreenSpinner label="Group Buy wird geladen …" />;
-  if (areasQuery.isError) {
+  if (!area && areasQuery.isLoading) return <FullScreenSpinner label="Group Buy wird geladen …" />;
+  if (!area && areasQuery.isError) {
     return <ErrorState message="Shop-Bereiche konnten nicht geladen werden." onRetry={() => areasQuery.refetch()} />;
   }
 
-  const groupBuyAreas = (areasQuery.data ?? []).filter((area) => isGroupBuyAreaKey(area.key));
-  if (groupBuyAreas.length === 0) return <Navigate to="/403" replace />;
-
-  const requested = location.pathname.startsWith("/shop/group-buy-2") ? "group_buy_2" : "group_buy_1";
-  const current = groupBuyAreas.find((area) => area.key === requested);
-  if (!current || !isGroupBuyAreaKey(current.key)) return <Navigate to="/403" replace />;
+  const current =
+    area ??
+    (areasQuery.data ?? []).find(
+      (item) => item.slug === slug && isGroupBuyPricing(item.pricing_profile),
+    );
+  if (!current || !isGroupBuyPricing(current.pricing_profile)) return <Navigate to="/403" replace />;
 
   return (
-    <ShopAreaProvider shopArea={current.key} pricingProfile="group_buy">
+    <ShopAreaProvider
+      shopArea={current.key}
+      pricingProfile="group_buy"
+      theme={parseAreaTheme(current.theme)}
+    >
       <GroupBuyContent shopArea={current.key} areaName={current.name} />
     </ShopAreaProvider>
   );
 }
 
 function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaName: string }) {
+  const { theme } = useShopAreaContext();
   const productsQuery = useShopProducts(shopArea);
   const storefrontQuery = useShopAreaStorefront(shopArea);
   const favoritesQuery = useFavorites();
@@ -138,9 +144,9 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
   }
 
   return (
-    <div className="space-y-8">
+    <div className={areaDensityClass(theme)} data-shop-area={shopArea}>
       <PageHeader
-        eyebrow={SHOP_AREA_LABELS[shopArea] ?? areaName}
+        eyebrow={areaName}
         title={areaName}
         description="Group-Buy-Katalog, Kits und gemeinsamer Einkauf."
         actions={
@@ -242,6 +248,7 @@ function GroupBuyCatalog({
   onSearch,
   onClearCategory,
 }: GroupBuyCatalogProps) {
+  const { theme } = useShopAreaContext();
   if (!selectedCategory) {
     return (
       <div className="space-y-10">
@@ -317,7 +324,7 @@ function GroupBuyCatalog({
         <Input
           value={search}
           onChange={(e) => onSearch(e.target.value)}
-          placeholder="Produktname suchen …"
+          placeholder={theme.searchPlaceholder || "Produktname suchen …"}
           className="pl-8"
         />
       </div>

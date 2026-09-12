@@ -27,7 +27,7 @@ describe("retail shop UI", () => {
 
   it("does not render kit or ab-10 copy on the retail shop page", () => {
     const shop = read("src/pages/ShopRetail.tsx");
-    expect(shop).toContain('pricingProfile="retail"');
+    expect(shop).toContain("pricingProfile={area.pricing_profile}");
     expect(shop).not.toMatch(/Preis ab 10 Vials/);
     expect(shop).not.toMatch(/Preis \/ 10 Vials/);
     expect(shop).not.toMatch(/5\/10 Kit/);
@@ -74,14 +74,14 @@ describe("ShopHub routing", () => {
   it("ShopHubPage redirects when only one area is accessible", () => {
     const hub = read("src/pages/ShopHub.tsx");
     expect(hub).toContain("areas.length === 1");
-    expect(hub).toContain('to={SHOP_AREA_PATHS[areas[0].key]}');
+    expect(hub).toContain("areas[0].path");
     expect(hub).toContain("Navigate");
   });
 
   it("ShopHubPage shows area cards when multiple areas are accessible", () => {
     const hub = read("src/pages/ShopHub.tsx");
     expect(hub).toContain("ShopAreaCard");
-    expect(hub).toContain("SHOP_AREA_PATHS");
+    expect(hub).toContain("area.path");
   });
 });
 
@@ -99,10 +99,11 @@ describe("admin Verkaufsbereiche", () => {
     expect(page).toContain("row.vendor_dosage ?? product?.dosage_vial");
     expect(page).not.toContain("variant: product?.dosage_vial ?? row.vendor_dosage");
     expect(page).toContain("Aktuelle Händlerdatei (angewendet)");
+    expect(page).toContain('value="allgemein"');
     expect(page).toContain('value="haendlerkatalog"');
     expect(page).toContain('value="produkte"');
     expect(page).toContain('value="preise"');
-    expect(page).not.toContain('value="allgemein"');
+    expect(page).toContain('value="design"');
     expect(page).not.toContain('value="dokument"');
     expect(page).not.toContain('value="rollenpreise"');
     expect(page).not.toContain("upsertAdminShopAreaRoleMarkup");

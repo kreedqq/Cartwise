@@ -37,9 +37,7 @@ import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { ShopAreaProvider } from "@/context/ShopAreaContext";
 import {
-  isGroupBuyAreaKey,
-  SHOP_AREA_LABELS,
-  SHOP_AREA_PATHS,
+  isGroupBuyPricing,
   type ShopAreaKey,
 } from "@/lib/shop/shopAreas";
 import {
@@ -62,16 +60,17 @@ export default function KitRequestsPage() {
     return <ErrorState message="Shop-Bereiche konnten nicht geladen werden." onRetry={() => areasQuery.refetch()} />;
   }
 
-  const groupBuyAreas = (areasQuery.data ?? []).filter((area) => isGroupBuyAreaKey(area.key));
+  const groupBuyAreas = (areasQuery.data ?? []).filter((area) => isGroupBuyPricing(area.pricing_profile) && area.purchasable);
   if (groupBuyAreas.length === 0) return <Navigate to="/403" replace />;
 
   if (location.pathname.startsWith("/kit-gesuche")) {
-    return <Navigate to={groupBuyAreas[0]?.path ?? SHOP_AREA_PATHS.group_buy_1} replace />;
+    return <Navigate to={groupBuyAreas[0].path} replace />;
   }
 
-  const requested = location.pathname.startsWith("/shop/group-buy-2") ? "group_buy_2" : "group_buy_1";
-  const current = groupBuyAreas.find((area) => area.key === requested);
-  if (!current || !isGroupBuyAreaKey(current.key)) return <Navigate to="/403" replace />;
+  const requested = location.pathname.replace(/^\/shop\//, "");
+  const current =
+    groupBuyAreas.find((area) => area.slug === requested) ?? groupBuyAreas[0];
+  if (!current) return <Navigate to="/403" replace />;
 
   return (
     <ShopAreaProvider shopArea={current.key} pricingProfile="group_buy">
@@ -158,7 +157,7 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
   return (
     <div className="min-w-0 space-y-8">
       <PageHeader
-        eyebrow={SHOP_AREA_LABELS[shopArea] ?? areaName}
+        eyebrow={areaName}
         title={areaName}
         description="Bestehende Group-Buy-Struktur: Kits, Anteile, Teilnehmer, Join und Leave. Kein Einzelverkauf."
         actions={

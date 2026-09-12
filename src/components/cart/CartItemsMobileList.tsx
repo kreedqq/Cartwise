@@ -15,7 +15,7 @@ import { ResolutionStatusBadge } from "@/components/cart/ResolutionStatusBadge";
 import { EditKitShareButton } from "@/components/shop/EditKitShareButton";
 import { useCartItemRow } from "@/hooks/useCartItemRow";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
-import { formatDateTime, formatUsd } from "@/lib/money";
+import { formatDateTime } from "@/lib/money";
 import {
   cartItemDisplayName,
   cartItemQuantityLabel,
@@ -155,9 +155,14 @@ function CartItemCardMobile({
             )}
           </p>
           <DualCurrencyPrice usd={item.totalUsd} eur={item.totalEur} />
-          <p className="mt-1 text-[10px] text-muted-foreground">
-            {formatUsd(item.unit_price_usd_snapshot)} / Stück
-          </p>
+          <div className="mt-1">
+            <p className="text-[10px] text-muted-foreground">Einzelpreis</p>
+            <DualCurrencyPrice
+              usd={item.unit_price_usd_snapshot}
+              rate={item.exchange_rate_snapshot}
+              size="compact"
+            />
+          </div>
         </div>
 
         <div className="space-y-1">

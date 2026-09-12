@@ -25,8 +25,7 @@ import DashboardPage from "@/pages/Dashboard";
 import CartDetailPage from "@/pages/CartDetail";
 import CheckoutPage from "@/pages/Checkout";
 import ShopHubPage from "@/pages/ShopHub";
-import ShopRetailPage from "@/pages/ShopRetail";
-import GroupBuyPage from "@/pages/GroupBuy";
+import ShopAreaPage from "@/pages/ShopAreaPage";
 import KitRequestsPage from "@/pages/KitRequests";
 import OrdersPage from "@/pages/Orders";
 import OrderDetailPage from "@/pages/OrderDetail";
@@ -97,9 +96,7 @@ export default function App() {
                 <Route path="/newsfeed" element={<Navigate to="/announcements" replace />} />
                 <Route path="/neuigkeiten" element={<Navigate to="/announcements" replace />} />
                 <Route path="/shop" element={<ShopHubPage />} />
-                <Route path="/shop/retail" element={<ShopRetailPage />} />
-                <Route path="/shop/group-buy-1" element={<GroupBuyPage />} />
-                <Route path="/shop/group-buy-2" element={<GroupBuyPage />} />
+                <Route path="/shop/:slug" element={<ShopAreaPage />} />
                 <Route path="/kit-gesuche" element={<KitRequestsPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/carts/:cartId" element={<CartDetailPage />} />

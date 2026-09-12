@@ -61,25 +61,22 @@ describe("customer dual-currency surfaces", () => {
     const app = read("src/App.tsx");
     expect(app).toContain('path="/shop"');
     expect(app).toContain("ShopHubPage");
-    expect(app).toContain('path="/shop/retail"');
-    expect(app).toContain("ShopRetailPage");
-    expect(app).toContain('path="/shop/group-buy-1"');
-    expect(app).toContain('path="/shop/group-buy-2"');
-    expect(app).toContain("GroupBuyPage");
+    expect(app).toContain('path="/shop/:slug"');
+    expect(app).toContain("ShopAreaPage");
     expect(read("src/pages/ShopRetail.tsx")).toContain("ShopProductsTable");
     expect(read("src/pages/ShopRetail.tsx")).toContain("ShopProductsMobileList");
     expect(read("src/pages/GroupBuy.tsx")).toContain("ShopProductsTable");
     expect(read("src/pages/GroupBuy.tsx")).toContain("ShopProductsMobileList");
-    expect(read("src/pages/GroupBuy.tsx")).toContain("group_buy_1");
-    expect(read("src/pages/GroupBuy.tsx")).toContain("group_buy_2");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("group_buy");
   });
 
-  it("uses DualCurrencyPrice in cart and checkout totals", () => {
-    expect(read("src/components/cart/CartItemsTable.tsx")).toContain("DualCurrencyPrice");
-    expect(read("src/components/cart/CartItemsMobileList.tsx")).toContain("DualCurrencyPrice");
+  it("uses DualCurrencyPrice in cart unit prices, totals, dashboard, and checkout", () => {
+    expect(read("src/components/cart/CartItemsTable.tsx")).toContain("usd={item.unit_price_usd_snapshot}");
+    expect(read("src/components/cart/CartItemsMobileList.tsx")).toContain("usd={item.unit_price_usd_snapshot}");
+    expect(read("src/components/cart/CartCard.tsx")).toContain("DualCurrencyPrice");
     expect(read("src/components/cart/CartSummaryBar.tsx")).toContain("DualCurrencyPrice");
     expect(read("src/components/cart/CartSummaryPanel.tsx")).toContain("DualCurrencyPrice");
-    expect(read("src/pages/Checkout.tsx")).toContain("DualCurrencyPrice");
+    expect(read("src/pages/Checkout.tsx")).toContain("usd={item.unit_price_usd_snapshot}");
     expect(read("src/pages/admin/AdminShopAreas.tsx")).not.toContain("DualCurrencyPrice");
   });
 });

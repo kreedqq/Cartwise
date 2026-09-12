@@ -33,8 +33,9 @@ import {
   formatOrderTelegramSnapshot,
   orderTelegramUsername,
 } from "@/services/orders";
-import { formatShopAreaLabel, SHOP_AREA_KEYS } from "@/lib/shop/shopAreas";
+import { formatShopAreaLabel } from "@/lib/shop/shopAreas";
 import { EmergencyMaintenanceButton } from "@/components/admin/EmergencyMaintenanceButton";
+import { listAdminShopAreas } from "@/services/shopAreas";
 import type { OrderStatus } from "@/types/database";
 
 const STATUS_FILTERS: Array<{ value: "all" | OrderStatus; label: string }> = [
@@ -42,12 +43,6 @@ const STATUS_FILTERS: Array<{ value: "all" | OrderStatus; label: string }> = [
   ...ADMIN_WORKFLOW_STATUSES.map((value) => ({ value, label: ORDER_STATUS_LABELS[value] })),
   { value: "confirmed", label: ORDER_STATUS_LABELS.confirmed },
   { value: "cancelled", label: ORDER_STATUS_LABELS.cancelled },
-];
-
-const SHOP_AREA_FILTERS: Array<{ value: string; label: string }> = [
-  { value: "all", label: "Alle Bereiche" },
-  ...SHOP_AREA_KEYS.map((key) => ({ value: key, label: formatShopAreaLabel(key) })),
-  { value: "legacy", label: "Nicht angegeben" },
 ];
 
 const PAYMENT_FILTERS: Array<{ value: string; label: string }> = [
@@ -65,11 +60,21 @@ export default function AdminOrdersPage() {
   const groupsQuery = useOrderGroups();
   const membershipQuery = useOrderGroupMemberships();
   const surchargeQuery = useQuery({ queryKey: QUERY_KEYS.adminRoleSurcharges, queryFn: listRoleSurchargeLines });
+  const areasQuery = useQuery({ queryKey: QUERY_KEYS.adminShopAreas, queryFn: listAdminShopAreas });
   const [search, setSearch] = React.useState("");
   const [status, setStatus] = React.useState<"all" | OrderStatus>("all");
   const [payment, setPayment] = React.useState("all");
   const [shopArea, setShopArea] = React.useState("all");
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
+
+  const shopAreaFilters = React.useMemo(
+    () => [
+      { value: "all", label: "Alle Bereiche" },
+      ...(areasQuery.data ?? []).map((area) => ({ value: area.key, label: area.name || formatShopAreaLabel(area.key) })),
+      { value: "legacy", label: "Nicht angegeben" },
+    ],
+    [areasQuery.data],
+  );
 
   const membership = React.useMemo(
     () => membershipByOrderId(membershipQuery.data ?? []),
@@ -233,7 +238,7 @@ export default function AdminOrdersPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {SHOP_AREA_FILTERS.map((item) => (
+            {shopAreaFilters.map((item) => (
               <SelectItem key={item.value} value={item.value}>
                 {item.label}
               </SelectItem>

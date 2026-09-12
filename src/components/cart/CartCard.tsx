@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { useCartMutations } from "@/hooks/useCarts";
-import { formatUsd } from "@/lib/money";
+import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import { cn } from "@/lib/utils";
 import { isOpenCart } from "@/services/carts";
 import { toast } from "@/components/ui/toaster";
@@ -99,8 +99,8 @@ export function CartCard({ cart, summary }: CartCardProps) {
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-semibold text-foreground">{cart.name}</span>
               <span className="mt-1 block text-xs text-muted-foreground">{positionLabel(itemCount)}</span>
-              <span className="mt-0.5 block text-sm font-medium tabular-nums text-foreground">
-                {formatUsd(summary?.total_usd ?? 0)}
+              <span className="mt-1 block">
+                <DualCurrencyPrice usd={summary?.total_usd ?? 0} eur={summary?.total_eur} size="compact" />
               </span>
               {cart.is_active_cart ? (
                 <span className="mt-1 block text-xs font-medium text-primary">Aktiver Warenkorb</span>

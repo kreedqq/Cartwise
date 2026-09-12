@@ -26,11 +26,22 @@ export async function listMyShopAreas(): Promise<MyShopArea[]> {
     return [
       {
         key: row.key,
+        slug: row.slug,
         name: row.name,
+        short_name: row.short_name || row.name,
+        subtitle: row.subtitle,
+        description: row.description,
+        icon_key: row.icon_key || "store",
+        badge_text: row.badge_text,
+        badge_color: row.badge_color,
+        status: row.status === "coming_soon" || row.status === "closed" || row.status === "disabled" ? row.status : "active",
         pricing_profile: row.pricing_profile,
         sort_order: row.sort_order,
         path: row.path,
         base_price_factor_pct: row.base_price_factor_pct ?? DEFAULT_BASE_PRICE_FACTOR_PCT,
+        theme: (row.theme ?? {}) as Record<string, unknown>,
+        options: (row.options ?? {}) as Record<string, unknown>,
+        purchasable: row.purchasable !== false,
       },
     ];
   });
@@ -62,10 +73,73 @@ export async function listAdminShopAreaRoleAccess(): Promise<Tables<"shop_area_r
 
 export async function updateAdminShopArea(
   key: ShopAreaKey,
-  patch: Partial<Pick<Tables<"shop_areas">, "name" | "is_active" | "pricing_profile" | "base_price_factor_pct">>,
+  patch: Partial<
+    Pick<
+      Tables<"shop_areas">,
+      | "name"
+      | "short_name"
+      | "subtitle"
+      | "description"
+      | "icon_key"
+      | "badge_text"
+      | "badge_color"
+      | "is_active"
+      | "status"
+      | "hub_visible"
+      | "pricing_profile"
+      | "base_price_factor_pct"
+      | "theme"
+      | "options"
+      | "sort_order"
+    >
+  >,
 ): Promise<void> {
   const { error } = await supabase.from("shop_areas").update(patch).eq("key", key);
   if (error) throw error;
+}
+
+export async function createAdminShopArea(input: {
+  name: string;
+  template?: string;
+  sourceKey?: string | null;
+  copyCategories?: boolean;
+  copyRoles?: boolean;
+  copyDesign?: boolean;
+}): Promise<Tables<"shop_areas">> {
+  const { data, error } = await supabase.rpc("admin_create_shop_area", {
+    _name: input.name,
+    _template: input.template ?? "empty",
+    _source_key: input.sourceKey ?? null,
+    _copy_categories: input.copyCategories ?? true,
+    _copy_roles: input.copyRoles ?? true,
+    _copy_design: input.copyDesign ?? true,
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function deactivateAdminShopArea(key: ShopAreaKey): Promise<void> {
+  const { error } = await supabase.rpc("admin_set_shop_area_inactive", { _area_key: key });
+  if (error) throw error;
+}
+
+export async function deleteAdminShopArea(key: ShopAreaKey): Promise<void> {
+  const { error } = await supabase.rpc("admin_delete_shop_area", { _area_key: key });
+  if (error) throw error;
+}
+
+export async function previewOpenCartPriceRefresh(): Promise<{ carts: number; items: number }> {
+  const { data, error } = await supabase.rpc("admin_preview_open_cart_price_refresh");
+  if (error) throw error;
+  const row = data as { carts?: number; items?: number } | null;
+  return { carts: Number(row?.carts ?? 0), items: Number(row?.items ?? 0) };
+}
+
+export async function refreshOpenCartPrices(): Promise<{ carts: number; items: number }> {
+  const { data, error } = await supabase.rpc("admin_refresh_open_cart_prices");
+  if (error) throw error;
+  const row = data as { carts?: number; items?: number } | null;
+  return { carts: Number(row?.carts ?? 0), items: Number(row?.items ?? 0) };
 }
 
 export async function setAdminShopAreaRoles(shopAreaKey: ShopAreaKey, roleIds: string[]): Promise<void> {

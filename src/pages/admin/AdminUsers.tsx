@@ -33,6 +33,7 @@ import {
 } from "@/services/profiles";
 import { assignCustomerRole, listCustomerRoles, listUserCustomerRoles } from "@/services/customerRoles";
 import { setUserRole } from "@/services/roles";
+import { AdminCartPriceRefresh } from "@/components/admin/AdminCartPriceRefresh";
 
 export default function AdminUsersPage() {
   const queryClient = useQueryClient();
@@ -153,6 +154,7 @@ export default function AdminUsersPage() {
         title="Benutzer & Rollen"
         description="Benutzer verwalten, Kundenrollen zuweisen und Rollenaufschläge konfigurieren."
       />
+      <AdminCartPriceRefresh />
 
       {userGroups.map((group) => (
         <AdminSection key={group.id} title={group.title} padded={false}>

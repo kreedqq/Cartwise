@@ -12,15 +12,17 @@ import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { toast } from "@/components/ui/toaster";
 import { listCustomerRoles, upsertCustomerRole, deleteCustomerRole } from "@/services/customerRoles";
-import { listAdminShopAreaRoleAccess, setAdminRoleShopAreas } from "@/services/shopAreas";
+import { listAdminShopAreaRoleAccess, listAdminShopAreas, setAdminRoleShopAreas } from "@/services/shopAreas";
 import { QUERY_KEYS } from "@/lib/constants";
-import { SHOP_AREA_KEYS, SHOP_AREA_LABELS, isShopAreaKey, type ShopAreaKey } from "@/lib/shop/shopAreas";
+import type { ShopAreaKey } from "@/lib/shop/shopAreas";
 
 /** Existing customer-role catalog + markup percent configuration. Engine unchanged. */
 export function AdminRoleCatalog() {
   const queryClient = useQueryClient();
   const rolesQuery = useQuery({ queryKey: ["customer-roles"], queryFn: listCustomerRoles });
+  const areasQuery = useQuery({ queryKey: QUERY_KEYS.adminShopAreas, queryFn: listAdminShopAreas });
   const accessQuery = useQuery({ queryKey: [...QUERY_KEYS.adminShopAreas, "access"], queryFn: listAdminShopAreaRoleAccess });
+  const areas = areasQuery.data ?? [];
 
   const [name, setName] = React.useState("");
   const [markup, setMarkup] = React.useState("25");
@@ -188,8 +190,8 @@ export function AdminRoleCatalog() {
             <TableHeader>
               <TableRow>
                 <TableHead>Rolle</TableHead>
-                {SHOP_AREA_KEYS.map((key) => (
-                  <TableHead key={key}>{SHOP_AREA_LABELS[key]}</TableHead>
+                {areas.map((area) => (
+                  <TableHead key={area.key}>{area.name}</TableHead>
                 ))}
               </TableRow>
             </TableHeader>
@@ -197,7 +199,8 @@ export function AdminRoleCatalog() {
               {roles.map((role) => (
                 <TableRow key={`access-${role.id}`}>
                   <TableCell className="font-medium">{role.name}</TableCell>
-                  {SHOP_AREA_KEYS.map((key) => {
+                  {areas.map((area) => {
+                    const key = area.key;
                     const checked = (accessQuery.data ?? []).some(
                       (row) => row.role_id === role.id && row.shop_area_key === key,
                     );
@@ -209,11 +212,10 @@ export function AdminRoleCatalog() {
                             void (async () => {
                               const current = (accessQuery.data ?? [])
                                 .filter((row) => row.role_id === role.id)
-                                .map((row) => row.shop_area_key)
-                                .filter(isShopAreaKey);
+                                .map((row) => row.shop_area_key);
                               const next: ShopAreaKey[] = value === true
                                 ? Array.from(new Set([...current, key]))
-                                : current.filter((area) => area !== key);
+                                : current.filter((item) => item !== key);
                               try {
                                 await setAdminRoleShopAreas(role.id, next);
                                 await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreas });
@@ -224,7 +226,7 @@ export function AdminRoleCatalog() {
                               }
                             })();
                           }}
-                          aria-label={`${role.name}: ${SHOP_AREA_LABELS[key]}`}
+                          aria-label={`${role.name}: ${area.name}`}
                         />
                       </TableCell>
                     );

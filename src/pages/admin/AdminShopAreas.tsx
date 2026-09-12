@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -30,10 +31,10 @@ import {
 } from "@/lib/shop/shopAreaPricing";
 import {
   DEFAULT_BASE_PRICE_FACTOR_PCT,
-  SHOP_AREA_KEYS,
-  SHOP_AREA_LABELS,
+  formatShopAreaLabel,
   isShopAreaKey,
-  pricingProfileForArea,
+  SHOP_AREA_STATUSES,
+  SHOP_PRICING_PROFILES,
   type ShopAreaKey,
   type ShopPricingProfile,
 } from "@/lib/shop/shopAreas";
@@ -49,6 +50,8 @@ import {
   applyVendorCatalogFromFile,
   createAdminShopAreaCategory,
   getAdminShopAreaDocument,
+  deactivateAdminShopArea,
+  deleteAdminShopArea,
   listAdminShopAreaCategories,
   listAdminShopAreaProductPrices,
   listAdminShopAreaProducts,
@@ -63,6 +66,8 @@ import {
   signedAdminShopAreaDocumentUrl,
   updateAdminShopArea,
 } from "@/services/shopAreas";
+import { AdminCreateShopAreaDialog } from "@/components/admin/AdminCreateShopAreaDialog";
+import { AreaDesignPanel } from "@/components/admin/AreaDesignPanel";
 import { parseVendorCatalogFile } from "@/services/vendorCatalogImport";
 import type { Tables } from "@/types/database";
 
@@ -73,6 +78,7 @@ export default function AdminShopAreasPage() {
   const rolesQuery = useQuery({ queryKey: ["customer-roles"], queryFn: listCustomerRoles });
   const productsQuery = useQuery({ queryKey: ["admin-products"], queryFn: () => listAllProducts() });
   const [areaKey, setAreaKey] = React.useState<ShopAreaKey>("shop");
+  const [createOpen, setCreateOpen] = React.useState(false);
 
   async function invalidate() {
     await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreas });
@@ -87,7 +93,7 @@ export default function AdminShopAreasPage() {
   const products = productsQuery.data ?? [];
   const selected = (areasQuery.data ?? []).find((area) => area.key === areaKey);
   const assigned = access.filter((row) => row.shop_area_key === areaKey).map((row) => row.role_id);
-  const lockedProfile = pricingProfileForArea(areaKey);
+  const lockedProfile = (selected?.pricing_profile === "group_buy" ? "group_buy" : "retail") as ShopPricingProfile;
 
   return (
     <div className="space-y-4">
@@ -101,27 +107,44 @@ export default function AdminShopAreasPage() {
         <ErrorState message="Verkaufsbereiche konnten nicht geladen werden." onRetry={() => areasQuery.refetch()} />
       )}
 
-      <div className="flex flex-wrap gap-2">
-        {SHOP_AREA_KEYS.map((key) => (
+      <div className="flex flex-wrap items-center gap-2">
+        {(areasQuery.data ?? []).map((area) => (
           <Button
-            key={key}
+            key={area.key}
             type="button"
             size="sm"
-            variant={areaKey === key ? "default" : "outline"}
-            onClick={() => setAreaKey(key)}
+            variant={areaKey === area.key ? "default" : "outline"}
+            onClick={() => setAreaKey(area.key)}
           >
-            {SHOP_AREA_LABELS[key]}
+            {area.name}
           </Button>
         ))}
+        <Button type="button" size="sm" variant="secondary" onClick={() => setCreateOpen(true)}>
+          + Neuen Bereich hinzufügen
+        </Button>
       </div>
+      <AdminCreateShopAreaDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        areas={areasQuery.data ?? []}
+        onCreated={(key) => {
+          setAreaKey(key);
+          void invalidate();
+        }}
+      />
 
       {selected && isShopAreaKey(selected.key) && (
         <Tabs key={areaKey} defaultValue="haendlerkatalog" className="space-y-4">
           <TabsList className="flex h-auto flex-wrap">
+            <TabsTrigger value="allgemein">Allgemein</TabsTrigger>
             <TabsTrigger value="haendlerkatalog">Händlerkatalog</TabsTrigger>
             <TabsTrigger value="produkte">Produkte</TabsTrigger>
             <TabsTrigger value="preise">Preise</TabsTrigger>
+            <TabsTrigger value="design">Design</TabsTrigger>
           </TabsList>
+          <TabsContent value="allgemein">
+            <AreaIdentityCard key={`${areaKey}|identity`} area={selected} onChanged={invalidate} />
+          </TabsContent>
           <TabsContent value="haendlerkatalog">
             <VendorCatalogPanel areaKey={areaKey} products={products} onChanged={invalidate} />
           </TabsContent>
@@ -139,9 +162,168 @@ export default function AdminShopAreasPage() {
               onChanged={invalidate}
             />
           </TabsContent>
+          <TabsContent value="design">
+            <AreaDesignPanel area={selected} onChanged={invalidate} />
+          </TabsContent>
         </Tabs>
       )}
     </div>
+  );
+}
+
+function AreaIdentityCard({
+  area,
+  onChanged,
+}: {
+  area: Tables<"shop_areas">;
+  onChanged: () => Promise<void>;
+}) {
+  const [name, setName] = React.useState(area.name);
+  const [shortName, setShortName] = React.useState(area.short_name ?? area.name);
+  const [subtitle, setSubtitle] = React.useState(area.subtitle ?? "");
+  const [status, setStatus] = React.useState(area.status || (area.is_active ? "active" : "disabled"));
+  const [hubVisible, setHubVisible] = React.useState(area.hub_visible !== false);
+  const [profile, setProfile] = React.useState<ShopPricingProfile>(
+    area.pricing_profile === "group_buy" ? "group_buy" : "retail",
+  );
+  const [saving, setSaving] = React.useState(false);
+
+  async function save() {
+    if (!name.trim()) {
+      toast.error("Name darf nicht leer sein.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateAdminShopArea(area.key, {
+        name: name.trim(),
+        short_name: shortName.trim() || name.trim(),
+        subtitle: subtitle.trim() || null,
+        status,
+        hub_visible: hubVisible,
+        is_active: status !== "disabled",
+        pricing_profile: profile,
+      });
+      toast.success("Bereich gespeichert.");
+      await onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Bereich konnte nicht gespeichert werden.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deactivate() {
+    setSaving(true);
+    try {
+      await deactivateAdminShopArea(area.key);
+      toast.success("Bereich deaktiviert.");
+      await onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Deaktivieren fehlgeschlagen.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function remove() {
+    setSaving(true);
+    try {
+      await deleteAdminShopArea(area.key);
+      toast.success("Bereich gelöscht.");
+      await onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Löschen nicht möglich. Bereich nur deaktivieren.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Allgemein</CardTitle>
+        <CardDescription>
+          Anzeigename und Status. Der technische Key {area.key} bleibt unverändert.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label>Name</Label>
+            <Input value={name} onChange={(event) => setName(event.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label>Kurzname</Label>
+            <Input value={shortName} onChange={(event) => setShortName(event.target.value)} />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label>Untertitel</Label>
+            <Input value={subtitle} onChange={(event) => setSubtitle(event.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label>Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SHOP_AREA_STATUSES.map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {value === "active"
+                      ? "Aktiv"
+                      : value === "disabled"
+                        ? "Deaktiviert"
+                        : value === "coming_soon"
+                          ? "Bald verfügbar"
+                          : "Temporär geschlossen"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label>Pricing Profile</Label>
+            <Select
+              value={profile}
+              onValueChange={(value: ShopPricingProfile) => setProfile(value)}
+              disabled={area.is_system}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SHOP_PRICING_PROFILES.map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {value === "retail" ? "Retail" : "Group Buy"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <label className="flex items-center gap-2 text-sm sm:col-span-2">
+            <Checkbox checked={hubVisible} onCheckedChange={(value) => setHubVisible(value === true)} />
+            Im Shop Hub anzeigen
+          </label>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Pfad: /shop/{area.slug} · Faktor {area.base_price_factor_pct} %
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" loading={saving} onClick={() => void save()}>
+            Speichern
+          </Button>
+          <Button type="button" variant="outline" disabled={saving} onClick={() => void deactivate()}>
+            Deaktivieren
+          </Button>
+          {!area.is_system ? (
+            <Button type="button" variant="destructive" disabled={saving} onClick={() => void remove()}>
+              Löschen
+            </Button>
+          ) : null}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -176,7 +358,7 @@ function AreaSettingsCard({
     try {
       await updateAdminShopArea(areaKey, { base_price_factor_pct: value, pricing_profile: profile });
       await setAdminShopAreaRoles(areaKey, roleIds);
-      toast.success(`${SHOP_AREA_LABELS[areaKey]} gespeichert.`);
+      toast.success(`${formatShopAreaLabel(areaKey)} gespeichert.`);
       await onChanged();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Einstellungen konnten nicht gespeichert werden.");
@@ -193,7 +375,7 @@ function AreaSettingsCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Bereichs-%-Grundpreis {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardTitle className="text-base">Bereichs-%-Grundpreis {formatShopAreaLabel(areaKey)}</CardTitle>
         <CardDescription>
           Dieser Faktor gilt für alle Händlerartikel des Bereichs. Der Grundpreis bleibt pro Artikel.
         </CardDescription>
@@ -356,7 +538,7 @@ function VendorCatalogPanel({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Händlerkatalog {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardTitle className="text-base">Händlerkatalog {formatShopAreaLabel(areaKey)}</CardTitle>
         <CardDescription>
           Nur Artikel aus der Händlerdatei. SKUs ohne globales Produkt werden trotzdem übernommen.
         </CardDescription>
@@ -532,7 +714,7 @@ function VendorProductsPanel({
       <AreaCategoriesEditor areaKey={areaKey} categories={categories} onChanged={onChanged} />
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Produkte {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+          <CardTitle className="text-base">Produkte {formatShopAreaLabel(areaKey)}</CardTitle>
           <CardDescription>
             Nur der Händlerkatalog dieses Bereichs. Die Kategorie gilt nur hier, nicht im globalen Produkt-Master.
           </CardDescription>
@@ -654,7 +836,7 @@ function AreaCategoriesEditor({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Kategorien {SHOP_AREA_LABELS[areaKey]}</CardTitle>
+        <CardTitle className="text-base">Kategorien {formatShopAreaLabel(areaKey)}</CardTitle>
         <CardDescription>
           Aktivierung und Reihenfolge gelten nur in diesem Verkaufsbereich. Produkte bleiben im Händlerkatalog.
         </CardDescription>

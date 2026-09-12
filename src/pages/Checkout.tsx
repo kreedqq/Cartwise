@@ -225,7 +225,14 @@ export default function CheckoutPage() {
                       <TableCell className="text-right tabular-nums">
                         {cartItemQuantityLabel({ ...item, shop_area: cart.shop_area })}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">{formatUsd(item.unit_price_usd_snapshot)}</TableCell>
+                      <TableCell className="text-right">
+                        <DualCurrencyPrice
+                          usd={item.unit_price_usd_snapshot}
+                          rate={item.exchange_rate_snapshot}
+                          size="compact"
+                          align="right"
+                        />
+                      </TableCell>
                       <TableCell className="hidden sm:table-cell">
                         <Badge variant={item.applied_price_tier === "bulk" ? "default" : "secondary"}>
                           {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normal"}

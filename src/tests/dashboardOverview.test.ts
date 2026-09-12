@@ -29,7 +29,8 @@ describe("customer dashboard cart overview", () => {
     expect(card).toContain("<Link to={cartHref}");
     expect(card).toContain("Aktiver Warenkorb");
     expect(card).toContain("Positionen");
-    expect(card).toContain("formatUsd");
+    expect(card).toContain("DualCurrencyPrice");
+    expect(card).not.toContain("formatUsd");
     expect(card).toContain("handleDelete");
     expect(card).toContain("Öffnen");
     expect(card).not.toContain("CartItemsTable");
