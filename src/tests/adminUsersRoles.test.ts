@@ -129,6 +129,9 @@ describe("admin username-required and delete RPCs", () => {
       if (name === "admin_list_telegram_linked_user_ids") {
         return { data: ["user-with-telegram"], error: null };
       }
+      if (name === "admin_list_telegram_orphan_user_ids") {
+        return { data: [], error: null };
+      }
       return { data: null, error: null };
     });
     from.mockImplementation((table: string) => {
@@ -174,6 +177,7 @@ describe("admin username-required and delete RPCs", () => {
         roles: ["user"],
         usernameRequiredOnNextLogin: true,
         hasTelegramIdentity: false,
+        hasTelegramProviderOrphan: false,
       },
       {
         id: "user-with-telegram",
@@ -182,6 +186,7 @@ describe("admin username-required and delete RPCs", () => {
         roles: ["user"],
         usernameRequiredOnNextLogin: false,
         hasTelegramIdentity: true,
+        hasTelegramProviderOrphan: false,
       },
     ]);
   });

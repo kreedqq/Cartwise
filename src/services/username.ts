@@ -58,7 +58,8 @@ export async function applyTelegramReauthUsername(): Promise<string> {
 
 const TRANSFER_INTENT_KEY = "peptix:telegram-transfer-intent";
 const TRANSFER_CONFLICT_KEY = "peptix:telegram-identity-conflict";
-const TRANSFER_CONFLICT_TTL_MS = 15 * 60 * 1000;
+/** Conflict UI is only valid across the immediate OAuth round-trip after identity_already_exists. */
+const TRANSFER_CONFLICT_TTL_MS = 3 * 60 * 1000;
 
 export function markTelegramIdentityConflict(): void {
   try {

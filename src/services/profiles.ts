@@ -22,6 +22,8 @@ export interface UserWithRoles {
   roles: string[];
   usernameRequiredOnNextLogin: boolean;
   hasTelegramIdentity: boolean;
+  /** providers still lists custom:telegram but auth.identities row is gone */
+  hasTelegramProviderOrphan: boolean;
 }
 
 /** Admin-only: list all users with their roles (joins profiles + user_roles). */
@@ -41,6 +43,12 @@ export async function listUsersWithRoles(): Promise<UserWithRoles[]> {
   if (telegramError) throw telegramError;
   const telegramIds = new Set((telegramLinked ?? []).map(String));
 
+  const { data: telegramOrphans, error: orphanError } = await supabase.rpc(
+    "admin_list_telegram_orphan_user_ids",
+  );
+  if (orphanError) throw orphanError;
+  const orphanIds = new Set((telegramOrphans ?? []).map(String));
+
   const rolesByUser = new Map<string, string[]>();
   for (const r of roles ?? []) {
     const list = rolesByUser.get(r.user_id) ?? [];
@@ -55,6 +63,7 @@ export async function listUsersWithRoles(): Promise<UserWithRoles[]> {
     roles: rolesByUser.get(p.id) ?? [],
     usernameRequiredOnNextLogin: Boolean(p.username_required_on_next_login),
     hasTelegramIdentity: telegramIds.has(p.id),
+    hasTelegramProviderOrphan: orphanIds.has(p.id),
   }));
 }
 

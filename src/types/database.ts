@@ -1751,6 +1751,7 @@ export interface Database {
       admin_assign_customer_role: { Args: { _user_id: string; _role_id: string }; Returns: undefined };
       admin_set_username_required: { Args: { _user_id: string; _required: boolean }; Returns: undefined };
       admin_list_telegram_linked_user_ids: { Args: Record<string, never>; Returns: string[] };
+      admin_list_telegram_orphan_user_ids: { Args: Record<string, never>; Returns: string[] };
       admin_remove_telegram_identity: { Args: { _user_id: string }; Returns: undefined };
       admin_delete_user: { Args: { _user_id: string }; Returns: undefined };
       admin_set_de_shipping: {

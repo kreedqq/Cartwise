@@ -61,6 +61,11 @@ export default function UsernameRequiredPage() {
   async function handleTelegramLink() {
     setTelegramBusy(true);
     setReauthError(null);
+    // A prior conflict marker must not block a fresh link after admin remove.
+    // Conflict is only valid when AuthCallback sets it again after identity_already_exists.
+    clearTelegramIdentityConflict();
+    clearTelegramTransferIntent();
+    setShowTransferConfirm(false);
     try {
       // Keep the existing PEPTIX session. linkIdentity attaches Telegram to this
       // auth.users.id. Never signOut first — that would allow a duplicate account.

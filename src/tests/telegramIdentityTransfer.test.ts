@@ -133,4 +133,10 @@ describe("telegram transfer UI wiring", () => {
     markTelegramIdentityConflict();
     expect(hasTelegramIdentityConflict()).toBe(true);
   });
+
+  it("expires conflict markers after the short OAuth TTL (3 minutes)", () => {
+    sessionStorage.clear();
+    sessionStorage.setItem("peptix:telegram-identity-conflict", String(Date.now() - 4 * 60 * 1000));
+    expect(hasTelegramIdentityConflict()).toBe(false);
+  });
 });

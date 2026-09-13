@@ -15,6 +15,7 @@ function user(overrides: Partial<UserWithRoles> & { id: string; username: string
     roles: [],
     usernameRequiredOnNextLogin: false,
     hasTelegramIdentity: false,
+    hasTelegramProviderOrphan: false,
     ...overrides,
   };
 }

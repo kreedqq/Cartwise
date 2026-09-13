@@ -175,7 +175,12 @@ export default function AdminUsersPage() {
       await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       setManaged((current) =>
         current && current.id === removeTelegramTarget.id
-          ? { ...current, hasTelegramIdentity: false, usernameRequiredOnNextLogin: false }
+          ? {
+              ...current,
+              hasTelegramIdentity: false,
+              hasTelegramProviderOrphan: false,
+              usernameRequiredOnNextLogin: false,
+            }
           : current,
       );
       setRemoveTelegramTarget(null);
@@ -346,16 +351,18 @@ export default function AdminUsersPage() {
                     Status:{" "}
                     {managed.hasTelegramIdentity
                       ? "Telegram verbunden"
-                      : managed.usernameRequiredOnNextLogin
-                        ? "Telegram Anmeldung beim nächsten Login angefordert"
-                        : "Telegram nicht verbunden"}
+                      : managed.hasTelegramProviderOrphan
+                        ? "Telegram Metadata verwaist (Identity fehlt)"
+                        : managed.usernameRequiredOnNextLogin
+                          ? "Telegram Anmeldung beim nächsten Login angefordert"
+                          : "Telegram nicht verbunden"}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <Button variant="outline" size="sm" onClick={() => openUsernameEditor(managed)}>
                     {managed.username ? "Benutzername bearbeiten" : "Benutzername festlegen"}
                   </Button>
-                  {managed.hasTelegramIdentity ? (
+                  {managed.hasTelegramIdentity || managed.hasTelegramProviderOrphan ? (
                     <div className="flex flex-col gap-2">
                       <Button
                         variant="outline"
@@ -363,7 +370,9 @@ export default function AdminUsersPage() {
                         disabled={removeTelegramLoading}
                         onClick={() => setRemoveTelegramTarget(managed)}
                       >
-                        Telegram Zuordnung entfernen
+                        {managed.hasTelegramProviderOrphan
+                          ? "Verwaiste Telegram-Metadaten bereinigen"
+                          : "Telegram Zuordnung entfernen"}
                       </Button>
                       {managed.usernameRequiredOnNextLogin ? (
                         <Button
