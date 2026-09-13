@@ -6,15 +6,18 @@ import { shouldPromptForUsername } from "@/services/username";
 
 /**
  * After a session exists, block the app shell until the user has a Telegram
- * username and any admin-required Telegram reauth is cleared. The duty page is
- * a sibling route so this gate cannot be skipped via in-app navigation.
+ * username and any admin-required Telegram linking is completed.
+ *
+ * Wait for profile before deciding — otherwise a fresh email login can briefly
+ * pass with profile=null and miss username_required_on_next_login.
  */
 export function UsernameGate() {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
 
   if (loading) return <FullScreenSpinner />;
-  if (shouldPromptForUsername({ loading, user, profile })) {
+  if (user && !profile) return <FullScreenSpinner label="Konto wird geladen …" />;
+  if (shouldPromptForUsername({ loading: false, user, profile })) {
     return <Navigate to="/username-required" replace state={{ from: location }} />;
   }
   return <Outlet />;

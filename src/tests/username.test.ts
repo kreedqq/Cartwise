@@ -71,6 +71,17 @@ describe("shouldPromptForUsername", () => {
       }),
     ).toBe(false);
   });
+
+  it("does not prompt when username exists, no admin request, and no Telegram", () => {
+    markUsernameChangeEligible("u1");
+    expect(
+      shouldPromptForUsername({
+        loading: false,
+        user: { id: "u1", identities: [{ provider: "email" }] },
+        profile: { username: "penny", username_required_on_next_login: false },
+      }),
+    ).toBe(false);
+  });
 });
 
 describe("usernameSchema", () => {

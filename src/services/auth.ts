@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
-import { clearTelegramIdentityConflict, clearTelegramTransferIntent } from "@/services/username";
+import { clearTelegramIdentityConflict, clearTelegramTransferIntent, markUsernameChangeEligible } from "@/services/username";
 
 export const DISCORD_OAUTH_PROVIDER = "discord" as const;
 export const TELEGRAM_OAUTH_PROVIDER = "custom:telegram" as const;
@@ -693,12 +693,21 @@ export async function signUp(email: string, password: string, displayName: strin
 export async function signIn(email: string, password: string) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
-  if (data.session) return data;
+
+  const session = data.session;
+  if (session?.user?.id) {
+    // Ensure admin Telegram linking eligibility even if onAuthStateChange ordering races Login navigation.
+    markUsernameChangeEligible(session.user.id);
+    return data;
+  }
 
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
   if (sessionError) throw sessionError;
   if (!sessionData.session) {
     throw new Error("session missing");
+  }
+  if (sessionData.session.user?.id) {
+    markUsernameChangeEligible(sessionData.session.user.id);
   }
   return { user: sessionData.session.user, session: sessionData.session };
 }

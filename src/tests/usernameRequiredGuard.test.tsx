@@ -17,7 +17,10 @@ function readSource(relativePath: string): string {
 
 const authValue = {
   session: { user: { id: "user-1" } } as { user: { id: string } } | null,
-  user: { id: "user-1" } as { id: string } | null,
+  user: { id: "user-1", identities: [{ provider: "email" }] } as {
+    id: string;
+    identities?: Array<{ provider?: string | null }>;
+  } | null,
   loading: false,
   profile: { username: "ExampleUser", username_required_on_next_login: false } as {
     username: string | null;
@@ -56,7 +59,7 @@ function renderGated(path: string) {
 describe("username required login guard", () => {
   beforeEach(() => {
     authValue.session = { user: { id: "user-1" } };
-    authValue.user = { id: "user-1" };
+    authValue.user = { id: "user-1", identities: [{ provider: "email" }] };
     authValue.loading = false;
     authValue.profile = { username: "ExampleUser", username_required_on_next_login: false };
     clearUsernameChangeEligible("user-1");
@@ -68,8 +71,36 @@ describe("username required login guard", () => {
     expect(screen.queryByText("Username Pflichtseite")).not.toBeInTheDocument();
   });
 
+  it("waits for profile before allowing access after login", () => {
+    authValue.profile = null;
+    renderGated("/dashboard");
+    expect(screen.getByText("Konto wird geladen …")).toBeInTheDocument();
+    expect(screen.queryByText("Dashboard ready")).not.toBeInTheDocument();
+  });
+
   it("does not force a change window while still logged in after admin request", () => {
     authValue.profile = { username: "ExampleUser", username_required_on_next_login: true };
+    renderGated("/shop");
+    expect(screen.getByText("Shop ready")).toBeInTheDocument();
+    expect(screen.queryByText("Username Pflichtseite")).not.toBeInTheDocument();
+  });
+
+  it("forces Telegram linking after fresh email login when flag is set and Telegram is missing", () => {
+    authValue.profile = { username: "ExampleUser", username_required_on_next_login: true };
+    authValue.user = { id: "user-1", identities: [{ provider: "email" }] };
+    markUsernameChangeEligible("user-1");
+    renderGated("/shop");
+    expect(screen.getByText("Username Pflichtseite")).toBeInTheDocument();
+    expect(screen.queryByText("Shop ready")).not.toBeInTheDocument();
+  });
+
+  it("does not force Telegram gate when Telegram is already linked even if flag is set", () => {
+    authValue.profile = { username: "Pepsidryage", username_required_on_next_login: true };
+    authValue.user = {
+      id: "user-1",
+      identities: [{ provider: "email" }, { provider: "custom:telegram" }],
+    };
+    markUsernameChangeEligible("user-1");
     renderGated("/shop");
     expect(screen.getByText("Shop ready")).toBeInTheDocument();
     expect(screen.queryByText("Username Pflichtseite")).not.toBeInTheDocument();

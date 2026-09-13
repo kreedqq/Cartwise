@@ -189,12 +189,13 @@ export function mapUsernameError(error: unknown): string {
 }
 
 /**
- * Initial missing username → always prompt.
- * Admin Telegram linking request → only when the account has no custom:telegram yet,
- * and only after a fresh SIGNED_IN in this browser session.
+ * Initial missing username → always prompt (claim form).
  *
- * Accounts that already have Telegram must not hit this gate on normal login:
- * preferred_username must not overwrite an existing profiles.username.
+ * Admin Telegram linking request (`username_required_on_next_login`):
+ * - no custom:telegram yet → prompt Telegram linking gate after fresh login (Fall B)
+ * - custom:telegram already present → never prompt; do not call apply on normal login (Fall C)
+ *
+ * preferred_username must never overwrite profiles.username on normal Telegram login (Fall A).
  */
 export function shouldPromptForUsername(input: {
   loading: boolean;
@@ -205,22 +206,41 @@ export function shouldPromptForUsername(input: {
   profile: { username: string | null; username_required_on_next_login?: boolean } | null;
 }): boolean {
   if (input.loading || !input.user || !input.profile) return false;
+
   const hasUsername = Boolean(input.profile.username?.trim());
+  // Fall: initial username claim
   if (!hasUsername) return true;
-  if (!input.profile.username_required_on_next_login) return false;
+
+  const adminTelegramRequest = Boolean(input.profile.username_required_on_next_login);
+  if (!adminTelegramRequest) return false;
+
   const hasTelegram = Boolean(
     input.user.identities?.some((identity) => identity.provider === "custom:telegram"),
   );
+
+  // Fall C / A: Telegram already linked — admin flag must not block login or rewrite username.
   if (hasTelegram) {
     console.info("[peptix:username]", {
       operation: "shouldPromptForUsername",
       reason: "skip_gate_already_has_telegram",
       currentUsername: input.profile.username,
       usernameRequired: true,
+      hasTelegram: true,
     });
     return false;
   }
-  return isUsernameChangeEligible(input.user.id);
+
+  // Fall B: admin request + no Telegram identity → force linking after fresh login.
+  const eligible = isUsernameChangeEligible(input.user.id);
+  console.info("[peptix:username]", {
+    operation: "shouldPromptForUsername",
+    reason: eligible ? "admin_telegram_link_required" : "admin_request_waiting_for_fresh_login",
+    currentUsername: input.profile.username,
+    usernameRequired: true,
+    hasTelegram: false,
+    eligible,
+  });
+  return eligible;
 }
 
 /** Admin-requested Telegram identity linking (existing username + flag). */

@@ -24,6 +24,7 @@ describe("signIn", () => {
   beforeEach(() => {
     signInWithPassword.mockReset();
     getSession.mockReset();
+    sessionStorage.clear();
   });
 
   it("returns the session from signInWithPassword when present", async () => {
@@ -31,6 +32,7 @@ describe("signIn", () => {
     const result = await signIn("test@example.com", "secret");
     expect(result.session).toEqual(session);
     expect(getSession).not.toHaveBeenCalled();
+    expect(sessionStorage.getItem("peptix:username-change-eligible:user-1")).toBe("1");
   });
 
   it("falls back to getSession when the password response omits the session", async () => {
