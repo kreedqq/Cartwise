@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@/lib/constants";
+import { resolveEnabledPaymentMethods } from "@/lib/shop/paymentMethod";
 import { resolvePublicAccess } from "@/lib/siteAccess";
 import { useAuth } from "@/context/AuthProvider";
 import { getSiteAccessState } from "@/services/appSettings";
@@ -35,4 +36,18 @@ export function useQuantityDiscountsEnabled(): boolean {
   const { quantityDiscountsEnabled, isLoading } = useResolvedSiteAccess();
   if (isLoading) return true;
   return quantityDiscountsEnabled;
+}
+
+export function useEnabledPaymentMethods() {
+  const siteQuery = useAppPublicState();
+  const methods = resolveEnabledPaymentMethods({
+    loadFailed: siteQuery.isError,
+    flags: siteQuery.data?.paymentMethodFlags ?? null,
+  });
+  return {
+    methods,
+    isLoading: siteQuery.isLoading,
+    isError: siteQuery.isError,
+    configured: siteQuery.data?.paymentMethodFlags != null,
+  };
 }

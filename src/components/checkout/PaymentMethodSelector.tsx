@@ -3,6 +3,7 @@ import {
   PAYMENT_FEE_DISCLAIMER,
   PAYMENT_METHOD_LABELS,
   PAYMENT_METHODS,
+  PAYMENT_METHODS_UNAVAILABLE_MESSAGE,
   type PaymentMethod,
 } from "@/lib/shop/paymentMethod";
 import { PaymentMethodIcon } from "@/components/orders/PaymentMethodIcon";
@@ -10,17 +11,32 @@ import { PaymentMethodIcon } from "@/components/orders/PaymentMethodIcon";
 interface PaymentMethodSelectorProps {
   value: PaymentMethod | null;
   onChange: (method: PaymentMethod) => void;
+  methods?: readonly PaymentMethod[];
   error?: string | null;
 }
 
-export function PaymentMethodSelector({ value, onChange, error }: PaymentMethodSelectorProps) {
+export function PaymentMethodSelector({
+  value,
+  onChange,
+  methods = PAYMENT_METHODS,
+  error,
+}: PaymentMethodSelectorProps) {
+  if (methods.length === 0) {
+    return (
+      <div className="space-y-3">
+        <p className="text-base font-semibold">Zahlungsmethode</p>
+        <p className="text-sm text-muted-foreground">{PAYMENT_METHODS_UNAVAILABLE_MESSAGE}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
       <div>
         <p className="text-base font-semibold">Zahlungsmethode</p>
       </div>
       <div className="space-y-2" role="radiogroup" aria-label="Zahlungsmethode">
-        {PAYMENT_METHODS.map((method) => {
+        {methods.map((method) => {
           const selected = value === method;
           return (
             <button

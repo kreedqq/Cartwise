@@ -68,6 +68,7 @@ describe("hub admin navigation", () => {
         "/admin/announcements",
         "/admin/design",
         "/admin/feedback",
+        "/admin/payment-methods",
       ]),
     );
     expect(destinations).not.toContain("/admin/pdf-import");
@@ -82,6 +83,7 @@ describe("hub admin navigation", () => {
       "Bestell Zusammenfassung",
       "Rollenaufschläge",
       "Versandkosten",
+      "Zahlungsmethoden",
     ]);
     expect(orders?.items.map((item) => item.label)).not.toContain("Versand");
     expect(orders?.items.map((item) => item.label)).not.toContain("Eingegangene Bestellungen");
@@ -132,6 +134,7 @@ describe("hub admin navigation", () => {
       'path="announcements"',
       'path="design"',
       'path="feedback"',
+      'path="payment-methods"',
     ]) {
       expect(app).toContain(path);
     }

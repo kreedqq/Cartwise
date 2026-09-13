@@ -1,7 +1,12 @@
 import { supabase } from "@/lib/supabaseClient";
 import { parseSiteAccessState, type SiteAccessState } from "@/lib/siteAccess";
 
-export type AppSettingKey = "maintenance_mode" | "quantity_discounts_enabled";
+export type AppSettingKey =
+  | "maintenance_mode"
+  | "quantity_discounts_enabled"
+  | "payment_crypto_enabled"
+  | "payment_paypal_enabled"
+  | "payment_bank_transfer_enabled";
 
 export async function getSiteAccessState(): Promise<SiteAccessState> {
   const { data, error } = await supabase.rpc("get_site_access_state");

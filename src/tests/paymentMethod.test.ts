@@ -5,6 +5,8 @@ import {
   isPaymentMethod,
   PAYMENT_METHOD_REQUIRED_MESSAGE,
   PAYMENT_METHODS,
+  PAYMENT_METHODS_UNAVAILABLE_MESSAGE,
+  resolveEnabledPaymentMethods,
 } from "@/lib/shop/paymentMethod";
 
 describe("paymentMethod", () => {
@@ -29,5 +31,19 @@ describe("paymentMethod", () => {
 
   it("exposes required validation message", () => {
     expect(PAYMENT_METHOD_REQUIRED_MESSAGE).toContain("Zahlungsmethode");
+  });
+
+  it("fails closed when settings cannot be loaded", () => {
+    expect(resolveEnabledPaymentMethods({ loadFailed: true, flags: { crypto: true, paypal: true, bank_transfer: true } })).toEqual([]);
+    expect(resolveEnabledPaymentMethods({ loadFailed: false, flags: null })).toEqual(PAYMENT_METHODS);
+    expect(resolveEnabledPaymentMethods({
+      loadFailed: false,
+      flags: { crypto: true, paypal: false, bank_transfer: true },
+    })).toEqual(["crypto", "bank_transfer"]);
+    expect(resolveEnabledPaymentMethods({
+      loadFailed: false,
+      flags: { crypto: false, paypal: false, bank_transfer: false },
+    })).toEqual([]);
+    expect(PAYMENT_METHODS_UNAVAILABLE_MESSAGE).toContain("keine Zahlungsmethoden");
   });
 });

@@ -1453,7 +1453,15 @@ export interface Database {
         };
       };
       admin_set_app_setting: {
-        Args: { _key: "maintenance_mode" | "quantity_discounts_enabled"; _value: boolean };
+        Args: {
+          _key:
+            | "maintenance_mode"
+            | "quantity_discounts_enabled"
+            | "payment_crypto_enabled"
+            | "payment_paypal_enabled"
+            | "payment_bank_transfer_enabled";
+          _value: boolean;
+        };
         Returns: {
           maintenance_mode: boolean;
           quantity_discounts_enabled: boolean;

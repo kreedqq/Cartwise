@@ -50,6 +50,7 @@ const AdminShippingPage = lazy(() => import("@/pages/admin/AdminShipping"));
 const AdminResearchPage = lazy(() => import("@/pages/admin/AdminResearch"));
 const AdminAnnouncementsPage = lazy(() => import("@/pages/admin/AdminAnnouncements"));
 const AdminDesignPage = lazy(() => import("@/pages/admin/AdminDesign"));
+const AdminPaymentMethodsPage = lazy(() => import("@/pages/admin/AdminPaymentMethods"));
 const AdminFeedbackPage = lazy(() => import("@/pages/admin/AdminFeedback"));
 const PeptideHubPage = lazy(() => import("@/pages/peptide/PeptideHub"));
 const PeptideCalculatorPage = lazy(() => import("@/pages/peptide/PeptideCalculator"));
@@ -156,6 +157,7 @@ export default function App() {
                     <Route path="shipping" element={<Navigate to="/admin/orders" replace />} />
                     <Route path="shipping/:orderId" element={<RedirectAdminShippingOrder />} />
                     <Route path="shipping-costs" element={<AdminShippingPage />} />
+                    <Route path="payment-methods" element={<AdminPaymentMethodsPage />} />
                     <Route path="products" element={<AdminProductsPage />} />
                     <Route path="shop-areas" element={<AdminShopAreasPage />} />
                     <Route path="pdf-import" element={<AdminPdfImportPage />} />

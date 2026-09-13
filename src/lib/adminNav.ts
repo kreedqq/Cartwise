@@ -50,12 +50,14 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       pathname.startsWith("/admin/orders") ||
       pathname.startsWith("/admin/shipping") ||
       pathname.startsWith("/admin/order-summary") ||
-      pathname.startsWith("/admin/surcharges"),
+      pathname.startsWith("/admin/surcharges") ||
+      pathname.startsWith("/admin/payment-methods"),
     items: [
       { to: "/admin/orders", label: "Übersicht", matchPrefix: true },
       { to: "/admin/order-summary", label: "Bestell Zusammenfassung" },
       { to: "/admin/surcharges", label: "Rollenaufschläge" },
       { to: "/admin/shipping-costs", label: "Versandkosten" },
+      { to: "/admin/payment-methods", label: "Zahlungsmethoden" },
     ],
   },
   {

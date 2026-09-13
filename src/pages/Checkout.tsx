@@ -20,11 +20,13 @@ import { EditKitShareButton } from "@/components/shop/EditKitShareButton";
 import { useCarts } from "@/hooks/useCarts";
 import { useCartItems } from "@/hooks/useCartItems";
 import { useCartComputed } from "@/hooks/useCartComputed";
+import { useEnabledPaymentMethods } from "@/hooks/useAppPublicState";
 import { useCreateOrder } from "@/hooks/useOrders";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import { calculateCartTotals, summarizeOrderCharges } from "@/lib/money";
 import {
   PAYMENT_METHOD_REQUIRED_MESSAGE,
+  PAYMENT_METHODS_UNAVAILABLE_MESSAGE,
   type PaymentMethod,
 } from "@/lib/shop/paymentMethod";
 import {
@@ -43,6 +45,7 @@ export default function CheckoutPage() {
   const cartsQuery = useCarts();
   const itemsQuery = useCartItems(cartId);
   const createOrder = useCreateOrder();
+  const paymentMethods = useEnabledPaymentMethods();
 
   const [note, setNote] = React.useState("");
   const [paymentMethod, setPaymentMethod] = React.useState<PaymentMethod | null>(null);
@@ -50,6 +53,9 @@ export default function CheckoutPage() {
   const [shipping, setShipping] = React.useState<CheckoutShippingForm>(EMPTY_CHECKOUT_SHIPPING);
   const [shippingErrors, setShippingErrors] = React.useState<Partial<Record<CheckoutShippingField, string>>>({});
   const [confirmOpen, setConfirmOpen] = React.useState(false);
+
+  const effectivePaymentMethod =
+    paymentMethod != null && paymentMethods.methods.includes(paymentMethod) ? paymentMethod : null;
 
   const cart = cartsQuery.data?.find((c) => c.id === cartId);
   const { items } = useCartComputed(itemsQuery.data);
@@ -120,7 +126,12 @@ export default function CheckoutPage() {
       toast.error("Bitte prüfe Lieferart und Lieferadresse.");
       return;
     }
-    if (!paymentMethod) {
+    if (paymentMethods.methods.length === 0) {
+      setPaymentError(PAYMENT_METHODS_UNAVAILABLE_MESSAGE);
+      setConfirmOpen(false);
+      return;
+    }
+    if (!effectivePaymentMethod) {
       setPaymentError(PAYMENT_METHOD_REQUIRED_MESSAGE);
       setConfirmOpen(false);
       return;
@@ -129,7 +140,7 @@ export default function CheckoutPage() {
       const result = await createOrder.mutateAsync({
         cartId: cart.id,
         note: note.trim() || null,
-        paymentMethod,
+        paymentMethod: effectivePaymentMethod,
         shipping: address,
       });
       const extraOrders = Array.isArray(result.orders) ? result.orders.length : 1;
@@ -154,7 +165,12 @@ export default function CheckoutPage() {
       toast.error("Bitte fülle Lieferart und Lieferadresse vollständig aus.");
       return;
     }
-    if (!paymentMethod) {
+    if (paymentMethods.methods.length === 0) {
+      setPaymentError(PAYMENT_METHODS_UNAVAILABLE_MESSAGE);
+      toast.error(PAYMENT_METHODS_UNAVAILABLE_MESSAGE);
+      return;
+    }
+    if (!effectivePaymentMethod) {
       setPaymentError(PAYMENT_METHOD_REQUIRED_MESSAGE);
       toast.error(PAYMENT_METHOD_REQUIRED_MESSAGE);
       return;
@@ -276,7 +292,8 @@ export default function CheckoutPage() {
           <Card>
             <CardContent className="space-y-6 p-5">
               <PaymentMethodSelector
-                value={paymentMethod}
+                value={effectivePaymentMethod}
+                methods={paymentMethods.methods}
                 onChange={(method) => {
                   setPaymentMethod(method);
                   setPaymentError(null);

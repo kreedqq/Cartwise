@@ -16,6 +16,31 @@ export function isPaymentMethod(value: string | null | undefined): value is Paym
   return PAYMENT_METHODS.includes(value as PaymentMethod);
 }
 
+export const PAYMENT_METHOD_SETTING_KEYS = {
+  crypto: "payment_crypto_enabled",
+  paypal: "payment_paypal_enabled",
+  bank_transfer: "payment_bank_transfer_enabled",
+} as const;
+
+export type PaymentMethodSettingKey = (typeof PAYMENT_METHOD_SETTING_KEYS)[PaymentMethod];
+
+export const PAYMENT_METHODS_UNAVAILABLE_MESSAGE = "Aktuell sind keine Zahlungsmethoden verfügbar.";
+
+export type PaymentMethodFlags = Record<PaymentMethod, boolean>;
+
+/**
+ * Fail-closed when settings cannot be loaded.
+ * Legacy RPC without flags keeps the current three methods visible.
+ */
+export function resolveEnabledPaymentMethods(input: {
+  loadFailed: boolean;
+  flags: PaymentMethodFlags | null;
+}): PaymentMethod[] {
+  if (input.loadFailed) return [];
+  if (input.flags == null) return [...PAYMENT_METHODS];
+  return PAYMENT_METHODS.filter((method) => input.flags?.[method] === true);
+}
+
 /** Optional human-readable note; payment method is stored in orders.payment_method. */
 export function formatPaymentMethodNote(method: PaymentMethod, userNote: string | null): string {
   const label = PAYMENT_METHOD_LABELS[method];
