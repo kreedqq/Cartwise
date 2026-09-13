@@ -25,6 +25,7 @@ const {
   readOAuthCallbackError,
   completeOAuthCallback,
   clearOAuthFlowLock,
+  isRecoverableConsumedOAuthCodeError,
   OAUTH_CALLBACK_PATH,
   POST_LOGIN_PATH,
   OAUTH_SUCCESS_PATH,
@@ -304,7 +305,7 @@ describe("completeOAuthCallback", () => {
     expect(result).toEqual({ status: "authenticated" });
   });
 
-  it("keeps an existing session when the code exchange fails", async () => {
+  it("treats invalid flow state as success only when detectSessionInUrl left a session", async () => {
     const result = await completeOAuthCallback({
       href: "https://peptix.app/auth/callback?code=abc",
       search: "?code=abc",
@@ -347,7 +348,7 @@ describe("completeOAuthCallback", () => {
     expect(result).toEqual({ status: "authenticated" });
   });
 
-  it("does not fail a prior session on non-identity exchange errors (double exchange race)", async () => {
+  it("allows recoverable consumed-code errors when a session remains after double exchange", async () => {
     const result = await completeOAuthCallback({
       href: "https://peptix.app/auth/callback?code=abc",
       search: "?code=abc",
@@ -357,6 +358,48 @@ describe("completeOAuthCallback", () => {
       }),
     });
     expect(result).toEqual({ status: "authenticated" });
+  });
+
+  it("rejects real OAuth errors even when a prior session remains", async () => {
+    const cases = [
+      "invalid_code",
+      "pkce_verifier_mismatch",
+      "pkce_verifier_missing",
+      "access_denied",
+      "redirect_uri_not_allowed",
+      "invalid_state",
+      "session missing",
+    ];
+    for (const message of cases) {
+      const result = await completeOAuthCallback({
+        href: "https://peptix.app/auth/callback?code=abc",
+        search: "?code=abc",
+        getSession: vi.fn().mockResolvedValue({ data: { session }, error: null }),
+        exchangeCodeForSession: vi.fn().mockResolvedValue({ error: { message } }),
+      });
+      expect(result).toEqual({ status: "failed", message });
+    }
+  });
+
+  it("rejects URL OAuth errors before exchanging", async () => {
+    const result = await completeOAuthCallback({
+      href: "https://peptix.app/auth/callback?error=access_denied&error_description=User+cancelled",
+      search: "?error=access_denied&error_description=User+cancelled",
+      getSession: vi.fn(),
+      exchangeCodeForSession: vi.fn(),
+    });
+    expect(result).toEqual({ status: "failed", message: "User cancelled" });
+  });
+
+  it("classifies recoverable consumed-code errors narrowly", () => {
+    expect(isRecoverableConsumedOAuthCodeError("invalid flow state")).toBe(true);
+    expect(isRecoverableConsumedOAuthCodeError("authorization code already exchanged")).toBe(true);
+    expect(isRecoverableConsumedOAuthCodeError("both auth code and code verifier should be non-empty")).toBe(true);
+    expect(isRecoverableConsumedOAuthCodeError("pkce_verifier_missing")).toBe(false);
+    expect(isRecoverableConsumedOAuthCodeError("pkce_verifier_mismatch")).toBe(false);
+    expect(isRecoverableConsumedOAuthCodeError("invalid_code")).toBe(false);
+    expect(isRecoverableConsumedOAuthCodeError("access_denied")).toBe(false);
+    expect(isRecoverableConsumedOAuthCodeError("identity_already_exists")).toBe(false);
   });
 
   it("exchanges the code even when a session already exists", async () => {
@@ -371,7 +414,7 @@ describe("completeOAuthCallback", () => {
     expect(result).toEqual({ status: "authenticated" });
   });
 
-  it("fails to login only when exchange fails and no session exists", async () => {
+  it("fails when exchange fails with recoverable error but no session exists", async () => {
     const result = await completeOAuthCallback({
       href: "https://peptix.app/auth/callback?code=abc",
       search: "?code=abc",

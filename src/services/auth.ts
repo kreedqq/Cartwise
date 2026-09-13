@@ -97,6 +97,40 @@ export function isIdentityAlreadyLinkedMessage(message: string): boolean {
 }
 
 /**
+ * Expected follow-on errors when `detectSessionInUrl` already consumed the PKCE code.
+ * Real OAuth failures (invalid_code, pkce mismatch/missing, access_denied, …) must NOT match.
+ */
+export function isRecoverableConsumedOAuthCodeError(message: string): boolean {
+  const msg = message.toLowerCase();
+  if (isIdentityAlreadyLinkedMessage(msg)) return false;
+  if (msg.includes("access_denied") || msg.includes("access denied")) return false;
+  if (msg.includes("redirect") && (msg.includes("not allowed") || msg.includes("invalid"))) return false;
+  if (msg.includes("invalid_state") || msg.includes("invalid state")) return false;
+  if (msg.includes("pkce_verifier_mismatch") || (msg.includes("verifier") && msg.includes("mismatch"))) {
+    return false;
+  }
+  if (msg.includes("pkce_verifier_missing") || (msg.includes("verifier") && msg.includes("missing"))) {
+    return false;
+  }
+  // Verifier already cleared after a successful auto-exchange (supabase-js wording).
+  if (
+    msg.includes("code verifier") &&
+    (msg.includes("non-empty") || msg.includes("should be non-empty") || msg.includes("empty"))
+  ) {
+    return true;
+  }
+  if (
+    (msg.includes("code") || msg.includes("auth code") || msg.includes("authorization code")) &&
+    (msg.includes("already") || msg.includes("exchanged") || msg.includes("reuse") || msg.includes("used"))
+  ) {
+    return true;
+  }
+  // Second exchange after detectSessionInUrl often surfaces as invalid/missing flow state.
+  if (msg.includes("invalid flow state") || msg.includes("no valid flow state")) return true;
+  return false;
+}
+
+/**
  * Non-secret OAuth callback diagnostics for production debugging.
  * Never logs code, tokens, verifiers, or cookies.
  */
@@ -131,12 +165,10 @@ export function logOAuthCallbackDiagnostics(input: {
 
 /**
  * Completes the PKCE callback without racing `detectSessionInUrl`.
- * A consumed OAuth code must not send the user to /login if a session already exists.
  *
- * Important: supabase-js may already exchange the code via `detectSessionInUrl`.
- * A second exchange then fails with "already used" / invalid flow — that is NOT a
- * login failure when a session is present. Only identity-already-linked is a
- * hard failure while keeping a prior session (linkIdentity conflict).
+ * A failed exchange is authenticated ONLY when a session exists AND the error is a
+ * recoverable consumed-code follow-on (detectSessionInUrl already succeeded).
+ * Real OAuth errors always fail — even if a prior email/Discord session remains.
  */
 export async function completeOAuthCallback(args: {
   href: string;
@@ -168,16 +200,23 @@ export async function completeOAuthCallback(args: {
     const { error } = await args.exchangeCodeForSession(args.href);
     const after = await args.getSession();
 
-    // linkIdentity conflict: Telegram identity belongs to another user.
     if (error && isIdentityAlreadyLinkedMessage(error.message)) {
       return { status: "failed", message: error.message };
     }
 
-    // Session present → success. Covers detectSessionInUrl winning the race and
-    // the subsequent exchange failing with code-already-used / invalid flow state.
-    if (after.data.session) {
+    if (!error && after.data.session) {
       return { status: "authenticated" };
     }
+
+    // detectSessionInUrl already exchanged; second call fails with code-already-used.
+    if (
+      error &&
+      after.data.session &&
+      isRecoverableConsumedOAuthCodeError(error.message)
+    ) {
+      return { status: "authenticated" };
+    }
+
     if (error) return { status: "failed", message: error.message };
     if (after.error) return { status: "failed", message: after.error.message };
     return { status: "failed", message: "session missing" };
