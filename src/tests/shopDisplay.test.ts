@@ -6,6 +6,7 @@ import {
   lexiconHrefForShopProduct,
   normalizeShopDisplayName,
   productMatchesShopSearch,
+  shopGroupMatchesSearch,
   shopGroupsForCategory,
 } from "@/lib/shop/display";
 import type { Tables } from "@/types/database";
@@ -159,5 +160,18 @@ describe("productMatchesShopSearch", () => {
     expect(productMatchesShopSearch({ code: "KL80", name: "(KLOW) GHK-CU 50mg+TB500 10mg+BPC157 10mg+TB500 10mg Blend" }, "klow")).toBe(
       true,
     );
+  });
+});
+
+describe("shopGroupMatchesSearch", () => {
+  it("filters existing shop groups by name, code, or variant", () => {
+    const groups = groupAndSortShopProducts([
+      shopRow("RT10", "Retatrutide", { dosage_vial: "10x 10 mg", category: "PEPTIDES" }),
+      shopRow("SM10", "Semax", { dosage_vial: "10x 10 mg", category: "PEPTIDES" }),
+    ]);
+    expect(groups.some((group) => shopGroupMatchesSearch(group, "reta"))).toBe(true);
+    expect(groups.filter((group) => shopGroupMatchesSearch(group, "semax"))).toHaveLength(1);
+    expect(groups.filter((group) => shopGroupMatchesSearch(group, "RT10"))).toHaveLength(1);
+    expect(groups.filter((group) => shopGroupMatchesSearch(group, "xyz-not-a-product"))).toHaveLength(0);
   });
 });

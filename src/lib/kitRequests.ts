@@ -37,6 +37,13 @@ export function remainingQuantityOptions(remaining: number): number[] {
   return Array.from({ length: remaining }, (_, i) => i + 1);
 }
 
+export function isValidJoinQuantity(remaining: number, quantity: number): boolean {
+  return remainingQuantityOptions(remaining).includes(quantity);
+}
+
+export const KIT_REQUEST_CARD_GRID =
+  "grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3";
+
 export function isValidCreatorQuantity(kitSize: number, creatorQuantity: number): boolean {
   return isValidKitSize(kitSize) && Number.isInteger(creatorQuantity) && creatorQuantity >= 1 && creatorQuantity < kitSize;
 }

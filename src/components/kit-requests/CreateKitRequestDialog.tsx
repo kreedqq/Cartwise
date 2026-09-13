@@ -10,13 +10,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toaster";
+import { Search } from "lucide-react";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { useCreateKitRequest } from "@/hooks/useKitRequests";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { isValidCreatorQuantity } from "@/lib/kitRequests";
 import type { ShopAreaKey } from "@/lib/shop/shopAreas";
-import { groupAndSortShopProducts } from "@/lib/shop/display";
+import {
+  groupAndSortShopProducts,
+  KIT_WIZARD_PRODUCT_PAGE_SIZE,
+  shopGroupMatchesSearch,
+} from "@/lib/shop/display";
 import { kitShareParticipantBaseUsd } from "@/lib/shop/kitSharePricing";
 import { KIT_SIZE_OPTIONS, formatKitSizeOption, kitCategoryIdFor } from "@/lib/shop/kitUnits";
 import { formatProductVariant, kitShareableVariants } from "@/lib/shop/variantCoverage";
@@ -24,7 +30,7 @@ import { cn } from "@/lib/utils";
 import type { Tables } from "@/types/database";
 
 const STEPS = [
-  { title: "Was möchtest du mit anderen teilen?", body: "Wähle zuerst das Produkt aus." },
+  { title: "Was möchtest du mit anderen teilen?", body: "Suche nach einem Produkt oder wähle eines aus." },
   { title: "Welche Variante möchtest du?", body: "Wähle die Variante, die du gemeinsam mit anderen kaufen möchtest." },
   { title: "Wie groß soll das gemeinsame Kit sein?", body: "Ein Kit besteht aus mehreren Vials. Du kannst einen Teil selbst übernehmen und den Rest anderen Kunden anbieten." },
   { title: "Wie viele möchtest du selbst übernehmen?", body: "Du übernimmst diesen Anteil selbst. Die übrigen Plätze können andere Kunden übernehmen." },
@@ -91,6 +97,8 @@ function CreateKitRequestWizard({
   const [step, setStep] = React.useState(initialProductId ? 2 : 0);
   const [pickedGroupKey, setPickedGroupKey] = React.useState<string | undefined>(undefined);
   const [pickedProductId, setPickedProductId] = React.useState<string | undefined>(undefined);
+  const [productSearch, setProductSearch] = React.useState("");
+  const [productVisibleCount, setProductVisibleCount] = React.useState(KIT_WIZARD_PRODUCT_PAGE_SIZE);
   const [kitSize, setKitSize] = React.useState(10);
   const [myQuantity, setMyQuantity] = React.useState(1);
   const [note, setNote] = React.useState("");
@@ -113,6 +121,11 @@ function CreateKitRequestWizard({
   const maxCreatorQty = Math.max(1, kitSize - 1);
   const creatorQuantity = Math.min(myQuantity, maxCreatorQty);
   const remainingAfter = kitSize - creatorQuantity;
+  const matchedGroups = React.useMemo(
+    () => groups.filter((group) => shopGroupMatchesSearch(group, productSearch)),
+    [groups, productSearch],
+  );
+  const visibleGroups = matchedGroups.slice(0, productVisibleCount);
   // Shop `price_usd` is already the area sell kit price (factor + role markup once).
   // Split that kit total. Do not mark the share up a second time.
   const sharePriceUsd = selectedProduct
@@ -123,6 +136,8 @@ function CreateKitRequestWizard({
     setStep(initialProductId ? 2 : 0);
     setPickedGroupKey(undefined);
     setPickedProductId(undefined);
+    setProductSearch("");
+    setProductVisibleCount(KIT_WIZARD_PRODUCT_PAGE_SIZE);
     setKitSize(10);
     setMyQuantity(1);
     setNote("");
@@ -208,18 +223,57 @@ function CreateKitRequestWizard({
             </DialogHeader>
 
             {step === 0 ? (
-              <div className="grid gap-2">
-                {groups.map((group) => (
-                  <ChoiceButton
-                    key={group.groupKey}
-                    active={groupKey === group.groupKey}
-                    onClick={() => {
-                      setPickedGroupKey(group.groupKey);
-                      setPickedProductId("");
+              <div className="space-y-3">
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={productSearch}
+                    onChange={(event) => {
+                      setProductSearch(event.target.value);
+                      setProductVisibleCount(KIT_WIZARD_PRODUCT_PAGE_SIZE);
                     }}
-                    title={group.displayName}
+                    placeholder="Produkt suchen …"
+                    className="pl-10"
+                    aria-label="Produkt suchen"
                   />
-                ))}
+                </div>
+                {matchedGroups.length === 0 ? (
+                  <p className="rounded-xl bg-secondary/40 px-4 py-6 text-sm text-muted-foreground">
+                    Suche nach einem Produkt, um es auszuwählen.
+                  </p>
+                ) : (
+                  <div className="grid gap-2">
+                    {visibleGroups.map((group) => {
+                      const shareable = kitShareableVariants(group.variants);
+                      return (
+                        <ChoiceButton
+                          key={group.groupKey}
+                          active={groupKey === group.groupKey}
+                          onClick={() => {
+                            setPickedGroupKey(group.groupKey);
+                            setPickedProductId("");
+                          }}
+                          title={group.displayName}
+                          subtitle={
+                            shareable.length === 1
+                              ? formatProductVariant(shareable[0])
+                              : "Mehrere Varianten"
+                          }
+                        />
+                      );
+                    })}
+                    {matchedGroups.length > visibleGroups.length ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="min-h-11 w-full"
+                        onClick={() => setProductVisibleCount((count) => count + KIT_WIZARD_PRODUCT_PAGE_SIZE)}
+                      >
+                        Mehr anzeigen
+                      </Button>
+                    ) : null}
+                  </div>
+                )}
               </div>
             ) : null}
 
@@ -352,10 +406,12 @@ function CreateKitRequestWizard({
 function ChoiceButton({
   active,
   title,
+  subtitle,
   onClick,
 }: {
   active: boolean;
   title: string;
+  subtitle?: string;
   onClick: () => void;
 }) {
   return (
@@ -363,11 +419,12 @@ function ChoiceButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "min-h-12 rounded-xl border px-4 py-3 text-left text-sm font-medium transition-colors",
+        "min-h-12 w-full rounded-xl border px-4 py-3 text-left transition-colors",
         active ? "border-primary bg-primary/10 text-foreground" : "border-border hover:border-primary/50",
       )}
     >
-      {title}
+      <p className="text-sm font-medium">{title}</p>
+      {subtitle ? <p className="text-xs text-muted-foreground">{subtitle}</p> : null}
     </button>
   );
 }

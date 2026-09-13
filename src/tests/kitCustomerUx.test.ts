@@ -22,7 +22,10 @@ describe("kit customer UX", () => {
     expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toContain("Was möchtest du mit anderen teilen?");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("useExchangeRate");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("DualCurrencyPrice");
-    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Dein Anteil:");
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Dein Anteil");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("KIT_REQUEST_CARD_GRID");
+    expect(read("src/pages/KitRequests.tsx")).toContain("KIT_REQUEST_CARD_GRID");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("overflow-x-auto");
     expect(read("src/pages/GroupBuy.tsx")).toContain("Kit gemeinsam kaufen");
     expect(read("src/pages/GroupBuy.tsx")).toContain("Meine Kit Beteiligungen");
     expect(read("src/pages/GroupBuy.tsx")).toContain("+ Kit Gesuch");

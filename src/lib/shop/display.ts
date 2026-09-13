@@ -234,3 +234,20 @@ export function productMatchesShopSearch(
     normalizeCatalogName(product.name).includes(needle)
   );
 }
+
+/** Live filter for kit-wizard product groups using the existing shop catalog. */
+export function shopGroupMatchesSearch(group: ShopProductGroup, term: string): boolean {
+  const needle = term.trim().toLowerCase();
+  if (!needle) return true;
+  if (group.displayName.toLowerCase().includes(needle) || group.sortKey.includes(needle)) return true;
+  return group.variants.some((variant) => {
+    const variantLabel = variantLabelForProduct(variant).toLowerCase();
+    return (
+      productMatchesShopSearch(variant, term) ||
+      variantLabel.includes(needle) ||
+      (variant.dosage_vial ?? "").toLowerCase().includes(needle)
+    );
+  });
+}
+
+export const KIT_WIZARD_PRODUCT_PAGE_SIZE = 8;

@@ -20,6 +20,11 @@ describe("kit create wizard", () => {
   it("walks one customer decision per step and keeps everyday language", () => {
     expect(wizard).toContain("Schritt {step + 1} von {STEPS.length}");
     expect(wizard).toContain("Was möchtest du mit anderen teilen?");
+    expect(wizard).toContain("Suche nach einem Produkt oder wähle eines aus.");
+    expect(wizard).toContain("Produkt suchen …");
+    expect(wizard).toContain("shopGroupMatchesSearch");
+    expect(wizard).toContain("Mehr anzeigen");
+    expect(wizard).toContain("KIT_WIZARD_PRODUCT_PAGE_SIZE");
     expect(wizard).toContain("Welche Variante möchtest du?");
     expect(wizard).toContain("Wie groß soll das gemeinsame Kit sein?");
     expect(wizard).toContain("Wie viele möchtest du selbst übernehmen?");

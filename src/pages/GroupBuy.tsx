@@ -9,6 +9,7 @@ import { ShopCategoryHub } from "@/components/shop/ShopCategoryHub";
 import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitRequestDialog";
 import { JoinKitRequestDialog } from "@/components/kit-requests/JoinKitRequestDialog";
 import { KitRequestCardView } from "@/components/kit-requests/KitRequestCard";
+import { KitRequestFilterBar } from "@/components/kit-requests/KitRequestFilterBar";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -48,9 +49,8 @@ import {
   type ShopAreaKey,
 } from "@/lib/shop/shopAreas";
 import { areaDensityClass, parseAreaTheme } from "@/lib/shop/areaTheme";
-import { kitRequestStatusLabel, type KitRequestSort } from "@/lib/kitRequests";
+import { KIT_REQUEST_CARD_GRID, kitRequestStatusLabel, type KitRequestSort } from "@/lib/kitRequests";
 import { shopGroupsForCategory, productMatchesShopSearch } from "@/lib/shop/display";
-import { formatProductVariant } from "@/lib/shop/variantCoverage";
 import {
   countProductsByAreaCategory,
   productsInAreaCategory,
@@ -460,7 +460,10 @@ function KitRequestsSection({
   const syncMutation = useSyncKitRequestCarts();
 
   const selectedGroup = groups.find(
-    (g) => g.displayName === productName || g.variants[0]?.name === productName,
+    (group) =>
+      group.groupKey === productName ||
+      group.displayName === productName ||
+      group.variants[0]?.name === productName,
   );
   const variantOptions = selectedGroup?.variants ?? [];
 
@@ -497,161 +500,66 @@ function KitRequestsSection({
       </div>
 
       <Tabs value={tab} onValueChange={setTab} className="min-w-0">
-        <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
-          <TabsTrigger value="open" className="flex-1 sm:flex-none">
+        <TabsList className="flex h-auto w-full flex-nowrap justify-start gap-1 overflow-x-auto">
+          <TabsTrigger value="open" className="shrink-0">
             Offene Kit Gesuche
           </TabsTrigger>
-          <TabsTrigger value="mine" className="flex-1 sm:flex-none">
+          <TabsTrigger value="mine" className="shrink-0">
             Von mir erstellt
           </TabsTrigger>
-          <TabsTrigger value="joined" className="flex-1 sm:flex-none">
+          <TabsTrigger value="joined" className="shrink-0">
             Meine Kit Beteiligungen
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="open" className="space-y-6">
-          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            <div className="space-y-1.5 sm:col-span-2 xl:col-span-1">
-              <Label htmlFor="kit-search">Suche</Label>
-              <Input
-                id="kit-search"
-                value={search}
-                onChange={(event) => {
-                  setSearch(event.target.value);
-                  setPage(1);
-                }}
-                placeholder="Produkt oder Username"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Kategorie</Label>
-              <Select
-                value={category ?? "all"}
-                onValueChange={(value) => {
-                  setCategory(value === "all" ? null : value);
-                  setProductName(null);
-                  setProductId(null);
-                  setVariant(null);
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Kategorien</SelectItem>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.category_key} value={cat.category_key}>
-                      {cat.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Produkt</Label>
-              <Select
-                value={productName ?? "all"}
-                onValueChange={(value) => {
-                  setProductName(value === "all" ? null : value);
-                  setProductId(null);
-                  setVariant(null);
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Produkte</SelectItem>
-                  {groups.map((group) => (
-                    <SelectItem
-                      key={group.groupKey}
-                      value={group.variants[0]?.name ?? group.displayName}
-                    >
-                      {group.displayName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Variante</Label>
-              <Select
-                value={variant ?? "all"}
-                onValueChange={(value) => {
-                  if (value === "all") {
-                    setVariant(null);
-                    setProductId(null);
-                    setPage(1);
-                    return;
-                  }
-                  const match = variantOptions.find((item) => (item.dosage_vial || item.code) === value);
-                  setVariant(value);
-                  setProductId(match?.id ?? null);
-                  setPage(1);
-                }}
-                disabled={!productName}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Alle Varianten" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Varianten</SelectItem>
-                  {variantOptions.map((item) => (
-                    <SelectItem key={item.id} value={item.dosage_vial || item.code}>
-                      {formatProductVariant(item)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Noch verfügbar</Label>
-              <Select
-                value={minRemaining == null ? "all" : String(minRemaining)}
-                onValueChange={(value) => {
-                  setMinRemaining(value === "all" ? null : Number(value));
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Beliebig</SelectItem>
-                  <SelectItem value="1">Mindestens 1</SelectItem>
-                  <SelectItem value="2">Mindestens 2</SelectItem>
-                  <SelectItem value="4">Mindestens 4</SelectItem>
-                  <SelectItem value="6">Mindestens 6</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Sortierung</Label>
-              <Select
-                value={sort}
-                onValueChange={(value) => {
-                  setSort(value as KitRequestSort);
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">Neueste</SelectItem>
-                  <SelectItem value="fewest_remaining">Am vollsten zuerst</SelectItem>
-                  <SelectItem value="most_remaining">Meiste Plätze frei</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <KitRequestFilterBar
+            searchId="kit-search"
+            search={search}
+            onSearch={(value) => {
+              setSearch(value);
+              setPage(1);
+            }}
+            category={category}
+            onCategory={(value) => {
+              setCategory(value);
+              setProductName(null);
+              setProductId(null);
+              setVariant(null);
+              setPage(1);
+            }}
+            categories={categories}
+            productName={productName}
+            onProductName={(value) => {
+              setProductName(value);
+              setProductId(null);
+              setVariant(null);
+              setPage(1);
+            }}
+            groups={groups}
+            variant={variant}
+            onVariant={(nextVariant, nextProductId) => {
+              setVariant(nextVariant);
+              setProductId(nextProductId);
+              setPage(1);
+            }}
+            variantOptions={variantOptions}
+            minRemaining={minRemaining}
+            onMinRemaining={(value) => {
+              setMinRemaining(value);
+              setPage(1);
+            }}
+            sort={sort}
+            onSort={(value) => {
+              setSort(value);
+              setPage(1);
+            }}
+          />
 
           {openQuery.isLoading ? (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className={KIT_REQUEST_CARD_GRID}>
               {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-64 w-full rounded-xl" />
+                <Skeleton key={i} className="h-48 w-full rounded-xl" />
               ))}
             </div>
           ) : null}
@@ -673,7 +581,7 @@ function KitRequestsSection({
 
           {openQuery.data && openQuery.data.items.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className={KIT_REQUEST_CARD_GRID}>
                 {openQuery.data.items.map((item) => (
                   <KitRequestCardView
                     key={item.id}
@@ -718,7 +626,7 @@ function KitRequestsSection({
           {mineQuery.data && myRequests.length === 0 ? (
             <EmptyState icon={Layers} title="Noch kein eigenes Kit" description="Teile ein Kit, um andere Kunden einzuladen." />
           ) : null}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className={KIT_REQUEST_CARD_GRID}>
             {myRequests.map((item) => (
               <KitRequestCardView
                 key={item.id}
@@ -742,7 +650,7 @@ function KitRequestsSection({
           {joinedQuery.data && myParticipations.length === 0 ? (
             <EmptyState icon={Layers} title="Keine Kit Beteiligungen" description="Mach bei einem offenen Kit mit, um hier zu erscheinen." />
           ) : null}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className={KIT_REQUEST_CARD_GRID}>
             {myParticipations.map((item) => (
               <KitRequestCardView
                 key={item.id}

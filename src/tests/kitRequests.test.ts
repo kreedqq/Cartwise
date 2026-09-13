@@ -7,6 +7,7 @@ import {
   kitRequestCustomerStatusLabel,
   kitRequestStatusLabel,
   remainingQuantityOptions,
+  isValidJoinQuantity,
 } from "@/lib/kitRequests";
 
 describe("kit request helpers", () => {
@@ -30,6 +31,8 @@ describe("kit request helpers", () => {
     expect(remainingQuantityOptions(3)).toEqual([1, 2, 3]);
     expect(remainingQuantityOptions(0)).toEqual([]);
     expect(remainingQuantityOptions(-1)).toEqual([]);
+    expect(isValidJoinQuantity(3, 3)).toBe(true);
+    expect(isValidJoinQuantity(3, 4)).toBe(false);
   });
 
   it("rejects a creator taking the entire kit", () => {
