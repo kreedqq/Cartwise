@@ -17,6 +17,7 @@ import { useShopProducts } from "@/hooks/useShopProducts";
 import { isValidCreatorQuantity } from "@/lib/kitRequests";
 import type { ShopAreaKey } from "@/lib/shop/shopAreas";
 import { groupAndSortShopProducts } from "@/lib/shop/display";
+import { kitShareParticipantBaseUsd } from "@/lib/shop/kitSharePricing";
 import { KIT_SIZE_OPTIONS, formatKitSizeOption, kitCategoryIdFor } from "@/lib/shop/kitUnits";
 import { formatProductVariant, kitShareableVariants } from "@/lib/shop/variantCoverage";
 import { cn } from "@/lib/utils";
@@ -112,6 +113,11 @@ function CreateKitRequestWizard({
   const maxCreatorQty = Math.max(1, kitSize - 1);
   const creatorQuantity = Math.min(myQuantity, maxCreatorQty);
   const remainingAfter = kitSize - creatorQuantity;
+  // Shop `price_usd` is already the area sell kit price (factor + role markup once).
+  // Split that kit total. Do not mark the share up a second time.
+  const sharePriceUsd = selectedProduct
+    ? kitShareParticipantBaseUsd(selectedProduct, kitSize, creatorQuantity, creatorQuantity)
+    : null;
 
   function close() {
     setStep(initialProductId ? 2 : 0);
@@ -294,11 +300,11 @@ function CreateKitRequestWizard({
                 <SummaryRow label="Gesamtes Kit" value={`${kitSize} Vials`} />
                 <SummaryRow label="Dein Anteil" value={`${creatorQuantity} Vials`} />
                 <SummaryRow label="Noch gesucht" value={`${remainingAfter} Vials`} />
-                {selectedProduct ? (
+                {sharePriceUsd != null ? (
                   <div>
                     <p className="text-xs text-muted-foreground">Dein voraussichtlicher Anteil</p>
                     <DualCurrencyPrice
-                      usd={selectedProduct.price_usd * creatorQuantity}
+                      usd={sharePriceUsd}
                       rate={rateQuery.data?.rate ?? null}
                       size="summary"
                     />

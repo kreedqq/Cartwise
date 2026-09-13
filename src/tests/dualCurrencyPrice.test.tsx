@@ -84,6 +84,7 @@ describe("customer dual-currency surfaces", () => {
 
   it("uses DualCurrencyPrice for customer kit prices", () => {
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("DualCurrencyPrice");
+    expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toContain("DualCurrencyPrice");
     expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("DualCurrencyPrice");
     expect(read("src/components/shop/KitShareDialog.tsx")).toContain("DualCurrencyPrice");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).not.toContain("formatUsd");

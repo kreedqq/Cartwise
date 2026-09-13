@@ -2,7 +2,9 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
+import { applyRoleMarkup, convertUsdToEur } from "@/lib/money";
 import { isValidCreatorQuantity, remainingQuantityOptions } from "@/lib/kitRequests";
+import { kitShareParticipantBaseUsd, kitShareParticipantPriceUsd } from "@/lib/shop/kitSharePricing";
 import { KIT_SIZE_OPTIONS, isValidKitSize } from "@/lib/shop/kitUnits";
 
 function read(path: string): string {
@@ -119,5 +121,84 @@ describe("shop layout uses available desktop width", () => {
     expect(read("src/components/shop/ShopProductsMobileList.tsx")).toContain("min-h-11 w-full");
     expect(read("src/components/shop/ShopProductsMobileList.tsx")).not.toContain("min-w-[9.5rem]");
     expect(read("src/components/layout/MobileNav.tsx")).toContain("useCustomerNavItems");
+  });
+});
+
+describe("kit create wizard share preview uses kit pricing SSoT", () => {
+  const wizard = read("src/components/kit-requests/CreateKitRequestDialog.tsx");
+  const kitSize = 10;
+  /** Shop-listed peptide `price_usd` is the sell price of one 10-vial kit (factor + markup already applied). */
+  const shopSellKitUsd = 73.28;
+  const shopPeptide = { category: "PEPTIDES", price_usd: shopSellKitUsd };
+
+  it("splits the shop kit sell price instead of treating it as a vial price", () => {
+    expect(wizard).toContain("kitShareParticipantBaseUsd");
+    expect(wizard).toContain("sharePriceUsd");
+    expect(wizard).not.toContain("price_usd * creatorQuantity");
+    expect(wizard).not.toContain("kitShareParticipantPriceUsd");
+    expect(wizard).not.toContain("applyRoleMarkup");
+    expect(wizard).toContain("useCreateKitRequest");
+    expect(wizard).not.toMatch(/mutateAsync\(\{[^}]*price/);
+  });
+
+  it.each([
+    [1, 7.33],
+    [2, 14.66],
+    [5, 36.64],
+    [6, 43.97],
+    [9, 65.95],
+    [10, 73.28],
+  ] as const)("kit 10 / share %i of shop kit %s USD", (shareQuantity, expectedShareUsd) => {
+    const shareUsd = kitShareParticipantBaseUsd(
+      shopPeptide,
+      kitSize,
+      shareQuantity,
+      shareQuantity,
+    );
+    expect(shareUsd).toBeCloseTo(expectedShareUsd, 2);
+    expect(shareUsd).toBeCloseTo((shopSellKitUsd * shareQuantity) / kitSize, 2);
+    expect(shareUsd).not.toBeCloseTo(shopSellKitUsd * shareQuantity, 2);
+  });
+
+  it("does not apply role markup a second time on an already-sold shop kit price", () => {
+    const catalogKitUsd = 100;
+    const markupPercent = 25;
+    const shopSellKit = {
+      category: "PEPTIDES",
+      price_usd: applyRoleMarkup(catalogKitUsd, markupPercent),
+    };
+    expect(shopSellKit.price_usd).toBe(125);
+    const shareUsd = kitShareParticipantBaseUsd(shopSellKit, kitSize, 6, 6);
+    expect(shareUsd).toBe(75);
+    expect(applyRoleMarkup(shareUsd, markupPercent)).toBe(93.75);
+    expect(kitShareParticipantPriceUsd(shopSellKit, kitSize, 6, 6, markupPercent)).toBe(93.75);
+    expect(shareUsd).not.toBe(93.75);
+  });
+
+  it("converts the share USD to EUR once through the central rate", () => {
+    const shareUsd = kitShareParticipantBaseUsd(shopPeptide, kitSize, 6, 6);
+    const rate = 0.86;
+    const shareEur = convertUsdToEur(shareUsd, rate);
+    expect(shareUsd).toBe(43.97);
+    expect(shareEur).toBe(37.81);
+    expect(convertUsdToEur(shareUsd, 63.22 / 73.28)).toBe(37.93);
+    expect(shareEur).not.toBeNull();
+    expect(convertUsdToEur(shareEur as number, rate)).toBe(32.52);
+    expect(convertUsdToEur(shareEur as number, rate)).not.toBe(shareEur);
+    expect(wizard).toContain("DualCurrencyPrice");
+    expect(wizard).toContain("useExchangeRate");
+    expect(wizard).toContain("usd={sharePriceUsd}");
+    expect(wizard).not.toContain("convertEurToUsd");
+    expect(wizard).not.toContain("convertUsdToEur(");
+  });
+
+  it("keeps join preview on the same participant-share SSoT", () => {
+    const join = read("src/components/kit-requests/JoinKitRequestDialog.tsx");
+    const previewSql = read("supabase/migrations/0052_shop_area_product_config.sql");
+    const previewFn = previewSql.slice(previewSql.indexOf("create or replace function public.preview_kit_request_join"));
+    expect(join).toContain("previewKitRequestJoin");
+    expect(previewFn).toContain("kit_share_participant_base_usd");
+    expect(previewFn).toContain("apply_role_markup");
+    expect(previewFn.match(/apply_role_markup/g)?.length).toBe(1);
   });
 });
