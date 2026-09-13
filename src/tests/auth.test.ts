@@ -24,6 +24,7 @@ const {
   stripSkipHttpRedirect,
   readOAuthCallbackError,
   completeOAuthCallback,
+  clearOAuthFlowLock,
   OAUTH_CALLBACK_PATH,
   POST_LOGIN_PATH,
   OAUTH_SUCCESS_PATH,
@@ -70,6 +71,7 @@ describe("OAuth URL safety", () => {
 
 describe("OAuth client helpers", () => {
   beforeEach(() => {
+    clearOAuthFlowLock();
     signInWithOAuth.mockReset();
     signInWithOAuth.mockResolvedValue({
       data: { url: AUTHORIZE, provider: "discord" },
@@ -78,6 +80,7 @@ describe("OAuth client helpers", () => {
   });
 
   afterEach(() => {
+    clearOAuthFlowLock();
     vi.unstubAllGlobals();
   });
 
@@ -280,6 +283,7 @@ describe("OAuth UI surface", () => {
     const callback = readFileSync(resolve(process.cwd(), "src/pages/AuthCallback.tsx"), "utf8");
     expect(callback).toContain("OAUTH_SUCCESS_PATH");
     expect(callback).toContain("completeOAuthCallback");
+    expect(callback).not.toMatch(/supabase\.auth\.onAuthStateChange/);
     expect(OAUTH_SUCCESS_PATH).toBe("/announcements");
   });
 });
@@ -313,7 +317,7 @@ describe("completeOAuthCallback", () => {
     expect(result).toEqual({ status: "authenticated" });
   });
 
-  it("fails linkIdentity when exchange errors but the prior session remains", async () => {
+  it("fails linkIdentity only when identity is already linked (prior session remains)", async () => {
     const result = await completeOAuthCallback({
       href: "https://peptix.app/auth/callback?code=abc",
       search: "?code=abc",
@@ -326,6 +330,33 @@ describe("completeOAuthCallback", () => {
       status: "failed",
       message: "Identity is already linked to another user",
     });
+  });
+
+  it("treats code-already-used as success when detectSessionInUrl already created a session", async () => {
+    const result = await completeOAuthCallback({
+      href: "https://peptix.app/auth/callback?code=abc",
+      search: "?code=abc",
+      getSession: vi
+        .fn()
+        .mockResolvedValueOnce({ data: { session }, error: null })
+        .mockResolvedValueOnce({ data: { session }, error: null }),
+      exchangeCodeForSession: vi.fn().mockResolvedValue({
+        error: { message: "invalid request: both auth code and code verifier should be non-empty" },
+      }),
+    });
+    expect(result).toEqual({ status: "authenticated" });
+  });
+
+  it("does not fail a prior session on non-identity exchange errors (double exchange race)", async () => {
+    const result = await completeOAuthCallback({
+      href: "https://peptix.app/auth/callback?code=abc",
+      search: "?code=abc",
+      getSession: vi.fn().mockResolvedValue({ data: { session }, error: null }),
+      exchangeCodeForSession: vi.fn().mockResolvedValue({
+        error: { message: "invalid flow state, no valid flow state found" },
+      }),
+    });
+    expect(result).toEqual({ status: "authenticated" });
   });
 
   it("exchanges the code even when a session already exists", async () => {

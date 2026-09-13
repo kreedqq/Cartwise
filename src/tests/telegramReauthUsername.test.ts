@@ -208,10 +208,11 @@ describe("telegram linking UI wiring", () => {
 
   it("exchanges OAuth codes even when a session already exists (linkIdentity)", () => {
     const auth = read("src/services/auth.ts");
-    expect(auth).toContain("Always exchange when a code is present");
-    expect(auth).toContain("before.data.session");
+    expect(auth).toContain("Always attempt exchange when a code is present");
+    expect(auth).toContain("isIdentityAlreadyLinkedMessage");
     const callback = read("src/pages/AuthCallback.tsx");
     expect(callback).toContain("/username-required");
+    expect(callback).not.toMatch(/supabase\.auth\.onAuthStateChange/);
   });
 
   it("keeps initial claim form for users without a username", () => {

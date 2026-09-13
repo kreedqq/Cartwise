@@ -63,9 +63,80 @@ type SessionLookup = () => Promise<{
   error: { message: string } | null;
 }>;
 
+const OAUTH_FLOW_LOCK_KEY = "peptix:oauth-flow-lock";
+const OAUTH_FLOW_LOCK_MS = 20_000;
+
+/** Prevents double-start of Telegram/Discord OAuth in the same tab. */
+export function beginOAuthFlowLock(): boolean {
+  try {
+    const raw = sessionStorage.getItem(OAUTH_FLOW_LOCK_KEY);
+    const started = raw ? Number(raw) : 0;
+    if (started && Date.now() - started < OAUTH_FLOW_LOCK_MS) return false;
+    sessionStorage.setItem(OAUTH_FLOW_LOCK_KEY, String(Date.now()));
+    return true;
+  } catch {
+    return true;
+  }
+}
+
+export function clearOAuthFlowLock(): void {
+  try {
+    sessionStorage.removeItem(OAUTH_FLOW_LOCK_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+export function isIdentityAlreadyLinkedMessage(message: string): boolean {
+  const msg = message.toLowerCase();
+  return (
+    msg.includes("identity_already_exists") ||
+    msg.includes("already linked") ||
+    msg.includes("identity is already linked")
+  );
+}
+
+/**
+ * Non-secret OAuth callback diagnostics for production debugging.
+ * Never logs code, tokens, verifiers, or cookies.
+ */
+export function logOAuthCallbackDiagnostics(input: {
+  href: string;
+  search?: string;
+  hash?: string;
+  phase: "start" | "result";
+  status?: string;
+  message?: string;
+}): void {
+  try {
+    const url = new URL(input.href);
+    const search = new URLSearchParams((input.search ?? url.search).replace(/^\?/, ""));
+    const hash = new URLSearchParams((input.hash ?? url.hash).replace(/^#/, ""));
+    const pick = (key: string) => search.get(key) ?? hash.get(key);
+    console.info("[peptix:oauth]", {
+      phase: input.phase,
+      path: url.pathname,
+      hasCode: Boolean(pick("code")),
+      error: pick("error"),
+      error_description: pick("error_description"),
+      hasState: Boolean(pick("state")),
+      hasFlowId: Boolean(pick("flow_id") ?? pick("sb_flow_id")),
+      status: input.status,
+      message: input.message ? input.message.slice(0, 180) : undefined,
+    });
+  } catch {
+    console.info("[peptix:oauth]", { phase: input.phase, status: input.status });
+  }
+}
+
 /**
  * Completes the PKCE callback without racing `detectSessionInUrl`.
  * A consumed OAuth code must not send the user to /login if a session already exists.
+ *
+ * Important: supabase-js may already exchange the code via `detectSessionInUrl`.
+ * A second exchange then fails with "already used" / invalid flow — that is NOT a
+ * login failure when a session is present. Only identity-already-linked is a
+ * hard failure while keeping a prior session (linkIdentity conflict).
  */
 export async function completeOAuthCallback(args: {
   href: string;
@@ -88,21 +159,23 @@ export async function completeOAuthCallback(args: {
   const searchCode = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search).get("code");
   const code = hrefCode ?? searchCode;
 
-  // Always exchange when a code is present — including linkIdentity returns while
-  // an email/Discord session already exists. Skipping exchange would leave the
-  // Telegram identity unlinked and keep auth.users.id only coincidentally stable.
+  // Always attempt exchange when a code is present — including linkIdentity returns
+  // while an email/Discord session already exists.
   if (code) {
     const before = await args.getSession();
     if (before.error) return { status: "failed", message: before.error.message };
 
     const { error } = await args.exchangeCodeForSession(args.href);
     const after = await args.getSession();
+
+    // linkIdentity conflict: Telegram identity belongs to another user.
+    if (error && isIdentityAlreadyLinkedMessage(error.message)) {
+      return { status: "failed", message: error.message };
+    }
+
+    // Session present → success. Covers detectSessionInUrl winning the race and
+    // the subsequent exchange failing with code-already-used / invalid flow state.
     if (after.data.session) {
-      // Link/sign-in code failed but a prior session remains → surface the error
-      // (e.g. Telegram already linked to another PEPTIX account).
-      if (error && before.data.session) {
-        return { status: "failed", message: error.message };
-      }
       return { status: "authenticated" };
     }
     if (error) return { status: "failed", message: error.message };
@@ -319,24 +392,53 @@ export function readOAuthCallbackError(
  * `window.location` (Chrome then downloads it as `authorize.json`).
  */
 export async function signInWithOAuth(provider: OAuthProvider, fetchImpl?: FetchLike) {
+  if (!beginOAuthFlowLock()) {
+    throw new Error("oauth_flow_in_progress");
+  }
   const origin = window.location.origin;
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    // `custom:telegram` is a dashboard Custom OIDC id; supabase-js Provider is built-ins only.
-    provider: provider as "discord",
-    options: {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      // `custom:telegram` is a dashboard Custom OIDC id; supabase-js Provider is built-ins only.
+      provider: provider as "discord",
+      options: {
+        redirectTo: getRedirectUrl(OAUTH_CALLBACK_PATH),
+        skipBrowserRedirect: true,
+        ...(provider === TELEGRAM_OAUTH_PROVIDER
+          ? { scopes: TELEGRAM_OAUTH_SCOPES, queryParams: { origin } }
+          : {}),
+      },
+    });
+    if (error) throw error;
+    if (!data.url) throw new Error("provider is not enabled");
+    console.info("[peptix:oauth]", {
+      phase: "start",
+      provider,
       redirectTo: getRedirectUrl(OAUTH_CALLBACK_PATH),
+      authorizeHost: (() => {
+        try {
+          return new URL(data.url).hostname;
+        } catch {
+          return null;
+        }
+      })(),
+      authorizePath: (() => {
+        try {
+          return new URL(data.url).pathname;
+        } catch {
+          return null;
+        }
+      })(),
+      pkce: true,
       skipBrowserRedirect: true,
-      ...(provider === TELEGRAM_OAUTH_PROVIDER
-        ? { scopes: TELEGRAM_OAUTH_SCOPES, queryParams: { origin } }
-        : {}),
-    },
-  });
-  if (error) throw error;
-  if (!data.url) throw new Error("provider is not enabled");
-  const resolved = await resolveOAuthRedirectUrl(data.url, fetchImpl);
-  const providerUrl = provider === TELEGRAM_OAUTH_PROVIDER ? withTelegramOriginParam(resolved, origin) : resolved;
-  beginOAuthRedirect(providerUrl);
-  return data;
+    });
+    const resolved = await resolveOAuthRedirectUrl(data.url, fetchImpl);
+    const providerUrl = provider === TELEGRAM_OAUTH_PROVIDER ? withTelegramOriginParam(resolved, origin) : resolved;
+    beginOAuthRedirect(providerUrl);
+    return data;
+  } catch (error) {
+    clearOAuthFlowLock();
+    throw error;
+  }
 }
 
 /** True when the Auth user already has a linked `custom:telegram` identity. */
@@ -352,22 +454,44 @@ export function userHasTelegramIdentity(
  * Requires Dashboard → Auth → Enable Manual Linking.
  */
 export async function linkTelegramIdentity(fetchImpl?: FetchLike) {
+  if (!beginOAuthFlowLock()) {
+    throw new Error("oauth_flow_in_progress");
+  }
   const origin = window.location.origin;
-  const { data, error } = await supabase.auth.linkIdentity({
-    // `custom:telegram` is a dashboard Custom OIDC id; supabase-js Provider is built-ins only.
-    provider: TELEGRAM_OAUTH_PROVIDER as "discord",
-    options: {
+  try {
+    const { data, error } = await supabase.auth.linkIdentity({
+      // `custom:telegram` is a dashboard Custom OIDC id; supabase-js Provider is built-ins only.
+      provider: TELEGRAM_OAUTH_PROVIDER as "discord",
+      options: {
+        redirectTo: getRedirectUrl(OAUTH_CALLBACK_PATH),
+        skipBrowserRedirect: true,
+        scopes: TELEGRAM_OAUTH_SCOPES,
+        queryParams: { origin },
+      },
+    });
+    if (error) throw error;
+    if (!data.url) throw new Error("provider is not enabled");
+    console.info("[peptix:oauth]", {
+      phase: "start",
+      provider: TELEGRAM_OAUTH_PROVIDER,
+      mode: "linkIdentity",
       redirectTo: getRedirectUrl(OAUTH_CALLBACK_PATH),
-      skipBrowserRedirect: true,
-      scopes: TELEGRAM_OAUTH_SCOPES,
-      queryParams: { origin },
-    },
-  });
-  if (error) throw error;
-  if (!data.url) throw new Error("provider is not enabled");
-  const resolved = await resolveOAuthRedirectUrl(data.url, fetchImpl);
-  beginOAuthRedirect(withTelegramOriginParam(resolved, origin));
-  return data;
+      authorizeHost: (() => {
+        try {
+          return new URL(data.url).hostname;
+        } catch {
+          return null;
+        }
+      })(),
+      pkce: true,
+    });
+    const resolved = await resolveOAuthRedirectUrl(data.url, fetchImpl);
+    beginOAuthRedirect(withTelegramOriginParam(resolved, origin));
+    return data;
+  } catch (error) {
+    clearOAuthFlowLock();
+    throw error;
+  }
 }
 
 /**
@@ -413,15 +537,20 @@ export function mapAuthError(error: unknown): string {
   ) {
     return "Anmeldung abgebrochen. Du kannst es erneut versuchen.";
   }
+  if (msg.includes("oauth_flow_in_progress")) {
+    return "Die Anmeldung läuft bereits. Bitte warte einen Moment.";
+  }
   if (msg.includes("manual linking") || msg.includes("linking is disabled") || msg.includes("manual_linking")) {
     return "Telegram-Verknüpfung ist serverseitig nicht aktiviert. Bitte kontaktiere den Support.";
   }
-  if (
-    msg.includes("identity_already_exists") ||
-    msg.includes("already linked") ||
-    msg.includes("identity is already linked")
-  ) {
+  if (isIdentityAlreadyLinkedMessage(msg)) {
     return "Dieses Telegram Konto ist bereits mit einem anderen PEPTIX Konto verknüpft.";
+  }
+  if (msg.includes("code") && (msg.includes("already") || msg.includes("exchanged") || msg.includes("reuse"))) {
+    return "Die Anmeldung konnte nicht abgeschlossen werden. Bitte starte den Vorgang erneut.";
+  }
+  if (msg.includes("pkce") || msg.includes("code verifier") || msg.includes("verifier")) {
+    return "Die Anmeldung konnte nicht abgeschlossen werden (Sicherheitsprüfung). Bitte starte den Vorgang erneut.";
   }
   if (msg.includes("redirect") && (msg.includes("not allowed") || msg.includes("invalid"))) {
     return "Die Weiterleitungs-URL ist nicht erlaubt. Bitte versuche es erneut oder nutze E-Mail und Passwort.";

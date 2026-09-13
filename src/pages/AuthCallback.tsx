@@ -4,7 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { toast } from "@/components/ui/toaster";
 import { supabase } from "@/lib/supabaseClient";
-import { completeOAuthCallback, mapAuthError, OAUTH_SUCCESS_PATH, signOut } from "@/services/auth";
+import {
+  clearOAuthFlowLock,
+  completeOAuthCallback,
+  logOAuthCallbackDiagnostics,
+  mapAuthError,
+  OAUTH_SUCCESS_PATH,
+  signOut,
+} from "@/services/auth";
 import {
   clearTelegramIdentityConflict,
   clearTelegramTransferIntent,
@@ -17,50 +24,61 @@ import {
 } from "@/services/username";
 
 /**
- * Completes the OAuth PKCE round-trip. This route always renders HTML.
- * It never returns JSON — `authorize.json` came from GoTrue `/authorize`, not here.
+ * Single authoritative OAuth completion path.
+ * Do not navigate from auth-state listeners here — that races URL session detection /
+ * code exchange and caused false login failures plus loops.
  */
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
 
   React.useEffect(() => {
     let cancelled = false;
+    let settled = false;
 
     const timeout = window.setTimeout(() => {
-      if (cancelled) return;
+      if (cancelled || settled) return;
+      settled = true;
+      clearOAuthFlowLock();
       toast.error("Die Anmeldung konnte nicht abgeschlossen werden. Bitte starte den Vorgang erneut.");
       navigate("/login", { replace: true });
-    }, 8000);
+    }, 12_000);
 
-    function go(sessionPresent: boolean) {
-      if (cancelled || !sessionPresent) return;
+    async function finish(path: string) {
+      if (cancelled || settled) return;
+      settled = true;
       window.clearTimeout(timeout);
-      navigate(OAUTH_SUCCESS_PATH, { replace: true });
+      clearOAuthFlowLock();
+      navigate(path, { replace: true });
     }
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      // Transfer completion handles navigation itself.
-      if (readTelegramTransferIntent()) return;
-      go(!!session);
-    });
-
     async function complete() {
+      const href = window.location.href;
+      const search = window.location.search;
+      const hash = window.location.hash;
+      logOAuthCallbackDiagnostics({ href, search, hash, phase: "start" });
+
       const transferIntentId = readTelegramTransferIntent();
 
       const result = await completeOAuthCallback({
-        href: window.location.href,
-        search: window.location.search,
-        hash: window.location.hash,
+        href,
+        search,
+        hash,
         getSession: () => supabase.auth.getSession(),
         exchangeCodeForSession: (url) => supabase.auth.exchangeCodeForSession(url),
       });
       if (cancelled) return;
 
+      logOAuthCallbackDiagnostics({
+        href,
+        search,
+        hash,
+        phase: "result",
+        status: result.status,
+        message: result.status === "failed" ? result.message : undefined,
+      });
+
       if (result.status === "authenticated") {
         if (transferIntentId) {
-          window.clearTimeout(timeout);
           try {
             await completeTelegramIdentityTransfer(transferIntentId);
             clearTelegramTransferIntent();
@@ -71,32 +89,43 @@ export default function AuthCallbackPage() {
             if (session?.user?.id) clearUsernameChangeEligible(session.user.id);
             await signOut();
             toast.success("Telegram erfolgreich verknüpft. Bitte melde dich erneut mit E-Mail an.");
-            navigate("/login", { replace: true });
+            await finish("/login");
           } catch (err) {
             clearTelegramTransferIntent();
             toast.error(mapUsernameError(err));
             await signOut();
-            navigate("/login", { replace: true });
+            await finish("/login");
           }
           return;
         }
-        go(true);
+        await finish(OAUTH_SUCCESS_PATH);
         return;
       }
 
       if (result.status === "failed") {
-        window.clearTimeout(timeout);
         const { data } = await supabase.auth.getSession();
         if (data.session && isTelegramIdentityConflictError(result.message)) {
           markTelegramIdentityConflict();
           toast("Telegram Konto bereits verknüpft");
-          navigate("/username-required", { replace: true });
+          await finish("/username-required");
           return;
         }
         toast.error(mapAuthError(result.message));
-        // linkIdentity failures keep the existing PEPTIX session — return to the gate.
-        navigate(data.session ? "/username-required" : "/login", { replace: true });
+        await finish(data.session ? "/username-required" : "/login");
+        return;
       }
+
+      // pending: wait briefly for detectSessionInUrl, then fail closed
+      const again = await supabase.auth.getSession();
+      if (again.data.session) {
+        await finish(OAUTH_SUCCESS_PATH);
+        return;
+      }
+      settled = true;
+      window.clearTimeout(timeout);
+      clearOAuthFlowLock();
+      toast.error("Die Anmeldung konnte nicht abgeschlossen werden. Bitte starte den Vorgang erneut.");
+      navigate("/login", { replace: true });
     }
 
     void complete();
@@ -104,7 +133,6 @@ export default function AuthCallbackPage() {
     return () => {
       cancelled = true;
       window.clearTimeout(timeout);
-      subscription.unsubscribe();
     };
   }, [navigate]);
 

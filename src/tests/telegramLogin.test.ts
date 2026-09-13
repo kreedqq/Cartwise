@@ -25,6 +25,7 @@ const {
   isEnabledGoTrueOAuthAuthorizeUrl,
   stripSkipHttpRedirect,
   withTelegramOriginParam,
+  clearOAuthFlowLock,
   OAUTH_CALLBACK_PATH,
   OAUTH_PROVIDERS,
   TELEGRAM_OAUTH_PROVIDER,
@@ -72,6 +73,7 @@ describe("Telegram OAuth provider", () => {
 
 describe("Telegram login", () => {
   beforeEach(() => {
+    clearOAuthFlowLock();
     signInWithOAuth.mockReset();
     linkIdentity.mockReset();
     signInWithOAuth.mockResolvedValue({
@@ -85,6 +87,7 @@ describe("Telegram login", () => {
   });
 
   afterEach(() => {
+    clearOAuthFlowLock();
     vi.unstubAllGlobals();
   });
 
@@ -185,6 +188,7 @@ describe("Telegram redirect safety", () => {
 
 describe("Telegram identity linking", () => {
   beforeEach(() => {
+    clearOAuthFlowLock();
     signInWithOAuth.mockReset();
     linkIdentity.mockReset();
     linkIdentity.mockResolvedValue({
@@ -198,6 +202,7 @@ describe("Telegram identity linking", () => {
   });
 
   afterEach(() => {
+    clearOAuthFlowLock();
     vi.unstubAllGlobals();
   });
 
@@ -247,6 +252,7 @@ describe("Telegram identity linking", () => {
 
 describe("Discord login remains unchanged", () => {
   beforeEach(() => {
+    clearOAuthFlowLock();
     signInWithOAuth.mockReset();
     signInWithOAuth.mockResolvedValue({
       data: { url: DISCORD_AUTHORIZE, provider: "discord" },
@@ -255,6 +261,7 @@ describe("Discord login remains unchanged", () => {
   });
 
   afterEach(() => {
+    clearOAuthFlowLock();
     vi.unstubAllGlobals();
   });
 
