@@ -10,12 +10,12 @@ import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitReque
 import { JoinKitRequestDialog } from "@/components/kit-requests/JoinKitRequestDialog";
 import { KitRequestCardView } from "@/components/kit-requests/KitRequestCard";
 import { KitRequestFilterBar } from "@/components/kit-requests/KitRequestFilterBar";
-import { CreateKitRequestButton, KitRequestIntro } from "@/components/kit-requests/KitRequestIntro";
+import { CreateKitRequestButton, KitAreaActionNav, KitRequestHint } from "@/components/kit-requests/KitRequestIntro";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
-import { PageHeader } from "@/components/common/PageHeader";
+import { AreaSectionHeader, PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,6 +57,14 @@ import {
   kitRequestStatusLabel,
   type KitRequestSort,
 } from "@/lib/kitRequests";
+import {
+  AREA_CATALOG_DESCRIPTION,
+  AREA_GROUP_BUY_DESCRIPTION,
+  AREA_KIT_REQUESTS_DESCRIPTION,
+  AREA_PAGE_CONTENT_SLOT,
+  AREA_PAGE_NAV_SLOT,
+  AREA_PAGE_RHYTHM,
+} from "@/lib/shop/areaLayout";
 import { shopGroupsForCategory, productMatchesShopSearch } from "@/lib/shop/display";
 import {
   catalogProductsForKitFilters,
@@ -96,12 +104,24 @@ export default function GroupBuyPage({ area }: { area?: MyShopArea }) {
       pricingProfile="group_buy"
       theme={parseAreaTheme(current.theme)}
     >
-      <GroupBuyContent shopArea={current.key} areaName={current.name} />
+      <GroupBuyContent
+        shopArea={current.key}
+        areaName={current.name}
+        areaDescription={current.subtitle}
+      />
     </ShopAreaProvider>
   );
 }
 
-function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaName: string }) {
+function GroupBuyContent({
+  shopArea,
+  areaName,
+  areaDescription,
+}: {
+  shopArea: ShopAreaKey;
+  areaName: string;
+  areaDescription?: string | null;
+}) {
   const { theme } = useShopAreaContext();
   const productsQuery = useShopProducts(shopArea);
   const storefrontQuery = useShopAreaStorefront(shopArea);
@@ -110,6 +130,7 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
   const [selectedKey, setSelectedKey] = React.useState<string | null>(null);
   const [search, setSearch] = React.useState("");
   const [activeSection, setActiveSection] = React.useState<"catalog" | "kits">("catalog");
+  const [createOpen, setCreateOpen] = React.useState(false);
 
   const products = React.useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
   const assignments = React.useMemo(
@@ -155,42 +176,24 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
   return (
     <div className={areaDensityClass(theme)} data-shop-area={shopArea}>
       <AreaStorefrontChrome theme={theme} areaName={areaName}>
+      <div className={AREA_PAGE_RHYTHM}>
       <PageHeader
-        eyebrow={areaName}
         title={areaName}
-        description="Gemeinsam bestellen: Katalog oder Kit mit anderen Kunden teilen."
-        actions={
-          <div className="flex flex-wrap gap-2">
-            <Button
-              className="min-h-11"
-              variant={activeSection === "catalog" ? "default" : "outline"}
-              onClick={() => setActiveSection("catalog")}
-            >
-              Produkte
-            </Button>
-            <Button
-              className="min-h-11"
-              variant={activeSection === "kits" ? "default" : "outline"}
-              onClick={() => setActiveSection("kits")}
-            >
-              <Layers className="mr-1.5 h-4 w-4" />
-              Kit Gesuche
-            </Button>
-          </div>
-        }
+        description={areaDescription?.trim() || AREA_GROUP_BUY_DESCRIPTION}
       />
+      <div className={AREA_PAGE_NAV_SLOT}>
+        <KitAreaActionNav
+          section={activeSection}
+          onSection={setActiveSection}
+          onCreate={() => {
+            setActiveSection("kits");
+            setCreateOpen(true);
+          }}
+        />
+      </div>
 
+      <div className={AREA_PAGE_CONTENT_SLOT}>
       {activeSection === "catalog" && (
-        <>
-        <div className="mb-6">
-          <KitRequestIntro
-            action={
-              <Button className="min-h-11 w-full sm:w-auto" onClick={() => setActiveSection("kits")}>
-                Kit Gesuche ansehen
-              </Button>
-            }
-          />
-        </div>
         <GroupBuyCatalog
           shopArea={shopArea}
           areaName={areaName}
@@ -214,19 +217,25 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
           onSearch={setSearch}
           onClearCategory={() => setSelectedKey(null)}
         />
-        </>
       )}
 
       {activeSection === "kits" && (
-        <div className="space-y-4">
-          <KitRequestsSection
-            shopArea={shopArea}
-            areaName={areaName}
-            categories={visible}
-            assignments={assignments}
-          />
-        </div>
+        <KitRequestsSection
+          shopArea={shopArea}
+          areaName={areaName}
+          categories={visible}
+          assignments={assignments}
+          onCreateOpenChange={setCreateOpen}
+        />
       )}
+      </div>
+      </div>
+      <CreateKitRequestDialog
+        shopArea={shopArea}
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={() => setActiveSection("kits")}
+      />
       </AreaStorefrontChrome>
     </div>
   );
@@ -280,11 +289,10 @@ function GroupBuyCatalog({
   const { theme } = useShopAreaContext();
   if (!selectedCategory) {
     return (
-      <div className="space-y-10">
-        <PageHeader
-          eyebrow={areaName}
+      <div className="space-y-6 sm:space-y-8">
+        <AreaSectionHeader
           title="Katalog"
-          description="Group-Buy-Preise. Kits, Mengenstaffeln und geteilte Bestellungen."
+          description={AREA_CATALOG_DESCRIPTION}
         />
         {(isLoading || storefrontLoading) && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -411,11 +419,13 @@ function KitRequestsSection({
   shopArea,
   categories,
   assignments,
+  onCreateOpenChange,
 }: {
   shopArea: ShopAreaKey;
   areaName?: string;
   categories: AreaCategory[];
   assignments: AreaCategoryAssignment[];
+  onCreateOpenChange: (open: boolean) => void;
 }) {
   const productsQuery = useShopProducts(shopArea);
 
@@ -428,7 +438,6 @@ function KitRequestsSection({
   const [minRemaining, setMinRemaining] = React.useState<number | null>(null);
   const [sort, setSort] = React.useState<KitRequestSort>("newest");
   const [page, setPage] = React.useState(1);
-  const [createOpen, setCreateOpen] = React.useState(false);
   const [joinTarget, setJoinTarget] = React.useState<KitRequestCard | null>(null);
   const [leaveTarget, setLeaveTarget] = React.useState<KitRequestCard | null>(null);
   const [cancelTarget, setCancelTarget] = React.useState<KitRequestCard | null>(null);
@@ -492,12 +501,11 @@ function KitRequestsSection({
 
   return (
     <div className="min-w-0 space-y-4">
-      <KitRequestIntro
-        action={<CreateKitRequestButton onClick={() => setCreateOpen(true)} />}
+      <AreaSectionHeader
+        title="Kit Gesuche"
+        description={AREA_KIT_REQUESTS_DESCRIPTION}
       />
-      <div className="sm:hidden">
-        <CreateKitRequestButton onClick={() => setCreateOpen(true)} />
-      </div>
+      <KitRequestHint />
 
       <Tabs value={tab} onValueChange={setTab} className="min-w-0">
         <TabsList className={KIT_REQUEST_TABS_LIST_CLASS}>
@@ -576,7 +584,7 @@ function KitRequestsSection({
               icon={Layers}
               title="Keine offenen Kit Gesuche"
               description="Aktuell gibt es keine passenden offenen Gesuche."
-              action={<CreateKitRequestButton onClick={() => setCreateOpen(true)} />}
+              action={<CreateKitRequestButton onClick={() => onCreateOpenChange(true)} />}
             />
           ) : null}
 
@@ -629,7 +637,7 @@ function KitRequestsSection({
               icon={Layers}
               title="Noch keine eigenen Gesuche"
               description="Erstelle ein Gesuch, um Teilnehmer zu finden."
-              action={<CreateKitRequestButton onClick={() => setCreateOpen(true)} />}
+              action={<CreateKitRequestButton onClick={() => onCreateOpenChange(true)} />}
             />
           ) : null}
           <div className={KIT_REQUEST_CARD_GRID}>
@@ -669,7 +677,6 @@ function KitRequestsSection({
         </TabsContent>
       </Tabs>
 
-      <CreateKitRequestDialog shopArea={shopArea} open={createOpen} onOpenChange={setCreateOpen} />
       <JoinKitRequestDialog request={joinTarget} open={joinTarget != null} onOpenChange={(next) => !next && setJoinTarget(null)} />
 
       <ConfirmDialog

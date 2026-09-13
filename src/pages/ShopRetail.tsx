@@ -12,7 +12,8 @@ import { ShopProductsTable } from "@/components/shop/ShopProductsTable";
 import { ShopProductsMobileList } from "@/components/shop/ShopProductsMobileList";
 import { AreaStorefrontChrome } from "@/components/shop/AreaStorefrontChrome";
 import { ShopCategoryHub } from "@/components/shop/ShopCategoryHub";
-import { PageHeader } from "@/components/common/PageHeader";
+import { AreaSectionHeader, PageHeader } from "@/components/common/PageHeader";
+import { AREA_PAGE_CONTENT_SLOT, AREA_PAGE_RHYTHM } from "@/lib/shop/areaLayout";
 import { ShopAreaProvider } from "@/context/ShopAreaContext";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
 import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
@@ -115,10 +116,18 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
         style={areaThemeCssVars(theme)}
       >
         <AreaStorefrontChrome theme={theme} areaName={area.name}>
+        <div className={AREA_PAGE_RHYTHM}>
         <PageHeader
-          eyebrow={area.name}
+          title={area.name}
+          description={
+            area.subtitle?.trim() ||
+            "Einzelverkauf. Peptide, Water und Oils als Vials, Orals als Packungen."
+          }
+        />
+        <div className={AREA_PAGE_CONTENT_SLOT}>
+        <AreaSectionHeader
           title="Katalog"
-          description="Einzelverkauf. Peptide, Water und Oils als Vials, Orals als Packungen. Keine Kits, keine Mengenstaffeln."
+          description="Peptide, Water und Oils als Vials, Orals als Packungen. Keine Kits, keine Mengenstaffeln."
         />
         {(productsQuery.isLoading || storefrontQuery.isLoading) && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -146,6 +155,8 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
         {productsQuery.data && storefrontQuery.data && visible.length > 0 && (
           <ShopCategoryHub categories={visible} counts={counts} onSelect={selectCategory} />
         )}
+        </div>
+        </div>
         </AreaStorefrontChrome>
       </div>
     );
@@ -156,8 +167,8 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
   return (
     <div className={areaDensityClass(theme)} data-shop-area={area.key} style={areaThemeCssVars(theme)}>
       <AreaStorefrontChrome theme={theme} areaName={area.name}>
+      <div className={AREA_PAGE_RHYTHM}>
       <PageHeader
-        eyebrow={area.name}
         title={selected.label}
         description={`${filtered.length} Artikel · Einzelmenge wählen und in den Warenkorb legen.`}
         actions={
@@ -168,6 +179,7 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
         }
       />
 
+      <div className={`${AREA_PAGE_CONTENT_SLOT} space-y-6`}>
       <div className="flex flex-wrap gap-2">
         {visible.map((category) => (
           <button
@@ -239,6 +251,8 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
           </div>
         </>
       )}
+      </div>
+      </div>
       </AreaStorefrontChrome>
     </div>
   );

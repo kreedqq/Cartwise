@@ -245,6 +245,24 @@ export function kitRequestableVariants<T extends { id: string; code: string }>(
   return shareable.filter((variant) => requestableIds.has(variant.id));
 }
 
+/** Compact wizard tile: strength on the first line, pack size on the second. */
+export function wizardVariantPresentation(product: {
+  code: string;
+  dosage_vial?: string | null;
+  name: string;
+}): { title: string; subtitle: string } {
+  const raw = (product.dosage_vial?.trim() || formatProductVariant(product)).trim();
+  const parts = raw.split(" / ").map((part) => part.trim()).filter(Boolean);
+  const kitSize = kitSizeVialsForProduct(product);
+  if (parts.length >= 2) {
+    return { title: parts[0], subtitle: parts.slice(1).join(" / ") };
+  }
+  return {
+    title: parts[0] || raw,
+    subtitle: kitSize ? `${kitSize} Vials` : raw,
+  };
+}
+
 /** Dropdown label: readable kit variant, e.g. "10x 20mg Vials". */
 export function variantStrengthLabel(
   product: { code: string; dosage_vial?: string | null; name: string },

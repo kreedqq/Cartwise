@@ -30,12 +30,12 @@ import {
 } from "@/lib/shop/display";
 import { kitShareParticipantBaseUsd } from "@/lib/shop/kitSharePricing";
 import { KIT_SIZE_OPTIONS, formatKitSizeOption, kitCategoryIdFor } from "@/lib/shop/kitUnits";
-import { formatProductVariant, kitRequestableVariants } from "@/lib/shop/variantCoverage";
+import { formatProductVariant, kitRequestableVariants, wizardVariantPresentation } from "@/lib/shop/variantCoverage";
 import { cn } from "@/lib/utils";
 import type { Tables } from "@/types/database";
 
 const STEPS = [
-  { title: "Was möchtest du mit anderen teilen?", body: "Suche nach einem Produkt oder wähle eines aus." },
+  { title: "Welches Produkt möchtest du teilen?", body: "Suche nach einem Produkt oder wähle eines aus." },
   { title: "Welche Variante möchtest du?", body: "Wähle die Variante, die du gemeinsam mit anderen kaufen möchtest." },
   { title: "Wie groß soll das gemeinsame Kit sein?", body: "Ein Kit besteht aus mehreren Vials. Du kannst einen Teil selbst übernehmen und den Rest anderen Kunden anbieten." },
   { title: "Wie viele möchtest du selbst übernehmen?", body: "Du übernimmst diesen Anteil selbst. Die übrigen Plätze können andere Kunden übernehmen." },
@@ -197,7 +197,7 @@ function CreateKitRequestWizard({
 
   return (
     <Dialog open onOpenChange={(next) => !next && close()}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-2xl">
         {created ? (
           <div className="space-y-4">
             <DialogHeader>
@@ -253,7 +253,7 @@ function CreateKitRequestWizard({
                     Suche nach einem Produkt, um es auszuwählen.
                   </p>
                 ) : (
-                  <div className="grid gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {visibleGroups.map((group) => (
                         <ChoiceButton
                           key={group.groupKey}
@@ -288,17 +288,18 @@ function CreateKitRequestWizard({
             ) : null}
 
             {step === 1 ? (
-              <div className="grid gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {variants.map((variant) => {
                   const requestable = isKitRequestableProductId(variant.id, requestableIds);
+                  const lines = wizardVariantPresentation(variant);
                   return (
                     <ChoiceButton
                       key={variant.id}
                       active={productId === variant.id}
                       disabled={!requestable}
                       onClick={() => setPickedProductId(variant.id)}
-                      title={formatProductVariant(variant)}
-                      subtitle={requestable ? undefined : KIT_REQUEST_NOT_SHAREABLE_MESSAGE}
+                      title={lines.title}
+                      subtitle={requestable ? lines.subtitle : KIT_REQUEST_NOT_SHAREABLE_MESSAGE}
                     />
                   );
                 })}
@@ -437,7 +438,7 @@ function ChoiceButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "min-h-12 w-full rounded-xl border px-4 py-3 text-left transition-colors",
+        "min-h-11 w-full rounded-xl border px-3 py-2.5 text-left transition-colors",
         disabled
           ? "cursor-not-allowed border-border/70 bg-secondary/30 text-muted-foreground"
           : active

@@ -6,7 +6,7 @@ import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitReque
 import { JoinKitRequestDialog } from "@/components/kit-requests/JoinKitRequestDialog";
 import { KitRequestCardView } from "@/components/kit-requests/KitRequestCard";
 import { KitRequestFilterBar } from "@/components/kit-requests/KitRequestFilterBar";
-import { CreateKitRequestButton, KitRequestIntro } from "@/components/kit-requests/KitRequestIntro";
+import { CreateKitRequestButton, KitRequestHint } from "@/components/kit-requests/KitRequestIntro";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -161,13 +161,12 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
 
   return (
     <div className="min-w-0 space-y-4">
-      <PageHeader eyebrow={areaName} title={areaName} description="Finde andere Kunden, die dasselbe Kit bestellen möchten." />
-      <KitRequestIntro
-        action={<CreateKitRequestButton onClick={() => setCreateOpen(true)} />}
+      <PageHeader
+        title={areaName}
+        description="Offene Gesuche anderer Kunden"
+        actions={<CreateKitRequestButton onClick={() => setCreateOpen(true)} />}
       />
-      <div className="sm:hidden">
-        <CreateKitRequestButton onClick={() => setCreateOpen(true)} />
-      </div>
+      <KitRequestHint />
 
       <Tabs value={tab} onValueChange={setTab} className="min-w-0">
         <TabsList className={KIT_REQUEST_TABS_LIST_CLASS}>

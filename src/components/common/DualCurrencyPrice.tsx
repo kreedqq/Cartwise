@@ -26,6 +26,7 @@ export function DualCurrencyPrice({
   usd,
   eur,
   rate,
+  unit,
   size = "catalog",
   align = "left",
   className,
@@ -33,6 +34,7 @@ export function DualCurrencyPrice({
   usd: number | null | undefined;
   eur?: number | null;
   rate?: number | null;
+  unit?: string | null;
   size?: DualCurrencySize;
   align?: "left" | "right";
   className?: string;
@@ -40,6 +42,7 @@ export function DualCurrencyPrice({
   const eurAmount =
     eur !== undefined ? eur : typeof usd === "number" ? convertUsdToEur(usd, rate) : null;
   const classes = SIZE_CLASSES[size];
+  const unitSuffix = unit?.trim() ? ` / ${unit.trim()}` : "";
 
   return (
     <div
@@ -48,6 +51,7 @@ export function DualCurrencyPrice({
     >
       <p className={classes.eur} data-currency="eur">
         {formatEur(eurAmount)}
+        {unitSuffix}
       </p>
       <p className={classes.usd} data-currency="usd">
         {formatUsd(usd)}

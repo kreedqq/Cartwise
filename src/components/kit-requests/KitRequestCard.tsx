@@ -4,6 +4,7 @@ import {
   kitRequestCustomerStatusLabel,
   kitRequestProgressPercent,
 } from "@/lib/kitRequests";
+import { getProductUnitLabel } from "@/lib/quantityFormat";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { KitRequestCard } from "@/services/kitRequests";
@@ -46,18 +47,20 @@ export function KitRequestCardView({
   const canLeave = request.status === "open" && request.isParticipant && !request.isCreator;
   const canCancel = request.status === "open" && request.isCreator;
   const showRetry = request.status === "full" && (request.isParticipant || request.isCreator) && onRetryCart;
-  const sharePriceUsd =
-    request.myQuantity > 0 && request.myUnitPriceUsd != null
-      ? request.myUnitPriceUsd * request.myQuantity
-      : request.myUnitPriceUsd;
+  const unitLabel = getProductUnitLabel({
+    category: request.category,
+    name: request.productName,
+    code: request.productCode,
+    dosageVial: request.variantLabel,
+  });
   const remainingLabel =
     request.remainingVials === 1
       ? "Noch 1 Platz"
       : `Noch ${request.remainingVials} Plätze`;
 
   return (
-    <article className="flex h-full min-w-0 flex-col rounded-2xl border border-border bg-card">
-      <header className="flex items-start justify-between gap-3 px-4 pt-4">
+    <article className="flex h-full min-w-0 flex-col rounded-2xl border border-border bg-card px-4 py-4">
+      <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="truncate text-base font-semibold leading-tight tracking-tight">
             {request.productName}
@@ -69,14 +72,11 @@ export function KitRequestCardView({
         </Badge>
       </header>
 
-      <div className="space-y-2 px-4 pt-4">
-        <div className="flex items-baseline justify-between gap-2">
-          <p className="text-lg font-semibold tabular-nums leading-none">
-            {request.allocatedTotal} / {request.kitSizeVials}{" "}
-            <span className="text-sm font-medium text-muted-foreground">Kit</span>
-          </p>
-          <p className="text-xs tabular-nums text-muted-foreground">{percent} %</p>
-        </div>
+      <div className="mt-4 space-y-2">
+        <p className="text-lg font-semibold tabular-nums leading-none">
+          {request.allocatedTotal} / {request.kitSizeVials}{" "}
+          <span className="text-sm font-medium text-muted-foreground">Kit</span>
+        </p>
         <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
           <div
             className="h-full rounded-full bg-primary transition-[width]"
@@ -95,13 +95,14 @@ export function KitRequestCardView({
         ) : null}
       </div>
 
-      <div className="mt-auto flex flex-col gap-3 px-4 pb-4 pt-4">
-        {sharePriceUsd != null ? (
+      <div className="mt-auto flex flex-col gap-3 pt-4">
+        {request.myUnitPriceUsd != null ? (
           <div>
             <p className="text-xs text-muted-foreground">Dein Anteil</p>
             <DualCurrencyPrice
-              usd={sharePriceUsd}
+              usd={request.myUnitPriceUsd}
               rate={rateQuery.data?.rate ?? null}
+              unit={unitLabel}
               size="catalog"
               className="[&_[data-currency=eur]]:text-xl"
             />
@@ -109,6 +110,11 @@ export function KitRequestCardView({
         ) : null}
 
         {request.note ? <p className="line-clamp-2 text-sm text-muted-foreground">{request.note}</p> : null}
+
+        <p className="truncate text-[11px] text-muted-foreground">
+          von {creatorHandle(request.creatorUsername)}
+          <span className="sr-only"> Telegram Benutzername</span>
+        </p>
 
         {canJoin && onJoin ? (
           <Button className="min-h-11 w-full" onClick={() => onJoin(request)} disabled={joining}>
@@ -135,11 +141,6 @@ export function KitRequestCardView({
             Warenkorb aktualisieren
           </Button>
         ) : null}
-
-        <p className="truncate text-[11px] text-muted-foreground">
-          von {creatorHandle(request.creatorUsername)}
-          <span className="sr-only"> Telegram Benutzername</span>
-        </p>
       </div>
     </article>
   );

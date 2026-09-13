@@ -314,7 +314,9 @@ export interface Database {
       kit_shares: {
         Row: {
           id: string;
-          product_id: string;
+          product_id: string | null;
+          area_product_id: string | null;
+          vendor_code: string | null;
           creator_user_id: string;
           kit_size_vials: number;
           status: KitShareStatus;
@@ -327,7 +329,6 @@ export interface Database {
           updated_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["kit_shares"]["Row"]> & {
-          product_id: string;
           creator_user_id: string;
           kit_size_vials: number;
         };

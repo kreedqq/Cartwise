@@ -21,6 +21,13 @@ describe("sales area designer", () => {
     const panel = read("src/components/admin/AreaDesignPanel.tsx");
     expect(panel).toContain('type="color"');
     expect(panel).toContain("Live Vorschau");
+    expect(panel).toContain("Grunddesign");
+    expect(panel).toContain("Shop & Produkte");
+    expect(panel).toContain("Kit Gesuche");
+    expect(panel).toContain("Navigation & Layout");
+    expect(panel).toContain("Passe Farben, Hintergrund und den allgemeinen Look dieses Verkaufsbereichs an.");
+    expect(panel).toContain("Diese Gruppe betrifft nur Kit Gesuche");
+    expect(panel).toContain("Kit Gesuch Vorschau");
     expect(panel).toContain("Palette aus Hauptfarbe");
     expect(panel).toContain("Verbessern");
     expect(panel).toContain("Mehr Einstellungen");

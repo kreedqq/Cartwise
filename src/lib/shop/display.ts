@@ -250,4 +250,4 @@ export function shopGroupMatchesSearch(group: ShopProductGroup, term: string): b
   });
 }
 
-export const KIT_WIZARD_PRODUCT_PAGE_SIZE = 8;
+export const KIT_WIZARD_PRODUCT_PAGE_SIZE = 6;

@@ -81,6 +81,21 @@ export function formatUnitWord(kind: ProductQuantityKind, count: number): string
   return asQuantity(count) < 2 ? singularUnit(kind) : pluralUnit(kind);
 }
 
+/**
+ * Per-unit price noun from the existing category domain.
+ * Peptides / water / oils → Vial. Orals → Packung.
+ * Uses retail_unit so peptides never say Kit on a unit price.
+ */
+export function getProductUnitLabel(input: {
+  categoryId?: ShopCategoryId | null;
+  category?: string | null;
+  name?: string | null;
+  code?: string | null;
+  dosageVial?: string | null;
+}): string {
+  return singularUnit(productQuantityKindFor(resolveProductCategoryId(input), "retail_unit"));
+}
+
 export function formatCountedQuantity(count: number, kind: ProductQuantityKind): string {
   const amount = asQuantity(count);
   return `${amount} ${formatUnitWord(kind, amount)}`;

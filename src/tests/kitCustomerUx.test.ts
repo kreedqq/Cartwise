@@ -20,7 +20,7 @@ describe("kit customer UX", () => {
     expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Passt alles?");
     expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Mit diesem Anteil beitreten");
     expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toContain("Kit Gesuch erstellen");
-    expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toContain("Was möchtest du mit anderen teilen?");
+    expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toContain("Welches Produkt möchtest du teilen?");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("useExchangeRate");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("DualCurrencyPrice");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain('data-currency=eur');
@@ -29,8 +29,13 @@ describe("kit customer UX", () => {
     expect(read("src/pages/KitRequests.tsx")).toContain("KIT_REQUEST_CARD_GRID");
     expect(read("src/lib/kitRequests.ts")).toContain("overflow-x-auto");
     expect(read("src/pages/GroupBuy.tsx")).toContain("KIT_REQUEST_TABS_LIST_CLASS");
-    expect(read("src/pages/GroupBuy.tsx")).toContain("KitRequestIntro");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("KitAreaActionNav");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("AREA_PAGE_NAV_SLOT");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("AREA_PAGE_CONTENT_SLOT");
+    expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("KitAreaActionNav");
+    expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("KitRequestHint");
     expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("Kit gemeinsam kaufen");
+    expect(read("src/components/kit-requests/KitRequestIntro.tsx")).not.toContain("rounded-xl border border-border bg-card");
     expect(read("src/pages/GroupBuy.tsx")).toContain("Meine Kit Beteiligungen");
     expect(read("src/lib/kitRequests.ts")).toContain('KIT_REQUEST_CREATE_LABEL = "Gesuch erstellen"');
     expect(read("src/pages/GroupBuy.tsx")).toContain("CreateKitRequestButton");
@@ -56,7 +61,11 @@ describe("kit customer UX", () => {
     expect(filter).toContain("grid-cols-1");
     expect(filter).toContain("min-h-11");
     expect(filter).toContain("sm:grid-cols-2");
-    expect(filter).toContain("xl:grid-cols-6");
+    expect(filter).toContain("xl:grid-cols-4");
+    expect(filter).toContain("Produkt suchen …");
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("getProductUnitLabel");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("AREA_PAGE_RHYTHM");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("AREA_GROUP_BUY_DESCRIPTION");
     expect(card).toContain("min-h-11 w-full");
     expect(card).toContain("min-w-0");
     expect(read("src/lib/kitRequests.ts")).toContain("grid-cols-1");

@@ -77,7 +77,7 @@ export function kitRequestFailureMessage(error: unknown): string {
 
 /**
  * null = requestable set unknown (legacy RPC missing) → keep current catalog visible.
- * A loaded set hides vendor-only rows that create_kit_request cannot store.
+ * A loaded set is the server allowlist: linked masters and vendor-only sap.id.
  */
 export function isKitRequestableProductId(
   productId: string | null | undefined,

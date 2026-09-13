@@ -47,27 +47,69 @@ const PREVIEW_SCENES = [
   { id: "join", title: "Join Dialog" },
 ] as const;
 
-const BASIC_SECTIONS = [
-  { id: "identity", title: "Identität" },
-  { id: "colors", title: "Farben" },
-  { id: "background", title: "Hintergrund" },
-  { id: "hero", title: "Hero" },
-  { id: "price", title: "Preise" },
-  { id: "buttons", title: "Buttons" },
-  { id: "mobile", title: "Mobile" },
+const DESIGNER_GROUPS = [
+  {
+    id: "grunddesign",
+    title: "Grunddesign",
+    description: "Passe Farben, Hintergrund und den allgemeinen Look dieses Verkaufsbereichs an.",
+    sections: ["identity", "colors", "background", "typography"],
+  },
+  {
+    id: "shop",
+    title: "Shop & Produkte",
+    description: "Bestimme, wie Produkte, Preise und Warenkorb dargestellt werden.",
+    sections: ["products", "cards", "price", "categories", "search"],
+  },
+  {
+    id: "kits",
+    title: "Kit Gesuche",
+    description: "Passe die Darstellung von Kit Gesuchen und deren Aktionen an.",
+    sections: [],
+  },
+  {
+    id: "nav",
+    title: "Navigation & Layout",
+    description: "Bestimme Aufbau, Abstände und Verhalten auf Desktop und Mobile.",
+    sections: ["header", "layout", "mobile"],
+  },
+  {
+    id: "images",
+    title: "Bilder",
+    description: "Hinterlege Background, Hero, Banner und weitere Area Bilder.",
+    sections: ["hero", "banner", "assets"],
+  },
+  {
+    id: "buttons",
+    title: "Buttons",
+    description: "Form, Größe und Stil echter Buttons. Inputs und Karten bleiben unverändert.",
+    sections: ["buttons"],
+  },
+  {
+    id: "advanced",
+    title: "Erweitert",
+    description: "Selten benötigte technische Optionen.",
+    sections: [],
+  },
 ] as const;
 
-const ADVANCED_SECTIONS = [
-  { id: "header", title: "Header" },
-  { id: "categories", title: "Kategorien" },
-  { id: "products", title: "Produkte" },
-  { id: "cards", title: "Karten" },
-  { id: "banner", title: "Banner" },
-  { id: "typography", title: "Typografie" },
-  { id: "layout", title: "Layout" },
-  { id: "assets", title: "Bilder" },
-  { id: "search", title: "Suche & Leerstand" },
-] as const;
+const SECTION_TITLES: Record<string, string> = {
+  identity: "Name",
+  colors: "Farben",
+  background: "Hintergrund",
+  typography: "Schrift",
+  products: "Produktdarstellung",
+  cards: "Produktkarten",
+  price: "Preise",
+  categories: "Kategorien",
+  search: "Suche & Leerstand",
+  header: "Header",
+  layout: "Desktop Layout",
+  mobile: "Mobile Layout",
+  hero: "Hero",
+  banner: "Banner",
+  assets: "Weitere Bilder",
+  buttons: "Button Form",
+};
 
 export function AreaDesignPanel({
   area,
@@ -91,7 +133,7 @@ function AreaDesignForm({
   const [iconKey, setIconKey] = React.useState(area.icon_key || "store");
   const [subtitle, setSubtitle] = React.useState(area.subtitle ?? "");
   const [badge, setBadge] = React.useState(area.badge_text ?? "");
-  const [openSection, setOpenSection] = React.useState<string>("colors");
+  const [openSection, setOpenSection] = React.useState<string>("grunddesign");
   const [viewport, setViewport] = React.useState<(typeof VIEWPORTS)[number]["id"]>("desktop");
   const [previewScene, setPreviewScene] = React.useState<(typeof PREVIEW_SCENES)[number]["id"]>("shop");
   const [showAdvanced, setShowAdvanced] = React.useState(false);
@@ -165,19 +207,43 @@ function AreaDesignForm({
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Häufig genutzt</p>
-          {(showAdvanced ? [...BASIC_SECTIONS, ...ADVANCED_SECTIONS] : [...BASIC_SECTIONS]).map((section) => (
+          {(showAdvanced ? DESIGNER_GROUPS : DESIGNER_GROUPS.filter((group) => group.id !== "advanced")).map((group) => (
             <details
-              key={section.id}
-              open={openSection === section.id}
+              key={group.id}
+              open={openSection === group.id}
               onToggle={(event) => {
-                if ((event.target as HTMLDetailsElement).open) setOpenSection(section.id);
+                if ((event.target as HTMLDetailsElement).open) setOpenSection(group.id);
               }}
               className="rounded-lg border border-border/70 px-3 py-2"
             >
-              <summary className="cursor-pointer text-sm font-medium">{section.title}</summary>
-              <div className="mt-3 space-y-3">
-                {section.id === "identity" ? (
+              <summary className="cursor-pointer text-sm font-medium">{group.title}</summary>
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{group.description}</p>
+              {group.id === "kits" ? (
+                <div className="mt-3 space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Diese Gruppe betrifft nur Kit Gesuche: Karten, Fortschritt, Anteilpreis und die Aktionen
+                    Gesuch erstellen und Mitmachen. Produktkatalog und Warenkorb bleiben unverändert.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" size="sm" variant="outline" onClick={() => setPreviewScene("kit")}>
+                      Kit Gesuch Vorschau
+                    </Button>
+                    <Button type="button" size="sm" variant="outline" onClick={() => setPreviewScene("join")}>
+                      Mitmachen Vorschau
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Button Form kommt aus der Gruppe Buttons. Der Kit Preis bleibt EUR zuerst, Einheit über die
+                    bestehende Quantity-Logik.
+                  </p>
+                </div>
+              ) : null}
+              {group.sections.map((sectionId) => (
+              <div key={sectionId} className="mt-3 space-y-3">
+                {group.sections.length > 1 ? (
+                  <p className="text-sm font-medium">{SECTION_TITLES[sectionId]}</p>
+                ) : null}
+                {sectionId === "identity" ? (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Field label="Untertitel">
                       <Input value={subtitle} onChange={(event) => setSubtitle(event.target.value)} />
@@ -220,7 +286,7 @@ function AreaDesignForm({
                     </Field>
                   </div>
                 ) : null}
-                {section.id === "colors" ? (
+                {sectionId === "colors" ? (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
                       <Label htmlFor={`theme-on-${area.key}`}>Eigenes Theme aktiv</Label>
@@ -318,7 +384,7 @@ function AreaDesignForm({
                     ) : null}
                   </div>
                 ) : null}
-                {section.id === "background" ? (
+                {sectionId === "background" ? (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Field label="Hintergrund" hint="Overlay legt fest, wie stark das Bild abgedunkelt wird.">
                       <Select
@@ -484,7 +550,7 @@ function AreaDesignForm({
                     </details>
                   </div>
                 ) : null}
-                {section.id === "hero" ? (
+                {sectionId === "hero" ? (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="flex items-center justify-between gap-3 sm:col-span-2">
                       <Label>Hero aktiv</Label>
@@ -578,12 +644,12 @@ function AreaDesignForm({
                     />
                   </div>
                 ) : null}
-                {section.id === "header" ? (
+                {sectionId === "header" ? (
                   <p className="text-xs text-muted-foreground">
                     Titel, Untertitel und Badge kommen aus der Identität. Die globale Navigation bleibt unverändert.
                   </p>
                 ) : null}
-                {section.id === "categories" ? (
+                {sectionId === "categories" ? (
                   <Field label="Darstellung" hint="Nur Optik. Die Kategorie-Logik bleibt unverändert.">
                     <Select
                       value={draft.categories.display}
@@ -607,7 +673,7 @@ function AreaDesignForm({
                     </Select>
                   </Field>
                 ) : null}
-                {section.id === "products" ? (
+                {sectionId === "products" ? (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Field label="Produkt Layout">
                       <Select
@@ -651,7 +717,7 @@ function AreaDesignForm({
                     </Field>
                   </div>
                 ) : null}
-                {section.id === "buttons" ? (
+                {sectionId === "buttons" ? (
                   <Field label="Button Form" hint="Gilt für primäre und sekundäre Buttons der Sales Area.">
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                       {AREA_BUTTON_RADIUS_OPTIONS.map((option) => {
@@ -683,7 +749,7 @@ function AreaDesignForm({
                     </div>
                   </Field>
                 ) : null}
-                {section.id === "cards" ? (
+                {sectionId === "cards" ? (
                   <div className="flex items-center justify-between gap-3">
                     <Label>Schatten</Label>
                     <Switch
@@ -694,7 +760,7 @@ function AreaDesignForm({
                     />
                   </div>
                 ) : null}
-                {section.id === "banner" ? (
+                {sectionId === "banner" ? (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="flex items-center justify-between gap-3 sm:col-span-2">
                       <Label>Banner aktiv</Label>
@@ -726,7 +792,7 @@ function AreaDesignForm({
                     </Field>
                   </div>
                 ) : null}
-                {section.id === "typography" ? (
+                {sectionId === "typography" ? (
                   <Field label="Schriftgröße">
                     <Select
                       value={draft.typography.scale}
@@ -748,7 +814,7 @@ function AreaDesignForm({
                     </Select>
                   </Field>
                 ) : null}
-                {section.id === "mobile" ? (
+                {sectionId === "mobile" ? (
                   <Field label="Mobile Hero Höhe">
                     <Select
                       value={draft.mobile.heroHeight}
@@ -769,7 +835,7 @@ function AreaDesignForm({
                     </Select>
                   </Field>
                 ) : null}
-                {section.id === "assets" ? (
+                {sectionId === "assets" ? (
                   <ImageField
                     label="Hub Bild"
                     areaKey={area.key}
@@ -780,7 +846,7 @@ function AreaDesignForm({
                     }
                   />
                 ) : null}
-                {section.id === "layout" ? (
+                {sectionId === "layout" ? (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Field label="Dichte">
                       <Select
@@ -822,7 +888,7 @@ function AreaDesignForm({
                     </Field>
                   </div>
                 ) : null}
-                {section.id === "search" ? (
+                {sectionId === "search" ? (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Field label="Suche Placeholder" hint='Beispiel: „Zubehör suchen …"'>
                       <Input
@@ -848,7 +914,7 @@ function AreaDesignForm({
                     </Field>
                   </div>
                 ) : null}
-                {section.id === "price" ? (
+                {sectionId === "price" ? (
                   <Field label="Preisdarstellung" hint="Berechnung bleibt die PEPTIX Money SSoT. EUR bleibt groß.">
                     <Select
                       value={draft.priceEmphasis}
@@ -871,6 +937,7 @@ function AreaDesignForm({
                   </Field>
                 ) : null}
               </div>
+              ))}
             </details>
           ))}
           <Button type="button" variant="ghost" className="w-full justify-start text-sm" onClick={() => setShowAdvanced((value) => !value)}>
@@ -998,13 +1065,14 @@ function AreaDesignForm({
                   <div className="rounded-lg border border-border p-3" style={{ background: draft.tokens.surface || undefined }}>
                     <p className="text-sm font-medium">KPV</p>
                     <p className="text-xs text-muted-foreground">30 mg · 10 Vials</p>
-                    <p className="mt-2 text-xs">5 von 10 Vials vergeben</p>
+                    <p className="mt-2 text-sm font-semibold">5 / 10 Kit</p>
                     <div className="my-2 h-2 overflow-hidden rounded-full bg-secondary">
                       <div className="h-full w-1/2 bg-primary" />
                     </div>
-                    <p className="text-xs text-muted-foreground">Noch 5 verfügbar</p>
+                    <p className="text-xs text-muted-foreground">Noch 5 Plätze</p>
                     <p className="mt-2 text-xs text-muted-foreground">Dein Anteil</p>
-                    <DualCurrencyPrice usd={45.85} rate={0.862} size="compact" />
+                    <DualCurrencyPrice usd={45.85} rate={0.862} unit="Vial" size="compact" />
+                    <p className="mt-2 text-[11px] text-muted-foreground">von @username</p>
                     <Button type="button" size="sm" className="mt-2">
                       Mitmachen
                     </Button>

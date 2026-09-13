@@ -12,6 +12,7 @@ import {
   formatPartialKitQuantity,
   formatProductQuantity,
   formatUnitWord,
+  getProductUnitLabel,
   productQuantityKindFor,
   resolveProductCategoryId,
 } from "@/lib/quantityFormat";
@@ -131,5 +132,14 @@ describe("quantityFormat", () => {
     expect(readFileSync(resolve(process.cwd(), "src/lib/orderExport.ts"), "utf8")).not.toMatch(
       /function format.*Quantity/,
     );
+  });
+
+  it("labels a unit price from the category domain, not Kit", () => {
+    expect(getProductUnitLabel({ categoryId: "peptides" })).toBe("Vial");
+    expect(getProductUnitLabel({ categoryId: "reconstitution-water" })).toBe("Vial");
+    expect(getProductUnitLabel({ categoryId: "injectable-oils" })).toBe("Vial");
+    expect(getProductUnitLabel({ categoryId: "orals" })).toBe("Packung");
+    expect(getProductUnitLabel({ category: "PEPTIDES", name: "Adamax" })).toBe("Vial");
+    expect(getProductUnitLabel({ category: "ORALS", name: "Anadrol" })).toBe("Packung");
   });
 });
