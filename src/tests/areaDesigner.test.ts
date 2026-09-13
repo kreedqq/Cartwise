@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   AREA_THEME_PRESETS,
+  COLOR_FIELD_LABELS,
   EMPTY_AREA_THEME,
   improveThemeContrast,
   normalizeHexColor,
@@ -20,8 +21,12 @@ describe("sales area designer", () => {
     const panel = read("src/components/admin/AreaDesignPanel.tsx");
     expect(panel).toContain('type="color"');
     expect(panel).toContain("Live Vorschau");
-    expect(panel).toContain("Palette erzeugen");
-    expect(panel).toContain("Kontrast verbessern");
+    expect(panel).toContain("Palette aus Hauptfarbe");
+    expect(panel).toContain("Verbessern");
+    expect(panel).toContain("Mehr Einstellungen");
+    expect(panel).toContain("Kit Gesuch");
+    expect(panel).toContain("Join Dialog");
+    expect(panel).toContain("COLOR_FIELD_LABELS");
     expect(panel).toContain("Du hast ungespeicherte Designänderungen.");
     expect(panel).toContain("width: 1440");
     expect(panel).toContain("width: 768");
@@ -51,6 +56,9 @@ describe("sales area designer", () => {
     expect(palette.button).toBe("#d4af37");
     expect(palette.background).toBeTruthy();
     expect(AREA_THEME_PRESETS.accessories?.primary).toBe("#d4af37");
+    expect(COLOR_FIELD_LABELS.primary).toBe("Hauptfarbe");
+    expect(COLOR_FIELD_LABELS.price).toBe("Preis");
+    expect(read("src/lib/shop/areaTheme.ts")).toContain("Hauptfarbe");
     const improved = improveThemeContrast({
       ...EMPTY_AREA_THEME,
       enabled: true,

@@ -76,6 +76,8 @@ describe("customer dual-currency surfaces", () => {
     expect(read("src/components/cart/CartCard.tsx")).toContain("DualCurrencyPrice");
     expect(read("src/components/cart/CartSummaryBar.tsx")).toContain("DualCurrencyPrice");
     expect(read("src/components/cart/CartSummaryPanel.tsx")).toContain("DualCurrencyPrice");
+    expect(read("src/components/cart/CartItemsTable.tsx")).toContain("formatEur(");
+    expect(read("src/components/cart/CartItemsTable.tsx")).toContain("convertUsdToEur");
     expect(read("src/pages/Checkout.tsx")).toContain("usd={item.unit_price_usd_snapshot}");
     expect(read("src/pages/admin/AdminShopAreas.tsx")).not.toContain("DualCurrencyPrice");
   });

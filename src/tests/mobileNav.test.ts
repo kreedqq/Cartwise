@@ -27,7 +27,7 @@ describe("mobile navigation", () => {
     expect(nav).toContain("overflow-x-auto");
     expect(nav).toContain("snap-x");
     expect(nav).toContain("min-h-12");
-    expect(nav).toContain("w-[4.75rem]");
+    expect(nav).toContain("w-[5.25rem]");
     expect(nav).toContain("text-[11px]");
     expect(nav).not.toContain("flex-1");
     expect(nav).not.toContain("text-[9px]");

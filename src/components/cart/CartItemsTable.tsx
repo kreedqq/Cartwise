@@ -22,7 +22,7 @@ import { ResolutionStatusBadge } from "@/components/cart/ResolutionStatusBadge";
 import { EditKitShareButton } from "@/components/shop/EditKitShareButton";
 import { useCartItemRow } from "@/hooks/useCartItemRow";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
-import { formatDateTime, formatRate, formatUsd } from "@/lib/money";
+import { convertUsdToEur, formatDateTime, formatEur, formatRate, formatUsd } from "@/lib/money";
 import {
   cartItemDisplayName,
   cartItemQuantityLabel,
@@ -160,9 +160,9 @@ function CartItemRowDesktop({
             className="block text-[11px] font-normal text-primary"
             title={
               item.bulk_price_min_quantity_snapshot != null
-                ? `Mengenpreis ab ${item.bulk_price_min_quantity_snapshot} Stück (Normalpreis ${formatUsd(
-                    item.normal_price_usd_snapshot,
-                  )})`
+                ? `Mengenpreis ab ${item.bulk_price_min_quantity_snapshot} Stück (Normalpreis ${formatEur(
+                    convertUsdToEur(item.normal_price_usd_snapshot ?? 0, item.exchange_rate_snapshot),
+                  )} / ${formatUsd(item.normal_price_usd_snapshot)})`
                 : "Mengenpreis"
             }
           >

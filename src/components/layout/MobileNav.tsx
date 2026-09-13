@@ -30,13 +30,13 @@ export function MobileNav() {
           data-active={location.pathname === item.to || (!item.end && location.pathname.startsWith(`${item.to}/`)) || undefined}
           className={({ isActive }) =>
             cn(
-              "flex min-h-12 w-[4.75rem] shrink-0 snap-start flex-col items-center justify-center gap-0.5 px-1 py-2 text-[11px] font-medium leading-tight tracking-wide",
+              "flex min-h-12 w-[5.25rem] shrink-0 snap-start flex-col items-center justify-center gap-0.5 px-1.5 py-2 text-[11px] font-medium leading-tight tracking-wide",
               isActive ? "text-primary" : "text-sidebar-muted",
             )
           }
         >
           <item.icon className="h-4 w-4 shrink-0" />
-          <span className="max-w-full text-center">{item.shortLabel ?? item.label}</span>
+          <span className="max-w-full truncate text-center">{item.shortLabel ?? item.label}</span>
         </NavLink>
       ))}
       {isAdmin && (
@@ -45,7 +45,7 @@ export function MobileNav() {
           data-active={location.pathname.startsWith("/admin") || undefined}
           className={({ isActive }) =>
             cn(
-              "flex min-h-12 w-[4.75rem] shrink-0 snap-start flex-col items-center justify-center gap-0.5 px-1 py-2 text-[11px] font-medium leading-tight tracking-wide",
+              "flex min-h-12 w-[5.25rem] shrink-0 snap-start flex-col items-center justify-center gap-0.5 px-1.5 py-2 text-[11px] font-medium leading-tight tracking-wide",
               isActive ? "text-primary" : "text-sidebar-muted",
             )
           }

@@ -154,23 +154,35 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
         actions={
           <div className="flex flex-wrap gap-2">
             <Button
+              className="min-h-11"
               variant={activeSection === "catalog" ? "default" : "outline"}
               onClick={() => setActiveSection("catalog")}
             >
               Produkte
             </Button>
             <Button
+              className="min-h-11"
               variant={activeSection === "kits" ? "default" : "outline"}
               onClick={() => setActiveSection("kits")}
             >
               <Layers className="mr-1.5 h-4 w-4" />
-              Kit Gesuche ansehen
+              Kit Gesuche
             </Button>
           </div>
         }
       />
 
       {activeSection === "catalog" && (
+        <>
+        <div className="mb-6 rounded-2xl border border-border bg-card p-4 sm:p-5">
+          <h2 className="text-lg font-semibold">Kit gemeinsam kaufen</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Teile ein Kit mit anderen Kunden und bezahle nur für deinen Anteil.
+          </p>
+          <Button className="mt-3 min-h-11" onClick={() => setActiveSection("kits")}>
+            Kit Gesuche ansehen
+          </Button>
+        </div>
         <GroupBuyCatalog
           shopArea={shopArea}
           areaName={areaName}
@@ -193,6 +205,7 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
           onSearch={setSearch}
           onClearCategory={() => setSelectedKey(null)}
         />
+        </>
       )}
 
       {activeSection === "kits" && (
@@ -200,7 +213,7 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
           <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
             <h2 className="text-lg font-semibold">Kit gemeinsam kaufen</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Ein Kit enthält mehrere Vials. Wenn du nicht alle brauchst, kannst du dir das Kit mit anderen Kunden teilen.
+              Teile ein Kit mit anderen Kunden und bezahle nur für deinen Anteil.
             </p>
           </div>
           <KitRequestsSection
@@ -589,7 +602,7 @@ function KitRequestsSection({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Verbleibend</Label>
+              <Label>Noch verfügbar</Label>
               <Select
                 value={minRemaining == null ? "all" : String(minRemaining)}
                 onValueChange={(value) => {
@@ -623,8 +636,8 @@ function KitRequestsSection({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="newest">Neueste</SelectItem>
-                  <SelectItem value="fewest_remaining">Wenigste fehlende Vials</SelectItem>
-                  <SelectItem value="most_remaining">Meiste fehlende Vials</SelectItem>
+                  <SelectItem value="fewest_remaining">Am vollsten zuerst</SelectItem>
+                  <SelectItem value="most_remaining">Meiste Plätze frei</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -743,16 +756,16 @@ function KitRequestsSection({
       <ConfirmDialog
         open={leaveTarget != null}
         onOpenChange={(next) => !next && setLeaveTarget(null)}
-        title="Möchtest du dieses Kit wirklich verlassen?"
-        description="Dein Anteil wird wieder freigegeben. Andere Kunden können ihn übernehmen."
-        confirmLabel="Verlassen"
+        title="Möchtest du dieses Kit verlassen?"
+        description="Dein Anteil wird wieder freigegeben."
+        confirmLabel="Kit verlassen"
         variant="destructive"
         loading={leaveMutation.isPending}
         onConfirm={async () => {
           if (!leaveTarget) return;
           try {
             await leaveMutation.mutateAsync(leaveTarget.id);
-            toast.success("Teilnahme storniert.");
+            toast.success("Du hast das Kit verlassen.");
             setLeaveTarget(null);
           } catch (error) {
             toast.error(error instanceof Error ? error.message : "Stornierung fehlgeschlagen.");

@@ -182,6 +182,39 @@ export const COLOR_FIELD_USAGE: Record<keyof AreaThemeTokens, string> = {
   mutedText: "Hinweise und Untertitel",
 };
 
+export const COLOR_FIELD_LABELS: Record<keyof AreaThemeTokens, string> = {
+  primary: "Hauptfarbe",
+  secondary: "Zweitfarbe",
+  accent: "Akzentfarbe",
+  background: "Hintergrund",
+  surface: "Karten",
+  text: "Text",
+  heading: "Überschrift",
+  price: "Preis",
+  border: "Rahmen",
+  button: "Button",
+  buttonText: "Button-Text",
+  mutedText: "Hinweistext",
+};
+
+export const BASIC_COLOR_KEYS: Array<keyof AreaThemeTokens> = [
+  "primary",
+  "accent",
+  "background",
+  "surface",
+  "text",
+  "heading",
+  "price",
+  "button",
+];
+
+export const ADVANCED_COLOR_KEYS: Array<keyof AreaThemeTokens> = [
+  "secondary",
+  "border",
+  "buttonText",
+  "mutedText",
+];
+
 function clampByte(value: number): number {
   return Math.max(0, Math.min(255, Math.round(value)));
 }

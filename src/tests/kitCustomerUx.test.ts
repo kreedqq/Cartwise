@@ -13,6 +13,10 @@ describe("kit customer UX", () => {
     expect(kitRequestCustomerStatusLabel("open", 1)).toBe("Fast voll");
     expect(kitRequestCustomerStatusLabel("full")).toBe("Voll");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Mitmachen");
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Kit verlassen");
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Vials vergeben");
+    expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Du bist dabei.");
+    expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toContain("Kit Gesuch erstellen");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("useExchangeRate");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("DualCurrencyPrice");
     expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Kit teilen");

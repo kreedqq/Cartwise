@@ -10,8 +10,11 @@ import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import { toast } from "@/components/ui/toaster";
 import { AREA_ICON_OPTIONS } from "@/lib/shop/areaIcons";
 import {
+  ADVANCED_COLOR_KEYS,
   AREA_THEME_PRESET_LABELS,
   AREA_THEME_PRESETS,
+  BASIC_COLOR_KEYS,
+  COLOR_FIELD_LABELS,
   COLOR_FIELD_USAGE,
   EMPTY_AREA_THEME,
   areaThemeContrastWarning,
@@ -21,7 +24,6 @@ import {
   paletteFromPrimary,
   parseAreaTheme,
   type AreaThemeConfig,
-  type AreaThemeTokens,
 } from "@/lib/shop/areaTheme";
 import { updateAdminShopArea } from "@/services/shopAreas";
 import { deleteSiteDesignImage, siteDesignImageUrl, uploadAreaDesignImage } from "@/services/siteDesign";
@@ -31,24 +33,36 @@ const VIEWPORTS = [
   { id: "desktop", label: "Desktop", width: 1440 },
   { id: "tablet", label: "Tablet", width: 768 },
   { id: "mobile", label: "Mobile", width: 390 },
+  { id: "iphone-se", label: "375", width: 375 },
+  { id: "pixel", label: "412", width: 412 },
 ] as const;
 
-const SECTIONS = [
+const PREVIEW_SCENES = [
+  { id: "shop", title: "Shop" },
+  { id: "product", title: "Produkt" },
+  { id: "kit", title: "Kit Gesuch" },
+  { id: "join", title: "Join Dialog" },
+] as const;
+
+const BASIC_SECTIONS = [
   { id: "identity", title: "Identität" },
   { id: "colors", title: "Farben" },
   { id: "background", title: "Hintergrund" },
   { id: "hero", title: "Hero" },
+  { id: "price", title: "Preise" },
+  { id: "buttons", title: "Buttons" },
+  { id: "mobile", title: "Mobile" },
+] as const;
+
+const ADVANCED_SECTIONS = [
   { id: "header", title: "Header" },
   { id: "categories", title: "Kategorien" },
   { id: "products", title: "Produkte" },
-  { id: "price", title: "Preise" },
-  { id: "buttons", title: "Buttons" },
   { id: "cards", title: "Karten" },
   { id: "banner", title: "Banner" },
   { id: "typography", title: "Typografie" },
   { id: "layout", title: "Layout" },
-  { id: "mobile", title: "Mobile" },
-  { id: "assets", title: "Assets" },
+  { id: "assets", title: "Bilder" },
   { id: "search", title: "Suche & Leerstand" },
 ] as const;
 
@@ -76,6 +90,8 @@ function AreaDesignForm({
   const [badge, setBadge] = React.useState(area.badge_text ?? "");
   const [openSection, setOpenSection] = React.useState<string>("colors");
   const [viewport, setViewport] = React.useState<(typeof VIEWPORTS)[number]["id"]>("desktop");
+  const [previewScene, setPreviewScene] = React.useState<(typeof PREVIEW_SCENES)[number]["id"]>("shop");
+  const [showAdvanced, setShowAdvanced] = React.useState(false);
   const [seed, setSeed] = React.useState("#d4af37");
   const [saving, setSaving] = React.useState(false);
 
@@ -133,7 +149,7 @@ function AreaDesignForm({
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(320px,440px)]">
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">PEPTIX Sales Area Designer</CardTitle>
+          <CardTitle className="text-base">Bereichsdesign</CardTitle>
           <CardDescription>
             Nur Darstellung dieses Verkaufsbereichs. Preise, Katalog und Rollen bleiben unverändert.
           </CardDescription>
@@ -146,7 +162,8 @@ function AreaDesignForm({
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          {SECTIONS.map((section) => (
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Häufig genutzt</p>
+          {(showAdvanced ? [...BASIC_SECTIONS, ...ADVANCED_SECTIONS] : [...BASIC_SECTIONS]).map((section) => (
             <details
               key={section.id}
               open={openSection === section.id}
@@ -210,20 +227,27 @@ function AreaDesignForm({
                         onCheckedChange={(value) => setDraft((current) => ({ ...current, enabled: value }))}
                       />
                     </div>
-                    <Field label="Preset" hint="Setzt Ausgangswerte. Danach einzeln anpassbar.">
-                      <Select onValueChange={applyPreset}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Preset wählen" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.keys(AREA_THEME_PRESETS).map((key) => (
-                            <SelectItem key={key} value={key}>
-                              {AREA_THEME_PRESET_LABELS[key] ?? key}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </Field>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Preset</p>
+                      <p className="text-[11px] text-muted-foreground">Setzt Ausgangswerte. Danach einzeln anpassbar.</p>
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                        {Object.entries(AREA_THEME_PRESETS).map(([key, tokens]) => (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => applyPreset(key)}
+                            className="rounded-lg border border-border p-2 text-left transition-colors hover:border-primary"
+                          >
+                            <div className="mb-2 flex h-8 overflow-hidden rounded-md">
+                              <span className="flex-[2]" style={{ background: tokens.background || "#070b14" }} />
+                              <span className="flex-1" style={{ background: tokens.primary || "#d4af37" }} />
+                              <span className="flex-1" style={{ background: tokens.surface || "#101826" }} />
+                            </div>
+                            <p className="text-xs font-medium">{AREA_THEME_PRESET_LABELS[key] ?? key}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                     <div className="flex flex-wrap items-end gap-2">
                       <ColorField
                         label="Hauptfarbe"
@@ -243,14 +267,14 @@ function AreaDesignForm({
                           }))
                         }
                       >
-                        Palette erzeugen
+                        Palette aus Hauptfarbe
                       </Button>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2">
-                      {(Object.keys(COLOR_FIELD_USAGE) as Array<keyof AreaThemeTokens>).map((key) => (
+                      {BASIC_COLOR_KEYS.map((key) => (
                         <ColorField
                           key={key}
-                          label={key}
+                          label={COLOR_FIELD_LABELS[key]}
                           usage={COLOR_FIELD_USAGE[key]}
                           value={draft.tokens[key] ?? ""}
                           onChange={(value) =>
@@ -262,11 +286,30 @@ function AreaDesignForm({
                         />
                       ))}
                     </div>
+                    <details className="rounded-md border border-border/60 px-3 py-2">
+                      <summary className="cursor-pointer text-sm font-medium">Weitere Farben</summary>
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        {ADVANCED_COLOR_KEYS.map((key) => (
+                          <ColorField
+                            key={key}
+                            label={COLOR_FIELD_LABELS[key]}
+                            usage={COLOR_FIELD_USAGE[key]}
+                            value={draft.tokens[key] ?? ""}
+                            onChange={(value) =>
+                              setDraft((current) => ({
+                                ...current,
+                                tokens: { ...current.tokens, [key]: value },
+                              }))
+                            }
+                          />
+                        ))}
+                      </div>
+                    </details>
                     {contrastWarning ? (
                       <div className="flex flex-wrap items-center gap-2 rounded-md border border-warning/40 bg-warning/10 px-3 py-2">
-                        <p className="text-xs text-warning">Diese Farbkombination ist schlecht lesbar. {contrastWarning}</p>
+                        <p className="text-xs text-warning">Schlechter Kontrast. {contrastWarning}</p>
                         <Button type="button" size="sm" variant="outline" onClick={() => setDraft(improveThemeContrast)}>
-                          Kontrast verbessern
+                          Verbessern
                         </Button>
                       </div>
                     ) : null}
@@ -365,6 +408,77 @@ function AreaDesignForm({
                         }
                       />
                     </Field>
+                    <details className="sm:col-span-2 rounded-md border border-border/60 px-3 py-2">
+                      <summary className="cursor-pointer text-sm font-medium">Weitere Hintergrundoptionen</summary>
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        <Field label="Position">
+                          <Input
+                            value={draft.background.position}
+                            onChange={(event) =>
+                              setDraft((current) => ({
+                                ...current,
+                                background: { ...current.background, position: event.target.value },
+                              }))
+                            }
+                          />
+                        </Field>
+                        <Field label="Skalierung">
+                          <Select
+                            value={draft.background.scale}
+                            onValueChange={(value) =>
+                              setDraft((current) => ({
+                                ...current,
+                                background: { ...current.background, scale: value as AreaThemeConfig["background"]["scale"] },
+                              }))
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="cover">Ausfüllen</SelectItem>
+                              <SelectItem value="contain">Einpassen</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </Field>
+                        <Field label="Unschärfe">
+                          <Input
+                            type="number"
+                            min={0}
+                            max={40}
+                            value={draft.background.blur}
+                            onChange={(event) =>
+                              setDraft((current) => ({
+                                ...current,
+                                background: { ...current.background, blur: Number(event.target.value) },
+                              }))
+                            }
+                          />
+                        </Field>
+                        <Field label="Bewegung">
+                          <Select
+                            value={draft.background.attachment}
+                            onValueChange={(value) =>
+                              setDraft((current) => ({
+                                ...current,
+                                background: {
+                                  ...current.background,
+                                  attachment: value as AreaThemeConfig["background"]["attachment"],
+                                },
+                              }))
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="scroll">Scrollt mit</SelectItem>
+                              <SelectItem value="fixed">Fixiert</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </Field>
+                      </div>
+                    </details>
                   </div>
                 ) : null}
                 {section.id === "hero" ? (
@@ -747,9 +861,12 @@ function AreaDesignForm({
               </div>
             </details>
           ))}
+          <Button type="button" variant="ghost" className="w-full justify-start text-sm" onClick={() => setShowAdvanced((value) => !value)}>
+            {showAdvanced ? "Weniger Einstellungen" : "Mehr Einstellungen"}
+          </Button>
           <div className="flex flex-wrap justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => setDraft(EMPTY_AREA_THEME)}>
-              Design auf Standard zurücksetzen
+              Standard wiederherstellen
             </Button>
             <Button type="button" variant="ghost" onClick={discard} disabled={!dirty}>
               Änderungen verwerfen
@@ -765,6 +882,19 @@ function AreaDesignForm({
         <CardHeader>
           <CardTitle className="text-base">Live Vorschau</CardTitle>
           <CardDescription>Demo-Produkte, keine echten Warenkorb- oder Bestelldaten.</CardDescription>
+          <div className="flex flex-wrap gap-2">
+            {PREVIEW_SCENES.map((item) => (
+              <Button
+                key={item.id}
+                type="button"
+                size="sm"
+                variant={previewScene === item.id ? "default" : "outline"}
+                onClick={() => setPreviewScene(item.id)}
+              >
+                {item.title}
+              </Button>
+            ))}
+          </div>
           <div className="flex flex-wrap gap-2">
             {VIEWPORTS.map((item) => (
               <Button
@@ -802,22 +932,29 @@ function AreaDesignForm({
                 ) : null}
               </div>
               <div className="space-y-3 p-4">
-                {draft.hero.enabled ? (
+                {(previewScene === "shop" || previewScene === "product") && draft.hero.enabled ? (
                   <div className="rounded-lg bg-primary/10 px-3 py-2 text-xs">
                     Hero: {draft.hero.variant} · {draft.hero.buttonText || "ohne Button"}
                   </div>
                 ) : null}
-                {draft.banner.enabled ? (
+                {previewScene === "shop" && draft.banner.enabled ? (
                   <div className="rounded-lg border border-border px-3 py-2 text-xs">
                     {draft.banner.title || "Banner"}
                   </div>
                 ) : null}
-                <Input readOnly value={draft.searchPlaceholder || "Artikel suchen …"} />
-                {[
-                  { name: "Semaglutide", variant: "5 mg", usd: 11.88 },
-                  { name: "Retatrutide", variant: "10 mg", usd: 18.5 },
-                  { name: "BAC Water", variant: "3 ml", usd: 6.25 },
-                ].map((product) => (
+                {previewScene === "shop" ? (
+                  <Input readOnly value={draft.searchPlaceholder || "Artikel suchen …"} />
+                ) : null}
+                {(previewScene === "shop" || previewScene === "product"
+                  ? previewScene === "product"
+                    ? [{ name: "Semaglutide", variant: "5 mg", usd: 11.88 }]
+                    : [
+                        { name: "Semaglutide", variant: "5 mg", usd: 11.88 },
+                        { name: "Retatrutide", variant: "10 mg", usd: 18.5 },
+                        { name: "BAC Water", variant: "3 ml", usd: 6.25 },
+                      ]
+                  : []
+                ).map((product) => (
                   <div
                     key={product.name}
                     className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
@@ -835,21 +972,46 @@ function AreaDesignForm({
                     </div>
                   </div>
                 ))}
-                <div className="rounded-lg border border-border p-3" style={{ background: draft.tokens.surface || undefined }}>
-                  <p className="text-sm font-medium">KPV · 30 mg</p>
-                  <p className="text-xs text-muted-foreground">5 von 10 belegt · Noch 5 frei</p>
-                  <div className="my-2 h-2 overflow-hidden rounded-full bg-secondary">
-                    <div className="h-full w-1/2 bg-primary" />
+                {previewScene === "kit" || previewScene === "shop" ? (
+                  <div className="rounded-lg border border-border p-3" style={{ background: draft.tokens.surface || undefined }}>
+                    <p className="text-sm font-medium">KPV</p>
+                    <p className="text-xs text-muted-foreground">30 mg · 10 Vials</p>
+                    <p className="mt-2 text-xs">5 von 10 Vials vergeben</p>
+                    <div className="my-2 h-2 overflow-hidden rounded-full bg-secondary">
+                      <div className="h-full w-1/2 bg-primary" />
+                    </div>
+                    <p className="text-xs text-muted-foreground">Noch 5 verfügbar</p>
+                    <p className="mt-2 text-xs text-muted-foreground">Dein Anteil</p>
+                    <DualCurrencyPrice usd={45.85} rate={0.862} size="compact" />
+                    <Button type="button" size="sm" className="mt-2">
+                      Mitmachen
+                    </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground">Dein Anteil</p>
-                  <DualCurrencyPrice usd={45.85} rate={0.862} size="compact" />
-                  <Button type="button" size="sm" className="mt-2">
-                    Mitmachen
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {draft.emptyTitle || "Dieser Bereich wird gerade vorbereitet."}
-                </p>
+                ) : null}
+                {previewScene === "join" ? (
+                  <div className="rounded-lg border border-border p-3" style={{ background: draft.tokens.surface || undefined }}>
+                    <p className="text-sm font-semibold">Kit teilen</p>
+                    <p className="text-xs text-muted-foreground">KPV · 30 mg · Noch 5 verfügbar</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {[1, 2, 3, 4, 5].map((qty) => (
+                        <span key={qty} className="min-w-11 rounded-md border border-border px-2 py-1 text-center text-xs">
+                          {qty}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="mt-3 text-xs text-muted-foreground">Dein Anteil</p>
+                    <DualCurrencyPrice usd={45.85} rate={0.862} size="summary" />
+                    <p className="mt-1 text-xs text-muted-foreground">Du zahlst nur für deinen Anteil.</p>
+                    <Button type="button" size="sm" className="mt-3">
+                      Kit beitreten
+                    </Button>
+                  </div>
+                ) : null}
+                {previewScene === "shop" ? (
+                  <p className="text-xs text-muted-foreground">
+                    {draft.emptyTitle || "Dieser Bereich wird gerade vorbereitet."}
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>
@@ -892,23 +1054,22 @@ function ColorField({
   value: string;
   onChange: (value: string) => void;
 }) {
-  const picker = normalizeHexColor(value) ?? "#d4af37";
+  const picker = normalizeHexColor(value) ?? "#111111";
   return (
     <div className="space-y-1">
-      <Label className="capitalize">{label}</Label>
+      <Label>{label}</Label>
       <div className="flex items-center gap-2">
         <input
           type="color"
           aria-label={`${label} wählen`}
           value={picker}
           onChange={(event) => onChange(event.target.value)}
-          className="h-10 w-10 shrink-0 cursor-pointer rounded-md border border-border bg-transparent p-0"
+          className="h-11 w-11 shrink-0 cursor-pointer rounded-md border border-border bg-transparent p-0"
         />
-        <Input value={value} onChange={(event) => onChange(event.target.value)} placeholder="#d4af37" />
+        <Input value={value} onChange={(event) => onChange(event.target.value)} placeholder="optional #d4af37" />
       </div>
-      <p className="text-[11px] text-muted-foreground">Verwendet für: {usage}</p>
+      <p className="text-[11px] text-muted-foreground">{usage}</p>
       {hint ? <p className="text-[11px] text-muted-foreground">{hint}</p> : null}
-      <p className="text-[10px] text-muted-foreground">Hex optional · RGB/HSL nur Anzeige</p>
     </div>
   );
 }
@@ -926,6 +1087,7 @@ function ImageField({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const [busy, setBusy] = React.useState(false);
   const preview = value
     ? value.startsWith("http") || value.startsWith("data:") || value.startsWith("/")
@@ -935,6 +1097,15 @@ function ImageField({
 
   async function onFile(file: File | undefined) {
     if (!file) return;
+    const type = file.type.toLowerCase();
+    if (!["image/jpeg", "image/png", "image/webp"].includes(type)) {
+      toast.error("Dateityp wird nicht unterstützt.");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error("Bild ist zu groß.");
+      return;
+    }
     setBusy(true);
     try {
       const previous = value;
@@ -944,7 +1115,8 @@ function ImageField({
         await deleteSiteDesignImage(previous);
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Bild konnte nicht hochgeladen werden.");
+      const message = error instanceof Error ? error.message : "Bild konnte nicht hochgeladen werden.";
+      toast.error(/too large|größer|size/i.test(message) ? "Bild ist zu groß." : message);
     } finally {
       setBusy(false);
     }
@@ -952,26 +1124,42 @@ function ImageField({
 
   return (
     <Field label={label} hint="JPG, PNG oder WEBP. Nur Darstellung.">
-      {preview ? <img src={preview} alt="" className="mb-2 h-16 w-full rounded-md object-cover" /> : null}
-      <Input
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        disabled={busy}
-        onChange={(event) => void onFile(event.target.files?.[0])}
-      />
-      {value ? (
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          onClick={() => {
-            if (value && !value.startsWith("http")) void deleteSiteDesignImage(value);
-            onChange("");
-          }}
-        >
-          Bild entfernen
-        </Button>
-      ) : null}
+      <div
+        className="rounded-md border border-dashed border-border px-3 py-3"
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={(event) => {
+          event.preventDefault();
+          void onFile(event.dataTransfer.files?.[0]);
+        }}
+      >
+        {preview ? <img src={preview} alt="" className="mb-2 h-16 w-full rounded-md object-cover" /> : null}
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="sr-only"
+          disabled={busy}
+          onChange={(event) => void onFile(event.target.files?.[0])}
+        />
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" size="sm" variant="outline" disabled={busy} onClick={() => inputRef.current?.click()}>
+            {busy ? "Wird geladen …" : preview ? "Bild ersetzen" : "Bild hochladen"}
+          </Button>
+          {value ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                if (value && !value.startsWith("http")) void deleteSiteDesignImage(value);
+                onChange("");
+              }}
+            >
+              Entfernen
+            </Button>
+          ) : null}
+        </div>
+      </div>
     </Field>
   );
 }

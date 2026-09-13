@@ -174,19 +174,20 @@ export function CreateKitRequestDialog({ open, onOpenChange, shopArea }: CreateK
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="kit-request-mine">Dein Anteil</Label>
-              <Select value={String(creatorQuantity)} onValueChange={(value) => setMyQuantity(Number(value))}>
-                <SelectTrigger id="kit-request-mine" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from({ length: maxCreatorQty }, (_, i) => i + 1).map((qty) => (
-                    <SelectItem key={qty} value={String(qty)}>
-                      {formatKitQuantity(qty, categoryId, kitSize)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label>Dein Anteil</Label>
+              <div className="flex flex-wrap gap-2">
+                {Array.from({ length: maxCreatorQty }, (_, i) => i + 1).map((qty) => (
+                  <Button
+                    key={qty}
+                    type="button"
+                    variant={creatorQuantity === qty ? "default" : "outline"}
+                    className="min-h-11 min-w-11"
+                    onClick={() => setMyQuantity(qty)}
+                  >
+                    {qty}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -230,7 +231,7 @@ export function CreateKitRequestDialog({ open, onOpenChange, shopArea }: CreateK
             Abbrechen
           </Button>
           <Button className="w-full sm:w-auto" onClick={() => void handleSubmit()} disabled={createMutation.isPending}>
-            {createMutation.isPending ? "Wird erstellt …" : "Kit erstellen"}
+            {createMutation.isPending ? "Wird erstellt …" : "Kit Gesuch erstellen"}
           </Button>
         </DialogFooter>
       </DialogContent>

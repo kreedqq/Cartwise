@@ -82,7 +82,7 @@ export function KitRequestCardView({
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2 text-sm">
             <span className="font-medium">
-              {request.allocatedTotal} von {request.kitSizeVials} belegt
+              {request.allocatedTotal} von {request.kitSizeVials} Vials vergeben
             </span>
             <span className="text-muted-foreground">{percent} %</span>
           </div>
@@ -94,13 +94,15 @@ export function KitRequestCardView({
               aria-valuenow={percent}
               aria-valuemin={0}
               aria-valuemax={100}
-              aria-label={`${request.allocatedTotal} von ${request.kitSizeVials} belegt`}
+              aria-label={`${request.allocatedTotal} von ${request.kitSizeVials} Vials vergeben`}
             />
           </div>
           {request.status === "open" ? (
-            <p className="text-sm">Noch verfügbar: {formatKitQuantity(request.remainingVials, categoryId, request.kitSizeVials)}</p>
+            <p className="text-sm">Noch {request.remainingVials} verfügbar</p>
           ) : request.status === "full" ? (
-            <p className="text-sm font-medium text-primary">Kit vollständig</p>
+            <p className="text-sm font-medium text-primary">
+              {request.kitSizeVials} von {request.kitSizeVials} Vials vergeben · Kit vollständig
+            </p>
           ) : null}
         </div>
 
@@ -132,7 +134,7 @@ export function KitRequestCardView({
         ) : null}
         {canLeave && onLeave ? (
           <Button className="min-h-11 w-full" variant="outline" onClick={() => onLeave(request)}>
-            Verlassen
+            Kit verlassen
           </Button>
         ) : null}
         {canCancel && onCancel ? (

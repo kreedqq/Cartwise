@@ -45,6 +45,7 @@ function JoinKitRequestDialogBody({
   const [previewPrice, setPreviewPrice] = React.useState<number | null>(null);
   const [previewUnit, setPreviewUnit] = React.useState<number | null>(null);
   const [previewLoading, setPreviewLoading] = React.useState(false);
+  const [joined, setJoined] = React.useState<{ quantity: number; full: boolean; price: number | null } | null>(null);
 
   const categoryId: ShopCategoryId = isShopCategoryId(request.category) ? request.category : "peptides";
   const liveTotal =
@@ -68,15 +69,10 @@ function JoinKitRequestDialogBody({
   async function handleConfirm() {
     try {
       const result = await joinMutation.mutateAsync({ id: request.id, quantity });
-      if (result.status === "full" && result.cartSynced) {
-        toast.success("Du bist diesem Kit beigetreten. Das Kit ist vollständig. Die Artikel liegen in deinem Warenkorb.");
-      } else {
-        toast.success(
-          `Du bist diesem Kit beigetreten. ${formatKitQuantity(result.myQuantity, categoryId, request.kitSizeVials)} · Wartet auf weitere Teilnehmer.`,
-        );
-      }
+      const full = result.status === "full" && result.cartSynced;
+      setJoined({ quantity: result.myQuantity, full, price: previewPrice });
       setConfirmOpen(false);
-      onOpenChange(false);
+      toast.success(full ? "Du bist dabei. Das Kit ist vollständig." : "Du bist dabei.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Beitritt fehlgeschlagen.");
     }
@@ -92,16 +88,37 @@ function JoinKitRequestDialogBody({
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Kit teilen</DialogTitle>
+            <DialogTitle>{joined ? "Du bist dabei." : "Kit teilen"}</DialogTitle>
             <DialogDescription>
               {request.productName} · {request.variantLabel}
             </DialogDescription>
           </DialogHeader>
+          {joined ? (
+            <div className="space-y-3">
+              <p className="text-sm">
+                Dein Anteil: {formatKitQuantity(joined.quantity, categoryId, request.kitSizeVials)}
+              </p>
+              <p className="text-sm">
+                {request.allocatedTotal + joined.quantity} von {request.kitSizeVials} Vials vergeben
+              </p>
+              {joined.price != null ? (
+                <div>
+                  <p className="text-xs text-muted-foreground">Preis</p>
+                  <DualCurrencyPrice usd={joined.price} rate={rateQuery.data?.rate ?? null} size="summary" />
+                </div>
+              ) : null}
+              <p className="text-sm text-muted-foreground">
+                {joined.full ? "Kit vollständig. Die Artikel liegen in deinem Warenkorb." : "Warte auf weitere Teilnehmer"}
+              </p>
+              <Button className="min-h-11 w-full" onClick={() => onOpenChange(false)}>
+                Schließen
+              </Button>
+            </div>
+          ) : (
           <div className="space-y-4">
             <p className="text-sm">
               Kit: {formatKitQuantity(request.kitSizeVials, categoryId, request.kitSizeVials)} · Bereits{" "}
-              {request.allocatedTotal} / {request.kitSizeVials} · Noch verfügbar:{" "}
-              {formatKitQuantity(request.remainingVials, categoryId, request.kitSizeVials)}
+              {request.allocatedTotal} / {request.kitSizeVials} · Noch verfügbar: {request.remainingVials}
             </p>
             <div className="space-y-2">
               <p className="text-sm font-medium">Wie viel möchtest du übernehmen?</p>
@@ -128,7 +145,6 @@ function JoinKitRequestDialogBody({
               )}
               <p className="mt-2 text-xs text-muted-foreground">Du zahlst nur für deinen Anteil.</p>
             </div>
-          </div>
           <DialogFooter className="flex-col gap-2 sm:flex-row">
             <Button className="min-h-11 w-full sm:w-auto" variant="outline" onClick={() => onOpenChange(false)}>
               Abbrechen
@@ -141,6 +157,8 @@ function JoinKitRequestDialogBody({
               {previewLoading ? "Bitte warten …" : "Weiter"}
             </Button>
           </DialogFooter>
+          </div>
+          )}
         </DialogContent>
       </Dialog>
 
@@ -154,7 +172,7 @@ function JoinKitRequestDialogBody({
         description={
           <div className="space-y-3 text-left text-sm text-foreground">
             <p>
-              Du möchtest {formatKitQuantity(quantity, categoryId, request.kitSizeVials)} dieses Kits übernehmen.
+              Du übernimmst {formatKitQuantity(quantity, categoryId, request.kitSizeVials)}.
             </p>
             {previewPrice != null ? (
               <div>
