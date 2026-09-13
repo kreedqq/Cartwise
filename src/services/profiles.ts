@@ -59,6 +59,16 @@ export async function adminSetUsernameRequired(userId: string, required: boolean
   if (error) throw error;
 }
 
+/** Admin-only RPC: set profiles.username directly and clear any change request. */
+export async function adminSetUsername(userId: string, username: string): Promise<string> {
+  const { data, error } = await supabase.rpc("admin_set_username", {
+    _user_id: userId,
+    _username: username,
+  });
+  if (error) throw error;
+  return String(data);
+}
+
 /** Admin-only RPC: delete the auth account. Historical orders stay. */
 export async function adminDeleteUser(userId: string): Promise<void> {
   const { error } = await supabase.rpc("admin_delete_user", { _user_id: userId });

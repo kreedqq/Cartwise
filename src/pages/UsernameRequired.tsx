@@ -7,12 +7,13 @@ import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthProvider";
 import { POST_LOGIN_PATH, signOut } from "@/services/auth";
-import { shouldPromptForUsername } from "@/services/username";
+import { isUsernameChangeRequest, shouldPromptForUsername } from "@/services/username";
 
 export default function UsernameRequiredPage() {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
   const needsUsername = shouldPromptForUsername({ loading, user, profile });
+  const isChangeRequest = isUsernameChangeRequest(profile);
   const destination = POST_LOGIN_PATH;
 
   React.useEffect(() => {
@@ -34,10 +35,21 @@ export default function UsernameRequiredPage() {
       <div className="flex flex-1 flex-col gap-5">
         <div className="space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">PEPTIX</p>
-          <h1 className="text-lg font-semibold">Telegram Benutzername erforderlich</h1>
-          <p className="text-sm text-muted-foreground">
-            Bitte trag deinen Telegram Benutzernamen ein bzw. bestätige ihn, bevor du PEPTIX weiter nutzen kannst.
-          </p>
+          {isChangeRequest ? (
+            <>
+              <h1 className="text-lg font-semibold">Telegram Benutzername aktualisieren</h1>
+              <p className="text-sm text-muted-foreground">
+                Dein Administrator hat eine Aktualisierung deines Telegram Benutzernamens angefordert.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-lg font-semibold">Telegram Benutzername erforderlich</h1>
+              <p className="text-sm text-muted-foreground">
+                Bitte trage deinen Telegram Benutzernamen ein bzw. bestätige ihn, bevor du PEPTIX weiter nutzen kannst.
+              </p>
+            </>
+          )}
         </div>
         <RequireUsernameForm onSaved={() => navigate(destination, { replace: true })} />
         <Button type="button" variant="ghost" className="w-full" onClick={() => void handleSignOut()}>

@@ -1,8 +1,15 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+import {
+  clearUsernameChangeEligible,
+  markUsernameChangeEligible,
+  shouldPromptForUsername,
+  usernameChangeEligibleKey,
+} from "@/services/username";
 
 function readSource(relativePath: string): string {
   return readFileSync(resolve(process.cwd(), relativePath), "utf8");
@@ -52,6 +59,7 @@ describe("username required login guard", () => {
     authValue.user = { id: "user-1" };
     authValue.loading = false;
     authValue.profile = { username: "ExampleUser", username_required_on_next_login: false };
+    clearUsernameChangeEligible("user-1");
   });
 
   it("lets users without the flag use the app", () => {
@@ -60,8 +68,16 @@ describe("username required login guard", () => {
     expect(screen.queryByText("Username Pflichtseite")).not.toBeInTheDocument();
   });
 
-  it("sends users with the flag to the Pflichtseite instead of the shop", () => {
+  it("does not force a change window while still logged in after admin request", () => {
     authValue.profile = { username: "ExampleUser", username_required_on_next_login: true };
+    renderGated("/shop");
+    expect(screen.getByText("Shop ready")).toBeInTheDocument();
+    expect(screen.queryByText("Username Pflichtseite")).not.toBeInTheDocument();
+  });
+
+  it("shows the change window only after a fresh login marks the session eligible", () => {
+    authValue.profile = { username: "ExampleUser", username_required_on_next_login: true };
+    markUsernameChangeEligible("user-1");
     renderGated("/shop");
     expect(screen.getByText("Username Pflichtseite")).toBeInTheDocument();
     expect(screen.queryByText("Shop ready")).not.toBeInTheDocument();
@@ -76,6 +92,7 @@ describe("username required login guard", () => {
 
   it("keeps the Pflichtseite reachable while the condition is active", () => {
     authValue.profile = { username: "ExampleUser", username_required_on_next_login: true };
+    markUsernameChangeEligible("user-1");
     renderGated("/username-required");
     expect(screen.getByText("Username Pflichtseite")).toBeInTheDocument();
   });
@@ -88,5 +105,40 @@ describe("username required login guard", () => {
     expect(routes.indexOf('path="/username-required"')).toBeLessThan(routes.indexOf("<UsernameGate"));
     expect(routes.indexOf("<UsernameGate")).toBeLessThan(routes.indexOf("<AppShell"));
     expect(readSource("src/components/layout/AppShell.tsx")).not.toContain("RequireUsernameDialog");
+  });
+});
+
+describe("shouldPromptForUsername next-login binding", () => {
+  beforeEach(() => {
+    clearUsernameChangeEligible("user-1");
+  });
+
+  it("always prompts when username is missing", () => {
+    expect(
+      shouldPromptForUsername({
+        loading: false,
+        user: { id: "user-1" },
+        profile: { username: null, username_required_on_next_login: false },
+      }),
+    ).toBe(true);
+  });
+
+  it("ignores admin request until SIGNED_IN marks eligibility", () => {
+    expect(
+      shouldPromptForUsername({
+        loading: false,
+        user: { id: "user-1" },
+        profile: { username: "Nullpzr", username_required_on_next_login: true },
+      }),
+    ).toBe(false);
+    markUsernameChangeEligible("user-1");
+    expect(sessionStorage.getItem(usernameChangeEligibleKey("user-1"))).toBe("1");
+    expect(
+      shouldPromptForUsername({
+        loading: false,
+        user: { id: "user-1" },
+        profile: { username: "Nullpzr", username_required_on_next_login: true },
+      }),
+    ).toBe(true);
   });
 });

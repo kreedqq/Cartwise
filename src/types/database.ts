@@ -1572,6 +1572,10 @@ export interface Database {
         Args: { _username: string };
         Returns: string;
       };
+      admin_set_username: {
+        Args: { _user_id: string; _username: string };
+        Returns: string;
+      };
       get_my_kit_share: {
         Args: { _kit_share_id: string };
         Returns: Record<string, unknown>;

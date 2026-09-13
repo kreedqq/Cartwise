@@ -7,6 +7,7 @@ import { clearUserScopedQueries } from "@/lib/userSessionCache";
 import { getOwnProfile } from "@/services/profiles";
 import { getOwnRoles } from "@/services/roles";
 import { getMyCustomerRoleName } from "@/services/customerRoles";
+import { clearUsernameChangeEligible, markUsernameChangeEligible } from "@/services/username";
 import type { Role, Tables } from "@/types/database";
 
 interface AuthState {
@@ -94,7 +95,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     void bootstrapAuth();
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, newSession) => {
+      if (event === "SIGNED_IN" && newSession?.user?.id) {
+        markUsernameChangeEligible(newSession.user.id);
+      }
+      if (event === "SIGNED_OUT") {
+        const previousId = prevUserIdRef.current;
+        if (previousId) clearUsernameChangeEligible(previousId);
+      }
       setSession(newSession);
       handleAuthUserChange(newSession?.user?.id ?? null);
       if (newSession?.user) {

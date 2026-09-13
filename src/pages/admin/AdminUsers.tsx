@@ -11,12 +11,13 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -25,12 +26,15 @@ import { toast } from "@/components/ui/toaster";
 import { useAuth } from "@/context/AuthProvider";
 import { formatDateTime } from "@/lib/money";
 import { adminUserTelegramLabel, groupUsersForAdminTables } from "@/lib/adminUserGroups";
+import { usernameSchema } from "@/lib/validation";
 import {
   adminDeleteUser,
+  adminSetUsername,
   adminSetUsernameRequired,
   listUsersWithRoles,
   type UserWithRoles,
 } from "@/services/profiles";
+import { mapUsernameError } from "@/services/username";
 import { assignCustomerRole, listCustomerRoles, listUserCustomerRoles } from "@/services/customerRoles";
 import { setUserRole } from "@/services/roles";
 import { AdminCartPriceRefresh } from "@/components/admin/AdminCartPriceRefresh";
@@ -45,9 +49,14 @@ export default function AdminUsersPage() {
   const [managed, setManaged] = React.useState<UserWithRoles | null>(null);
   const [adminTarget, setAdminTarget] = React.useState<{ user: UserWithRoles; grant: boolean } | null>(null);
   const [deleteTarget, setDeleteTarget] = React.useState<UserWithRoles | null>(null);
+  const [usernameEditTarget, setUsernameEditTarget] = React.useState<UserWithRoles | null>(null);
+  const [usernameDraft, setUsernameDraft] = React.useState("");
+  const [usernameEditError, setUsernameEditError] = React.useState<string | null>(null);
+  const [requestTarget, setRequestTarget] = React.useState<UserWithRoles | null>(null);
   const [adminLoading, setAdminLoading] = React.useState(false);
   const [deleteLoading, setDeleteLoading] = React.useState(false);
   const [flagLoading, setFlagLoading] = React.useState(false);
+  const [usernameSaving, setUsernameSaving] = React.useState(false);
 
   const roles = rolesQuery.data ?? [];
   const assignmentByUser = React.useMemo(() => {
@@ -99,19 +108,49 @@ export default function AdminUsersPage() {
     }
   }
 
+  function openUsernameEditor(user: UserWithRoles) {
+    setUsernameEditTarget(user);
+    setUsernameDraft(user.username ?? "");
+    setUsernameEditError(null);
+  }
+
+  async function handleUsernameSave() {
+    if (!usernameEditTarget) return;
+    const parsed = usernameSchema.safeParse(usernameDraft.replace(/^@+/, ""));
+    if (!parsed.success) {
+      setUsernameEditError(parsed.error.issues[0]?.message ?? "Ungültiger Telegram Benutzername.");
+      return;
+    }
+    setUsernameSaving(true);
+    setUsernameEditError(null);
+    try {
+      const saved = await adminSetUsername(usernameEditTarget.id, parsed.data);
+      toast.success("Telegram Benutzername gespeichert.");
+      await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      setManaged((current) =>
+        current && current.id === usernameEditTarget.id
+          ? { ...current, username: saved, usernameRequiredOnNextLogin: false }
+          : current,
+      );
+      setUsernameEditTarget(null);
+    } catch (error) {
+      console.error("Admin Username speichern fehlgeschlagen:", error);
+      setUsernameEditError(mapUsernameError(error));
+    } finally {
+      setUsernameSaving(false);
+    }
+  }
+
   async function handleUsernameRequired(user: UserWithRoles, required: boolean) {
     setFlagLoading(true);
     try {
       await adminSetUsernameRequired(user.id, required);
-      toast.success(
-        required
-          ? "Telegram Benutzername wird beim nächsten Login verlangt."
-          : "Username-Erzwingung aufgehoben.",
-      );
+      toast.success(required ? "Änderung beim nächsten Login angefordert." : "Änderungsfreigabe widerrufen.");
       await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       setManaged((current) =>
         current && current.id === user.id ? { ...current, usernameRequiredOnNextLogin: required } : current,
       );
+      setRequestTarget(null);
     } catch (error) {
       console.error("Username-Erzwingung fehlgeschlagen:", error);
       toast.error(error instanceof Error ? error.message : "Einstellung konnte nicht gespeichert werden.");
@@ -170,7 +209,7 @@ export default function AdminUsersPage() {
                       <TableHead>Rolle</TableHead>
                       <TableHead>Aufschlag</TableHead>
                       <TableHead>Registriert</TableHead>
-                      <TableHead>Username erforderlich</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead className="text-right">Aktionen</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -190,7 +229,13 @@ export default function AdminUsersPage() {
                             {role ? `${Number(role.markup_percent)} %` : "—"}
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground">{formatDateTime(u.createdAt)}</TableCell>
-                          <TableCell>{u.usernameRequiredOnNextLogin ? "Ja" : "Nein"}</TableCell>
+                          <TableCell className="text-sm">
+                            {u.usernameRequiredOnNextLogin
+                              ? "Änderung angefordert"
+                              : u.username
+                                ? "✓ Gesperrt"
+                                : "Ohne Username"}
+                          </TableCell>
                           <TableCell className="text-right">
                             <Button variant="outline" size="sm" onClick={() => setManaged(u)}>
                               Verwalten
@@ -224,8 +269,14 @@ export default function AdminUsersPage() {
                           <dd>{formatDateTime(u.createdAt)}</dd>
                         </div>
                         <div className="flex justify-between gap-3">
-                          <dt>Username erforderlich</dt>
-                          <dd>{u.usernameRequiredOnNextLogin ? "Ja" : "Nein"}</dd>
+                          <dt>Status</dt>
+                          <dd>
+                            {u.usernameRequiredOnNextLogin
+                              ? "Änderung angefordert"
+                              : u.username
+                                ? "✓ Gesperrt"
+                                : "Ohne Username"}
+                          </dd>
                         </div>
                       </dl>
                       <Button variant="outline" size="sm" className="w-full" onClick={() => setManaged(u)}>
@@ -248,17 +299,55 @@ export default function AdminUsersPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Benutzer verwalten</DialogTitle>
-            <DialogDescription>Rolle, Login-Erzwingung und Account-Löschung für diesen Benutzer.</DialogDescription>
+            <DialogDescription>Telegram Benutzername, Rolle und Account für diesen Benutzer.</DialogDescription>
           </DialogHeader>
 
           {managed && (
             <div className="space-y-5">
               <section className="space-y-3 border-b border-border pb-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Benutzer</h3>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Telegram Benutzername
+                </h3>
                 <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">Telegram Benutzername</p>
                   <p className="text-sm font-medium">{adminUserTelegramLabel(managed.username)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Status:{" "}
+                    {managed.usernameRequiredOnNextLogin
+                      ? "Änderung beim nächsten Login angefordert"
+                      : managed.username
+                        ? "✓ Gesperrt"
+                        : "Noch nicht gesetzt"}
+                  </p>
                 </div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  <Button variant="outline" size="sm" onClick={() => openUsernameEditor(managed)}>
+                    {managed.username ? "Benutzername bearbeiten" : "Benutzername festlegen"}
+                  </Button>
+                  {managed.usernameRequiredOnNextLogin ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={flagLoading}
+                      onClick={() => void handleUsernameRequired(managed, false)}
+                    >
+                      Änderungsfreigabe widerrufen
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={flagLoading || !managed.username}
+                      title={!managed.username ? "Zuerst einen Telegram Benutzernamen festlegen." : undefined}
+                      onClick={() => setRequestTarget(managed)}
+                    >
+                      Änderung beim nächsten Login anfordern
+                    </Button>
+                  )}
+                </div>
+              </section>
+
+              <section className="space-y-3 border-b border-border pb-4">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Benutzer</h3>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">Registriert</p>
                   <p className="text-sm">{formatDateTime(managed.createdAt)}</p>
@@ -313,30 +402,6 @@ export default function AdminUsersPage() {
                 </Button>
               </section>
 
-              <section className="space-y-3 border-b border-border pb-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Login</h3>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 space-y-1">
-                    <Label htmlFor="username-required" className="text-sm font-medium leading-snug">
-                      Telegram Benutzername beim nächsten Login erforderlich
-                    </Label>
-                    <p className="text-xs text-muted-foreground">
-                      Der Benutzer muss beim nächsten Login einen Telegram Benutzernamen eingeben bzw. bestätigen,
-                      bevor er PEPTIX weiter nutzen kann.
-                    </p>
-                    <p className="text-xs font-medium">
-                      Status: {managed.usernameRequiredOnNextLogin ? "Erforderlich" : "Nicht erforderlich"}
-                    </p>
-                  </div>
-                  <Switch
-                    id="username-required"
-                    checked={managed.usernameRequiredOnNextLogin}
-                    disabled={flagLoading}
-                    onCheckedChange={(checked) => void handleUsernameRequired(managed, checked)}
-                  />
-                </div>
-              </section>
-
               <section className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Account</h3>
                 <Button
@@ -353,6 +418,72 @@ export default function AdminUsersPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <Dialog
+        open={!!usernameEditTarget}
+        onOpenChange={(open) => {
+          if (!open && !usernameSaving) setUsernameEditTarget(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Telegram Benutzername bearbeiten</DialogTitle>
+            <DialogDescription>
+              Admin kann den Telegram Benutzernamen direkt setzen. Offene Änderungsfreigaben werden entfernt.
+            </DialogDescription>
+          </DialogHeader>
+          {usernameEditTarget && (
+            <div className="space-y-3">
+              <div className="rounded-md border border-border bg-muted/30 px-3 py-2 text-sm">
+                <p className="text-xs text-muted-foreground">Aktueller Benutzername</p>
+                <p className="font-medium">{adminUserTelegramLabel(usernameEditTarget.username)}</p>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="admin-username">Neuer Telegram Benutzername</Label>
+                <Input
+                  id="admin-username"
+                  value={usernameDraft}
+                  invalid={!!usernameEditError}
+                  onChange={(e) => setUsernameDraft(e.target.value)}
+                  placeholder="@ExampleUser"
+                  autoFocus
+                />
+                {usernameEditError ? (
+                  <p className="text-xs text-destructive">{usernameEditError}</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">3–24 Zeichen, beginnend mit einem Buchstaben.</p>
+                )}
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={usernameSaving}
+              onClick={() => setUsernameEditTarget(null)}
+            >
+              Abbrechen
+            </Button>
+            <Button type="button" loading={usernameSaving} onClick={() => void handleUsernameSave()}>
+              Speichern
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmDialog
+        open={!!requestTarget}
+        onOpenChange={(open) => !open && setRequestTarget(null)}
+        title="Telegram Benutzernamen ändern lassen?"
+        description="Der Benutzer erhält beim nächsten Login ein Änderungsfenster und kann dort seinen Telegram Benutzernamen aktualisieren. Nach erfolgreicher Änderung wird die Änderungsfreigabe automatisch entfernt."
+        confirmLabel="Anfordern"
+        cancelLabel="Abbrechen"
+        loading={flagLoading}
+        onConfirm={() => {
+          if (requestTarget) void handleUsernameRequired(requestTarget, true);
+        }}
+      />
 
       <ConfirmDialog
         open={!!adminTarget}

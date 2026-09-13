@@ -1,7 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { usernameSchema, registerSchema } from "@/lib/validation";
-import { shouldPromptForUsername } from "@/services/username";
+import {
+  clearUsernameChangeEligible,
+  markUsernameChangeEligible,
+  shouldPromptForUsername,
+} from "@/services/username";
 
 const rpc = vi.fn();
 
@@ -14,6 +18,10 @@ vi.mock("@/lib/supabaseClient", () => ({
 const { isUsernameAvailable, claimUsername, mapUsernameError } = await import("@/services/username");
 
 describe("shouldPromptForUsername", () => {
+  beforeEach(() => {
+    clearUsernameChangeEligible("u1");
+  });
+
   it("prompts only when auth is ready, a user exists, and username is missing", () => {
     expect(
       shouldPromptForUsername({ loading: false, user: { id: "u1" }, profile: { username: null } }),
@@ -25,7 +33,15 @@ describe("shouldPromptForUsername", () => {
     expect(shouldPromptForUsername({ loading: false, user: null, profile: { username: null } })).toBe(false);
   });
 
-  it("prompts when the admin required-on-next-login flag is set even if a username exists", () => {
+  it("prompts for an admin change request only after a fresh login marks eligibility", () => {
+    expect(
+      shouldPromptForUsername({
+        loading: false,
+        user: { id: "u1" },
+        profile: { username: "ExampleUser", username_required_on_next_login: true },
+      }),
+    ).toBe(false);
+    markUsernameChangeEligible("u1");
     expect(
       shouldPromptForUsername({
         loading: false,
@@ -121,10 +137,10 @@ describe("username service", () => {
 
   it("maps duplicate-username errors to a stable user-facing message", () => {
     expect(mapUsernameError(new Error("Dieser Benutzername ist bereits vergeben."))).toBe(
-      "Dieser Telegram Benutzername ist bereits vergeben.",
+      "Dieser Telegram Benutzername wird bereits verwendet.",
     );
-    expect(mapUsernameError(new Error("Dieser Telegram Benutzername ist bereits vergeben."))).toBe(
-      "Dieser Telegram Benutzername ist bereits vergeben.",
+    expect(mapUsernameError(new Error("Dieser Telegram Benutzername wird bereits verwendet."))).toBe(
+      "Dieser Telegram Benutzername wird bereits verwendet.",
     );
   });
 });

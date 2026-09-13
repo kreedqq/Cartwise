@@ -16,7 +16,7 @@ vi.mock("@/lib/supabaseClient", () => ({
   },
 }));
 
-const { adminSetUsernameRequired, adminDeleteUser, listUsersWithRoles } = await import("@/services/profiles");
+const { adminSetUsernameRequired, adminDeleteUser, adminSetUsername, listUsersWithRoles } = await import("@/services/profiles");
 
 describe("admin users and roles merge", () => {
   it("keeps Benutzer & Rollen as one subtab and does not show the old split tabs", () => {
@@ -37,10 +37,9 @@ describe("admin users and roles merge", () => {
   it("shows Telegram Benutzername, role markup, username-required, manage, and delete on the merged page", () => {
     const page = readSource("src/pages/admin/AdminUsers.tsx");
     expect(page).toContain("Telegram Benutzername");
-    expect(page).toContain("Username erforderlich");
+    expect(page).toContain("Änderung beim nächsten Login anfordern");
     expect(page).toContain("Verwalten");
     expect(page).toContain("Benutzer dauerhaft entfernen");
-    expect(page).toContain("Telegram Benutzername beim nächsten Login erforderlich");
     expect(page).toContain("AdminRoleCatalog");
     expect(page).toContain("assignCustomerRole");
     expect(page).toContain("groupUsersForAdminTables");
@@ -69,6 +68,15 @@ describe("admin username-required and delete RPCs", () => {
     expect(rpc).toHaveBeenCalledWith("admin_set_username_required", {
       _user_id: "user-2",
       _required: true,
+    });
+  });
+
+  it("sets a username through admin_set_username", async () => {
+    rpc.mockResolvedValue({ data: "NewHandle", error: null });
+    await expect(adminSetUsername("user-2", "NewHandle")).resolves.toBe("NewHandle");
+    expect(rpc).toHaveBeenCalledWith("admin_set_username", {
+      _user_id: "user-2",
+      _username: "NewHandle",
     });
   });
 

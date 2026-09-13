@@ -27,6 +27,7 @@ describe("canonical username identity", () => {
     expect(readSource("src/pages/admin/AdminOrders.tsx")).toContain("formatOrderTelegramSnapshot");
     expect(readSource("src/pages/admin/AdminOrders.tsx")).not.toContain("customer?.displayName");
     expect(readSource("src/pages/Profile.tsx")).toContain("Telegram Benutzername");
+    expect(readSource("src/pages/Profile.tsx")).toContain("kann nicht selbst geändert werden");
   });
 
   it("kit member list maps the username RPC column and never email", () => {
