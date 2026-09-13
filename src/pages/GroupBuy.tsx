@@ -186,6 +186,7 @@ function GroupBuyContent({ shopArea, areaName }: { shopArea: ShopAreaKey; areaNa
         <GroupBuyCatalog
           shopArea={shopArea}
           areaName={areaName}
+          onKitCreated={() => setActiveSection("kits")}
           products={products}
           counts={counts}
           visible={visible}
@@ -250,6 +251,7 @@ interface GroupBuyCatalogProps {
   onSelectCategory: (id: string) => void;
   onSearch: (term: string) => void;
   onClearCategory: () => void;
+  onKitCreated?: () => void;
 }
 
 function GroupBuyCatalog({
@@ -271,6 +273,7 @@ function GroupBuyCatalog({
   onSelectCategory,
   onSearch,
   onClearCategory,
+  onKitCreated,
 }: GroupBuyCatalogProps) {
   const { theme } = useShopAreaContext();
   if (!selectedCategory) {
@@ -343,13 +346,13 @@ function GroupBuyCatalog({
         ))}
       </div>
 
-      <div className="relative min-w-[160px] max-w-md">
+      <div className="relative w-full max-w-3xl">
         <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={search}
           onChange={(e) => onSearch(e.target.value)}
           placeholder={theme.searchPlaceholder || "Produktname suchen …"}
-          className="pl-8"
+          className="h-11 pl-8"
         />
       </div>
 
@@ -383,6 +386,7 @@ function GroupBuyCatalog({
               categoryId={tableCategoryId}
               categoryLabel={selectedCategory.label}
               pricingProfile="group_buy"
+              onKitCreated={onKitCreated}
             />
           </div>
           <div className="lg:hidden">
@@ -392,6 +396,7 @@ function GroupBuyCatalog({
               favoriteProductIds={favoriteProductIds}
               categoryId={tableCategoryId}
               pricingProfile="group_buy"
+              onKitCreated={onKitCreated}
             />
           </div>
         </>
@@ -487,7 +492,7 @@ function KitRequestsSection({
       <div className="flex justify-end">
         <Button className="min-h-11 w-full sm:w-auto" onClick={() => setCreateOpen(true)}>
           <Plus className="h-4 w-4" />
-          Kit teilen
+          + Kit Gesuch
         </Button>
       </div>
 
@@ -756,9 +761,9 @@ function KitRequestsSection({
       <ConfirmDialog
         open={leaveTarget != null}
         onOpenChange={(next) => !next && setLeaveTarget(null)}
-        title="Möchtest du dieses Kit verlassen?"
-        description="Dein Anteil wird wieder freigegeben."
-        confirmLabel="Kit verlassen"
+        title="Möchtest du deinen Anteil wieder freigeben?"
+        description="Dein Anteil wird anschließend wieder für andere Kunden verfügbar."
+        confirmLabel="Ja, Anteil freigeben"
         variant="destructive"
         loading={leaveMutation.isPending}
         onConfirm={async () => {

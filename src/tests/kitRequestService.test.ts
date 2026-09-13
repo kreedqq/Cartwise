@@ -8,7 +8,8 @@ vi.mock("@/lib/supabaseClient", () => ({
   },
 }));
 
-const { joinKitRequest, mapKitRequestCard, previewKitRequestJoin } = await import("@/services/kitRequests");
+const { createKitRequest, joinKitRequest, mapKitRequestCard, previewKitRequestJoin, syncCompletedKitRequestCarts } =
+  await import("@/services/kitRequests");
 
 const sampleCard = {
   id: "req-1",
@@ -68,6 +69,44 @@ describe("kitRequests service mapping", () => {
     expect(rpc).toHaveBeenCalledWith("join_kit_request", { _kit_share_id: "req-1", _quantity: 2 });
     expect(result.myQuantity).toBe(2);
     expect(result.cartSynced).toBe(false);
+  });
+
+  it("creates an open request without calling cart sync", async () => {
+    rpc.mockResolvedValue({ data: sampleCard, error: null });
+    const card = await createKitRequest({
+      productId: "prod-1",
+      kitSizeVials: 10,
+      myQuantity: 3,
+      shopArea: "group_buy_1",
+    });
+    expect(rpc).toHaveBeenCalledWith("create_kit_request", {
+      _product_id: "prod-1",
+      _kit_size_vials: 10,
+      _my_quantity: 3,
+      _note: null,
+      _expires_at: null,
+      _shop_area: "group_buy_1",
+    });
+    expect(rpc).not.toHaveBeenCalledWith("sync_completed_kit_request_carts", expect.anything());
+    expect(card.status).toBe("open");
+  });
+
+  it("syncs carts only through sync_completed_kit_request_carts", async () => {
+    rpc.mockResolvedValue({
+      data: {
+        success: true,
+        kitRequestId: "req-1",
+        myQuantity: 0,
+        remainingQuantity: 0,
+        status: "full",
+        myPriceUsd: 36,
+        cartSynced: true,
+      },
+      error: null,
+    });
+    const result = await syncCompletedKitRequestCarts("req-1");
+    expect(rpc).toHaveBeenCalledWith("sync_completed_kit_request_carts", { _kit_share_id: "req-1" });
+    expect(result.cartSynced).toBe(true);
   });
 
   it("keeps join preview limited to the caller's price", async () => {

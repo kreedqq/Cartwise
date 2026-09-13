@@ -117,7 +117,7 @@ export function KitRequestCardView({
 
         {request.isParticipant && !request.isCreator ? (
           <p className="text-sm">
-            Mein Anteil: {formatKitQuantity(request.myQuantity, categoryId, request.kitSizeVials)}
+            Dein Anteil: {formatKitQuantity(request.myQuantity, categoryId, request.kitSizeVials)}
             {request.status === "open" && request.remainingVials > 0
               ? " · Wartet auf weitere Teilnehmer"
               : null}

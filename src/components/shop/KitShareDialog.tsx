@@ -80,16 +80,13 @@ function resolveInitialVariantId(
 
 function kitSyncErrorMessage(err: unknown): string {
   const message = err instanceof Error ? err.message : "";
-  if (/Verteilung|Kit Verteilung|Gesamtmenge|teilbar/i.test(message)) {
+  if (message && !/42501|permission denied|JWT/i.test(message)) {
     return message;
   }
   if (/42501|403|permission/i.test(message)) {
-    return "Der Kit Anteil konnte nicht synchronisiert werden.";
+    return "Das hat leider nicht funktioniert. Dein Kit wurde nicht verändert. Bitte versuche es noch einmal.";
   }
-  if (/P0001|22023|P0002|42703/i.test(message)) {
-    return message || "Der Kit Anteil konnte nicht synchronisiert werden.";
-  }
-  return message || "Der Kit Anteil konnte nicht synchronisiert werden.";
+  return message || "Das hat leider nicht funktioniert. Dein Kit wurde nicht verändert. Bitte versuche es noch einmal.";
 }
 
 export function KitShareDialog({
@@ -218,7 +215,11 @@ export function KitShareDialog({
       assertKitSharePricePrivacy(view);
       setKitView(view);
       await invalidateCarts();
-      toast.success("Kit wurde erstellt. Dein Kit Anteil wurde dem Warenkorb hinzugefügt.");
+      toast.success(
+        view.status === "full"
+          ? "Kit wurde erstellt. Die Anteile liegen in den Warenkörben."
+          : "Kit wurde erstellt. Dein Anteil ist gespeichert.",
+      );
     } catch (err) {
       setError(kitSyncErrorMessage(err));
     } finally {
@@ -391,8 +392,8 @@ export function KitShareDialog({
             Kit teilen
           </DialogTitle>
           <DialogDescription>
-            Teile ein gemeinsames {activeKitSize}-Einheiten-Kit. Anteile werden automatisch in die Warenkörbe
-            synchronisiert.
+            Teile ein gemeinsames {activeKitSize}-Einheiten-Kit. Offene Anteile bleiben offen. Erst wenn das Kit
+            vollständig ist, werden die Warenkörbe aktualisiert.
           </DialogDescription>
         </DialogHeader>
 
@@ -709,7 +710,7 @@ export function KitShareButton({
       title={needsVariantPick ? "Bitte zuerst eine Variante auswählen." : undefined}
     >
       <Users className="mr-1.5 h-4 w-4" />
-      Kit teilen
+      + Kit Gesuch
     </Button>
   );
 }

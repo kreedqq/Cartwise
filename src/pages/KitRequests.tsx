@@ -164,7 +164,7 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
         actions={
           <Button className="min-h-11 w-full sm:w-auto" onClick={() => setCreateOpen(true)}>
             <Plus className="h-4 w-4" />
-            Kit teilen
+            + Kit Gesuch
           </Button>
         }
       />
@@ -441,16 +441,16 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
       <ConfirmDialog
         open={leaveTarget != null}
         onOpenChange={(next) => !next && setLeaveTarget(null)}
-        title="Möchtest du dieses Kit wirklich verlassen?"
-        description="Dein Anteil wird wieder freigegeben. Andere Kunden können ihn übernehmen."
-        confirmLabel="Verlassen"
+        title="Möchtest du deinen Anteil wieder freigeben?"
+        description="Dein Anteil wird anschließend wieder für andere Kunden verfügbar."
+        confirmLabel="Ja, Anteil freigeben"
         variant="destructive"
         loading={leaveMutation.isPending}
         onConfirm={async () => {
           if (!leaveTarget) return;
           try {
             await leaveMutation.mutateAsync(leaveTarget.id);
-            toast.success("Teilnahme storniert.");
+            toast.success("Du hast das Kit verlassen.");
             setLeaveTarget(null);
           } catch (error) {
             toast.error(error instanceof Error ? error.message : "Stornierung fehlgeschlagen.");

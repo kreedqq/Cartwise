@@ -1,7 +1,6 @@
 import { Check, Info, ShoppingCart, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import * as React from "react";
-import { useQuery } from "@tanstack/react-query";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { KitShareButton, KitShareDialog } from "@/components/shop/KitShareDialog";
+import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitRequestDialog";
+import { KitShareButton } from "@/components/shop/KitShareDialog";
+import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import { formatQuantity, hasBulkTier } from "@/lib/money";
@@ -33,7 +34,6 @@ import {
   shopProductTitle,
   showsStandaloneVariantLabel,
 } from "@/lib/shop/variantCoverage";
-import { listKitShareMembers } from "@/services/kitShareMembers";
 import { useQuantityDiscountsEnabled } from "@/hooks/useAppPublicState";
 import type { Tables } from "@/types/database";
 
@@ -43,6 +43,7 @@ interface ShopProductsMobileListProps {
   favoriteProductIds: Set<string>;
   categoryId?: ShopCategoryId;
   pricingProfile?: ShopPricingProfile;
+  onKitCreated?: (id: string) => void;
 }
 
 export function ShopProductsMobileList({
@@ -51,7 +52,9 @@ export function ShopProductsMobileList({
   favoriteProductIds,
   categoryId,
   pricingProfile = "group_buy",
+  onKitCreated,
 }: ShopProductsMobileListProps) {
+  const { shopArea } = useShopAreaContext();
   const quantityDiscountsEnabled = useQuantityDiscountsEnabled();
   const groups = groupAndSortShopProducts(products);
   const priceLabels = shopPriceColumnLabels(
@@ -61,16 +64,7 @@ export function ShopProductsMobileList({
   const saleMode = isRetailPricing(pricingProfile) ? "retail_unit" : "catalog";
   const showKitShare = !isRetailPricing(pricingProfile);
   const showBulkColumn = !isRetailPricing(pricingProfile) && quantityDiscountsEnabled;
-  const [kitShareContext, setKitShareContext] = React.useState<{
-    group: ShopProductGroup;
-    initialProductId: string;
-  } | null>(null);
-  const membersQuery = useQuery({
-    queryKey: ["kit-share-members"],
-    queryFn: listKitShareMembers,
-    enabled: kitShareContext != null,
-    staleTime: 60_000,
-  });
+  const [kitProductId, setKitProductId] = React.useState<string | null>(null);
 
   return (
     <>
@@ -85,24 +79,25 @@ export function ShopProductsMobileList({
             saleMode={saleMode}
             showBulkColumn={showBulkColumn}
             showKitShare={showKitShare}
-            onKitShare={({ group, initialProductId }) => setKitShareContext({ group, initialProductId })}
+            onKitShare={(productId) => setKitProductId(productId)}
           />
         ))}
       </div>
-      {kitShareContext && (
-        <KitShareDialog
-          key={`${kitShareContext.group.groupKey}-${kitShareContext.initialProductId}`}
-          group={kitShareContext.group}
-          initialProductId={kitShareContext.initialProductId}
-          members={membersQuery.data ?? []}
-          membersLoading={membersQuery.isLoading}
-          open={kitShareContext != null}
+      {showKitShare && kitProductId ? (
+        <CreateKitRequestDialog
+          key={kitProductId}
+          shopArea={shopArea}
+          initialProductId={kitProductId}
+          open
           onOpenChange={(open) => {
-            if (!open) setKitShareContext(null);
+            if (!open) setKitProductId(null);
           }}
-          onCartSynced={() => setKitShareContext(null)}
+          onCreated={(id) => {
+            setKitProductId(null);
+            onKitCreated?.(id);
+          }}
         />
-      )}
+      ) : null}
     </>
   );
 }
@@ -124,7 +119,7 @@ function ShopProductGroupCard({
   saleMode: "catalog" | "retail_unit";
   showBulkColumn: boolean;
   showKitShare: boolean;
-  onKitShare: (context: { group: ShopProductGroup; initialProductId: string }) => void;
+  onKitShare: (productId: string) => void;
 }) {
   const row = useShopProductGroupRow(group, rate, favoriteProductIds);
   const product = row.product;
@@ -172,7 +167,7 @@ function ShopProductGroupCard({
             <p className="text-sm font-semibold">{title}</p>
             {row.hasMultipleVariants ? (
               <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
-                <SelectTrigger className="mt-2 h-9 w-full min-w-[11rem]" aria-label="Variante wählen">
+                <SelectTrigger className="mt-2 h-10 w-full" aria-label="Variante wählen">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -193,7 +188,7 @@ function ShopProductGroupCard({
               <KitShareButton
                 group={group}
                 selectedProductId={row.selectedProductId}
-                onClick={() => onKitShare({ group, initialProductId: row.selectedProductId })}
+                onClick={() => onKitShare(row.selectedProductId)}
               />
             </div>
             )}
@@ -225,9 +220,9 @@ function ShopProductGroupCard({
           </p>
         )}
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2">
           <Select value={row.quantity} onValueChange={row.setQuantity}>
-            <SelectTrigger className="h-10 min-w-[9.5rem] w-[9.5rem] shrink-0" aria-label="Menge wählen">
+            <SelectTrigger className="h-11 w-full" aria-label="Menge wählen">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -239,14 +234,13 @@ function ShopProductGroupCard({
             </SelectContent>
           </Select>
           <Button
-            size="icon"
-            className="h-10 w-10 shrink-0"
+            className="min-h-11 w-full"
             variant={row.status === "success" ? "secondary" : "default"}
             loading={row.status === "loading"}
             onClick={row.handleAdd}
-            aria-label={`${group.displayName} zum Warenkorb hinzufügen`}
           >
             {row.status === "success" ? <Check className="text-success" /> : <ShoppingCart />}
+            {row.status === "success" ? "Hinzugefügt" : "In den Warenkorb"}
           </Button>
         </div>
       </CardContent>

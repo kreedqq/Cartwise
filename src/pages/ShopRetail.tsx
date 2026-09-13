@@ -186,13 +186,13 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
         ))}
       </div>
 
-      <div className="relative min-w-[160px] max-w-md">
+      <div className="relative w-full max-w-3xl">
         <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={theme.searchPlaceholder || "Produktname suchen …"}
-          className="pl-8"
+          className="h-11 pl-8"
         />
       </div>
 

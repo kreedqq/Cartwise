@@ -1,7 +1,6 @@
 import { Check, Info, ShoppingCart, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import * as React from "react";
-import { useQuery } from "@tanstack/react-query";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { KitShareButton, KitShareDialog } from "@/components/shop/KitShareDialog";
+import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitRequestDialog";
+import { KitShareButton } from "@/components/shop/KitShareDialog";
+import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import { formatQuantity, hasBulkTier } from "@/lib/money";
@@ -33,7 +34,6 @@ import {
   shopProductTitle,
   showsStandaloneVariantLabel,
 } from "@/lib/shop/variantCoverage";
-import { listKitShareMembers } from "@/services/kitShareMembers";
 import { useQuantityDiscountsEnabled } from "@/hooks/useAppPublicState";
 import type { Tables } from "@/types/database";
 
@@ -44,6 +44,7 @@ interface ShopProductsTableProps {
   categoryId?: ShopCategoryId;
   categoryLabel?: string;
   pricingProfile?: ShopPricingProfile;
+  onKitCreated?: (id: string) => void;
 }
 
 export function ShopProductsTable({
@@ -53,7 +54,9 @@ export function ShopProductsTable({
   categoryId,
   categoryLabel,
   pricingProfile = "group_buy",
+  onKitCreated,
 }: ShopProductsTableProps) {
+  const { shopArea } = useShopAreaContext();
   const quantityDiscountsEnabled = useQuantityDiscountsEnabled();
   const groups = groupAndSortShopProducts(products);
   const priceLabels = shopPriceColumnLabels(
@@ -63,63 +66,56 @@ export function ShopProductsTable({
   const saleMode = isRetailPricing(pricingProfile) ? "retail_unit" : "catalog";
   const showKitShare = !isRetailPricing(pricingProfile);
   const showBulkColumn = !isRetailPricing(pricingProfile) && quantityDiscountsEnabled;
-  const [kitShareContext, setKitShareContext] = React.useState<{
-    group: ShopProductGroup;
-    initialProductId: string;
-  } | null>(null);
-  const membersQuery = useQuery({
-    queryKey: ["kit-share-members"],
-    queryFn: listKitShareMembers,
-    enabled: kitShareContext != null,
-    staleTime: 60_000,
-  });
+  const [kitProductId, setKitProductId] = React.useState<string | null>(null);
 
   return (
     <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-20">Info</TableHead>
-            <TableHead className="min-w-[240px]">Produkt</TableHead>
-            <TableHead className="w-44">{priceLabels.unitPrice}</TableHead>
-            {showBulkColumn ? <TableHead className="w-48">{priceLabels.bulkPrice}</TableHead> : null}
-            <TableHead className="w-28 text-right">Menge</TableHead>
-            <TableHead className="w-16 text-right">In den Warenkorb</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {groups.map((group) => (
-            <ShopProductGroupTableRow
-              key={group.groupKey}
-              group={group}
-              rate={rate}
-              favoriteProductIds={favoriteProductIds}
-              priceLabels={priceLabels}
-              saleMode={saleMode}
-              showBulkColumn={showBulkColumn}
-              showKitShare={showKitShare}
-              categoryLabel={categoryLabel}
-              onKitShare={({ group, initialProductId }) => setKitShareContext({ group, initialProductId })}
-            />
-          ))}
-        </TableBody>
-      </Table>
-      {kitShareContext && (
-        <KitShareDialog
-          key={`${kitShareContext.group.groupKey}-${kitShareContext.initialProductId}`}
-          group={kitShareContext.group}
-          initialProductId={kitShareContext.initialProductId}
-          members={membersQuery.data ?? []}
-          membersLoading={membersQuery.isLoading}
-          open={kitShareContext != null}
+      <div className="rounded-2xl border border-border/80 bg-card/90 p-2 shadow-sm lg:p-4">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-20 px-4">Info</TableHead>
+              <TableHead className="min-w-[16rem] px-4">Produkt</TableHead>
+              <TableHead className="min-w-[12rem] px-4">Variante</TableHead>
+              <TableHead className="min-w-[9rem] px-4">{priceLabels.unitPrice}</TableHead>
+              {showBulkColumn ? <TableHead className="min-w-[10rem] px-4">{priceLabels.bulkPrice}</TableHead> : null}
+              <TableHead className="w-40 px-4 text-right">Menge</TableHead>
+              <TableHead className="w-48 px-4 text-right">Warenkorb</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {groups.map((group) => (
+              <ShopProductGroupTableRow
+                key={group.groupKey}
+                group={group}
+                rate={rate}
+                favoriteProductIds={favoriteProductIds}
+                priceLabels={priceLabels}
+                saleMode={saleMode}
+                showBulkColumn={showBulkColumn}
+                showKitShare={showKitShare}
+                categoryLabel={categoryLabel}
+                onKitShare={(productId) => setKitProductId(productId)}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+      {showKitShare && kitProductId ? (
+        <CreateKitRequestDialog
+          key={kitProductId}
+          shopArea={shopArea}
+          initialProductId={kitProductId}
+          open
           onOpenChange={(open) => {
-            if (!open) setKitShareContext(null);
+            if (!open) setKitProductId(null);
           }}
-          onCartSynced={() => {
-            setKitShareContext(null);
+          onCreated={(id) => {
+            setKitProductId(null);
+            onKitCreated?.(id);
           }}
         />
-      )}
+      ) : null}
     </>
   );
 }
@@ -143,7 +139,7 @@ function ShopProductGroupTableRow({
   showBulkColumn: boolean;
   showKitShare: boolean;
   categoryLabel?: string;
-  onKitShare: (context: { group: ShopProductGroup; initialProductId: string }) => void;
+  onKitShare: (productId: string) => void;
 }) {
   const row = useShopProductGroupRow(group, rate, favoriteProductIds);
   const product = row.product;
@@ -163,7 +159,7 @@ function ShopProductGroupTableRow({
 
   return (
     <TableRow>
-      <TableCell>
+      <TableCell className="px-4 py-4">
         <div className="flex items-center gap-0.5">
           {group.lexiconHref ? (
             <Button variant="ghost" size="icon" className="h-8 w-8" asChild title="Zum Lexikon">
@@ -186,46 +182,46 @@ function ShopProductGroupTableRow({
           </Button>
         </div>
       </TableCell>
-      <TableCell>
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
+      <TableCell className="px-4 py-4">
+        <div className="min-w-0 space-y-1">
           <p className="text-sm font-medium">{title}</p>
-          {row.hasMultipleVariants ? (
-            <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
-              <SelectTrigger className="h-9 min-w-[11rem] w-auto max-w-full shrink-0" aria-label="Variante wählen">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {group.variants.map((variant) => (
-                  <SelectItem key={variant.id} value={variant.id}>
-                    {isRetail ? formatRetailVariantLabel(variant) : variantLabelForProduct(variant)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : showsStandaloneVariantLabel(product, false) ? (
-            <p className="text-xs text-muted-foreground">
-              {isRetail ? formatRetailVariantLabel(product) : variantLabelForProduct(product)}
-            </p>
-          ) : null}
-        </div>
-        <div className="mt-1 flex flex-wrap items-center gap-2">
-          {categoryLabel ? (
-            <p className="text-[11px] text-muted-foreground">{categoryLabel}</p>
-          ) : null}
+          {categoryLabel ? <p className="text-[11px] text-muted-foreground">{categoryLabel}</p> : null}
           {showKitShare && (
-          <KitShareButton
-            group={group}
-            selectedProductId={row.selectedProductId}
-            onClick={() => onKitShare({ group, initialProductId: row.selectedProductId })}
-          />
+            <KitShareButton
+              group={group}
+              selectedProductId={row.selectedProductId}
+              onClick={() => onKitShare(row.selectedProductId)}
+            />
           )}
         </div>
       </TableCell>
-      <TableCell className="text-sm">
+      <TableCell className="px-4 py-4">
+        {row.hasMultipleVariants ? (
+          <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
+            <SelectTrigger className="h-10 w-full min-w-[11rem]" aria-label="Variante wählen">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {group.variants.map((variant) => (
+                <SelectItem key={variant.id} value={variant.id}>
+                  {isRetail ? formatRetailVariantLabel(variant) : variantLabelForProduct(variant)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : showsStandaloneVariantLabel(product, false) ? (
+          <p className="text-sm text-muted-foreground">
+            {isRetail ? formatRetailVariantLabel(product) : variantLabelForProduct(product)}
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">—</p>
+        )}
+      </TableCell>
+      <TableCell className="px-4 py-4 text-sm">
         <DualCurrencyPrice usd={product.price_usd} rate={rate} />
       </TableCell>
       {showBulkColumn ? (
-      <TableCell className="text-sm">
+      <TableCell className="px-4 py-4 text-sm">
         {bulk ? (
           <>
             <DualCurrencyPrice usd={product.bulk_price_usd} rate={rate} />
@@ -242,9 +238,9 @@ function ShopProductGroupTableRow({
         )}
       </TableCell>
       ) : null}
-      <TableCell>
+      <TableCell className="px-4 py-4">
         <Select value={row.quantity} onValueChange={row.setQuantity}>
-          <SelectTrigger className="ml-auto h-9 min-w-[9.5rem] w-[9.5rem]" aria-label="Menge wählen">
+          <SelectTrigger className="ml-auto h-10 min-w-[10rem] w-[10rem]" aria-label="Menge wählen">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -256,15 +252,15 @@ function ShopProductGroupTableRow({
           </SelectContent>
         </Select>
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell className="px-4 py-4 text-right">
         <Button
-          size="icon"
+          className="min-h-10 min-w-[10.5rem]"
           variant={row.status === "success" ? "secondary" : "default"}
           loading={row.status === "loading"}
           onClick={row.handleAdd}
-          aria-label={`${group.displayName} zum Warenkorb hinzufügen`}
         >
           {row.status === "success" ? <Check className="text-success" /> : <ShoppingCart />}
+          {row.status === "success" ? "Hinzugefügt" : "In den Warenkorb"}
         </Button>
       </TableCell>
     </TableRow>
