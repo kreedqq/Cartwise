@@ -175,9 +175,8 @@ export default function UsernameRequiredPage() {
                   Mit Telegram anmelden
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  Nach erfolgreicher Verknüpfung wird dein verifizierter Telegram Benutzername automatisch übernommen
-                  und gesperrt. Es entsteht kein zweites PEPTIX Konto. E-Mail oder Discord können diesen Schritt nicht
-                  ersetzen.
+                  Nach erfolgreicher Verknüpfung bleibt dein bestehender PEPTIX Benutzername erhalten. Es entsteht kein
+                  zweites PEPTIX Konto. E-Mail oder Discord können diesen Schritt nicht ersetzen.
                 </p>
               </>
             )}
