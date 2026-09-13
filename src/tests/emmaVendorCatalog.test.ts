@@ -320,15 +320,15 @@ describe("Emma Group Buy 1 dealer file", () => {
     const water = groups.find((group) => group.variants.some((row) => row.code.startsWith("BA")));
     expect(kpv?.variants.map((row) => row.code).sort()).toEqual(["KP10", "KP30", "KP50"]);
     expect(kpv?.variants.map((row) => variantLabelForProduct(row)).sort()).toEqual([
-      "10x 10 mg Vials",
-      "10x 30 mg Vials",
-      "10x 50 mg Vials",
+      "10 mg · 10 Vials",
+      "30 mg · 10 Vials",
+      "50 mg · 10 Vials",
     ]);
     expect(water?.variants.map((row) => row.code).sort()).toEqual(["BA10", "BA3"]);
-    expect(formatVialVariant(catalog.find((row) => row.code === "KP30")!)).toBe("10x 30 mg Vials");
-    expect(formatVialVariant(catalog.find((row) => row.code === "KP50")!)).toBe("10x 50 mg Vials");
-    expect(formatVialVariant(catalog.find((row) => row.code === "BA3")!)).toBe("10x 3 ml Vials");
-    expect(formatVialVariant(catalog.find((row) => row.code === "BA10")!)).toBe("10x 10 ml Vials");
+    expect(formatVialVariant(catalog.find((row) => row.code === "KP30")!)).toBe("30 mg · 10 Vials");
+    expect(formatVialVariant(catalog.find((row) => row.code === "KP50")!)).toBe("50 mg · 10 Vials");
+    expect(formatVialVariant(catalog.find((row) => row.code === "BA3")!)).toBe("3 ml · 10 Vials");
+    expect(formatVialVariant(catalog.find((row) => row.code === "BA10")!)).toBe("10 ml · 10 Vials");
   });
 
   it("keeps an area category without a global product_id", () => {

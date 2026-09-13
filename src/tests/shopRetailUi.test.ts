@@ -38,12 +38,13 @@ describe("retail shop UI", () => {
 
   it("retail variant label strips kit kit-size prefix and never returns 'Nx ...' format", () => {
     // Known CSV product code (10AD = AOD9604) has kitSizeVials=10, vialStrength="10 mg".
-    // Group-buy returns "10x 10 mg Vials"; retail should return only "10 mg".
+    // Group-buy returns "10 mg · 10 Vials"; retail should return only "10 mg".
     const aodProduct = { code: "10AD", dosage_vial: null as string | null, name: "AOD9604" };
     const retailLabel = formatRetailVariantLabel(aodProduct);
     expect(retailLabel).toBe("10 mg");
     expect(retailLabel).not.toMatch(/\d+x/i); // no kit-count prefix in retail
-    expect(formatVialVariant(aodProduct)).toBe("10x 10 mg Vials"); // full kit label for comparison
+    expect(retailLabel).not.toMatch(/·/);
+    expect(formatVialVariant(aodProduct)).toBe("10 mg · 10 Vials"); // full kit label for comparison
 
     // A product with simple dosage_vial (already just a strength, no kit prefix)
     const simpleProduct = { code: "SIM001", dosage_vial: "5 mg", name: "Simple Peptide" };

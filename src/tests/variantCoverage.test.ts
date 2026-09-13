@@ -44,7 +44,7 @@ describe("parseVariantColumn", () => {
       kitSizeVials: 10,
     });
     expect(formatVialVariant({ code: "RT5", name: "Retatrutide", dosage_vial: "5mgx 10vials" })).toBe(
-      "10x 5 mg Vials",
+      "5 mg · 10 Vials",
     );
   });
 
@@ -57,10 +57,10 @@ describe("parseVariantColumn", () => {
       vialStrength: "3 ml",
       kitSizeVials: 10,
     });
-    expect(formatVialVariant({ code: "KP30", name: "KPV", dosage_vial: "30mg*10vials" })).toBe("10x 30 mg Vials");
-    expect(formatVialVariant({ code: "KP50", name: "KPV", dosage_vial: "50mg*10vials" })).toBe("10x 50 mg Vials");
-    expect(formatVialVariant({ code: "BA3", name: "BAC Water", dosage_vial: "3ml*10vials" })).toBe("10x 3 ml Vials");
-    expect(formatVialVariant({ code: "BA10", name: "BAC Water", dosage_vial: "10ml*10vials" })).toBe("10x 10 ml Vials");
+    expect(formatVialVariant({ code: "KP30", name: "KPV", dosage_vial: "30mg*10vials" })).toBe("30 mg · 10 Vials");
+    expect(formatVialVariant({ code: "KP50", name: "KPV", dosage_vial: "50mg*10vials" })).toBe("50 mg · 10 Vials");
+    expect(formatVialVariant({ code: "BA3", name: "BAC Water", dosage_vial: "3ml*10vials" })).toBe("3 ml · 10 Vials");
+    expect(formatVialVariant({ code: "BA10", name: "BAC Water", dosage_vial: "10ml*10vials" })).toBe("10 ml · 10 Vials");
     expect(formatVialVariant({ code: "KP30", name: "KPV", dosage_vial: null })).toBe("Standard");
     expect(kitSizeVialsForProduct({ code: "KP30", dosage_vial: "30mg*10vials" })).toBe(10);
   });
@@ -102,18 +102,18 @@ describe("vialStrengthForProduct", () => {
 });
 
 describe("formatVialVariant", () => {
-  it("formats vial kit labels as 10x [strength] Vials", () => {
+  it("formats vial kit labels as [strength] · N Vials", () => {
     expect(formatVialVariant({ code: "RT10", name: "Retatrutide", dosage_vial: "10 mg" })).toBe(
-      "10x 10 mg Vials",
+      "10 mg · 10 Vials",
     );
     expect(formatVialVariant({ code: "RT20", name: "Retatrutide", dosage_vial: "20 mg" })).toBe(
-      "10x 20 mg Vials",
+      "20 mg · 10 Vials",
     );
-    expect(formatVialVariant({ code: "10AD", name: "AOD9604", dosage_vial: null })).toMatch(/^10x .+ Vials$/);
+    expect(formatVialVariant({ code: "10AD", name: "AOD9604", dosage_vial: null })).toMatch(/^.+ · 10 Vials$/);
   });
 
   it("handles IU and ml units when kit size is known", () => {
-    expect(formatVialVariant({ code: "H10", name: "HGH", dosage_vial: null })).toMatch(/^10x .+ Vials$/i);
+    expect(formatVialVariant({ code: "H10", name: "HGH", dosage_vial: null })).toMatch(/^.+ · 10 Vials$/i);
   });
 
   it("returns strength only when no kit size is known", () => {
@@ -141,7 +141,7 @@ describe("shopProductTitle", () => {
   it("shows kit variant label for single-variant peptide kits", () => {
     expect(
       shopProductTitle("AOD9604", { code: "10AD", name: "AOD9604", dosage_vial: null }, false),
-    ).toMatch(/^AOD9604 10x .+ Vials$/);
+    ).toMatch(/^AOD9604 .+ · 10 Vials$/);
   });
 
   it("keeps name only when multiple variants use dropdown", () => {
@@ -177,9 +177,9 @@ describe("kitShareableVariants", () => {
       { id: "rt30", code: "RT30", name: "Retatrutide", dosage_vial: "30 mg" },
     ];
     expect(kitShareableVariants(variants)).toHaveLength(3);
-    expect(variantStrengthLabel(variants[0])).toBe("10x 10 mg Vials");
-    expect(variantStrengthLabel(variants[1])).toBe("10x 20 mg Vials");
-    expect(variantStrengthLabel(variants[2])).toBe("10x 30 mg Vials");
+    expect(variantStrengthLabel(variants[0])).toBe("10 mg · 10 Vials");
+    expect(variantStrengthLabel(variants[1])).toBe("20 mg · 10 Vials");
+    expect(variantStrengthLabel(variants[2])).toBe("30 mg · 10 Vials");
     expect(kitSizeVialsForProduct(variants[0])).toBe(10);
     expect(kitSizeVialsForProduct(variants[1])).toBe(10);
     expect(kitSizeVialsForProduct(variants[2])).toBe(10);

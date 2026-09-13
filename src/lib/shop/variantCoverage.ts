@@ -9,7 +9,7 @@ export interface ProductVariantMeta {
   rawVariant: string;
 }
 
-const KIT_VIALS_RE = /(?:\*|x|×)\s*(\d+)\s*vials?\b/i;
+const KIT_VIALS_RE = /(?:\*|x|×|\/|·)\s*(\d+)\s*vials?\b/i;
 const VIAL_STRENGTH_RE =
   /^([\d.,]+\s*(?:mg|mcg|µg|ug|iu|ui|ml))\b(?:\s*\/\s*vial)?/i;
 const CAPSULE_TABLET_RE = /\bx\s*\d+\s*(?:capsule|tablet)/i;
@@ -124,8 +124,29 @@ function rawVariantSource(product: { code: string; dosage_vial?: string | null }
 }
 
 /**
+ * Display-only normalization of vendor / catalog dosage strings.
+ * Raw vendor data is unchanged; unknown shapes fall back to the original text.
+ * Peptides/water: "5 mg · 10 Vials". Orals keep pack formatting.
+ */
+export function formatVendorDosageDisplay(raw: string | null | undefined, code = ""): string {
+  const trimmed = (raw ?? "").trim();
+  if (!trimmed || trimmed === "—") return trimmed;
+
+  const oral = formatOralVariantLabel(trimmed, code);
+  if (oral) return oral;
+
+  const parsed = parseVariantColumn(trimmed);
+  if (parsed.vialStrength && parsed.kitSizeVials != null && parsed.kitSizeVials > 0) {
+    return `${parsed.vialStrength} · ${parsed.kitSizeVials} Vials`;
+  }
+  if (parsed.vialStrength) return parsed.vialStrength;
+
+  return trimmed;
+}
+
+/**
  * Customer-facing variant label.
- * Peptides: "10x 20 mg Vials". Orals: "50 mg × 25 Tabletten". Oils: strength only.
+ * Peptides: "20 mg · 10 Vials". Orals: "50 mg × 25 Tabletten". Oils: strength only.
  */
 export function formatVialVariant(
   product: { code: string; dosage_vial?: string | null; name: string },
@@ -138,7 +159,7 @@ export function formatVialVariant(
 
   const kitSize = kitSizeVialsForProduct(product);
   if (kitSize != null && kitSize > 0) {
-    return `${kitSize}x ${strength} Vials`;
+    return `${strength} · ${kitSize} Vials`;
   }
 
   return strength;
@@ -251,19 +272,29 @@ export function wizardVariantPresentation(product: {
   dosage_vial?: string | null;
   name: string;
 }): { title: string; subtitle: string } {
-  const raw = (product.dosage_vial?.trim() || formatProductVariant(product)).trim();
-  const parts = raw.split(" / ").map((part) => part.trim()).filter(Boolean);
-  const kitSize = kitSizeVialsForProduct(product);
-  if (parts.length >= 2) {
-    return { title: parts[0], subtitle: parts.slice(1).join(" / ") };
+  const oral = formatOralVariantLabel(rawVariantSource(product), product.code);
+  if (oral) {
+    const parts = oral.split(" × ").map((part) => part.trim()).filter(Boolean);
+    if (parts.length >= 2) {
+      return { title: parts[0], subtitle: parts.slice(1).join(" × ") };
+    }
+    return { title: oral, subtitle: "" };
   }
-  return {
-    title: parts[0] || raw,
-    subtitle: kitSize ? `${kitSize} Vials` : raw,
-  };
+
+  const strength = normalizedVialStrength(product);
+  const kitSize = kitSizeVialsForProduct(product);
+  if (strength && kitSize != null && kitSize > 0) {
+    return { title: strength, subtitle: `${kitSize} Vials` };
+  }
+  if (strength) {
+    return { title: strength, subtitle: "" };
+  }
+
+  const raw = (product.dosage_vial?.trim() || formatProductVariant(product)).trim();
+  return { title: raw || "Standard", subtitle: kitSize ? `${kitSize} Vials` : "" };
 }
 
-/** Dropdown label: readable kit variant, e.g. "10x 20mg Vials". */
+/** Dropdown label: readable kit variant, e.g. "20 mg · 10 Vials". */
 export function variantStrengthLabel(
   product: { code: string; dosage_vial?: string | null; name: string },
 ): string {
@@ -292,7 +323,7 @@ export function showsStandaloneVariantLabel(
 }
 
 /**
- * Retail-only variant label: shows only the strength (e.g. "5 mg"), not "10x 5 mg Vials".
+ * Retail-only variant label: shows only the strength (e.g. "5 mg"), not "5 mg · 10 Vials".
  * Used in /shop/retail where products are sold as individual units.
  */
 export function formatRetailVariantLabel(
@@ -305,7 +336,7 @@ export function formatRetailVariantLabel(
 }
 
 /**
- * Retail product title: "Name 5 mg" instead of "Name 10x 5 mg Vials".
+ * Retail product title: "Name 5 mg" instead of "Name 5 mg · 10 Vials".
  */
 export function retailShopProductTitle(
   displayName: string,

@@ -5,6 +5,7 @@ import {
   kitRequestProgressPercent,
 } from "@/lib/kitRequests";
 import { getProductUnitLabel } from "@/lib/quantityFormat";
+import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { KitRequestCard } from "@/services/kitRequests";
@@ -65,7 +66,9 @@ export function KitRequestCardView({
           <h3 className="truncate text-base font-semibold leading-tight tracking-tight">
             {request.productName}
           </h3>
-          <p className="mt-0.5 truncate text-sm text-muted-foreground">{request.variantLabel}</p>
+          <p className="mt-0.5 truncate text-sm text-muted-foreground">
+            {formatVendorDosageDisplay(request.variantLabel, request.productCode)}
+          </p>
         </div>
         <Badge className="shrink-0" variant={statusVariant(request.status, request.remainingVials)}>
           {kitRequestCustomerStatusLabel(request.status, request.remainingVials)}

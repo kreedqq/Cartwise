@@ -16,6 +16,7 @@ import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { useJoinKitRequest } from "@/hooks/useKitRequests";
 import { kitRequestFailureMessage, remainingQuantityOptions } from "@/lib/kitRequests";
 import { formatKitQuantity } from "@/lib/shop/kitUnits";
+import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
 import { isShopCategoryId, type ShopCategoryId } from "@/lib/shopCategories";
 import { previewKitRequestJoin, type KitRequestCard } from "@/services/kitRequests";
 
@@ -90,7 +91,7 @@ function JoinKitRequestDialogBody({
           <DialogHeader>
             <DialogTitle>{joined ? "Du bist dabei!" : "Wie viele möchtest du übernehmen?"}</DialogTitle>
             <DialogDescription>
-              {request.productName} · {request.variantLabel}
+              {request.productName} · {formatVendorDosageDisplay(request.variantLabel, request.productCode)}
             </DialogDescription>
           </DialogHeader>
           {joined ? (
@@ -169,7 +170,7 @@ function JoinKitRequestDialogBody({
         description={
           <div className="space-y-3 text-left text-sm text-foreground">
             <p>
-              {request.productName} · {request.variantLabel}
+              {request.productName} · {formatVendorDosageDisplay(request.variantLabel, request.productCode)}
             </p>
             <p>Dein Anteil: {formatKitQuantity(quantity, categoryId, request.kitSizeVials)}</p>
             <p>Noch verfügbare Plätze: {request.remainingVials}</p>

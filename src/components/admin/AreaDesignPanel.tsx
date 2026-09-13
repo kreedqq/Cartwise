@@ -63,7 +63,7 @@ const DESIGNER_GROUPS = [
   {
     id: "kits",
     title: "Kit Gesuche",
-    description: "Passe die Darstellung von Kit Gesuchen und deren Aktionen an.",
+    description: "Passe Kit Karten, Preise und Aktionen an.",
     sections: [],
   },
   {
@@ -75,19 +75,19 @@ const DESIGNER_GROUPS = [
   {
     id: "images",
     title: "Bilder",
-    description: "Hinterlege Background, Hero, Banner und weitere Area Bilder.",
+    description: "Verwalte Hintergrund, Hero und weitere Bilder.",
     sections: ["hero", "banner", "assets"],
   },
   {
     id: "buttons",
     title: "Buttons",
-    description: "Form, Größe und Stil echter Buttons. Inputs und Karten bleiben unverändert.",
+    description: "Passe Form, Größe und Stil der Aktionen an.",
     sections: ["buttons"],
   },
   {
     id: "advanced",
     title: "Erweitert",
-    description: "Selten benötigte technische Optionen.",
+    description: "Selten benötigte Einstellungen für diesen Verkaufsbereich.",
     sections: [],
   },
 ] as const;

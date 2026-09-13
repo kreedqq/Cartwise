@@ -407,6 +407,20 @@ describe("merchant quantity totals", () => {
     ]);
   });
 
+  it("keeps vendor-only AD10 separate from linked AD5 by product_code_snapshot", () => {
+    expect(
+      aggregateMerchantQuantitiesByCode([
+        makeItem({ id: "ad5a", product_id: "master-ad5", product_code_snapshot: "AD5", quantity: 4 }),
+        makeItem({ id: "ad10a", product_id: null, product_code_snapshot: "AD10", quantity: 6 }),
+        makeItem({ id: "ad10b", product_id: null, product_code_snapshot: "AD10", quantity: 14 }),
+        makeItem({ id: "ad5b", product_id: "master-ad5", product_code_snapshot: "AD5", quantity: 1 }),
+      ]),
+    ).toEqual([
+      { code: "AD10", quantity: 20 },
+      { code: "AD5", quantity: 5 },
+    ]);
+  });
+
   it("sums kit participant quantities from order items instead of complete-kit display lines", () => {
     const orders = Array.from({ length: 5 }, (_, index) =>
       makeOrder({ id: `kit-${index}`, order_number: `CN-2026-0000${index}`, user_id: `user-${index}` }),

@@ -4,7 +4,11 @@ import { describe, expect, it } from "vitest";
 
 import { isKitRequestableProductId } from "@/lib/kitRequests";
 import { getProductUnitLabel } from "@/lib/quantityFormat";
-import { wizardVariantPresentation } from "@/lib/shop/variantCoverage";
+import {
+  formatVendorDosageDisplay,
+  formatVialVariant,
+  wizardVariantPresentation,
+} from "@/lib/shop/variantCoverage";
 
 function read(path: string): string {
   return readFileSync(resolve(process.cwd(), path), "utf8");
@@ -48,6 +52,15 @@ describe("0073 vendor-only kit catalog identity", () => {
     expect(isKitRequestableProductId("unknown", new Set(["area-ad10"]))).toBe(false);
   });
 
+  it("creates One Cart for area-restricted owners during kit cart sync", () => {
+    const cartFix = read("supabase/migrations/0074_one_cart_accessible_area.sql");
+    expect(cartFix).toContain("user_can_access_shop_area(NEW.user_id, NEW.shop_area)");
+    expect(cartFix).not.toContain("user_can_access_shop_area(auth.uid(), NEW.shop_area)");
+    expect(cartFix).toContain("user_can_access_shop_area(_user_id, sa.key)");
+    expect(cartFix).toContain("get_or_create_user_cart_for");
+    expect(read("supabase/migrations/0070_one_user_cart.sql").slice(0, 40)).toContain("0070");
+  });
+
   it("does not map a vendor-only row onto another SKU", () => {
     const createStart = sql.indexOf("create or replace function public.create_kit_request");
     const createFn = sql.slice(createStart, sql.indexOf("revoke all on function public.create_kit_request"));
@@ -78,5 +91,39 @@ describe("kit price unit and wizard tiles", () => {
     });
     expect(lines.title).toBe("10 mg");
     expect(lines.subtitle).toBe("10 Vials");
+  });
+
+  it("keeps AD5 and AD10 as independent display variants", () => {
+    const ad5 = {
+      code: "AD5",
+      name: "Adamax",
+      dosage_vial: "5mg*10vials",
+    };
+    const ad10 = {
+      code: "AD10",
+      name: "Adamax",
+      dosage_vial: "10mg*10vials",
+    };
+
+    expect(formatVialVariant(ad5)).toBe("5 mg · 10 Vials");
+    expect(formatVialVariant(ad10)).toBe("10 mg · 10 Vials");
+    expect(formatVialVariant(ad10)).not.toContain("5 mg");
+    expect(wizardVariantPresentation(ad5)).toEqual({ title: "5 mg", subtitle: "10 Vials" });
+    expect(wizardVariantPresentation(ad10)).toEqual({ title: "10 mg", subtitle: "10 Vials" });
+  });
+});
+
+describe("formatVendorDosageDisplay", () => {
+  it("normalizes common vendor dosage strings without inventing data", () => {
+    expect(formatVendorDosageDisplay("5mg*10vials", "AD5")).toBe("5 mg · 10 Vials");
+    expect(formatVendorDosageDisplay("10mg*10vials", "AD10")).toBe("10 mg · 10 Vials");
+    expect(formatVendorDosageDisplay("3ml*10vials", "BA3")).toBe("3 ml · 10 Vials");
+    expect(formatVendorDosageDisplay("100mg*10vials", "AU100")).toBe("100 mg · 10 Vials");
+    expect(formatVendorDosageDisplay("30mg/vial x10vials", "KP30")).toBe("30 mg · 10 Vials");
+  });
+
+  it("falls back to the original raw value when parsing is unsafe", () => {
+    expect(formatVendorDosageDisplay("custom-pack-ABC", "ZZ9")).toBe("custom-pack-ABC");
+    expect(formatVendorDosageDisplay("—")).toBe("—");
   });
 });
