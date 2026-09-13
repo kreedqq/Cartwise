@@ -2,6 +2,66 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-14 (Telegram Identity Management Final)
+
+### Fixed
+
+- Generic toast „Der Telegram Benutzername konnte nicht zugewiesen werden.“ often hid the real RPC message because PostgREST errors are plain objects (not `Error`); `extractRpcErrorMessage` / `mapUsernameError` now read `message`/`details`/`hint`.
+- Linking no longer forces `profiles.username` overwrite with Telegram `preferred_username` when a PEPTIX username already exists — consumes `username_required_on_next_login` only.
+- Transfer no longer overwrites an existing target username; expired intents write `status=failed` + `failure_reason=expired` (0078’s `status=expired` violated the CHECK and aborted cleanup).
+- AuthCallback Flow B apply failure returns to `/username-required` instead of the dashboard.
+
+### Added
+
+- Admin RPC + UI: `admin_remove_telegram_identity` with confirmation; blocked when Telegram is the sole login method.
+- Migration `0080_telegram_identity_management_final.sql` applied on `cartwise-prod`.
+
+## 2026-09-13 (Telegram Reauth Username)
+
+### Changed
+
+- Admin „Telegram Anmeldung beim nächsten Login erzwingen“ replaces free-text next-login username change (same `username_required_on_next_login` flag).
+- New SECURITY DEFINER RPC `apply_telegram_reauth_username` copies only `preferred_username` from the caller’s fresh `custom:telegram` identity; never name/display claims. Fail closed if missing/stale/duplicate.
+- `set_username` is initial claim only. Profile stays read-only. Admin Direct Edit unchanged.
+- Local migration `0076_telegram_reauth_username.sql`. Not applied to production in this session. No SPA deploy.
+
+## 2026-09-09 (Bereichskategorien)
+
+### Added
+
+- Per-area display categories (`shop_area_categories`) with active flag, label, and sort order.
+- Per-product area assignment `imported_category_key` / `manual_category_key` on `shop_area_products`.
+- Admin Produkte tab: category checkboxes, rename, order, dropdown per SKU, reset to import category.
+- Shop / Group Buy storefront uses `list_shop_area_storefront` instead of global `products.category`.
+
+### Notes
+
+- Local migration `0059`. Not committed, not pushed, not applied to production. `products.category` and pricing/checkout are unchanged.
+
+## 2026-09-09 (Bereichs-Grundpreis + manueller Override)
+
+### Changed
+
+- Admin Verkaufsbereiche: Händlerkatalog, Produkte (editierbarer Grundpreis), Preise (Bereichs-%-Grundpreis). Globaler Import ist aus der normalen Navigation.
+- `shop_area_product_prices` stores `imported_price_usd` and nullable `manual_price_usd`. Effective `price_usd` is `coalesce(manual, imported)` so checkout still reads one column.
+- Re-import can keep remaining manual overrides; removed SKUs lose theirs. Never writes `products.price_usd`.
+
+### Notes
+
+- Local migration `0058`. Not committed, not pushed, not applied to production. `0056` fail-closed checkout unchanged.
+
+## 2026-09-09 (Händlerkatalog als einzige Sortimentsquelle)
+
+### Changed
+
+- Admin Verkaufsbereiche is one dealer catalog per area: upload CSV/XLSX/XLS/PDF → preview (matched + unmatched SKUs) → apply. Nested Allgemein/Produkte/Dokument/Preise tabs and the manual product-add toggle are gone.
+- Global Import is labeled **Globaler Produkt-Master** / **Master-Verlauf**. It still writes `products` only and never makes SKUs visible in Shop / GB1 / GB2.
+- Local additive `0057` stores `vendor_name`, `vendor_dosage`, `vendor_raw` on `shop_area_products` and keeps `apply_area_vendor_catalog` atomic. The RPC also writes the applied `shop_area_documents` pointer. Client uploads the new file first; the previous storage object is removed only after a successful apply. `0056` fail-closed checkout is unchanged.
+
+### Notes
+
+- Not committed. Not pushed. `0057` is not applied to production.
+
 ## 2026-09-08 (Shop-Bereiche + Group Buy)
 
 ### Added
@@ -16,6 +76,16 @@ Only material changes. Dates are local project days.
 
 - Roles stay 1:1 (`user_customer_roles`). A **Group Buy** catalog role is inserted unassigned. Kunde/Stammkunde see only Shop until an admin grants Group Buy.
 - Kits stay Group Buy only. `list_shop_products()` now lists the retail Shop. No catalog copies. No production migration/deploy.
+
+## 2026-09-05 (Kunden-Bestelldetail: Zahlung statt Verlauf)
+
+### Changed
+
+- Customer `/orders/:id` no longer shows the internal `order_status_history` list. That card now shows the stored payment method (`Zahlungsmethode` + existing `PAYMENT_METHOD_LABELS`).
+
+### Notes
+
+- No migration. History rows, admin detail, `orders.status`, and the seven shipping progress statuses are unchanged.
 
 ## 2026-09-05 (Übersicht: eine Statusspalte)
 

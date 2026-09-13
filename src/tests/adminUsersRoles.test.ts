@@ -16,7 +16,7 @@ vi.mock("@/lib/supabaseClient", () => ({
   },
 }));
 
-const { adminSetUsernameRequired, adminDeleteUser, adminSetUsername, listUsersWithRoles } = await import("@/services/profiles");
+const { adminSetUsernameRequired, adminDeleteUser, adminSetUsername, adminRemoveTelegramIdentity, listUsersWithRoles } = await import("@/services/profiles");
 
 describe("admin users and roles merge", () => {
   it("keeps Benutzer & Rollen as one subtab and does not show the old split tabs", () => {
@@ -38,6 +38,7 @@ describe("admin users and roles merge", () => {
     const page = readSource("src/pages/admin/AdminUsers.tsx");
     expect(page).toContain("Telegram Benutzername");
     expect(page).toContain("Telegram Anmeldung beim nächsten Login erzwingen");
+    expect(page).toContain("Telegram Zuordnung entfernen");
     expect(page).toContain("Verwalten");
     expect(page).toContain("Benutzer dauerhaft entfernen");
     expect(page).toContain("AdminRoleCatalog");
@@ -115,6 +116,12 @@ describe("admin username-required and delete RPCs", () => {
     await adminDeleteUser("user-2");
     expect(rpc).toHaveBeenCalledWith("admin_delete_user", { _user_id: "user-2" });
     expect(from).not.toHaveBeenCalled();
+  });
+
+  it("removes telegram identity through admin_remove_telegram_identity", async () => {
+    rpc.mockResolvedValue({ data: null, error: null });
+    await adminRemoveTelegramIdentity("user-2");
+    expect(rpc).toHaveBeenCalledWith("admin_remove_telegram_identity", { _user_id: "user-2" });
   });
 
   it("lists username_required_on_next_login for the admin table", async () => {

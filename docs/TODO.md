@@ -4,6 +4,9 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 
 # Critical
 
+- [ ] Controlled browser QA: `@penny` email → Telegram gate → conflict → transfer confirm; admin remove Email+Telegram (0080 deployed; SPA pending push)
+- [x] Telegram Identity Management Final (`0080`): keep username on link/transfer; PostgREST error extraction; admin remove Telegram; applied on `cartwise-prod`
+- [x] Telegram Reauth Username (`0076`–`0079`): production apply + SPA path; remaining work is controlled transfer/remove browser QA above
 - [x] Kit sharing 3.0: username system + creator participant removal + Cart/Checkout kit editing — **DEPLOYED_WITH_LIMITATIONS** (migration `0038`; commit `c7906e4`; see chat release report); no real second test account for live two-user E2E; Admin visual redesign (Phase 30) and full mobile/browser QA (Phase 37/38) not performed — TEST LIMITATION
 - [x] User-approved git backup of the dirty `main` working tree (`0da9c90`; do not commit unless asked)
 - [x] Phase 10A local release backup (`feat: persist research platform and admin workflow`; not pushed)
@@ -40,7 +43,11 @@ Code wins if this list drifts. Check boxes only when the **code** has the behavi
 - [x] 2026-09-05 Versandübersicht: 7 feste Kundenfortschritt-Status per Dropdown; manuelle Fortschrittsfelder aus Verwalten entfernt; keine Migration
 - [x] 2026-09-05 Bestellungen-Tabs: Übersicht + Fortschritt/Tracking in Bestelldetail; Versand-Tab entfernt; `/admin/shipping` leitet um
 - [x] 2026-09-05 Übersicht-Liste: eine Statusspalte (`order_progress`); interner `orders.status` nur noch im Bestelldetail sichtbar
+- [x] 2026-09-05 Kunden-Bestelldetail: internen Verlauf ausblenden; stattdessen gespeicherte Zahlungsmethode anzeigen
 - [x] 2026-09-08 Shop-Bereiche + Group Buy (code + `0051` lokal; nicht auf Production angewendet)
+- [x] 2026-09-09 Händlerkatalog = einzige Sortimentsquelle pro Verkaufsbereich (Admin-UI vereinfacht; `0057` lokal; nicht committen/pushen/Production)
+- [x] 2026-09-09 Bereichs-Grundpreis manuell überschreibbar (`imported_price_usd` / `manual_price_usd`; `0058` lokal; Import aus Admin-Nav entfernt)
+- [x] 2026-09-09 Bereichskategorien unabhängig vom globalen Produkt-Master (`0059` lokal; nicht committen/pushen/Production)
 
 # High
 

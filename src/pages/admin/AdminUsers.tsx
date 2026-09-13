@@ -29,6 +29,7 @@ import { adminUserTelegramLabel, groupUsersForAdminTables } from "@/lib/adminUse
 import { usernameSchema } from "@/lib/validation";
 import {
   adminDeleteUser,
+  adminRemoveTelegramIdentity,
   adminSetUsername,
   adminSetUsernameRequired,
   listUsersWithRoles,
@@ -53,9 +54,11 @@ export default function AdminUsersPage() {
   const [usernameDraft, setUsernameDraft] = React.useState("");
   const [usernameEditError, setUsernameEditError] = React.useState<string | null>(null);
   const [requestTarget, setRequestTarget] = React.useState<UserWithRoles | null>(null);
+  const [removeTelegramTarget, setRemoveTelegramTarget] = React.useState<UserWithRoles | null>(null);
   const [adminLoading, setAdminLoading] = React.useState(false);
   const [deleteLoading, setDeleteLoading] = React.useState(false);
   const [flagLoading, setFlagLoading] = React.useState(false);
+  const [removeTelegramLoading, setRemoveTelegramLoading] = React.useState(false);
   const [usernameSaving, setUsernameSaving] = React.useState(false);
 
   const roles = rolesQuery.data ?? [];
@@ -157,9 +160,30 @@ export default function AdminUsersPage() {
       setRequestTarget(null);
     } catch (error) {
       console.error("Username-Erzwingung fehlgeschlagen:", error);
-      toast.error(error instanceof Error ? error.message : "Einstellung konnte nicht gespeichert werden.");
+      toast.error(mapUsernameError(error) || "Einstellung konnte nicht gespeichert werden.");
     } finally {
       setFlagLoading(false);
+    }
+  }
+
+  async function handleRemoveTelegramIdentity() {
+    if (!removeTelegramTarget) return;
+    setRemoveTelegramLoading(true);
+    try {
+      await adminRemoveTelegramIdentity(removeTelegramTarget.id);
+      toast.success("Telegram Zuordnung entfernt.");
+      await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      setManaged((current) =>
+        current && current.id === removeTelegramTarget.id
+          ? { ...current, hasTelegramIdentity: false, usernameRequiredOnNextLogin: false }
+          : current,
+      );
+      setRemoveTelegramTarget(null);
+    } catch (error) {
+      console.error("Telegram Zuordnung entfernen fehlgeschlagen:", error);
+      toast.error(mapUsernameError(error));
+    } finally {
+      setRemoveTelegramLoading(false);
     }
   }
 
@@ -321,12 +345,10 @@ export default function AdminUsersPage() {
                   <p className="text-xs text-muted-foreground">
                     Status:{" "}
                     {managed.hasTelegramIdentity
-                      ? "Telegram bereits verknüpft"
+                      ? "Telegram verbunden"
                       : managed.usernameRequiredOnNextLogin
                         ? "Telegram Anmeldung beim nächsten Login angefordert"
-                        : managed.username
-                          ? "✓ Gesperrt"
-                          : "Noch nicht gesetzt"}
+                        : "Telegram nicht verbunden"}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -334,11 +356,15 @@ export default function AdminUsersPage() {
                     {managed.username ? "Benutzername bearbeiten" : "Benutzername festlegen"}
                   </Button>
                   {managed.hasTelegramIdentity ? (
-                    <div className="space-y-2">
-                      <p className="text-xs text-muted-foreground">
-                        Erzwingen gilt nur für Konten ohne Telegram-Verknüpfung. Normaler Telegram-Login bleibt ohne
-                        Username-Gate.
-                      </p>
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={removeTelegramLoading}
+                        onClick={() => setRemoveTelegramTarget(managed)}
+                      >
+                        Telegram Zuordnung entfernen
+                      </Button>
                       {managed.usernameRequiredOnNextLogin ? (
                         <Button
                           variant="outline"
@@ -510,6 +536,20 @@ export default function AdminUsersPage() {
         loading={flagLoading}
         onConfirm={() => {
           if (requestTarget) void handleUsernameRequired(requestTarget, true);
+        }}
+      />
+
+      <ConfirmDialog
+        open={!!removeTelegramTarget}
+        onOpenChange={(open) => !open && !removeTelegramLoading && setRemoveTelegramTarget(null)}
+        title="Telegram Zuordnung entfernen?"
+        description="Die Telegram Anmeldung wird von diesem PEPTIX Konto getrennt. Das Telegram Konto selbst wird nicht gelöscht. Der PEPTIX Benutzername und Bestellungen bleiben erhalten. Entfernung ist nur möglich, wenn eine weitere Anmeldemethode existiert."
+        confirmLabel="Zuordnung entfernen"
+        cancelLabel="Abbrechen"
+        variant="destructive"
+        loading={removeTelegramLoading}
+        onConfirm={() => {
+          void handleRemoveTelegramIdentity();
         }}
       />
 

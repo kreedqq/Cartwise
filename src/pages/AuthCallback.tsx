@@ -133,7 +133,7 @@ export default function AuthCallbackPage() {
           clearTelegramIdentityConflict();
         }
 
-        // Flow B: after linkIdentity, consume admin flag + preferred_username once.
+        // Flow B: after linkIdentity, consume admin flag. Keep existing profiles.username.
         // Never run this on Flow A normal login.
         if (flowKind === "link") {
           try {
@@ -146,6 +146,8 @@ export default function AuthCallbackPage() {
             });
             if (sessionUserId) clearUsernameChangeEligible(sessionUserId);
             clearTelegramIdentityConflict();
+            toast.success("Telegram erfolgreich verknüpft.");
+            await finish(OAUTH_SUCCESS_PATH);
           } catch (err) {
             const message = mapUsernameError(err);
             console.info("[peptix:username]", {
@@ -153,9 +155,19 @@ export default function AuthCallbackPage() {
               flow: "link",
               reason: "post_link_failed",
               error: message.slice(0, 180),
+              hasTelegramIdentity,
             });
+            if (isTelegramIdentityConflictError(err)) {
+              markTelegramIdentityConflict();
+              toast("Telegram Konto bereits verknüpft");
+              await finish("/username-required");
+              return;
+            }
             toast.error(message);
+            // Stay on linking gate — do not send a half-linked session to the dashboard.
+            await finish("/username-required");
           }
+          return;
         }
 
         await finish(OAUTH_SUCCESS_PATH);

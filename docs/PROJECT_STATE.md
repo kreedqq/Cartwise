@@ -2,9 +2,23 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-08** (shop areas + Group Buy; committed locally; not deployed; `0051` not on production).
+Last documentation pass: **2026-09-14** (Telegram identity management final / `0080`).
+
+**Update 2026-09-14 (Telegram Identity Management Final)**: Flows separated as login / link / transfer / admin-remove. `apply_telegram_reauth_username` keeps existing `profiles.username` and only adopts `preferred_username` when unset. Transfer keeps target username when set; expired intents use `failed`+`expired` (not invalid `expired` status). New admin RPC `admin_remove_telegram_identity` (fail-closed if Telegram-only). Client extracts PostgREST error objects so RPC messages are not lost. Migration `0080` applied on `cartwise-prod`.
+
+**Update 2026-09-13 (Telegram Reauth)**: Admin forces next-login Telegram OIDC (`username_required_on_next_login`). Username updates only via `apply_telegram_reauth_username` from `auth.identities.preferred_username` after a fresh Telegram sign-in. Free-text change window removed for that path. Initial claim and Admin Direct Edit unchanged. Local `0076`, not on production.
+
+**Update 2026-09-09 (Bereichskategorien)**: Each selling area has its own `shop_area_categories` (active, label, sort order) and per-product `imported_category_key` / `manual_category_key`. Storefront grouping uses the area assignment, never `products.category`. Deactivating a category hides it; catalog rows and prices stay. Re-import keeps remaining manual category overrides. Pricing and `0056` fail-closed checkout are unchanged. Local `0059`, not on production.
+
+**Update 2026-09-09 (Grundpreis manuell pro Bereich)**: Area grundpreis lives in `shop_area_product_prices` (`imported_price_usd`, nullable `manual_price_usd`, effective `price_usd`). Admin Verkaufsbereiche has Händlerkatalog / Produkte / Preise. Global Import/Import-Verlauf are off the normal admin nav; routes remain. Formula unchanged: effective grundpreis × area factor × role markup once (retail kit still ÷10). Re-import can keep remaining manual overrides. `0056` fail-closed checkout unchanged. Local `0058`, not on production.
+
+**Update 2026-09-09 (Händlerdatei vor Katalog-Apply)**: Apply order is upload new file → `apply_area_vendor_catalog` (catalog + `shop_area_documents` pointer in one Postgres transaction) → then delete the previous storage object. Upload failure skips the RPC. RPC failure leaves the previous catalog and the previous applied document; the new file may remain unapplied. `0056` fail-closed checkout is unchanged.
+
+**Update 2026-09-09 (Händlerkatalog vereinfacht)**: Each of Shop / Group Buy 1 / Group Buy 2 has one uploaded dealer file. That file is the only assortment source (SKU match onto `products.code`; vendor price; extras in `shop_area_products.vendor_raw`). Global `/admin/pdf-import` is labeled **Globaler Produkt-Master** and does not populate areas. Admin Verkaufsbereiche is a flat catalog panel (no nested product/document/price tabs, no add-product toggle). Checkout fail-closed from `0056` is unchanged. Local migration `0057` adds vendor name/dosage/raw. Not committed, not pushed, not applied to production.
 
 **Update 2026-09-08 (Shop-Bereiche + Group Buy)**: One product catalog, three areas (`shop` retail, `group_buy_1` / `group_buy_2` existing kit/tier math). Access via existing `customer_roles` + `shop_area_role_access`. Pricing: area formula then existing `apply_role_markup` once. Carts are per area; orders snapshot `shop_area` (NULL = legacy). Kits never enter retail carts. Migration `0051` is additive and **not** applied to `cartwise-prod`. Contradiction vs spec §20: production is one role per user, not a union/priority engine.
+
+**Update 2026-09-05 (Kunden-Bestelldetail Zahlung statt Verlauf)**: Customer `/orders/:id` hides internal `order_status_history` and shows stored `orders.payment_method` as Zahlungsmethode. Admin history, `orders.status`, and shipping progress are unchanged. No migration.
 
 **Update 2026-09-05 (Übersicht eine Statusspalte)**: `/admin/orders` list Status column is `ShippingProgressSelect` / `order_progress` only. Internal `orders.status` stays on the detail page and in the filter. No migration.
 

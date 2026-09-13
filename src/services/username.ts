@@ -139,14 +139,29 @@ export async function completeTelegramIdentityTransfer(intentId: string): Promis
   return String(data);
 }
 
+/** Extract PostgREST / Auth / Error message (supabase errors are often plain objects). */
+export function extractRpcErrorMessage(error: unknown): string {
+  if (error == null) return "";
+  if (typeof error === "string") return error;
+  if (error instanceof Error && error.message.trim()) return error.message;
+  if (typeof error === "object") {
+    const record = error as {
+      message?: unknown;
+      details?: unknown;
+      hint?: unknown;
+      error_description?: unknown;
+      msg?: unknown;
+    };
+    const parts = [record.message, record.details, record.hint, record.error_description, record.msg]
+      .map((part) => (typeof part === "string" ? part.trim() : ""))
+      .filter(Boolean);
+    if (parts.length) return parts.join(" — ");
+  }
+  return "";
+}
+
 export function isTelegramIdentityConflictError(error: unknown): boolean {
-  const raw =
-    error instanceof Error
-      ? error.message
-      : typeof error === "string"
-        ? error
-        : "";
-  const msg = raw.toLowerCase();
+  const msg = extractRpcErrorMessage(error).toLowerCase();
   return (
     msg.includes("identity_already_exists") ||
     msg.includes("already linked") ||
@@ -156,7 +171,7 @@ export function isTelegramIdentityConflictError(error: unknown): boolean {
 }
 
 export function mapUsernameError(error: unknown): string {
-  const raw = error instanceof Error ? error.message : typeof error === "string" ? error : "";
+  const raw = extractRpcErrorMessage(error);
   if (/bereits verwendet|bereits vergeben/i.test(raw)) {
     return "Dieser Telegram Benutzername wird bereits verwendet.";
   }
@@ -168,6 +183,9 @@ export function mapUsernameError(error: unknown): string {
   }
   if (/einzige Anmeldung des bisherigen PEPTIX Kontos/i.test(raw)) {
     return "Dieses Telegram Konto ist die einzige Anmeldung des bisherigen PEPTIX Kontos und kann nicht übertragen werden.";
+  }
+  if (/einzige Anmeldemethode dieses Kontos/i.test(raw)) {
+    return "Die Telegram Zuordnung kann nicht entfernt werden, solange sie die einzige Anmeldemethode dieses Kontos ist.";
   }
   if (/Bitte melde dich mit Telegram an/i.test(raw)) {
     return "Bitte melde dich mit Telegram an. Dein bestehender PEPTIX Account wird anschließend mit deinem Telegram Konto verknüpft.";
@@ -181,10 +199,18 @@ export function mapUsernameError(error: unknown): string {
   if (/Telegram Identity konnte nicht übertragen werden/i.test(raw)) {
     return "Telegram Identity konnte nicht übertragen werden.";
   }
+  if (/keine Telegram Verknüpfung/i.test(raw)) {
+    return "Dieses Konto hat keine Telegram Verknüpfung.";
+  }
   if (/Ungültiger (Telegram )?Benutzername/i.test(raw)) {
     return raw.includes("Telegram") ? raw : raw.replace("Benutzername", "Telegram Benutzername");
   }
   if (raw.trim()) return raw;
+  console.info("[peptix:username]", {
+    operation: "mapUsernameError",
+    reason: "empty_rpc_message",
+    errorType: error == null ? "null" : typeof error,
+  });
   return "Der Telegram Benutzername konnte nicht zugewiesen werden.";
 }
 

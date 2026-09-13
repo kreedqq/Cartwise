@@ -95,3 +95,14 @@ export async function adminDeleteUser(userId: string): Promise<void> {
   const { error } = await supabase.rpc("admin_delete_user", { _user_id: userId });
   if (error) throw error;
 }
+
+/**
+ * Admin-only: remove custom:telegram from a user who still has another login method.
+ * Never locks out telegram-only accounts. Does not clear profiles.username.
+ */
+export async function adminRemoveTelegramIdentity(userId: string): Promise<void> {
+  const { error } = await supabase.rpc("admin_remove_telegram_identity", {
+    _user_id: userId,
+  });
+  if (error) throw error;
+}
