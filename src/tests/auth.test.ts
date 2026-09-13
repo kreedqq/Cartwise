@@ -25,6 +25,9 @@ const {
   readOAuthCallbackError,
   completeOAuthCallback,
   clearOAuthFlowLock,
+  beginOAuthFlowKind,
+  readOAuthFlowKind,
+  clearOAuthFlowKind,
   isRecoverableConsumedOAuthCodeError,
   OAUTH_CALLBACK_PATH,
   POST_LOGIN_PATH,
@@ -32,6 +35,13 @@ const {
   OAUTH_PROVIDERS,
   safePostLoginPath,
 } = await import("@/services/auth");
+
+import {
+  hasTelegramIdentityConflict,
+  markTelegramIdentityConflict,
+  readTelegramTransferIntent,
+  storeTelegramTransferIntent,
+} from "@/services/username";
 
 const AUTHORIZE = "https://example.supabase.co/auth/v1/authorize?provider=discord";
 const DISCORD = "https://discord.com/api/oauth2/authorize?client_id=x";
@@ -422,6 +432,43 @@ describe("completeOAuthCallback", () => {
       exchangeCodeForSession: vi.fn().mockResolvedValue({ error: { message: "invalid flow state" } }),
     });
     expect(result).toEqual({ status: "failed", message: "invalid flow state" });
+  });
+});
+
+describe("OAuth flow kind isolation", () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    clearOAuthFlowKind();
+  });
+
+  it("login flow clears stale transfer intent and conflict", () => {
+    storeTelegramTransferIntent("stale-intent");
+    markTelegramIdentityConflict();
+    beginOAuthFlowKind("login");
+    expect(readOAuthFlowKind()).toBe("login");
+    expect(readTelegramTransferIntent()).toBeNull();
+    expect(hasTelegramIdentityConflict()).toBe(false);
+  });
+
+  it("link flow clears stale transfer intent but is not transfer", () => {
+    storeTelegramTransferIntent("stale-intent");
+    beginOAuthFlowKind("link");
+    expect(readOAuthFlowKind()).toBe("link");
+    expect(readTelegramTransferIntent()).toBeNull();
+  });
+
+  it("transfer flow keeps the pending intent", () => {
+    storeTelegramTransferIntent("intent-keep");
+    beginOAuthFlowKind("transfer");
+    expect(readOAuthFlowKind()).toBe("transfer");
+    expect(readTelegramTransferIntent()).toBe("intent-keep");
+  });
+
+  it("AuthCallback requires transfer flow kind before completing transfer", () => {
+    const callback = readFileSync(resolve(process.cwd(), "src/pages/AuthCallback.tsx"), "utf8");
+    expect(callback).toContain('flowKind === "transfer" && transferIntentId');
+    expect(callback).toContain('flowKind === "link"');
+    expect(callback).not.toMatch(/if \(transferIntentId\) \{\s*try \{\s*await completeTelegramIdentityTransfer/);
   });
 });
 

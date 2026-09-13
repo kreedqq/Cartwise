@@ -122,7 +122,7 @@ export default function UsernameRequiredPage() {
       clearTelegramIdentityConflict();
       // Prove ownership of the Telegram account (session becomes the source user).
       // complete_telegram_identity_transfer then moves the identity onto the target.
-      await signInWithOAuth(TELEGRAM_OAUTH_PROVIDER);
+      await signInWithOAuth(TELEGRAM_OAUTH_PROVIDER, undefined, { flow: "transfer" });
     } catch (error) {
       setReauthError(mapUsernameError(error));
       setTransferBusy(false);

@@ -108,11 +108,29 @@ describe("telegram transfer UI wiring", () => {
     expect(page).not.toContain("from_user");
   });
 
-  it("completes transfer after OAuth when an intent is pending", () => {
+  it("completes transfer after OAuth only for explicit transfer flow", () => {
     const callback = read("src/pages/AuthCallback.tsx");
     expect(callback).toContain("completeTelegramIdentityTransfer");
+    expect(callback).toContain('flowKind === "transfer"');
+    expect(callback).toContain("readOAuthFlowKind");
     expect(callback).toContain("markTelegramIdentityConflict");
-    expect(callback).toContain("isTelegramIdentityConflictError");
+    expect(callback).toContain('flowKind === "link"');
     expect(callback).toContain("Telegram erfolgreich verknüpft");
+    expect(callback).toContain("Stale transfer intent must never hijack");
+  });
+
+  it("stores transfer flow marker when confirming reassignment", () => {
+    const page = read("src/pages/UsernameRequired.tsx");
+    expect(page).toContain('flow: "transfer"');
+    expect(page).toContain("createTelegramTransferIntent");
+    expect(page).toContain("storeTelegramTransferIntent");
+  });
+
+  it("expires stale identity conflict markers", () => {
+    sessionStorage.clear();
+    sessionStorage.setItem("peptix:telegram-identity-conflict", String(Date.now() - 16 * 60 * 1000));
+    expect(hasTelegramIdentityConflict()).toBe(false);
+    markTelegramIdentityConflict();
+    expect(hasTelegramIdentityConflict()).toBe(true);
   });
 });

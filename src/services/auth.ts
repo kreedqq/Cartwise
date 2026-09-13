@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { clearTelegramIdentityConflict, clearTelegramTransferIntent } from "@/services/username";
 
 export const DISCORD_OAUTH_PROVIDER = "discord" as const;
 export const TELEGRAM_OAUTH_PROVIDER = "custom:telegram" as const;
@@ -82,6 +83,47 @@ export function beginOAuthFlowLock(): boolean {
 export function clearOAuthFlowLock(): void {
   try {
     sessionStorage.removeItem(OAUTH_FLOW_LOCK_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+/** Distinguishes login vs linkIdentity vs transfer OAuth callbacks. */
+export type OAuthFlowKind = "login" | "link" | "transfer";
+
+const OAUTH_FLOW_KIND_KEY = "peptix:oauth-flow-kind";
+
+/**
+ * Marks the active OAuth flow for AuthCallback.
+ * login/link clear stale transfer intents so a normal Telegram login never completes a transfer.
+ */
+export function beginOAuthFlowKind(kind: OAuthFlowKind): void {
+  try {
+    sessionStorage.setItem(OAUTH_FLOW_KIND_KEY, kind);
+  } catch {
+    // ignore
+  }
+  if (kind === "login") {
+    clearTelegramTransferIntent();
+    clearTelegramIdentityConflict();
+  } else if (kind === "link") {
+    clearTelegramTransferIntent();
+  }
+}
+
+export function readOAuthFlowKind(): OAuthFlowKind | null {
+  try {
+    const value = sessionStorage.getItem(OAUTH_FLOW_KIND_KEY);
+    if (value === "login" || value === "link" || value === "transfer") return value;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearOAuthFlowKind(): void {
+  try {
+    sessionStorage.removeItem(OAUTH_FLOW_KIND_KEY);
   } catch {
     // ignore
   }
@@ -429,11 +471,20 @@ export function readOAuthCallbackError(
  *
  * `skipBrowserRedirect` is required so a JSON error body is never assigned to
  * `window.location` (Chrome then downloads it as `authorize.json`).
+ *
+ * Default flow is `login` (Flow A). Pass `{ flow: "transfer" }` only after an
+ * explicit transfer confirmation (Flow C).
  */
-export async function signInWithOAuth(provider: OAuthProvider, fetchImpl?: FetchLike) {
+export async function signInWithOAuth(
+  provider: OAuthProvider,
+  fetchImpl?: FetchLike,
+  options?: { flow?: OAuthFlowKind },
+) {
   if (!beginOAuthFlowLock()) {
     throw new Error("oauth_flow_in_progress");
   }
+  const flow = options?.flow ?? "login";
+  beginOAuthFlowKind(flow);
   const origin = window.location.origin;
   try {
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -452,6 +503,7 @@ export async function signInWithOAuth(provider: OAuthProvider, fetchImpl?: Fetch
     console.info("[peptix:oauth]", {
       phase: "start",
       provider,
+      flow,
       redirectTo: getRedirectUrl(OAUTH_CALLBACK_PATH),
       authorizeHost: (() => {
         try {
@@ -476,6 +528,7 @@ export async function signInWithOAuth(provider: OAuthProvider, fetchImpl?: Fetch
     return data;
   } catch (error) {
     clearOAuthFlowLock();
+    clearOAuthFlowKind();
     throw error;
   }
 }
@@ -496,6 +549,7 @@ export async function linkTelegramIdentity(fetchImpl?: FetchLike) {
   if (!beginOAuthFlowLock()) {
     throw new Error("oauth_flow_in_progress");
   }
+  beginOAuthFlowKind("link");
   const origin = window.location.origin;
   try {
     const { data, error } = await supabase.auth.linkIdentity({
@@ -513,6 +567,7 @@ export async function linkTelegramIdentity(fetchImpl?: FetchLike) {
     console.info("[peptix:oauth]", {
       phase: "start",
       provider: TELEGRAM_OAUTH_PROVIDER,
+      flow: "link",
       mode: "linkIdentity",
       redirectTo: getRedirectUrl(OAUTH_CALLBACK_PATH),
       authorizeHost: (() => {
@@ -529,21 +584,22 @@ export async function linkTelegramIdentity(fetchImpl?: FetchLike) {
     return data;
   } catch (error) {
     clearOAuthFlowLock();
+    clearOAuthFlowKind();
     throw error;
   }
 }
 
 /**
- * Admin-requested Telegram step while signed in:
+ * Admin-requested Telegram step while signed in (Flow B):
  * - no Telegram identity yet → linkIdentity (same auth.users.id)
- * - already linked → fresh Telegram OAuth for that identity (same user when the same Telegram account is used)
+ * - already linked → fresh Telegram OAuth for that same identity (still Flow B, not transfer)
  * Never signs out first (that would allow a duplicate account on plain signInWithOAuth).
  */
 export async function startTelegramAccountLink(user: {
   identities?: Array<{ provider?: string | null }> | null;
 } | null, fetchImpl?: FetchLike) {
   if (userHasTelegramIdentity(user)) {
-    return signInWithOAuth(TELEGRAM_OAUTH_PROVIDER, fetchImpl);
+    return signInWithOAuth(TELEGRAM_OAUTH_PROVIDER, fetchImpl, { flow: "link" });
   }
   return linkTelegramIdentity(fetchImpl);
 }

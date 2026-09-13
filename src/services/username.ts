@@ -58,10 +58,11 @@ export async function applyTelegramReauthUsername(): Promise<string> {
 
 const TRANSFER_INTENT_KEY = "peptix:telegram-transfer-intent";
 const TRANSFER_CONFLICT_KEY = "peptix:telegram-identity-conflict";
+const TRANSFER_CONFLICT_TTL_MS = 15 * 60 * 1000;
 
 export function markTelegramIdentityConflict(): void {
   try {
-    sessionStorage.setItem(TRANSFER_CONFLICT_KEY, "1");
+    sessionStorage.setItem(TRANSFER_CONFLICT_KEY, String(Date.now()));
   } catch {
     // ignore
   }
@@ -77,7 +78,14 @@ export function clearTelegramIdentityConflict(): void {
 
 export function hasTelegramIdentityConflict(): boolean {
   try {
-    return sessionStorage.getItem(TRANSFER_CONFLICT_KEY) === "1";
+    const raw = sessionStorage.getItem(TRANSFER_CONFLICT_KEY);
+    if (!raw) return false;
+    const started = Number(raw);
+    if (!Number.isFinite(started) || Date.now() - started > TRANSFER_CONFLICT_TTL_MS) {
+      sessionStorage.removeItem(TRANSFER_CONFLICT_KEY);
+      return false;
+    }
+    return true;
   } catch {
     return false;
   }
@@ -167,10 +175,17 @@ export function mapUsernameError(error: unknown): string {
   if (/Keine Telegram Anmeldung angefordert/i.test(raw)) {
     return "Keine Telegram Anmeldung angefordert.";
   }
+  if (/Telegram Identity gehört bereits zu diesem PEPTIX Konto/i.test(raw)) {
+    return "Telegram Identity gehört bereits zu diesem PEPTIX Konto.";
+  }
+  if (/Telegram Identity konnte nicht übertragen werden/i.test(raw)) {
+    return "Telegram Identity konnte nicht übertragen werden.";
+  }
   if (/Ungültiger (Telegram )?Benutzername/i.test(raw)) {
     return raw.includes("Telegram") ? raw : raw.replace("Benutzername", "Telegram Benutzername");
   }
-  return raw || "Der Telegram Benutzername konnte nicht gespeichert werden.";
+  if (raw.trim()) return raw;
+  return "Der Telegram Benutzername konnte nicht zugewiesen werden.";
 }
 
 /**

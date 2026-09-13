@@ -247,6 +247,9 @@ describe("Telegram identity linking", () => {
     await startTelegramAccountLink({ identities: [{ provider: "custom:telegram" }] }, fetchImpl);
     expect(signInWithOAuth).toHaveBeenCalled();
     expect(linkIdentity).not.toHaveBeenCalled();
+    const auth = readSource("src/services/auth.ts");
+    expect(auth).toContain('flow: "link"');
+    expect(auth).toContain('options?.flow ?? "login"');
   });
 });
 

@@ -5,11 +5,13 @@ import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { toast } from "@/components/ui/toaster";
 import { supabase } from "@/lib/supabaseClient";
 import {
+  clearOAuthFlowKind,
   clearOAuthFlowLock,
   completeOAuthCallback,
   logOAuthCallbackDiagnostics,
   mapAuthError,
   OAUTH_SUCCESS_PATH,
+  readOAuthFlowKind,
   signOut,
 } from "@/services/auth";
 import {
@@ -25,8 +27,7 @@ import {
 
 /**
  * Single authoritative OAuth completion path.
- * Do not navigate from auth-state listeners here — that races URL session detection /
- * code exchange and caused false login failures plus loops.
+ * Flow A (login), Flow B (link), and Flow C (transfer) must not share completion logic.
  */
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ export default function AuthCallbackPage() {
       if (cancelled || settled) return;
       settled = true;
       clearOAuthFlowLock();
+      clearOAuthFlowKind();
       toast.error("Die Anmeldung konnte nicht abgeschlossen werden. Bitte starte den Vorgang erneut.");
       navigate("/login", { replace: true });
     }, 12_000);
@@ -48,6 +50,7 @@ export default function AuthCallbackPage() {
       settled = true;
       window.clearTimeout(timeout);
       clearOAuthFlowLock();
+      clearOAuthFlowKind();
       navigate(path, { replace: true });
     }
 
@@ -55,9 +58,14 @@ export default function AuthCallbackPage() {
       const href = window.location.href;
       const search = window.location.search;
       const hash = window.location.hash;
-      logOAuthCallbackDiagnostics({ href, search, hash, phase: "start" });
-
+      const flowKind = readOAuthFlowKind();
       const transferIntentId = readTelegramTransferIntent();
+      logOAuthCallbackDiagnostics({ href, search, hash, phase: "start" });
+      console.info("[peptix:oauth]", {
+        phase: "callback-context",
+        flow: flowKind,
+        hasTransferIntent: Boolean(transferIntentId),
+      });
 
       const result = await completeOAuthCallback({
         href,
@@ -68,6 +76,16 @@ export default function AuthCallbackPage() {
       });
       if (cancelled) return;
 
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const sessionUserId = session?.user?.id ?? null;
+      const sessionProvider =
+        (session?.user?.app_metadata as { provider?: string } | undefined)?.provider ?? null;
+      const hasTelegramIdentity = Boolean(
+        session?.user?.identities?.some((identity) => identity.provider === "custom:telegram"),
+      );
+
       logOAuthCallbackDiagnostics({
         href,
         search,
@@ -76,17 +94,24 @@ export default function AuthCallbackPage() {
         status: result.status,
         message: result.status === "failed" ? result.message : undefined,
       });
+      console.info("[peptix:oauth]", {
+        phase: "callback-session",
+        flow: flowKind,
+        status: result.status,
+        hasSession: Boolean(session),
+        sessionUserId,
+        sessionProvider,
+        hasTelegramIdentity,
+      });
 
       if (result.status === "authenticated") {
-        if (transferIntentId) {
+        // Flow C only: explicit transfer confirmation must have set both markers.
+        if (flowKind === "transfer" && transferIntentId) {
           try {
             await completeTelegramIdentityTransfer(transferIntentId);
             clearTelegramTransferIntent();
             clearTelegramIdentityConflict();
-            const {
-              data: { session },
-            } = await supabase.auth.getSession();
-            if (session?.user?.id) clearUsernameChangeEligible(session.user.id);
+            if (sessionUserId) clearUsernameChangeEligible(sessionUserId);
             await signOut();
             toast.success("Telegram erfolgreich verknüpft. Bitte melde dich erneut mit E-Mail an.");
             await finish("/login");
@@ -98,32 +123,54 @@ export default function AuthCallbackPage() {
           }
           return;
         }
+
+        // Stale transfer intent must never hijack Flow A/B.
+        if (transferIntentId) {
+          clearTelegramTransferIntent();
+        }
+        if (flowKind === "login") {
+          clearTelegramIdentityConflict();
+        }
         await finish(OAUTH_SUCCESS_PATH);
         return;
       }
 
       if (result.status === "failed") {
-        const { data } = await supabase.auth.getSession();
-        if (data.session && isTelegramIdentityConflictError(result.message)) {
+        // Identity-already-linked is only a Flow B (linkIdentity) conflict → Flow C UI.
+        if (
+          flowKind === "link" &&
+          session &&
+          isTelegramIdentityConflictError(result.message)
+        ) {
           markTelegramIdentityConflict();
           toast("Telegram Konto bereits verknüpft");
           await finish("/username-required");
           return;
         }
+
+        if (flowKind === "login") {
+          clearTelegramIdentityConflict();
+          clearTelegramTransferIntent();
+        }
+
         toast.error(mapAuthError(result.message));
-        await finish(data.session ? "/username-required" : "/login");
+        await finish(session ? "/username-required" : "/login");
         return;
       }
 
       // pending: wait briefly for detectSessionInUrl, then fail closed
       const again = await supabase.auth.getSession();
       if (again.data.session) {
+        if (transferIntentId && flowKind !== "transfer") {
+          clearTelegramTransferIntent();
+        }
         await finish(OAUTH_SUCCESS_PATH);
         return;
       }
       settled = true;
       window.clearTimeout(timeout);
       clearOAuthFlowLock();
+      clearOAuthFlowKind();
       toast.error("Die Anmeldung konnte nicht abgeschlossen werden. Bitte starte den Vorgang erneut.");
       navigate("/login", { replace: true });
     }
