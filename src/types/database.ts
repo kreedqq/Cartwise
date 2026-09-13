@@ -1572,6 +1572,10 @@ export interface Database {
         Args: { _username: string };
         Returns: string;
       };
+      apply_telegram_reauth_username: {
+        Args: Record<string, never>;
+        Returns: string;
+      };
       admin_set_username: {
         Args: { _user_id: string; _username: string };
         Returns: string;

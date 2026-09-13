@@ -11,7 +11,7 @@ function read(path: string): string {
 describe("0075 telegram username lock", () => {
   const sql = read("supabase/migrations/0075_telegram_username_lock.sql");
 
-  it("locks self-service changes unless an admin change request is active", () => {
+  it("locks client username mutation and provides admin direct edit", () => {
     expect(sql).toContain("protect_profile_username");
     expect(sql).toContain("profiles_protect_username");
     expect(sql).toContain("Dein Telegram Benutzername ist gesperrt");
@@ -41,21 +41,22 @@ describe("username profile and admin UX", () => {
     expect(profile).not.toContain("<Save");
   });
 
-  it("shows admin direct edit and next-login request actions", () => {
+  it("shows admin direct edit and Telegram reauth actions", () => {
     const page = read("src/pages/admin/AdminUsers.tsx");
     expect(page).toContain("Benutzername bearbeiten");
     expect(page).toContain("Benutzername festlegen");
-    expect(page).toContain("Änderung beim nächsten Login anfordern");
-    expect(page).toContain("Änderungsfreigabe widerrufen");
+    expect(page).toContain("Telegram Anmeldung beim nächsten Login erzwingen");
+    expect(page).toContain("Telegram Anmeldung widerrufen");
     expect(page).toContain("adminSetUsername");
     expect(page).toContain("✓ Gesperrt");
   });
 
-  it("binds change window to SIGNED_IN and clears eligibility after save", () => {
+  it("binds the reauth gate to SIGNED_IN and applies Telegram identity server-side", () => {
     expect(read("src/context/AuthProvider.tsx")).toContain('event === "SIGNED_IN"');
     expect(read("src/context/AuthProvider.tsx")).toContain("markUsernameChangeEligible");
-    expect(read("src/components/auth/RequireUsernameDialog.tsx")).toContain("clearUsernameChangeEligible");
-    expect(read("src/pages/UsernameRequired.tsx")).toContain("Telegram Benutzername aktualisieren");
+    expect(read("src/pages/UsernameRequired.tsx")).toContain("applyTelegramReauthUsername");
+    expect(read("src/pages/UsernameRequired.tsx")).toContain("clearUsernameChangeEligible");
+    expect(read("src/pages/UsernameRequired.tsx")).toContain("Telegram Anmeldung erforderlich");
   });
 
   it("maps lock and duplicate errors for users", () => {

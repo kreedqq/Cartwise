@@ -6,12 +6,12 @@ export function usernameChangeEligibleKey(userId: string): string {
   return `${CHANGE_ELIGIBLE_PREFIX}${userId}`;
 }
 
-/** Mark that this browser session may show the admin-requested change window. */
+/** Mark that this browser session may show the admin-requested Telegram reauth gate. */
 export function markUsernameChangeEligible(userId: string): void {
   try {
     sessionStorage.setItem(usernameChangeEligibleKey(userId), "1");
   } catch {
-    // Private mode / blocked storage: fail closed (no change window without session mark).
+    // Private mode / blocked storage: fail closed (no gate without session mark).
   }
 }
 
@@ -38,9 +38,19 @@ export async function isUsernameAvailable(username: string): Promise<boolean> {
   return Boolean(data);
 }
 
-/** Claims a validated, unique username for the current user. Throws on duplicate/invalid/locked. */
+/** Claims a validated, unique username for the current user (initial claim only). */
 export async function claimUsername(username: string): Promise<string> {
   const { data, error } = await supabase.rpc("set_username", { _username: username });
+  if (error) throw error;
+  return String(data);
+}
+
+/**
+ * Applies the verified Telegram OIDC preferred_username after admin reauth.
+ * Server reads auth.identities only — never client-supplied names.
+ */
+export async function applyTelegramReauthUsername(): Promise<string> {
+  const { data, error } = await supabase.rpc("apply_telegram_reauth_username");
   if (error) throw error;
   return String(data);
 }
@@ -53,6 +63,15 @@ export function mapUsernameError(error: unknown): string {
   if (/gesperrt/i.test(raw)) {
     return "Dein Telegram Benutzername ist gesperrt und kann nicht selbst geändert werden.";
   }
+  if (/Kein verifizierter Telegram Benutzername/i.test(raw)) {
+    return "Kein verifizierter Telegram Benutzername verfügbar. Bitte verwende ein Telegram-Konto mit Benutzername.";
+  }
+  if (/Bitte melde dich mit Telegram an/i.test(raw)) {
+    return "Bitte melde dich mit Telegram an, damit dein Telegram Benutzername aktualisiert werden kann.";
+  }
+  if (/Keine Telegram Anmeldung angefordert/i.test(raw)) {
+    return "Keine Telegram Anmeldung angefordert.";
+  }
   if (/Ungültiger (Telegram )?Benutzername/i.test(raw)) {
     return raw.includes("Telegram") ? raw : raw.replace("Benutzername", "Telegram Benutzername");
   }
@@ -61,7 +80,7 @@ export function mapUsernameError(error: unknown): string {
 
 /**
  * Initial missing username → always prompt.
- * Admin change request → only after a fresh SIGNED_IN in this browser session.
+ * Admin Telegram reauth → only after a fresh SIGNED_IN in this browser session.
  * Profile stays read-only either way.
  */
 export function shouldPromptForUsername(input: {
@@ -76,9 +95,12 @@ export function shouldPromptForUsername(input: {
   return isUsernameChangeEligible(input.user.id);
 }
 
+/** Admin-requested Telegram reauthentication (existing username + flag). */
 export function isUsernameChangeRequest(profile: {
   username: string | null;
   username_required_on_next_login?: boolean;
 } | null): boolean {
   return Boolean(profile?.username?.trim() && profile.username_required_on_next_login);
 }
+
+export const isTelegramReauthRequired = isUsernameChangeRequest;

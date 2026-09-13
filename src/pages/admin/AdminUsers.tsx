@@ -145,7 +145,11 @@ export default function AdminUsersPage() {
     setFlagLoading(true);
     try {
       await adminSetUsernameRequired(user.id, required);
-      toast.success(required ? "Änderung beim nächsten Login angefordert." : "Änderungsfreigabe widerrufen.");
+      toast.success(
+        required
+          ? "Telegram Anmeldung beim nächsten Login erzwungen."
+          : "Telegram Anmeldung-Anforderung widerrufen.",
+      );
       await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       setManaged((current) =>
         current && current.id === user.id ? { ...current, usernameRequiredOnNextLogin: required } : current,
@@ -231,7 +235,7 @@ export default function AdminUsersPage() {
                           <TableCell className="text-xs text-muted-foreground">{formatDateTime(u.createdAt)}</TableCell>
                           <TableCell className="text-sm">
                             {u.usernameRequiredOnNextLogin
-                              ? "Änderung angefordert"
+                              ? "Telegram Anmeldung angefordert"
                               : u.username
                                 ? "✓ Gesperrt"
                                 : "Ohne Username"}
@@ -272,7 +276,7 @@ export default function AdminUsersPage() {
                           <dt>Status</dt>
                           <dd>
                             {u.usernameRequiredOnNextLogin
-                              ? "Änderung angefordert"
+                              ? "Telegram Anmeldung angefordert"
                               : u.username
                                 ? "✓ Gesperrt"
                                 : "Ohne Username"}
@@ -313,7 +317,7 @@ export default function AdminUsersPage() {
                   <p className="text-xs text-muted-foreground">
                     Status:{" "}
                     {managed.usernameRequiredOnNextLogin
-                      ? "Änderung beim nächsten Login angefordert"
+                      ? "Telegram Anmeldung beim nächsten Login angefordert"
                       : managed.username
                         ? "✓ Gesperrt"
                         : "Noch nicht gesetzt"}
@@ -330,7 +334,7 @@ export default function AdminUsersPage() {
                       disabled={flagLoading}
                       onClick={() => void handleUsernameRequired(managed, false)}
                     >
-                      Änderungsfreigabe widerrufen
+                      Telegram Anmeldung widerrufen
                     </Button>
                   ) : (
                     <Button
@@ -340,7 +344,7 @@ export default function AdminUsersPage() {
                       title={!managed.username ? "Zuerst einen Telegram Benutzernamen festlegen." : undefined}
                       onClick={() => setRequestTarget(managed)}
                     >
-                      Änderung beim nächsten Login anfordern
+                      Telegram Anmeldung beim nächsten Login erzwingen
                     </Button>
                   )}
                 </div>
@@ -429,7 +433,8 @@ export default function AdminUsersPage() {
           <DialogHeader>
             <DialogTitle>Telegram Benutzername bearbeiten</DialogTitle>
             <DialogDescription>
-              Admin kann den Telegram Benutzernamen direkt setzen. Offene Änderungsfreigaben werden entfernt.
+              Admin kann den Telegram Benutzernamen direkt setzen. Offene Telegram-Anmeldungsanforderungen werden
+              entfernt.
             </DialogDescription>
           </DialogHeader>
           {usernameEditTarget && (
@@ -475,9 +480,9 @@ export default function AdminUsersPage() {
       <ConfirmDialog
         open={!!requestTarget}
         onOpenChange={(open) => !open && setRequestTarget(null)}
-        title="Telegram Benutzernamen ändern lassen?"
-        description="Der Benutzer erhält beim nächsten Login ein Änderungsfenster und kann dort seinen Telegram Benutzernamen aktualisieren. Nach erfolgreicher Änderung wird die Änderungsfreigabe automatisch entfernt."
-        confirmLabel="Anfordern"
+        title="Telegram Anmeldung erzwingen?"
+        description="Beim nächsten Login muss sich der Benutzer mit Telegram anmelden. PEPTIX übernimmt dann automatisch den verifizierten Telegram Benutzernamen. Danach ist der Benutzername wieder gesperrt."
+        confirmLabel="Erzwingen"
         cancelLabel="Abbrechen"
         loading={flagLoading}
         onConfirm={() => {

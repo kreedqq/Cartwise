@@ -6,7 +6,7 @@ import { shouldPromptForUsername } from "@/services/username";
 
 /**
  * After a session exists, block the app shell until the user has a Telegram
- * username and any admin-required confirmation is cleared. The duty page is
+ * username and any admin-required Telegram reauth is cleared. The duty page is
  * a sibling route so this gate cannot be skipped via in-app navigation.
  */
 export function UsernameGate() {

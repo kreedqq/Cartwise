@@ -37,7 +37,7 @@ describe("admin users and roles merge", () => {
   it("shows Telegram Benutzername, role markup, username-required, manage, and delete on the merged page", () => {
     const page = readSource("src/pages/admin/AdminUsers.tsx");
     expect(page).toContain("Telegram Benutzername");
-    expect(page).toContain("Änderung beim nächsten Login anfordern");
+    expect(page).toContain("Telegram Anmeldung beim nächsten Login erzwingen");
     expect(page).toContain("Verwalten");
     expect(page).toContain("Benutzer dauerhaft entfernen");
     expect(page).toContain("AdminRoleCatalog");

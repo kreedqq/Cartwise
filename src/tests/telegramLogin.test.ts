@@ -224,13 +224,17 @@ describe("Telegram identity without insecure merge", () => {
   it("keeps profiles.username as the canonical public handle after Telegram login", () => {
     const dialog = readSource("src/components/auth/RequireUsernameDialog.tsx");
     const usernameService = readSource("src/services/username.ts");
+    const reauthPage = readSource("src/pages/UsernameRequired.tsx");
     expect(dialog).toContain("shouldPromptForUsername");
     expect(dialog).toContain("claimUsername");
     expect(dialog).toContain("preferred_username");
     expect(dialog).not.toMatch(/email\?\.split/);
     expect(dialog).not.toMatch(/user\.email/);
     expect(usernameService).toContain("set_username");
+    expect(usernameService).toContain("apply_telegram_reauth_username");
     expect(usernameService).toContain("shouldPromptForUsername");
+    expect(reauthPage).toContain("applyTelegramReauthUsername");
+    expect(reauthPage).toContain("Mit Telegram anmelden");
   });
 
   it("keeps email/password login and the existing callback route", () => {

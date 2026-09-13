@@ -5,18 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthProvider";
 import { usernameSchema } from "@/lib/validation";
-import { publicUsername } from "@/lib/username";
 import {
   claimUsername,
   clearUsernameChangeEligible,
-  isUsernameChangeRequest,
   mapUsernameError,
   shouldPromptForUsername,
 } from "@/services/username";
 
 /**
- * Telegram handle form used after login when username is missing or an admin
- * requested a one-shot change. Prefills OAuth suggestion only for initial claim.
+ * Initial Telegram handle claim after first login when profiles.username is empty.
+ * Prefills OAuth preferred_username as a suggestion only — never auto-saves.
+ * Admin reauth does NOT use this form (see UsernameRequired Telegram CTA).
  */
 export function RequireUsernameForm({ onSaved }: { onSaved?: () => void }) {
   const { user, profile, loading, refreshProfile } = useAuth();
@@ -25,14 +24,11 @@ export function RequireUsernameForm({ onSaved }: { onSaved?: () => void }) {
   const [busy, setBusy] = React.useState(false);
 
   const open = shouldPromptForUsername({ loading, user, profile });
-  const changeRequest = isUsernameChangeRequest(profile);
-  const currentHandle = publicUsername(profile);
+  const hasUsername = Boolean(profile?.username?.trim());
 
   React.useEffect(() => {
-    if (!open || value || changeRequest) return;
-    const existing = profile?.username?.trim() ?? "";
+    if (!open || value || hasUsername) return;
     const suggestionRaw =
-      existing ||
       (user?.user_metadata?.preferred_username as string | undefined) ||
       (user?.user_metadata?.user_name as string | undefined) ||
       (user?.user_metadata?.username as string | undefined) ||
@@ -42,7 +38,7 @@ export function RequireUsernameForm({ onSaved }: { onSaved?: () => void }) {
       queueMicrotask(() => setValue(sanitized));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, changeRequest]);
+  }, [open, hasUsername]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -67,16 +63,8 @@ export function RequireUsernameForm({ onSaved }: { onSaved?: () => void }) {
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
-      {changeRequest && currentHandle ? (
-        <div className="rounded-md border border-border bg-muted/30 px-3 py-2 text-sm">
-          <p className="text-xs text-muted-foreground">Aktueller Benutzername</p>
-          <p className="font-medium">@{currentHandle}</p>
-        </div>
-      ) : null}
       <div className="space-y-1.5">
-        <Label htmlFor="require-username">
-          {changeRequest ? "Neuer Telegram Benutzername" : "Telegram Benutzername"}
-        </Label>
+        <Label htmlFor="require-username">Telegram Benutzername</Label>
         <Input
           id="require-username"
           autoComplete="username"
@@ -89,11 +77,7 @@ export function RequireUsernameForm({ onSaved }: { onSaved?: () => void }) {
         {error ? (
           <p className="text-xs text-destructive">{error}</p>
         ) : (
-          <p className="text-xs text-muted-foreground">
-            {changeRequest
-              ? "Nach dem Speichern wird dein Telegram Benutzername wieder gesperrt."
-              : "3–24 Zeichen, beginnend mit einem Buchstaben."}
-          </p>
+          <p className="text-xs text-muted-foreground">3–24 Zeichen, beginnend mit einem Buchstaben.</p>
         )}
       </div>
       <Button type="submit" className="w-full" loading={busy}>
