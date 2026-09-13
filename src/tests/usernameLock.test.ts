@@ -54,8 +54,9 @@ describe("username profile and admin UX", () => {
   it("binds the reauth gate to SIGNED_IN and applies Telegram identity server-side", () => {
     expect(read("src/context/AuthProvider.tsx")).toContain('event === "SIGNED_IN"');
     expect(read("src/context/AuthProvider.tsx")).toContain("markUsernameChangeEligible");
-    expect(read("src/pages/UsernameRequired.tsx")).toContain("applyTelegramReauthUsername");
-    expect(read("src/pages/UsernameRequired.tsx")).toContain("clearUsernameChangeEligible");
+    expect(read("src/pages/AuthCallback.tsx")).toContain("applyTelegramReauthUsername");
+    expect(read("src/pages/AuthCallback.tsx")).toContain("clearUsernameChangeEligible");
+    expect(read("src/pages/UsernameRequired.tsx")).not.toContain("applyTelegramReauthUsername");
     expect(read("src/pages/UsernameRequired.tsx")).toContain("Telegram Anmeldung erforderlich");
   });
 

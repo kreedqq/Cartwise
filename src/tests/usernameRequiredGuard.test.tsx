@@ -127,7 +127,7 @@ describe("shouldPromptForUsername next-login binding", () => {
     expect(
       shouldPromptForUsername({
         loading: false,
-        user: { id: "user-1" },
+        user: { id: "user-1", identities: [{ provider: "email" }] },
         profile: { username: "Nullpzr", username_required_on_next_login: true },
       }),
     ).toBe(false);
@@ -136,7 +136,7 @@ describe("shouldPromptForUsername next-login binding", () => {
     expect(
       shouldPromptForUsername({
         loading: false,
-        user: { id: "user-1" },
+        user: { id: "user-1", identities: [{ provider: "email" }] },
         profile: { username: "Nullpzr", username_required_on_next_login: true },
       }),
     ).toBe(true);

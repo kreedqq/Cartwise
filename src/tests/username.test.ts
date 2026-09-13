@@ -33,11 +33,11 @@ describe("shouldPromptForUsername", () => {
     expect(shouldPromptForUsername({ loading: false, user: null, profile: { username: null } })).toBe(false);
   });
 
-  it("prompts for an admin change request only after a fresh login marks eligibility", () => {
+  it("prompts for an admin linking request only after a fresh login marks eligibility", () => {
     expect(
       shouldPromptForUsername({
         loading: false,
-        user: { id: "u1" },
+        user: { id: "u1", identities: [{ provider: "email" }] },
         profile: { username: "ExampleUser", username_required_on_next_login: true },
       }),
     ).toBe(false);
@@ -45,15 +45,29 @@ describe("shouldPromptForUsername", () => {
     expect(
       shouldPromptForUsername({
         loading: false,
-        user: { id: "u1" },
+        user: { id: "u1", identities: [{ provider: "email" }] },
         profile: { username: "ExampleUser", username_required_on_next_login: true },
       }),
     ).toBe(true);
     expect(
       shouldPromptForUsername({
         loading: false,
-        user: { id: "u1" },
+        user: { id: "u1", identities: [{ provider: "email" }] },
         profile: { username: "ExampleUser", username_required_on_next_login: false },
+      }),
+    ).toBe(false);
+  });
+
+  it("does not prompt on normal Telegram login when Telegram is already linked", () => {
+    markUsernameChangeEligible("u1");
+    expect(
+      shouldPromptForUsername({
+        loading: false,
+        user: {
+          id: "u1",
+          identities: [{ provider: "email" }, { provider: "custom:telegram" }],
+        },
+        profile: { username: "Pepsidryage", username_required_on_next_login: true },
       }),
     ).toBe(false);
   });

@@ -15,6 +15,7 @@ import {
   signOut,
 } from "@/services/auth";
 import {
+  applyTelegramReauthUsername,
   clearTelegramIdentityConflict,
   clearTelegramTransferIntent,
   clearUsernameChangeEligible,
@@ -131,6 +132,32 @@ export default function AuthCallbackPage() {
         if (flowKind === "login") {
           clearTelegramIdentityConflict();
         }
+
+        // Flow B: after linkIdentity, consume admin flag + preferred_username once.
+        // Never run this on Flow A normal login.
+        if (flowKind === "link") {
+          try {
+            const applied = await applyTelegramReauthUsername();
+            console.info("[peptix:username]", {
+              operation: "apply_telegram_reauth_username",
+              flow: "link",
+              reason: "post_link_success",
+              applied,
+            });
+            if (sessionUserId) clearUsernameChangeEligible(sessionUserId);
+            clearTelegramIdentityConflict();
+          } catch (err) {
+            const message = mapUsernameError(err);
+            console.info("[peptix:username]", {
+              operation: "apply_telegram_reauth_username",
+              flow: "link",
+              reason: "post_link_failed",
+              error: message.slice(0, 180),
+            });
+            toast.error(message);
+          }
+        }
+
         await finish(OAUTH_SUCCESS_PATH);
         return;
       }

@@ -14,13 +14,10 @@ import {
   signOut,
   startTelegramAccountLink,
   TELEGRAM_OAUTH_PROVIDER,
-  userHasTelegramIdentity,
 } from "@/services/auth";
 import {
-  applyTelegramReauthUsername,
   clearTelegramIdentityConflict,
   clearTelegramTransferIntent,
-  clearUsernameChangeEligible,
   createTelegramTransferIntent,
   hasTelegramIdentityConflict,
   isUsernameChangeRequest,
@@ -29,69 +26,30 @@ import {
   storeTelegramTransferIntent,
 } from "@/services/username";
 
+/**
+ * Username / Telegram-linking duty page.
+ * Normal Telegram login of an already-linked account must never land here just because
+ * preferred_username differs from profiles.username — see shouldPromptForUsername.
+ */
 export default function UsernameRequiredPage() {
-  const { user, profile, loading, refreshProfile } = useAuth();
+  const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
   const needsUsername = shouldPromptForUsername({ loading, user, profile });
   const isReauth = isUsernameChangeRequest(profile);
   const destination = POST_LOGIN_PATH;
   const currentHandle = publicUsername(profile);
-  const hasTelegram = userHasTelegramIdentity(user);
 
   const [reauthError, setReauthError] = React.useState<string | null>(null);
-  const [reauthBusy, setReauthBusy] = React.useState(false);
   const [telegramBusy, setTelegramBusy] = React.useState(false);
   const [transferBusy, setTransferBusy] = React.useState(false);
   const [showTransferConfirm, setShowTransferConfirm] = React.useState(() => hasTelegramIdentityConflict());
-  const applyAttempted = React.useRef(false);
+
   React.useEffect(() => {
     if (loading) return;
     if (!needsUsername) {
       navigate(destination, { replace: true });
     }
   }, [loading, needsUsername, destination, navigate]);
-
-  React.useEffect(() => {
-    if (!isReauth || !needsUsername || loading || applyAttempted.current) return;
-    if (showTransferConfirm) return;
-    // After linkIdentity / Telegram reauth the JWT provider may still be email.
-    // Apply when a Telegram identity is present; the RPC enforces freshness.
-    if (!hasTelegram) return;
-    applyAttempted.current = true;
-    let cancelled = false;
-
-    async function tryApply() {
-      setReauthBusy(true);
-      setReauthError(null);
-      try {
-        await applyTelegramReauthUsername();
-        if (user?.id) clearUsernameChangeEligible(user.id);
-        clearTelegramIdentityConflict();
-        clearTelegramTransferIntent();
-        await refreshProfile();
-        if (!cancelled) navigate(destination, { replace: true });
-      } catch (err) {
-        if (!cancelled) setReauthError(mapUsernameError(err));
-      } finally {
-        if (!cancelled) setReauthBusy(false);
-      }
-    }
-
-    void tryApply();
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    isReauth,
-    needsUsername,
-    loading,
-    hasTelegram,
-    showTransferConfirm,
-    user?.id,
-    refreshProfile,
-    navigate,
-    destination,
-  ]);
 
   async function handleSignOut() {
     clearTelegramIdentityConflict();
@@ -106,6 +64,7 @@ export default function UsernameRequiredPage() {
     try {
       // Keep the existing PEPTIX session. linkIdentity attaches Telegram to this
       // auth.users.id. Never signOut first — that would allow a duplicate account.
+      // Username apply runs in AuthCallback only for flowKind === "link".
       await startTelegramAccountLink(user);
     } catch (error) {
       setReauthError(mapAuthError(error));
@@ -179,9 +138,6 @@ export default function UsernameRequiredPage() {
                 <p className="font-medium">@{currentHandle}</p>
               </div>
             ) : null}
-            {reauthBusy ? (
-              <p className="text-sm text-muted-foreground">Telegram Benutzername wird übernommen …</p>
-            ) : null}
             {reauthError ? <p className="text-xs text-destructive">{reauthError}</p> : null}
 
             {showTransferConfirm ? (
@@ -214,7 +170,6 @@ export default function UsernameRequiredPage() {
                   type="button"
                   className="w-full"
                   loading={telegramBusy}
-                  disabled={reauthBusy}
                   onClick={() => void handleTelegramLink()}
                 >
                   Mit Telegram anmelden

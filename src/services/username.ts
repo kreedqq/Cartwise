@@ -190,18 +190,36 @@ export function mapUsernameError(error: unknown): string {
 
 /**
  * Initial missing username → always prompt.
- * Admin Telegram linking → only after a fresh SIGNED_IN in this browser session.
- * Profile stays read-only either way.
+ * Admin Telegram linking request → only when the account has no custom:telegram yet,
+ * and only after a fresh SIGNED_IN in this browser session.
+ *
+ * Accounts that already have Telegram must not hit this gate on normal login:
+ * preferred_username must not overwrite an existing profiles.username.
  */
 export function shouldPromptForUsername(input: {
   loading: boolean;
-  user: { id: string } | null;
+  user: {
+    id: string;
+    identities?: Array<{ provider?: string | null }> | null;
+  } | null;
   profile: { username: string | null; username_required_on_next_login?: boolean } | null;
 }): boolean {
   if (input.loading || !input.user || !input.profile) return false;
   const hasUsername = Boolean(input.profile.username?.trim());
   if (!hasUsername) return true;
   if (!input.profile.username_required_on_next_login) return false;
+  const hasTelegram = Boolean(
+    input.user.identities?.some((identity) => identity.provider === "custom:telegram"),
+  );
+  if (hasTelegram) {
+    console.info("[peptix:username]", {
+      operation: "shouldPromptForUsername",
+      reason: "skip_gate_already_has_telegram",
+      currentUsername: input.profile.username,
+      usernameRequired: true,
+    });
+    return false;
+  }
   return isUsernameChangeEligible(input.user.id);
 }
 

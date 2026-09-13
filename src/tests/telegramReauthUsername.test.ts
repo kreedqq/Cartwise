@@ -137,12 +137,12 @@ describe("telegram reauth client gate", () => {
     ).toBe(false);
   });
 
-  it("prompts for reauth only after SIGNED_IN eligibility", () => {
+  it("prompts for reauth only after SIGNED_IN eligibility when Telegram is not linked", () => {
     markUsernameChangeEligible("u1");
     expect(
       shouldPromptForUsername({
         loading: false,
-        user: { id: "u1" },
+        user: { id: "u1", identities: [{ provider: "email" }] },
         profile: { username: "ExampleUser", username_required_on_next_login: true },
       }),
     ).toBe(true);
@@ -150,8 +150,22 @@ describe("telegram reauth client gate", () => {
     expect(
       shouldPromptForUsername({
         loading: false,
-        user: { id: "u1" },
+        user: { id: "u1", identities: [{ provider: "email" }] },
         profile: { username: "ExampleUser", username_required_on_next_login: true },
+      }),
+    ).toBe(false);
+  });
+
+  it("never prompts for username overwrite when custom:telegram is already linked", () => {
+    markUsernameChangeEligible("u1");
+    expect(
+      shouldPromptForUsername({
+        loading: false,
+        user: {
+          id: "u1",
+          identities: [{ provider: "email" }, { provider: "discord" }, { provider: "custom:telegram" }],
+        },
+        profile: { username: "Pepsidryage", username_required_on_next_login: true },
       }),
     ).toBe(false);
   });
@@ -196,14 +210,20 @@ describe("telegram linking UI wiring", () => {
     expect(page).toContain("Telegram Anmeldung erforderlich");
     expect(page).toContain("Mit Telegram anmelden");
     expect(page).toContain("bestehender PEPTIX Account");
-    expect(page).toContain("applyTelegramReauthUsername");
     expect(page).toContain("startTelegramAccountLink");
-    expect(page).toContain("userHasTelegramIdentity");
+    expect(page).not.toContain("applyTelegramReauthUsername");
     const linkHandler = page.slice(page.indexOf("async function handleTelegramLink"), page.indexOf("async function handleConfirmTransfer"));
     expect(linkHandler).toContain("startTelegramAccountLink");
     expect(linkHandler).not.toMatch(/await\s+signOut\s*\(/);
     expect(page).not.toContain("Telegram Benutzername aktualisieren");
     expect(page).not.toContain("Neuer Telegram Benutzername");
+  });
+
+  it("applies Telegram username only after Flow B link callback, never on normal login", () => {
+    const callback = read("src/pages/AuthCallback.tsx");
+    expect(callback).toContain("applyTelegramReauthUsername");
+    expect(callback).toContain('flowKind === "link"');
+    expect(callback).toContain("post_link_success");
   });
 
   it("exchanges OAuth codes even when a session already exists (linkIdentity)", () => {

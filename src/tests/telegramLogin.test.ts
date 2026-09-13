@@ -326,7 +326,9 @@ describe("Telegram identity without insecure merge", () => {
     expect(usernameService).toContain("set_username");
     expect(usernameService).toContain("apply_telegram_reauth_username");
     expect(usernameService).toContain("shouldPromptForUsername");
-    expect(reauthPage).toContain("applyTelegramReauthUsername");
+    expect(reauthPage).toContain("startTelegramAccountLink");
+    expect(reauthPage).not.toContain("applyTelegramReauthUsername");
+    expect(readSource("src/pages/AuthCallback.tsx")).toContain("applyTelegramReauthUsername");
     expect(reauthPage).toContain("Mit Telegram anmelden");
   });
 
