@@ -144,15 +144,15 @@ export default function AdminUsersPage() {
   async function handleUsernameRequired(user: UserWithRoles, required: boolean) {
     setFlagLoading(true);
     try {
-      await adminSetUsernameRequired(user.id, required);
+      const stored = await adminSetUsernameRequired(user.id, required);
       toast.success(
-        required
-          ? "Telegram Anmeldung beim nächsten Login erzwungen."
-          : "Telegram Anmeldung-Anforderung widerrufen.",
+        stored
+          ? "Telegram Anmeldung beim nächsten Login erzwungen (in DB gespeichert)."
+          : "Telegram Anmeldung-Anforderung widerrufen (in DB gespeichert).",
       );
       await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       setManaged((current) =>
-        current && current.id === user.id ? { ...current, usernameRequiredOnNextLogin: required } : current,
+        current && current.id === user.id ? { ...current, usernameRequiredOnNextLogin: stored } : current,
       );
       setRequestTarget(null);
     } catch (error) {
@@ -234,11 +234,13 @@ export default function AdminUsersPage() {
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground">{formatDateTime(u.createdAt)}</TableCell>
                           <TableCell className="text-sm">
-                            {u.usernameRequiredOnNextLogin
-                              ? "Telegram Anmeldung angefordert"
-                              : u.username
-                                ? "✓ Gesperrt"
-                                : "Ohne Username"}
+                            {u.hasTelegramIdentity
+                              ? "Telegram verknüpft"
+                              : u.usernameRequiredOnNextLogin
+                                ? "Telegram Anmeldung angefordert"
+                                : u.username
+                                  ? "✓ Gesperrt"
+                                  : "Ohne Username"}
                           </TableCell>
                           <TableCell className="text-right">
                             <Button variant="outline" size="sm" onClick={() => setManaged(u)}>
@@ -275,11 +277,13 @@ export default function AdminUsersPage() {
                         <div className="flex justify-between gap-3">
                           <dt>Status</dt>
                           <dd>
-                            {u.usernameRequiredOnNextLogin
-                              ? "Telegram Anmeldung angefordert"
-                              : u.username
-                                ? "✓ Gesperrt"
-                                : "Ohne Username"}
+                            {u.hasTelegramIdentity
+                              ? "Telegram verknüpft"
+                              : u.usernameRequiredOnNextLogin
+                                ? "Telegram Anmeldung angefordert"
+                                : u.username
+                                  ? "✓ Gesperrt"
+                                  : "Ohne Username"}
                           </dd>
                         </div>
                       </dl>
@@ -316,18 +320,37 @@ export default function AdminUsersPage() {
                   <p className="text-sm font-medium">{adminUserTelegramLabel(managed.username)}</p>
                   <p className="text-xs text-muted-foreground">
                     Status:{" "}
-                    {managed.usernameRequiredOnNextLogin
-                      ? "Telegram Anmeldung beim nächsten Login angefordert"
-                      : managed.username
-                        ? "✓ Gesperrt"
-                        : "Noch nicht gesetzt"}
+                    {managed.hasTelegramIdentity
+                      ? "Telegram bereits verknüpft"
+                      : managed.usernameRequiredOnNextLogin
+                        ? "Telegram Anmeldung beim nächsten Login angefordert"
+                        : managed.username
+                          ? "✓ Gesperrt"
+                          : "Noch nicht gesetzt"}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <Button variant="outline" size="sm" onClick={() => openUsernameEditor(managed)}>
                     {managed.username ? "Benutzername bearbeiten" : "Benutzername festlegen"}
                   </Button>
-                  {managed.usernameRequiredOnNextLogin ? (
+                  {managed.hasTelegramIdentity ? (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground">
+                        Erzwingen gilt nur für Konten ohne Telegram-Verknüpfung. Normaler Telegram-Login bleibt ohne
+                        Username-Gate.
+                      </p>
+                      {managed.usernameRequiredOnNextLogin ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={flagLoading}
+                          onClick={() => void handleUsernameRequired(managed, false)}
+                        >
+                          Veraltete Anforderung widerrufen
+                        </Button>
+                      ) : null}
+                    </div>
+                  ) : managed.usernameRequiredOnNextLogin ? (
                     <Button
                       variant="outline"
                       size="sm"
@@ -481,7 +504,7 @@ export default function AdminUsersPage() {
         open={!!requestTarget}
         onOpenChange={(open) => !open && setRequestTarget(null)}
         title="Telegram Anmeldung erzwingen?"
-        description="Beim nächsten Login muss sich der Benutzer mit Telegram anmelden. PEPTIX übernimmt dann automatisch den verifizierten Telegram Benutzernamen. Danach ist der Benutzername wieder gesperrt."
+        description="Beim nächsten E-Mail-Login muss sich der Benutzer mit Telegram anmelden und die Identity an dieses PEPTIX Konto verknüpfen. Gilt nur, wenn noch keine Telegram-Verknüpfung existiert. Danach ist der Benutzername gesperrt."
         confirmLabel="Erzwingen"
         cancelLabel="Abbrechen"
         loading={flagLoading}

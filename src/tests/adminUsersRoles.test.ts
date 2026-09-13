@@ -62,13 +62,43 @@ describe("admin username-required and delete RPCs", () => {
     from.mockReset();
   });
 
-  it("sets the per-user flag through admin_set_username_required", async () => {
+  it("sets the per-user flag through admin_set_username_required and reads it back", async () => {
     rpc.mockResolvedValue({ data: null, error: null });
-    await adminSetUsernameRequired("user-2", true);
+    from.mockImplementation((table: string) => {
+      if (table === "profiles") {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: { username_required_on_next_login: true },
+                error: null,
+              }),
+            }),
+          }),
+        };
+      }
+      return { select: async () => ({ data: [], error: null }) };
+    });
+    await expect(adminSetUsernameRequired("user-2", true)).resolves.toBe(true);
     expect(rpc).toHaveBeenCalledWith("admin_set_username_required", {
       _user_id: "user-2",
       _required: true,
     });
+  });
+
+  it("rejects enable when read-back does not match", async () => {
+    rpc.mockResolvedValue({ data: null, error: null });
+    from.mockImplementation(() => ({
+      select: () => ({
+        eq: () => ({
+          maybeSingle: async () => ({
+            data: { username_required_on_next_login: false },
+            error: null,
+          }),
+        }),
+      }),
+    }));
+    await expect(adminSetUsernameRequired("user-2", true)).rejects.toThrow(/nicht in der Datenbank/i);
   });
 
   it("sets a username through admin_set_username", async () => {
@@ -88,6 +118,12 @@ describe("admin username-required and delete RPCs", () => {
   });
 
   it("lists username_required_on_next_login for the admin table", async () => {
+    rpc.mockImplementation(async (name: string) => {
+      if (name === "admin_list_telegram_linked_user_ids") {
+        return { data: ["user-with-telegram"], error: null };
+      }
+      return { data: null, error: null };
+    });
     from.mockImplementation((table: string) => {
       if (table === "profiles") {
         return {
@@ -100,6 +136,12 @@ describe("admin username-required and delete RPCs", () => {
                   created_at: "2026-09-02T00:00:00.000Z",
                   username_required_on_next_login: true,
                 },
+                {
+                  id: "user-with-telegram",
+                  username: "Linked",
+                  created_at: "2026-09-02T00:00:00.000Z",
+                  username_required_on_next_login: false,
+                },
               ],
               error: null,
             }),
@@ -107,7 +149,13 @@ describe("admin username-required and delete RPCs", () => {
         };
       }
       return {
-        select: async () => ({ data: [{ user_id: "user-2", role: "user" }], error: null }),
+        select: async () => ({
+          data: [
+            { user_id: "user-2", role: "user" },
+            { user_id: "user-with-telegram", role: "user" },
+          ],
+          error: null,
+        }),
       };
     });
     const users = await listUsersWithRoles();
@@ -118,8 +166,27 @@ describe("admin username-required and delete RPCs", () => {
         createdAt: "2026-09-02T00:00:00.000Z",
         roles: ["user"],
         usernameRequiredOnNextLogin: true,
+        hasTelegramIdentity: false,
+      },
+      {
+        id: "user-with-telegram",
+        username: "Linked",
+        createdAt: "2026-09-02T00:00:00.000Z",
+        roles: ["user"],
+        usernameRequiredOnNextLogin: false,
+        hasTelegramIdentity: true,
       },
     ]);
+  });
+});
+
+describe("0079 admin telegram required only without telegram", () => {
+  const sql = readSource("supabase/migrations/0079_admin_telegram_required_only_without_telegram.sql");
+
+  it("refuses enable when custom:telegram already exists", () => {
+    expect(sql).toContain("custom:telegram");
+    expect(sql).toContain("bereits mit Telegram verknüpft");
+    expect(sql).toContain("admin_list_telegram_linked_user_ids");
   });
 });
 

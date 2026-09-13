@@ -14,6 +14,7 @@ function user(overrides: Partial<UserWithRoles> & { id: string; username: string
     createdAt: "2026-01-01T00:00:00.000Z",
     roles: [],
     usernameRequiredOnNextLogin: false,
+    hasTelegramIdentity: false,
     ...overrides,
   };
 }
