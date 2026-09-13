@@ -1,7 +1,14 @@
 import * as React from "react";
+import type { CSSProperties } from "react";
 
 import { DEFAULT_SHOP_AREA, type ShopAreaKey, type ShopPricingProfile } from "@/lib/shop/shopAreas";
-import { areaThemeCssVars, EMPTY_AREA_THEME, type AreaThemeConfig } from "@/lib/shop/areaTheme";
+import {
+  AREA_THEME_BUTTON_CLASS,
+  areaButtonRadiusCss,
+  areaThemeCssVars,
+  EMPTY_AREA_THEME,
+  type AreaThemeConfig,
+} from "@/lib/shop/areaTheme";
 
 interface ShopAreaContextValue {
   shopArea: ShopAreaKey;
@@ -32,7 +39,14 @@ export function ShopAreaProvider({
   );
   return (
     <ShopAreaContext.Provider value={value}>
-      <div data-shop-area={shopArea} style={areaThemeCssVars(theme)}>
+      <div
+        data-shop-area={shopArea}
+        className={AREA_THEME_BUTTON_CLASS}
+        style={{
+          ...areaThemeCssVars(theme),
+          "--area-button-radius": areaButtonRadiusCss(theme.buttons.radius),
+        } as CSSProperties}
+      >
         {children}
       </div>
     </ShopAreaContext.Provider>

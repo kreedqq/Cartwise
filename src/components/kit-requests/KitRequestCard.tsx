@@ -17,6 +17,11 @@ function statusVariant(status: KitRequestCard["status"], remaining: number): "de
   return "secondary";
 }
 
+function creatorHandle(username: string): string {
+  const trimmed = username.trim().replace(/^@+/, "");
+  return trimmed ? `@${trimmed}` : "Unbekannt";
+}
+
 interface KitRequestCardViewProps {
   request: KitRequestCard;
   onJoin?: (request: KitRequestCard) => void;
@@ -45,32 +50,34 @@ export function KitRequestCardView({
     request.myQuantity > 0 && request.myUnitPriceUsd != null
       ? request.myUnitPriceUsd * request.myQuantity
       : request.myUnitPriceUsd;
+  const remainingLabel =
+    request.remainingVials === 1
+      ? "Noch 1 Platz"
+      : `Noch ${request.remainingVials} Plätze`;
 
   return (
-    <article className="flex h-full min-w-0 flex-col gap-3 rounded-2xl border border-border bg-card p-4">
-      <div className="flex items-start justify-between gap-2">
+    <article className="flex h-full min-w-0 flex-col rounded-2xl border border-border bg-card">
+      <header className="flex items-start justify-between gap-3 px-4 pt-4">
         <div className="min-w-0">
-          <h3 className="truncate text-base font-semibold leading-tight">{request.productName}</h3>
-          <p className="truncate text-sm text-muted-foreground">{request.variantLabel}</p>
+          <h3 className="truncate text-base font-semibold leading-tight tracking-tight">
+            {request.productName}
+          </h3>
+          <p className="mt-0.5 truncate text-sm text-muted-foreground">{request.variantLabel}</p>
         </div>
-        <Badge variant={statusVariant(request.status, request.remainingVials)}>
+        <Badge className="shrink-0" variant={statusVariant(request.status, request.remainingVials)}>
           {kitRequestCustomerStatusLabel(request.status, request.remainingVials)}
         </Badge>
-      </div>
-      {!request.isCreator && !request.isParticipant ? (
-        <p className="truncate text-xs text-muted-foreground">
-          Telegram Benutzername {request.creatorUsername}
-        </p>
-      ) : null}
+      </header>
 
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between gap-2 text-sm">
-          <span className="font-medium">
-            {request.allocatedTotal} von {request.kitSizeVials} Vials vergeben
-          </span>
-          <span className="text-muted-foreground">{percent} %</span>
+      <div className="space-y-2 px-4 pt-4">
+        <div className="flex items-baseline justify-between gap-2">
+          <p className="text-lg font-semibold tabular-nums leading-none">
+            {request.allocatedTotal} / {request.kitSizeVials}{" "}
+            <span className="text-sm font-medium text-muted-foreground">Kit</span>
+          </p>
+          <p className="text-xs tabular-nums text-muted-foreground">{percent} %</p>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+        <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
           <div
             className="h-full rounded-full bg-primary transition-[width]"
             style={{ width: `${percent}%` }}
@@ -82,19 +89,27 @@ export function KitRequestCardView({
           />
         </div>
         {request.status === "open" ? (
-          <p className="text-sm">Noch {request.remainingVials} verfügbar</p>
+          <p className="text-sm text-muted-foreground">{remainingLabel}</p>
         ) : request.status === "full" ? (
           <p className="text-sm font-medium text-primary">Kit vollständig</p>
         ) : null}
       </div>
 
-      {sharePriceUsd != null ? (
-        <DualCurrencyPrice usd={sharePriceUsd} rate={rateQuery.data?.rate ?? null} size="catalog" />
-      ) : null}
+      <div className="mt-auto flex flex-col gap-3 px-4 pb-4 pt-4">
+        {sharePriceUsd != null ? (
+          <div>
+            <p className="text-xs text-muted-foreground">Dein Anteil</p>
+            <DualCurrencyPrice
+              usd={sharePriceUsd}
+              rate={rateQuery.data?.rate ?? null}
+              size="catalog"
+              className="[&_[data-currency=eur]]:text-xl"
+            />
+          </div>
+        ) : null}
 
-      {request.note ? <p className="line-clamp-2 text-sm text-muted-foreground">{request.note}</p> : null}
+        {request.note ? <p className="line-clamp-2 text-sm text-muted-foreground">{request.note}</p> : null}
 
-      <div className="mt-auto flex flex-col gap-2">
         {canJoin && onJoin ? (
           <Button className="min-h-11 w-full" onClick={() => onJoin(request)} disabled={joining}>
             Mitmachen
@@ -120,6 +135,11 @@ export function KitRequestCardView({
             Warenkorb aktualisieren
           </Button>
         ) : null}
+
+        <p className="truncate text-[11px] text-muted-foreground">
+          von {creatorHandle(request.creatorUsername)}
+          <span className="sr-only"> Telegram Benutzername</span>
+        </p>
       </div>
     </article>
   );

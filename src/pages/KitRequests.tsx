@@ -1,11 +1,12 @@
 import * as React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { Layers, Plus } from "lucide-react";
+import { Layers } from "lucide-react";
 
 import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitRequestDialog";
 import { JoinKitRequestDialog } from "@/components/kit-requests/JoinKitRequestDialog";
 import { KitRequestCardView } from "@/components/kit-requests/KitRequestCard";
 import { KitRequestFilterBar } from "@/components/kit-requests/KitRequestFilterBar";
+import { CreateKitRequestButton, KitRequestIntro } from "@/components/kit-requests/KitRequestIntro";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -43,11 +44,13 @@ import {
 } from "@/lib/shop/shopAreas";
 import {
   KIT_REQUEST_CARD_GRID,
+  KIT_REQUEST_TAB_TRIGGER_CLASS,
+  KIT_REQUEST_TABS_LIST_CLASS,
   kitRequestStatusLabel,
   type KitRequestSort,
 } from "@/lib/kitRequests";
 import { shopGroupsForCategory } from "@/lib/shop/display";
-import { productsInAreaCategory, visibleStorefrontCategories } from "@/lib/shop/areaCategories";
+import { catalogProductsForKitFilters, visibleStorefrontCategories } from "@/lib/shop/areaCategories";
 import type { KitRequestCard } from "@/services/kitRequests";
 
 const PAGE_SIZE = 20;
@@ -102,9 +105,7 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
   const groups = React.useMemo(() => {
     const catalog = productsQuery.data ?? [];
     const assignments = storefrontQuery.data?.assignments ?? [];
-    const scoped = category
-      ? productsInAreaCategory(catalog, assignments, category)
-      : catalog.filter((product) => assignments.some((row) => row.product_id === product.id));
+    const scoped = catalogProductsForKitFilters(catalog, assignments, category);
     return shopGroupsForCategory(scoped, null);
   }, [category, productsQuery.data, storefrontQuery.data?.assignments]);
 
@@ -159,28 +160,24 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
   }
 
   return (
-    <div className="min-w-0 space-y-8">
-      <PageHeader
-        eyebrow={areaName}
-        title={areaName}
-        description="Finde andere Kunden, die dasselbe Kit bestellen möchten."
-        actions={
-          <Button className="min-h-11 w-full sm:w-auto" onClick={() => setCreateOpen(true)}>
-            <Plus className="h-4 w-4" />
-            + Kit Gesuch
-          </Button>
-        }
+    <div className="min-w-0 space-y-4">
+      <PageHeader eyebrow={areaName} title={areaName} description="Finde andere Kunden, die dasselbe Kit bestellen möchten." />
+      <KitRequestIntro
+        action={<CreateKitRequestButton onClick={() => setCreateOpen(true)} />}
       />
+      <div className="sm:hidden">
+        <CreateKitRequestButton onClick={() => setCreateOpen(true)} />
+      </div>
 
       <Tabs value={tab} onValueChange={setTab} className="min-w-0">
-        <TabsList className="flex h-auto w-full flex-nowrap justify-start gap-1 overflow-x-auto">
-          <TabsTrigger value="open" className="shrink-0">
+        <TabsList className={KIT_REQUEST_TABS_LIST_CLASS}>
+          <TabsTrigger value="open" className={KIT_REQUEST_TAB_TRIGGER_CLASS}>
             Offene Kit Gesuche
           </TabsTrigger>
-          <TabsTrigger value="mine" className="shrink-0">
+          <TabsTrigger value="mine" className={KIT_REQUEST_TAB_TRIGGER_CLASS}>
             Von mir erstellt
           </TabsTrigger>
-          <TabsTrigger value="joined" className="shrink-0">
+          <TabsTrigger value="joined" className={KIT_REQUEST_TAB_TRIGGER_CLASS}>
             Meine Kit Beteiligungen
           </TabsTrigger>
         </TabsList>
@@ -256,7 +253,8 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
             <EmptyState
               icon={Layers}
               title="Keine offenen Kit Gesuche"
-              description="Teile ein Kit, wenn du nicht das ganze Kit allein brauchst."
+              description="Aktuell gibt es keine passenden offenen Gesuche."
+              action={<CreateKitRequestButton onClick={() => setCreateOpen(true)} />}
             />
           ) : null}
 
@@ -305,7 +303,12 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
             <ErrorState message="Deine Gesuche konnten nicht geladen werden." onRetry={() => void mineQuery.refetch()} />
           ) : null}
           {mineQuery.data && myRequests.length === 0 ? (
-            <EmptyState icon={Layers} title="Noch keine eigenen Gesuche" description="Erstelle ein Kit-Gesuch, um Teilnehmer zu finden." />
+            <EmptyState
+              icon={Layers}
+              title="Noch keine eigenen Gesuche"
+              description="Erstelle ein Gesuch, um Teilnehmer zu finden."
+              action={<CreateKitRequestButton onClick={() => setCreateOpen(true)} />}
+            />
           ) : null}
           <div className={KIT_REQUEST_CARD_GRID}>
             {myRequests.map((item) => (
@@ -395,7 +398,7 @@ function StatusFilter({ value, onChange }: { value: string; onChange: (value: st
     <div className="max-w-xs space-y-1.5">
       <Label>Status</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="min-h-11 w-full">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

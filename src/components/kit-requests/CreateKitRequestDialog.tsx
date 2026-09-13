@@ -15,7 +15,12 @@ import { toast } from "@/components/ui/toaster";
 import { Search } from "lucide-react";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { useCreateKitRequest, useKitRequestableProductIds } from "@/hooks/useKitRequests";
-import { isValidCreatorQuantity, kitRequestFailureMessage } from "@/lib/kitRequests";
+import {
+  isKitRequestableProductId,
+  isValidCreatorQuantity,
+  kitRequestFailureMessage,
+  KIT_REQUEST_NOT_SHAREABLE_MESSAGE,
+} from "@/lib/kitRequests";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import type { ShopAreaKey } from "@/lib/shop/shopAreas";
 import {
@@ -83,14 +88,7 @@ function CreateKitRequestWizard({
     () => (requestableQuery.data == null ? null : new Set(requestableQuery.data)),
     [requestableQuery.data],
   );
-  const groups = React.useMemo(() => {
-    return groupAndSortShopProducts(productsQuery.data ?? [])
-      .map((group) => ({
-        ...group,
-        variants: kitRequestableVariants(group.variants, requestableIds),
-      }))
-      .filter((group) => group.variants.length > 0);
-  }, [productsQuery.data, requestableIds]);
+  const groups = React.useMemo(() => groupAndSortShopProducts(productsQuery.data ?? []), [productsQuery.data]);
 
   const preset = (() => {
     if (!initialProductId) return { groupKey: "", productId: "" };
@@ -102,7 +100,8 @@ function CreateKitRequestWizard({
     return { groupKey: "", productId: initialProductId };
   })();
 
-  const [step, setStep] = React.useState(initialProductId ? 2 : 0);
+  const initialRequestable = isKitRequestableProductId(initialProductId, requestableIds);
+  const [step, setStep] = React.useState(initialProductId ? (initialRequestable ? 2 : 1) : 0);
   const [pickedGroupKey, setPickedGroupKey] = React.useState<string | undefined>(undefined);
   const [pickedProductId, setPickedProductId] = React.useState<string | undefined>(undefined);
   const [productSearch, setProductSearch] = React.useState("");
@@ -140,8 +139,10 @@ function CreateKitRequestWizard({
     ? kitShareParticipantBaseUsd(selectedProduct, kitSize, creatorQuantity, creatorQuantity)
     : null;
 
+  const selectedIsRequestable = isKitRequestableProductId(selectedProduct?.id, requestableIds);
+
   function close() {
-    setStep(initialProductId ? 2 : 0);
+    setStep(initialProductId ? (initialRequestable ? 2 : 1) : 0);
     setPickedGroupKey(undefined);
     setPickedProductId(undefined);
     setProductSearch("");
@@ -155,14 +156,20 @@ function CreateKitRequestWizard({
 
   function canContinue() {
     if (step === 0) return Boolean(groupKey);
-    if (step === 1) return Boolean(selectedProduct);
-    if (step >= 2) return Boolean(selectedProduct) && isValidCreatorQuantity(kitSize, creatorQuantity);
+    if (step === 1) return Boolean(selectedProduct) && selectedIsRequestable;
+    if (step >= 2) {
+      return Boolean(selectedProduct) && selectedIsRequestable && isValidCreatorQuantity(kitSize, creatorQuantity);
+    }
     return true;
   }
 
   async function handleCreate() {
     if (!selectedProduct) {
       toast.error("Bitte wähle Produkt und Variante.");
+      return;
+    }
+    if (!isKitRequestableProductId(selectedProduct.id, requestableIds)) {
+      toast.error(KIT_REQUEST_NOT_SHAREABLE_MESSAGE);
       return;
     }
     if (!isValidCreatorQuantity(kitSize, creatorQuantity)) {
@@ -259,7 +266,9 @@ function CreateKitRequestWizard({
                           subtitle={
                             group.variants.length === 1
                               ? formatProductVariant(group.variants[0])
-                              : "Mehrere Varianten"
+                              : kitRequestableVariants(group.variants, requestableIds).length === 0
+                                ? KIT_REQUEST_NOT_SHAREABLE_MESSAGE
+                                : "Mehrere Varianten"
                           }
                         />
                     ))}
@@ -280,14 +289,19 @@ function CreateKitRequestWizard({
 
             {step === 1 ? (
               <div className="grid gap-2">
-                {variants.map((variant) => (
-                  <ChoiceButton
-                    key={variant.id}
-                    active={productId === variant.id}
-                    onClick={() => setPickedProductId(variant.id)}
-                    title={formatProductVariant(variant)}
-                  />
-                ))}
+                {variants.map((variant) => {
+                  const requestable = isKitRequestableProductId(variant.id, requestableIds);
+                  return (
+                    <ChoiceButton
+                      key={variant.id}
+                      active={productId === variant.id}
+                      disabled={!requestable}
+                      onClick={() => setPickedProductId(variant.id)}
+                      title={formatProductVariant(variant)}
+                      subtitle={requestable ? undefined : KIT_REQUEST_NOT_SHAREABLE_MESSAGE}
+                    />
+                  );
+                })}
               </div>
             ) : null}
 
@@ -409,19 +423,26 @@ function ChoiceButton({
   title,
   subtitle,
   onClick,
+  disabled,
 }: {
   active: boolean;
   title: string;
   subtitle?: string;
   onClick: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className={cn(
         "min-h-12 w-full rounded-xl border px-4 py-3 text-left transition-colors",
-        active ? "border-primary bg-primary/10 text-foreground" : "border-border hover:border-primary/50",
+        disabled
+          ? "cursor-not-allowed border-border/70 bg-secondary/30 text-muted-foreground"
+          : active
+            ? "border-primary bg-primary/10 text-foreground"
+            : "border-border hover:border-primary/50",
       )}
     >
       <p className="text-sm font-medium">{title}</p>

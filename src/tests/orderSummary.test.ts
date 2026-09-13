@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -5,7 +7,12 @@ import {
   buildProcessingOrderSummaryPrintHtml,
   printProcessingOrderSummary,
 } from "@/lib/orderSummaryExport";
-import { buildProcessingOrderSummary, ORDER_SUMMARY_CATEGORY_LABELS } from "@/lib/orderSummary";
+import {
+  aggregateMerchantQuantitiesByCode,
+  buildProcessingOrderSummary,
+  ORDER_SUMMARY_CATEGORY_LABELS,
+} from "@/lib/orderSummary";
+import { planPeptixOrderSummaryPages } from "@/lib/pdf/peptixOrderSummaryPdf";
 import { EMPTY_ORDER_TRACKING } from "@/lib/tracking";
 import type { Tables } from "@/types/database";
 
@@ -366,5 +373,96 @@ describe("processing order summary PDF", () => {
     expect(summary.customers[0]?.orderNumber).toBe("CN-2026-000034");
     expect(text).not.toContain("display_name");
     expect(text).not.toContain("1.25");
+    expect(text).toContain("GESAMTMENGE");
+  });
+});
+
+describe("merchant quantity totals", () => {
+  it("aggregates raw order items by product code, not display names or kit rows", () => {
+    const items = Array.from({ length: 10 }, (_, index) =>
+      makeItem({
+        id: `rt-${index}`,
+        order_id: `order-${index}`,
+        product_code_snapshot: "RT10",
+        product_name_snapshot: "Retatrutide 10 mg",
+        quantity: 2,
+      }),
+    );
+    expect(aggregateMerchantQuantitiesByCode(items)).toEqual([{ code: "RT10", quantity: 20 }]);
+  });
+
+  it("never merges different product codes", () => {
+    expect(
+      aggregateMerchantQuantitiesByCode([
+        makeItem({ id: "a", product_code_snapshot: "RT10", quantity: 2 }),
+        makeItem({ id: "b", product_code_snapshot: "RT30", quantity: 2 }),
+        makeItem({ id: "c", product_code_snapshot: "KP10", quantity: 15 }),
+        makeItem({ id: "d", product_code_snapshot: "BA3", quantity: 8 }),
+      ]),
+    ).toEqual([
+      { code: "BA3", quantity: 8 },
+      { code: "KP10", quantity: 15 },
+      { code: "RT10", quantity: 2 },
+      { code: "RT30", quantity: 2 },
+    ]);
+  });
+
+  it("sums kit participant quantities from order items instead of complete-kit display lines", () => {
+    const orders = Array.from({ length: 5 }, (_, index) =>
+      makeOrder({ id: `kit-${index}`, order_number: `CN-2026-0000${index}`, user_id: `user-${index}` }),
+    );
+    const items = orders.map((order, index) =>
+      makeItem({
+        id: `kit-item-${index}`,
+        order_id: order.id,
+        product_code_snapshot: "RT10",
+        quantity: 2,
+      }),
+    );
+    const summary = buildProcessingOrderSummary(orders, items);
+    expect(summary.merchantTotals).toEqual([{ code: "RT10", quantity: 10 }]);
+    expect(summary.merchantArticleCount).toBe(10);
+    expect(summary.merchantTotals.some((row) => row.quantity === 1 && row.code === "RT10")).toBe(false);
+  });
+
+  it("puts the dealer overview on its own additional page after the order pages", () => {
+    const pdf = readFileSync(resolve(process.cwd(), "src/lib/pdf/peptixOrderSummaryPdf.ts"), "utf8");
+    const customer = readFileSync(resolve(process.cwd(), "src/lib/orderExport.ts"), "utf8");
+    expect(pdf).toContain("HÄNDLER GESAMTÜBERSICHT");
+    expect(pdf).toContain("merchantTotals");
+    expect(pdf).toContain("GESAMTMENGE");
+    expect(pdf).toContain("[...product, ...orders, ...merchant]");
+    expect(customer).not.toContain("HÄNDLER GESAMTÜBERSICHT");
+    expect(readFileSync(resolve(process.cwd(), "src/lib/orderSummaryExport.ts"), "utf8")).toContain(
+      "buildPeptixOrderSummaryPdf",
+    );
+
+    const summary = buildProcessingOrderSummary(
+      [
+        makeOrder({ id: "a", order_number: "CN-1" }),
+        makeOrder({ id: "b", order_number: "CN-2", user_id: "user-2", telegram_username_snapshot: "Raff" }),
+      ],
+      [
+        makeItem({ id: "i1", order_id: "a", product_code_snapshot: "RT10", quantity: 2 }),
+        makeItem({ id: "i2", order_id: "b", product_code_snapshot: "RT10", quantity: 2 }),
+      ],
+    );
+    const pages = planPeptixOrderSummaryPages(summary);
+    const firstMerchant = pages.indexOf("HÄNDLER GESAMTÜBERSICHT");
+    const lastOrders = pages.lastIndexOf("BESTELLUNGEN");
+    expect(pages[0]).toBe("PEPTIDE");
+    expect(firstMerchant).toBeGreaterThan(0);
+    expect(lastOrders).toBeGreaterThanOrEqual(0);
+    expect(firstMerchant).toBe(lastOrders + 1);
+    expect(pages.at(-1)).toBe("HÄNDLER GESAMTÜBERSICHT");
+    expect(pages.filter((title) => title === "HÄNDLER GESAMTÜBERSICHT")).toHaveLength(1);
+
+    const bytes = buildProcessingOrderSummaryPdf(summary, "13.09.2026, 12:00");
+    const text = new TextDecoder("latin1").decode(bytes);
+    const count = text.match(/\/Count (\d+)/);
+    expect(Number(count?.[1])).toBe(pages.length);
+    expect(text.indexOf("PEPTIDE")).toBeGreaterThan(-1);
+    expect(text.indexOf("BESTELLUNGEN")).toBeGreaterThan(text.indexOf("PEPTIDE"));
+    expect(text.lastIndexOf("H")).toBeGreaterThan(-1);
   });
 });

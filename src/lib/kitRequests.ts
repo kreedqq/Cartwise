@@ -14,6 +14,7 @@ export const KIT_REQUEST_STATUS_LABELS: Record<KitRequestStatus, string> = {
 /** Customer-facing status. "Fast voll" is presentation only — the server status stays open. */
 export function kitRequestCustomerStatusLabel(status: string, remainingVials = Number.POSITIVE_INFINITY): string {
   if (status === "open" && remainingVials > 0 && remainingVials <= 2) return "Fast voll";
+  if (status === "cancelled") return "Abgebrochen";
   return kitRequestStatusLabel(status);
 }
 
@@ -42,11 +43,22 @@ export function isValidJoinQuantity(remaining: number, quantity: number): boolea
 }
 
 export const KIT_REQUEST_CARD_GRID =
-  "grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3";
+  "grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3";
 
 export function isValidCreatorQuantity(kitSize: number, creatorQuantity: number): boolean {
   return isValidKitSize(kitSize) && Number.isInteger(creatorQuantity) && creatorQuantity >= 1 && creatorQuantity < kitSize;
 }
+
+export const KIT_REQUEST_CREATE_LABEL = "Gesuch erstellen";
+
+export const KIT_REQUEST_NOT_SHAREABLE_MESSAGE =
+  "Dieses Produkt kann nicht als Kit Gesuch geteilt werden.";
+
+export const KIT_REQUEST_TABS_LIST_CLASS =
+  "flex h-auto min-h-11 w-full flex-wrap justify-start gap-1 overflow-x-auto rounded-xl bg-secondary/50 p-1";
+
+export const KIT_REQUEST_TAB_TRIGGER_CLASS =
+  "min-h-11 shrink-0 rounded-lg px-3 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-border";
 
 export const KIT_REQUEST_MUTATION_FAILED_MESSAGE =
   "Das hat leider nicht funktioniert. Dein Kit wurde nicht verändert. Bitte versuche es noch einmal.";

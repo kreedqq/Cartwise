@@ -59,7 +59,8 @@ describe("kit create wizard", () => {
     expect(shopTable).not.toMatch(/<KitShareDialog/);
     expect(shopMobile).toContain("CreateKitRequestDialog");
     expect(shopMobile).not.toMatch(/<KitShareDialog/);
-    expect(read("src/components/shop/KitShareDialog.tsx")).toContain("+ Kit Gesuch");
+    expect(read("src/components/shop/KitShareDialog.tsx")).toContain("KIT_REQUEST_CREATE_LABEL");
+    expect(read("src/components/shop/KitShareDialog.tsx")).not.toContain("+ Kit Gesuch");
   });
 
   it("keeps creator quantity and kit size on the existing engine", () => {

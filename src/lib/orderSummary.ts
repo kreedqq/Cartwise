@@ -81,6 +81,11 @@ export interface OrderSummaryGroup {
   lines: OrderSummaryLine[];
 }
 
+export interface MerchantQuantityTotal {
+  code: string;
+  quantity: number;
+}
+
 export interface ProcessingOrderSummary {
   orderCount: number;
   productCount: number;
@@ -92,6 +97,26 @@ export interface ProcessingOrderSummary {
   positionCount: number;
   personQuantityTotal: number;
   personLines: OrderSummaryPersonLine[];
+  merchantTotals: MerchantQuantityTotal[];
+  merchantArticleCount: number;
+}
+
+/** Raw order-item quantities grouped by product code. Never uses merged kit display lines. */
+export function aggregateMerchantQuantitiesByCode(
+  items: readonly Pick<Tables<"order_items">, "product_code_snapshot" | "quantity">[],
+): MerchantQuantityTotal[] {
+  const totals = new Map<string, number>();
+  for (const item of items) {
+    const code = normalizeProductCode(item.product_code_snapshot ?? "") || "—";
+    totals.set(code, (totals.get(code) ?? 0) + asQuantity(item.quantity));
+  }
+  return [...totals.entries()]
+    .map(([code, quantity]) => ({ code, quantity }))
+    .sort((a, b) => {
+      if (a.code === "—") return 1;
+      if (b.code === "—") return -1;
+      return a.code.localeCompare(b.code, "de");
+    });
 }
 
 export function isProcessingOrder(order: { status: string }): boolean {
@@ -494,6 +519,7 @@ export function buildProcessingOrderSummary(
     if (article !== 0) return article;
     return a.dose.localeCompare(b.dose, "de");
   });
+  const merchantTotals = aggregateMerchantQuantitiesByCode(processingItems);
   const personKeys = new Set(
     processing.map((order) =>
       order.telegram_username_snapshot?.trim()
@@ -513,5 +539,7 @@ export function buildProcessingOrderSummary(
     positionCount: personLines.length,
     personQuantityTotal: personLines.reduce((sum, line) => sum + line.quantity, 0),
     personLines,
+    merchantTotals,
+    merchantArticleCount: merchantTotals.reduce((sum, row) => sum + row.quantity, 0),
   };
 }

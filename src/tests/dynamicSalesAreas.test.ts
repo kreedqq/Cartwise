@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 
 import { slugifyShopAreaName } from "@/lib/shop/shopAreas";
 import { applyRoleMarkup } from "@/lib/money";
-import { areaThemeCssVars, parseAreaTheme } from "@/lib/shop/areaTheme";
+import { areaButtonRadiusCss, areaThemeCssVars, parseAreaTheme } from "@/lib/shop/areaTheme";
 
 function read(path: string): string {
   return readFileSync(resolve(process.cwd(), path), "utf8");
@@ -83,5 +83,18 @@ describe("area theme fallback", () => {
     expect(vars["--area-primary"]).toBe("#d4af37");
     expect(vars["--primary"]).toMatch(/^\d+ \d+% \d+%$/);
     expect(vars["--background"]).toMatch(/^\d+ \d+% \d+%$/);
+    expect(vars["--area-button-radius"]).toBe("0.5rem");
+    expect(areaButtonRadiusCss("none")).toBe("0px");
+    expect(areaButtonRadiusCss("sm")).toBe("0.25rem");
+    expect(areaButtonRadiusCss("md")).toBe("0.5rem");
+    expect(areaButtonRadiusCss("full")).toBe("9999px");
+    expect(parseAreaTheme({ enabled: true, buttons: { radius: "weird" } }).buttons.radius).toBe("md");
+    expect(
+      (areaThemeCssVars(parseAreaTheme({ enabled: true, buttons: { radius: "full" } })) as Record<string, string>)[
+        "--area-button-radius"
+      ],
+    ).toBe("9999px");
+    expect(read("src/context/ShopAreaContext.tsx")).toContain("AREA_THEME_BUTTON_CLASS");
+    expect(read("src/context/ShopAreaContext.tsx")).toContain("--area-button-radius");
   });
 });

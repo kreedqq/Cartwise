@@ -31,6 +31,7 @@ const BODY_ROWS = 17;
 const FOOTER_H = 24.09;
 const PRODUCT_COLS = [0, 79.4, 275, 354.3, 467.72];
 const ORDER_COLS = [0, 119, 204, 301, 467.72];
+const MERCHANT_COLS = [0, 233.86, 467.72];
 
 const HELVETICA_WIDTHS: number[] = [
   278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278,
@@ -246,16 +247,60 @@ function groupById(groups: OrderSummaryGroup[]): Map<ShopCategoryId, OrderSummar
   return new Map(groups.map((group) => [group.categoryId, group]));
 }
 
-function productPages(summary: ProcessingOrderSummary, exportedAt: string): string[] {
-  const { datum, zeitraum } = splitExportStamp(exportedAt);
-  const byId = groupById(summary.groups);
+function productPageSpecs(summary: ProcessingOrderSummary): Array<{ id: ShopCategoryId; title: string }> {
   const specs = [...PRODUCT_PAGE_CATEGORIES];
-  const water = byId.get("reconstitution-water");
+  const water = groupById(summary.groups).get("reconstitution-water");
   if (water && water.lines.length > 0) {
     specs.push({ id: "reconstitution-water", title: "RECONSTITUTION WATER" });
   }
+  return specs;
+}
+
+/** Page titles in export order. Merchant totals always start on their own page after BESTELLUNGEN. */
+export function planPeptixOrderSummaryPages(summary: ProcessingOrderSummary): string[] {
+  const titles: string[] = [];
+  const byId = groupById(summary.groups);
+  for (const spec of productPageSpecs(summary)) {
+    titles.push(...chunkRows(byId.get(spec.id)?.lines ?? [], BODY_ROWS).map(() => spec.title));
+  }
+  titles.push(...chunkRows(summary.personLines, BODY_ROWS).map(() => "BESTELLUNGEN"));
+  titles.push(...chunkRows(summary.merchantTotals ?? [], BODY_ROWS).map(() => "HÄNDLER GESAMTÜBERSICHT"));
+  return titles;
+}
+
+function merchantPages(summary: ProcessingOrderSummary, exportedAt: string, startPage: number): string[] {
+  const { datum, zeitraum } = splitExportStamp(exportedAt);
+  const rows = summary.merchantTotals ?? [];
+  const articleCount = summary.merchantArticleCount ?? rows.reduce((sum, row) => sum + row.quantity, 0);
+  return chunkRows(rows, BODY_ROWS).map((chunk, index) => {
+    const ops = [
+      ...chrome("HÄNDLER GESAMTÜBERSICHT", startPage + index, "GESAMTÜBERSICHT ALLER BESTELLUNGEN"),
+      ...metaBox(datum, `${summary.orderCount} Bestellungen`, zeitraum),
+      ...tableFrame(MERCHANT_COLS),
+      ...headerCells(MERCHANT_COLS, ["CODE", "GESAMTMENGE"]),
+    ];
+    chunk.forEach((row, rowIndex) => {
+      const y = TABLE_Y + TABLE_H - HEADER_H - (rowIndex + 1) * ROW_H + 7;
+      ops.push(...cellText(MERCHANT_COLS, y, [row.code, `${row.quantity}x`]));
+    });
+    ops.push(
+      ...cellText(
+        MERCHANT_COLS,
+        TABLE_Y + 8.2,
+        ["GESAMT ARTIKEL", String(articleCount)],
+        8.2,
+      ),
+    );
+    return contentStream(ops);
+  });
+}
+
+function productPages(summary: ProcessingOrderSummary, exportedAt: string, startPage = 1): string[] {
+  const { datum, zeitraum } = splitExportStamp(exportedAt);
+  const byId = groupById(summary.groups);
+  const specs = productPageSpecs(summary);
   const streams: string[] = [];
-  let pageNumber = 1;
+  let pageNumber = startPage;
   for (const spec of specs) {
     const group = byId.get(spec.id);
     const lines = group?.lines ?? [];
@@ -307,9 +352,10 @@ function orderPages(summary: ProcessingOrderSummary, startPage: number): string[
 }
 
 export function buildPeptixOrderSummaryPdf(summary: ProcessingOrderSummary, exportedAt: string): Uint8Array {
-  const product = productPages(summary, exportedAt);
+  const product = productPages(summary, exportedAt, 1);
   const orders = orderPages(summary, product.length + 1);
-  const contents = [...product, ...orders];
+  const merchant = merchantPages(summary, exportedAt, product.length + orders.length + 1);
+  const contents = [...product, ...orders, ...merchant];
   const jpeg = jpegImageXObject(templateLogoJpeg(), 630, 700);
   const pageObjectStart = 6 + contents.length;
   const pageRefs = contents.map((_, index) => `${pageObjectStart + index} 0 R`).join(" ");

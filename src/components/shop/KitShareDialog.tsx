@@ -24,6 +24,7 @@ import { toast } from "@/components/ui/toaster";
 import { QUERY_KEYS } from "@/lib/constants";
 import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { useKitRequestableProductIds } from "@/hooks/useKitRequests";
+import { KIT_REQUEST_CREATE_LABEL, KIT_REQUEST_NOT_SHAREABLE_MESSAGE } from "@/lib/kitRequests";
 import { useAuth } from "@/context/AuthProvider";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
@@ -689,7 +690,6 @@ export function KitShareDialog({
 
 export function KitShareButton({
   group,
-  selectedProductId,
   onClick,
 }: {
   group: ShopProductGroup;
@@ -700,9 +700,7 @@ export function KitShareButton({
   const requestableQuery = useKitRequestableProductIds(shopArea);
   const requestableIds = requestableQuery.data == null ? null : new Set(requestableQuery.data);
   const shareableVariants = kitRequestableVariants(group.variants, requestableIds);
-  if (shareableVariants.length === 0) return null;
-
-  const selectedIsShareable = shareableVariants.some((variant) => variant.id === selectedProductId);
+  const canCreate = shareableVariants.length > 0;
 
   return (
     <Button
@@ -711,11 +709,11 @@ export function KitShareButton({
       size="sm"
       className="h-9 shrink-0"
       onClick={onClick}
-      disabled={!selectedIsShareable}
-      title={!selectedIsShareable ? "Bitte zuerst eine Variante auswählen." : undefined}
+      disabled={!canCreate}
+      title={!canCreate ? KIT_REQUEST_NOT_SHAREABLE_MESSAGE : undefined}
     >
       <Users className="mr-1.5 h-4 w-4" />
-      + Kit Gesuch
+      {KIT_REQUEST_CREATE_LABEL}
     </Button>
   );
 }

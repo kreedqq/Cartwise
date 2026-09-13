@@ -36,6 +36,19 @@ describe("sales area designer", () => {
     expect(panel).toContain("Hero aktiv");
     expect(panel).toContain("uploadAreaDesignImage");
     expect(panel).toContain("Mitmachen");
+    expect(panel).toContain("Button Form");
+    const theme = read("src/lib/shop/areaTheme.ts");
+    expect(theme).toContain("Eckig");
+    expect(theme).toContain("Leicht abgerundet");
+    expect(theme).toContain("Abgerundet");
+    expect(theme).toContain("Pill");
+    expect(panel).toContain("Primary Button");
+    expect(panel).toContain("Secondary Button");
+    expect(panel).toContain("Gesuch erstellen");
+    expect(panel).toContain("AREA_BUTTON_RADIUS_OPTIONS");
+    expect(panel).toContain("areaButtonRadiusCss(draft.buttons.radius)");
+    expect(panel).toContain("Standard wiederherstellen");
+    expect(panel).toContain("Änderungen verwerfen");
     expect(panel).not.toContain("from(\"carts\")");
   });
 
@@ -68,5 +81,10 @@ describe("sales area designer", () => {
     expect(parseAreaTheme({ enabled: true, tokens: { primary: "#d4af37" } }).tokens.primary).toBe("#d4af37");
     expect(parseAreaTheme({}).background.mode).toBe("global");
     expect(parseAreaTheme({ hero: { enabled: true, title: "Zubehör" } }).hero.title).toBe("Zubehör");
+    expect(parseAreaTheme({}).buttons.radius).toBe("md");
+    expect(parseAreaTheme({ buttons: { radius: "full" } }).buttons.radius).toBe("full");
+    expect(parseAreaTheme({ buttons: { radius: "none" } }).buttons.radius).toBe("none");
+    expect(parseAreaTheme({ buttons: { radius: "lg" } }).buttons.radius).toBe("lg");
+    expect(EMPTY_AREA_THEME.buttons.radius).toBe("md");
   });
 });

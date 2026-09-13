@@ -11,12 +11,15 @@ import { toast } from "@/components/ui/toaster";
 import { AREA_ICON_OPTIONS } from "@/lib/shop/areaIcons";
 import {
   ADVANCED_COLOR_KEYS,
+  AREA_BUTTON_RADIUS_OPTIONS,
+  AREA_THEME_BUTTON_CLASS,
   AREA_THEME_PRESET_LABELS,
   AREA_THEME_PRESETS,
   BASIC_COLOR_KEYS,
   COLOR_FIELD_LABELS,
   COLOR_FIELD_USAGE,
   EMPTY_AREA_THEME,
+  areaButtonRadiusCss,
   areaThemeContrastWarning,
   areaThemeCssVars,
   improveThemeContrast,
@@ -649,26 +652,35 @@ function AreaDesignForm({
                   </div>
                 ) : null}
                 {section.id === "buttons" ? (
-                  <Field label="Button Radius">
-                    <Select
-                      value={draft.buttons.radius}
-                      onValueChange={(value) =>
-                        setDraft((current) => ({
-                          ...current,
-                          buttons: { radius: value as AreaThemeConfig["buttons"]["radius"] },
-                        }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sm">Klein</SelectItem>
-                        <SelectItem value="md">Mittel</SelectItem>
-                        <SelectItem value="lg">Groß</SelectItem>
-                        <SelectItem value="full">Rund</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <Field label="Button Form" hint="Gilt für primäre und sekundäre Buttons der Sales Area.">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      {AREA_BUTTON_RADIUS_OPTIONS.map((option) => {
+                        const active = draft.buttons.radius === option.value;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() =>
+                              setDraft((current) => ({
+                                ...current,
+                                buttons: { radius: option.value },
+                              }))
+                            }
+                            className={`min-h-11 rounded-xl border px-2 py-2 text-left transition-colors ${
+                              active ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
+                            }`}
+                          >
+                            <span
+                              className="mb-2 flex h-8 items-center justify-center bg-primary px-3 text-[11px] font-medium text-primary-foreground"
+                              style={{ borderRadius: option.css }}
+                            >
+                              {option.label === "Leicht abgerundet" ? "Leicht" : option.label === "Abgerundet" ? "Rund" : option.label}
+                            </span>
+                            <span className="block text-xs font-medium">{option.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </Field>
                 ) : null}
                 {section.id === "cards" ? (
@@ -913,12 +925,13 @@ function AreaDesignForm({
           <div className="mx-auto origin-top" style={{ width: Math.min(previewWidth, 440), maxWidth: "100%" }}>
             <div
               data-shop-area={area.key}
-              className="overflow-hidden rounded-xl border border-border"
+              className={`overflow-hidden rounded-xl border border-border ${AREA_THEME_BUTTON_CLASS}`}
               style={{
                 ...areaThemeCssVars(draft),
+                "--area-button-radius": areaButtonRadiusCss(draft.buttons.radius),
                 background: draft.tokens.background || undefined,
                 color: draft.tokens.text || undefined,
-              }}
+              } as React.CSSProperties}
             >
               <div className="border-b border-border px-4 py-3">
                 <p className="text-sm font-semibold" style={{ color: draft.tokens.heading || undefined }}>
@@ -932,6 +945,15 @@ function AreaDesignForm({
                 ) : null}
               </div>
               <div className="space-y-3 p-4">
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" size="sm">Primary Button</Button>
+                  <Button type="button" size="sm" variant="outline">Secondary Button</Button>
+                  <Button type="button" size="sm">Shop</Button>
+                  <Button type="button" size="sm" variant="outline">Group Buy</Button>
+                  <Button type="button" size="sm">In den Warenkorb</Button>
+                  <Button type="button" size="sm">Gesuch erstellen</Button>
+                  <Button type="button" size="sm">Mitmachen</Button>
+                </div>
                 {(previewScene === "shop" || previewScene === "product") && draft.hero.enabled ? (
                   <div className="rounded-lg bg-primary/10 px-3 py-2 text-xs">
                     Hero: {draft.hero.variant} · {draft.hero.buttonText || "ohne Button"}

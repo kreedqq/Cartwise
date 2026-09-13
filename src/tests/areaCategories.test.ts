@@ -8,6 +8,7 @@ import {
   effectiveAreaCategoryKey,
   kitRequestMatchesAreaCategory,
   parseImportedCategoryKey,
+  catalogProductsForKitFilters,
   productsInAreaCategory,
   visibleStorefrontCategories,
   type AreaCategory,
@@ -86,6 +87,19 @@ describe("area display categories", () => {
     const products = [{ id: "sap-kp30", code: "KP30" }];
     const assignments = [{ product_id: "sap-kp30", vendor_code: "KP30", category_key: "peptides" }];
     expect(productsInAreaCategory(products, assignments, "peptides")).toHaveLength(1);
+    const linkedMaster = [{ id: "master-ad5", code: "AD5" }, { id: "sap-ad10", code: "AD10" }];
+    const sapAssignments = [
+      { product_id: "sap-ad5", vendor_code: "AD5", category_key: "peptides" },
+      { product_id: "sap-ad10", vendor_code: "AD10", category_key: "peptides" },
+    ];
+    expect(catalogProductsForKitFilters(linkedMaster, sapAssignments, null).map((item) => item.code)).toEqual([
+      "AD5",
+      "AD10",
+    ]);
+    expect(catalogProductsForKitFilters(linkedMaster, sapAssignments, "peptides").map((item) => item.code)).toEqual([
+      "AD5",
+      "AD10",
+    ]);
     expect(effectiveAreaCategoryKey(null, "peptides")).toBe("peptides");
     expect(effectiveAreaCategoryKey("reconstitution-water", null)).toBe("reconstitution-water");
   });

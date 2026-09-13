@@ -56,6 +56,31 @@ export interface AreaBannerConfig {
   buttonHref: string;
 }
 
+export type AreaButtonRadius = "none" | "sm" | "md" | "lg" | "full";
+
+export const AREA_BUTTON_RADIUS_OPTIONS = [
+  { value: "none" as const, label: "Eckig", css: "0px" },
+  { value: "sm" as const, label: "Leicht abgerundet", css: "0.25rem" },
+  { value: "md" as const, label: "Abgerundet", css: "0.5rem" },
+  { value: "full" as const, label: "Pill", css: "9999px" },
+] as const;
+
+export function parseAreaButtonRadius(value: unknown): AreaButtonRadius {
+  if (value === "none" || value === "sm" || value === "lg" || value === "full") return value;
+  return "md";
+}
+
+export function areaButtonRadiusCss(radius: AreaButtonRadius): string {
+  if (radius === "none") return "0px";
+  if (radius === "sm") return "0.25rem";
+  if (radius === "lg") return "0.75rem";
+  if (radius === "full") return "9999px";
+  return "0.5rem";
+}
+
+export const AREA_THEME_BUTTON_CLASS =
+  "[&_button.inline-flex]:![border-radius:var(--area-button-radius,0.5rem)]";
+
 export interface AreaThemeConfig {
   enabled: boolean;
   density: "compact" | "balanced" | "spacious";
@@ -72,7 +97,7 @@ export interface AreaThemeConfig {
   categories: { display: "pills" | "tabs" | "cards" | "buttons" | "minimal" };
   products: { layout: "table" | "cards" | "hybrid"; radius: "sm" | "md" | "lg"; shadow: boolean };
   cards: { radius: "sm" | "md" | "lg"; border: boolean; shadow: boolean };
-  buttons: { radius: "sm" | "md" | "lg" | "full" };
+  buttons: { radius: AreaButtonRadius };
   typography: { scale: "sm" | "md" | "lg" };
   mobile: { heroHeight: "compact" | "standard" };
 }
@@ -398,8 +423,7 @@ export function parseAreaTheme(raw: unknown): AreaThemeConfig {
       shadow: cards.shadow === true,
     },
     buttons: {
-      radius:
-        buttons.radius === "sm" || buttons.radius === "lg" || buttons.radius === "full" ? buttons.radius : "md",
+      radius: parseAreaButtonRadius(buttons.radius),
     },
     typography: {
       scale: typography.scale === "sm" || typography.scale === "lg" ? typography.scale : "md",
@@ -502,6 +526,7 @@ export function areaThemeCssVars(theme: AreaThemeConfig): CSSProperties {
   if (t.button) vars["--area-button"] = t.button;
   if (t.buttonText) vars["--area-button-text"] = t.buttonText;
   if (t.mutedText) vars["--area-muted"] = t.mutedText;
+  vars["--area-button-radius"] = areaButtonRadiusCss(theme.buttons.radius);
 
   const primary = colorToHslChannels(t.button || t.primary);
   if (primary) {

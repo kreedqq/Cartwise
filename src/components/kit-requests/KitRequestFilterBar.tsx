@@ -54,14 +54,15 @@ export function KitRequestFilterBar({
   onSort,
 }: KitRequestFilterBarProps) {
   return (
-    <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-6">
+    <div className="grid min-w-0 grid-cols-1 gap-2 rounded-xl border border-border bg-card p-2.5 sm:grid-cols-2 sm:p-3 xl:grid-cols-6">
       <div className="space-y-1 sm:col-span-2 xl:col-span-2">
-        <Label htmlFor={searchId} className="text-xs">Suche</Label>
+        <Label htmlFor={searchId} className="text-[11px] text-muted-foreground">Suche</Label>
         <Input
           id={searchId}
           value={search}
           onChange={(event) => onSearch(event.target.value)}
           placeholder="Produkt suchen …"
+          className="min-h-11"
         />
       </div>
       <FilterSelect
@@ -143,9 +144,9 @@ function FilterSelect({
 }) {
   return (
     <div className="space-y-1">
-      <Label className="text-xs">{label}</Label>
+      <Label className="text-[11px] text-muted-foreground">{label}</Label>
       <Select value={value} onValueChange={onValueChange} disabled={disabled}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="min-h-11 w-full">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

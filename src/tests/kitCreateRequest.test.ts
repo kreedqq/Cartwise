@@ -81,9 +81,25 @@ describe("create_kit_request catalog identity", () => {
     );
   });
 
-  it("filters the wizard and shop create button with the existing catalog ids", () => {
-    expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toContain("kitRequestableVariants");
-    expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toContain("useCreateKitRequest");
+  it("keeps linked catalog groups visible and only disables vendor-only variants", () => {
+    const wizard = read("src/components/kit-requests/CreateKitRequestDialog.tsx");
+    const variants = [
+      { id: "master-ad5", code: "AD5", name: "Adamax 1032" },
+      { id: "area-ad10", code: "AD10", name: "Adamax 1032" },
+      { id: "master-au100", code: "AU100", name: "AHK-CU" },
+      { id: "area-au50", code: "AU50", name: "AHK-CU" },
+    ];
+    const requestable = new Set(["master-ad5", "master-au100"]);
+    expect(kitRequestableVariants(variants, requestable).map((item) => item.code)).toEqual(["AD5", "AU100"]);
+    expect(isKitRequestableProductId("master-ad5", requestable)).toBe(true);
+    expect(isKitRequestableProductId("area-ad10", requestable)).toBe(false);
+    expect(isKitRequestableProductId("master-au100", requestable)).toBe(true);
+    expect(isKitRequestableProductId("area-au50", requestable)).toBe(false);
+    expect(wizard).toContain("groupAndSortShopProducts(productsQuery.data ?? [])");
+    expect(wizard).toContain("isKitRequestableProductId");
+    expect(wizard).toContain("KIT_REQUEST_NOT_SHAREABLE_MESSAGE");
+    expect(wizard).toContain("kitRequestableVariants");
+    expect(wizard).not.toContain("filter((group) => group.variants.length > 0)");
     expect(read("src/components/shop/KitShareDialog.tsx")).toContain("kitRequestableVariants");
     expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("CreateKitRequestDialog");
     expect(read("src/services/kitRequests.ts")).toContain("list_kit_requestable_product_ids");

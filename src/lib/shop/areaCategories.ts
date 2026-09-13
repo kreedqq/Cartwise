@@ -166,6 +166,16 @@ export function productsInAreaCategory<T extends { id: string; code?: string }>(
   });
 }
 
+/** Area catalog is already scoped. Do not drop linked master ids that assignments store as sap.id. */
+export function catalogProductsForKitFilters<T extends { id: string; code?: string }>(
+  products: readonly T[],
+  assignments: readonly AreaCategoryAssignment[],
+  categoryKey: string | null,
+): T[] {
+  if (categoryKey) return productsInAreaCategory(products, assignments, categoryKey);
+  return [...products];
+}
+
 export function countProductsByAreaCategory(
   productIds: readonly string[],
   assignments: readonly AreaCategoryAssignment[],
