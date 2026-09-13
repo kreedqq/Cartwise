@@ -8,8 +8,14 @@ vi.mock("@/lib/supabaseClient", () => ({
   },
 }));
 
-const { createKitRequest, joinKitRequest, mapKitRequestCard, previewKitRequestJoin, syncCompletedKitRequestCarts } =
-  await import("@/services/kitRequests");
+const {
+  createKitRequest,
+  joinKitRequest,
+  listKitRequestableProductIds,
+  mapKitRequestCard,
+  previewKitRequestJoin,
+  syncCompletedKitRequestCarts,
+} = await import("@/services/kitRequests");
 
 const sampleCard = {
   id: "req-1",
@@ -89,6 +95,13 @@ describe("kitRequests service mapping", () => {
     });
     expect(rpc).not.toHaveBeenCalledWith("sync_completed_kit_request_carts", expect.anything());
     expect(card.status).toBe("open");
+  });
+
+  it("treats a missing kit-requestable RPC as unknown, not as an empty catalog", async () => {
+    rpc.mockResolvedValue({ data: null, error: { message: "function does not exist" } });
+    await expect(listKitRequestableProductIds("group_buy_1")).resolves.toBeNull();
+    rpc.mockResolvedValue({ data: ["prod-1"], error: null });
+    await expect(listKitRequestableProductIds("group_buy_1")).resolves.toEqual(["prod-1"]);
   });
 
   it("syncs carts only through sync_completed_kit_request_carts", async () => {

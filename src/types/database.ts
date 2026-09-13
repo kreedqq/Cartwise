@@ -1581,6 +1581,10 @@ export interface Database {
       };
       leave_kit_share: { Args: { _kit_share_id: string }; Returns: undefined };
       cancel_kit_share: { Args: { _kit_share_id: string }; Returns: undefined };
+      list_kit_requestable_product_ids: {
+        Args: { _shop_area: string };
+        Returns: string[];
+      };
       create_kit_request: {
         Args: {
           _product_id: string;

@@ -48,6 +48,34 @@ export function isValidCreatorQuantity(kitSize: number, creatorQuantity: number)
   return isValidKitSize(kitSize) && Number.isInteger(creatorQuantity) && creatorQuantity >= 1 && creatorQuantity < kitSize;
 }
 
+export const KIT_REQUEST_MUTATION_FAILED_MESSAGE =
+  "Das hat leider nicht funktioniert. Dein Kit wurde nicht verändert. Bitte versuche es noch einmal.";
+
+/** Customer toast stays generic. The real RPC/Postgrest detail stays in the console. */
+export function kitRequestFailureMessage(error: unknown): string {
+  const detail =
+    error instanceof Error
+      ? error.message
+      : error && typeof error === "object" && "message" in error
+        ? String((error as { message: unknown }).message)
+        : String(error);
+  console.error("kit request failed:", error, detail);
+  return KIT_REQUEST_MUTATION_FAILED_MESSAGE;
+}
+
+/**
+ * null = requestable set unknown (legacy RPC missing) → keep current catalog visible.
+ * A loaded set hides vendor-only rows that create_kit_request cannot store.
+ */
+export function isKitRequestableProductId(
+  productId: string | null | undefined,
+  requestableIds: ReadonlySet<string> | null,
+): boolean {
+  if (!productId) return false;
+  if (requestableIds == null) return true;
+  return requestableIds.has(productId);
+}
+
 const FORBIDDEN_PRICE_KEYS = /price|markup|einkauf|cost/i;
 const ALLOWED_OWN_PRICE_KEYS = new Set(["myPriceUsd", "myUnitPriceUsd"]);
 

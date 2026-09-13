@@ -14,7 +14,7 @@ import {
 import { toast } from "@/components/ui/toaster";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { useJoinKitRequest } from "@/hooks/useKitRequests";
-import { remainingQuantityOptions } from "@/lib/kitRequests";
+import { kitRequestFailureMessage, remainingQuantityOptions } from "@/lib/kitRequests";
 import { formatKitQuantity } from "@/lib/shop/kitUnits";
 import { isShopCategoryId, type ShopCategoryId } from "@/lib/shopCategories";
 import { previewKitRequestJoin, type KitRequestCard } from "@/services/kitRequests";
@@ -74,11 +74,7 @@ function JoinKitRequestDialogBody({
       setConfirmOpen(false);
       toast.success(full ? "Du bist dabei! Das Kit ist vollständig." : "Du bist dabei!");
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Das hat leider nicht funktioniert. Dein Kit wurde nicht verändert. Bitte versuche es noch einmal.",
-      );
+      toast.error(kitRequestFailureMessage(error));
     }
   }
 

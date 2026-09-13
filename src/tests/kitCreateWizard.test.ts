@@ -23,6 +23,8 @@ describe("kit create wizard", () => {
     expect(wizard).toContain("Suche nach einem Produkt oder wähle eines aus.");
     expect(wizard).toContain("Produkt suchen …");
     expect(wizard).toContain("shopGroupMatchesSearch");
+    expect(wizard).toContain("kitRequestableVariants");
+    expect(wizard).toContain("useKitRequestableProductIds");
     expect(wizard).toContain("Mehr anzeigen");
     expect(wizard).toContain("KIT_WIZARD_PRODUCT_PAGE_SIZE");
     expect(wizard).toContain("Welche Variante möchtest du?");
@@ -41,6 +43,8 @@ describe("kit create wizard", () => {
     expect(wizard).not.toContain("create_kit_share");
     expect(wizard).not.toContain("sync_completed_kit_request_carts");
     expect(wizard).not.toContain("useSyncKitRequestCarts");
+    expect(wizard).not.toContain("Adamax");
+    expect(wizard).not.toContain("AD10");
   });
 
   it("preselects a shop product and still uses create_kit_request", () => {

@@ -173,6 +173,15 @@ export async function getKitRequest(id: string): Promise<KitRequestCard> {
   return mapKitRequestCard(asRecord(data));
 }
 
+export async function listKitRequestableProductIds(shopArea: string): Promise<string[] | null> {
+  const { data, error } = await supabase.rpc("list_kit_requestable_product_ids", {
+    _shop_area: shopArea,
+  });
+  if (error) return null;
+  if (!Array.isArray(data)) return [];
+  return data.filter((id): id is string => typeof id === "string" && id.length > 0);
+}
+
 export async function createKitRequest(input: {
   productId: string;
   kitSizeVials: number;

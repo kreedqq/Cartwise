@@ -14,9 +14,9 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toaster";
 import { Search } from "lucide-react";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
-import { useCreateKitRequest } from "@/hooks/useKitRequests";
+import { useCreateKitRequest, useKitRequestableProductIds } from "@/hooks/useKitRequests";
+import { isValidCreatorQuantity, kitRequestFailureMessage } from "@/lib/kitRequests";
 import { useShopProducts } from "@/hooks/useShopProducts";
-import { isValidCreatorQuantity } from "@/lib/kitRequests";
 import type { ShopAreaKey } from "@/lib/shop/shopAreas";
 import {
   groupAndSortShopProducts,
@@ -25,7 +25,7 @@ import {
 } from "@/lib/shop/display";
 import { kitShareParticipantBaseUsd } from "@/lib/shop/kitSharePricing";
 import { KIT_SIZE_OPTIONS, formatKitSizeOption, kitCategoryIdFor } from "@/lib/shop/kitUnits";
-import { formatProductVariant, kitShareableVariants } from "@/lib/shop/variantCoverage";
+import { formatProductVariant, kitRequestableVariants } from "@/lib/shop/variantCoverage";
 import { cn } from "@/lib/utils";
 import type { Tables } from "@/types/database";
 
@@ -76,18 +76,26 @@ function CreateKitRequestWizard({
   onCreated?: (id: string) => void;
 }) {
   const productsQuery = useShopProducts(shopArea);
+  const requestableQuery = useKitRequestableProductIds(shopArea);
   const createMutation = useCreateKitRequest();
   const rateQuery = useExchangeRate();
-  const groups = React.useMemo(
-    () => groupAndSortShopProducts(productsQuery.data ?? []),
-    [productsQuery.data],
+  const requestableIds = React.useMemo(
+    () => (requestableQuery.data == null ? null : new Set(requestableQuery.data)),
+    [requestableQuery.data],
   );
+  const groups = React.useMemo(() => {
+    return groupAndSortShopProducts(productsQuery.data ?? [])
+      .map((group) => ({
+        ...group,
+        variants: kitRequestableVariants(group.variants, requestableIds),
+      }))
+      .filter((group) => group.variants.length > 0);
+  }, [productsQuery.data, requestableIds]);
 
   const preset = (() => {
     if (!initialProductId) return { groupKey: "", productId: "" };
     for (const group of groups) {
-      const shareable = kitShareableVariants(group.variants);
-      if (shareable.some((variant) => variant.id === initialProductId)) {
+      if (group.variants.some((variant) => variant.id === initialProductId)) {
         return { groupKey: group.groupKey, productId: initialProductId };
       }
     }
@@ -111,7 +119,7 @@ function CreateKitRequestWizard({
 
   const groupKey = pickedGroupKey ?? preset.groupKey;
   const selectedGroup = groups.find((group) => group.groupKey === groupKey || group.displayName === groupKey);
-  const variants = selectedGroup ? kitShareableVariants(selectedGroup.variants) : [];
+  const variants = selectedGroup?.variants ?? [];
   const productId =
     pickedProductId !== undefined
       ? pickedProductId || (variants.length === 1 ? variants[0].id : "")
@@ -176,11 +184,7 @@ function CreateKitRequestWizard({
         priceUsd: card.myPriceUsd,
       });
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Das hat leider nicht funktioniert. Dein Kit wurde nicht verändert. Bitte versuche es noch einmal.",
-      );
+      toast.error(kitRequestFailureMessage(error));
     }
   }
 
@@ -243,9 +247,7 @@ function CreateKitRequestWizard({
                   </p>
                 ) : (
                   <div className="grid gap-2">
-                    {visibleGroups.map((group) => {
-                      const shareable = kitShareableVariants(group.variants);
-                      return (
+                    {visibleGroups.map((group) => (
                         <ChoiceButton
                           key={group.groupKey}
                           active={groupKey === group.groupKey}
@@ -255,13 +257,12 @@ function CreateKitRequestWizard({
                           }}
                           title={group.displayName}
                           subtitle={
-                            shareable.length === 1
-                              ? formatProductVariant(shareable[0])
+                            group.variants.length === 1
+                              ? formatProductVariant(group.variants[0])
                               : "Mehrere Varianten"
                           }
                         />
-                      );
-                    })}
+                    ))}
                     {matchedGroups.length > visibleGroups.length ? (
                       <Button
                         type="button"

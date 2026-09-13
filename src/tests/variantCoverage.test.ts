@@ -5,6 +5,7 @@ import {
   formatOralVariantLabel,
   formatProductVariant,
   isKitShareableProduct,
+  kitRequestableVariants,
   kitShareableVariants,
   kitSizeVialsForProduct,
   parseVariantColumn,
@@ -182,5 +183,15 @@ describe("kitShareableVariants", () => {
     expect(kitSizeVialsForProduct(variants[0])).toBe(10);
     expect(kitSizeVialsForProduct(variants[1])).toBe(10);
     expect(kitSizeVialsForProduct(variants[2])).toBe(10);
+  });
+
+  it("hides vendor-only rows once kit-requestable ids are known", () => {
+    const variants = [
+      { id: "master-rt10", code: "RT10", name: "Retatrutide" },
+      { id: "area-ad10", code: "AD10", name: "Adamax 1032" },
+    ];
+    expect(kitRequestableVariants(variants, null).map((item) => item.code)).toEqual(["RT10", "AD10"]);
+    expect(kitRequestableVariants(variants, new Set(["master-rt10"])).map((item) => item.code)).toEqual(["RT10"]);
+    expect(kitRequestableVariants(variants, new Set())).toEqual([]);
   });
 });

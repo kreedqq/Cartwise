@@ -7,6 +7,7 @@ import {
   createKitRequest,
   joinKitRequest,
   leaveKitRequest,
+  listKitRequestableProductIds,
   listMyKitRequestParticipations,
   listMyKitRequests,
   listOpenKitRequests,
@@ -67,6 +68,14 @@ export function useInvalidateKitRequests() {
     void queryClient.invalidateQueries({ queryKey: ["carts"] });
     void queryClient.invalidateQueries({ queryKey: ["cart-summaries"] });
   };
+}
+
+export function useKitRequestableProductIds(shopArea: string) {
+  return useQuery({
+    queryKey: QUERY_KEYS.kitRequestableProductIds(shopArea),
+    queryFn: () => listKitRequestableProductIds(shopArea),
+    enabled: Boolean(shopArea),
+  });
 }
 
 export function useCreateKitRequest() {

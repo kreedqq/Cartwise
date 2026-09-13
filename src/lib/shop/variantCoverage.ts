@@ -232,6 +232,19 @@ export function kitShareableVariants<T extends { code: string }>(variants: reado
   return [...variants];
 }
 
+/**
+ * Marketplace create needs a real products.id. Unknown eligibility keeps the
+ * current list; a loaded set hides vendor-only area rows.
+ */
+export function kitRequestableVariants<T extends { id: string; code: string }>(
+  variants: readonly T[],
+  requestableIds: ReadonlySet<string> | null,
+): T[] {
+  const shareable = kitShareableVariants(variants);
+  if (requestableIds == null) return shareable;
+  return shareable.filter((variant) => requestableIds.has(variant.id));
+}
+
 /** Dropdown label: readable kit variant, e.g. "10x 20mg Vials". */
 export function variantStrengthLabel(
   product: { code: string; dosage_vial?: string | null; name: string },

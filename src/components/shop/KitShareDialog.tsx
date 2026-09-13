@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/toaster";
 import { QUERY_KEYS } from "@/lib/constants";
+import { useShopAreaContext } from "@/context/ShopAreaContext";
+import { useKitRequestableProductIds } from "@/hooks/useKitRequests";
 import { useAuth } from "@/context/AuthProvider";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
@@ -38,6 +40,7 @@ import {
   kitCategoryIdFor,
 } from "@/lib/shop/kitUnits";
 import {
+  kitRequestableVariants,
   kitShareableVariants,
   variantStrengthLabel,
 } from "@/lib/shop/variantCoverage";
@@ -693,11 +696,13 @@ export function KitShareButton({
   selectedProductId: string;
   onClick: () => void;
 }) {
-  const shareableVariants = kitShareableVariants(group.variants);
+  const { shopArea } = useShopAreaContext();
+  const requestableQuery = useKitRequestableProductIds(shopArea);
+  const requestableIds = requestableQuery.data == null ? null : new Set(requestableQuery.data);
+  const shareableVariants = kitRequestableVariants(group.variants, requestableIds);
   if (shareableVariants.length === 0) return null;
 
   const selectedIsShareable = shareableVariants.some((variant) => variant.id === selectedProductId);
-  const needsVariantPick = shareableVariants.length > 1 && !selectedIsShareable;
 
   return (
     <Button
@@ -706,8 +711,8 @@ export function KitShareButton({
       size="sm"
       className="h-9 shrink-0"
       onClick={onClick}
-      disabled={needsVariantPick}
-      title={needsVariantPick ? "Bitte zuerst eine Variante auswählen." : undefined}
+      disabled={!selectedIsShareable}
+      title={!selectedIsShareable ? "Bitte zuerst eine Variante auswählen." : undefined}
     >
       <Users className="mr-1.5 h-4 w-4" />
       + Kit Gesuch

@@ -24,6 +24,9 @@ describe("kit request lifecycle stays on the existing engine", () => {
     expect(wizard).toContain("useCreateKitRequest");
     expect(wizard).not.toContain("sync_completed_kit_request_carts");
     expect(wizard).not.toContain("create_kit_share");
+    expect(read("supabase/migrations/0072_kit_request_catalog_identity.sql")).not.toContain(
+      "sync_completed_kit_request_carts",
+    );
   });
 
   it("joins through preview + join and syncs only when full", () => {
