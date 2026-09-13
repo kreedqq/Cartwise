@@ -34,7 +34,10 @@ describe("kit customer UX", () => {
     expect(read("src/pages/GroupBuy.tsx")).toContain("AREA_PAGE_CONTENT_SLOT");
     expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("KitAreaActionNav");
     expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("KitRequestHint");
-    expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("Kit gemeinsam kaufen");
+    expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain(
+      "Teile ein Kit mit anderen Kunden und bezahle nur deinen Anteil.",
+    );
+    expect(read("src/components/kit-requests/KitRequestIntro.tsx")).not.toContain("Kit gemeinsam kaufen");
     expect(read("src/components/kit-requests/KitRequestIntro.tsx")).not.toContain("rounded-xl border border-border bg-card");
     expect(read("src/pages/GroupBuy.tsx")).toContain("Meine Kit Beteiligungen");
     expect(read("src/lib/kitRequests.ts")).toContain('KIT_REQUEST_CREATE_LABEL = "Gesuch erstellen"');

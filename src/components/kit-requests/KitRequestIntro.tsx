@@ -43,7 +43,6 @@ export function KitAreaActionNav({
 export function KitRequestHint({ className }: { className?: string }) {
   return (
     <p className={cn("max-w-2xl text-sm leading-relaxed text-muted-foreground", className)}>
-      <span className="font-medium text-foreground">Kit gemeinsam kaufen. </span>
       Teile ein Kit mit anderen Kunden und bezahle nur deinen Anteil.
     </p>
   );
