@@ -56,6 +56,97 @@ export async function applyTelegramReauthUsername(): Promise<string> {
   return String(data);
 }
 
+const TRANSFER_INTENT_KEY = "peptix:telegram-transfer-intent";
+const TRANSFER_CONFLICT_KEY = "peptix:telegram-identity-conflict";
+
+export function markTelegramIdentityConflict(): void {
+  try {
+    sessionStorage.setItem(TRANSFER_CONFLICT_KEY, "1");
+  } catch {
+    // ignore
+  }
+}
+
+export function clearTelegramIdentityConflict(): void {
+  try {
+    sessionStorage.removeItem(TRANSFER_CONFLICT_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+export function hasTelegramIdentityConflict(): boolean {
+  try {
+    return sessionStorage.getItem(TRANSFER_CONFLICT_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function storeTelegramTransferIntent(intentId: string): void {
+  try {
+    sessionStorage.setItem(TRANSFER_INTENT_KEY, intentId);
+  } catch {
+    // ignore
+  }
+}
+
+export function readTelegramTransferIntent(): string | null {
+  try {
+    return sessionStorage.getItem(TRANSFER_INTENT_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function clearTelegramTransferIntent(): void {
+  try {
+    sessionStorage.removeItem(TRANSFER_INTENT_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+/** Target user confirms the reassignment UI before Telegram ownership proof. */
+export async function createTelegramTransferIntent(): Promise<string> {
+  const { data, error } = await supabase.rpc("create_telegram_transfer_intent");
+  if (error) throw error;
+  return String(data);
+}
+
+export async function cancelTelegramTransferIntent(intentId: string): Promise<void> {
+  const { error } = await supabase.rpc("cancel_telegram_transfer_intent", { _intent_id: intentId });
+  if (error) throw error;
+}
+
+/**
+ * Called while signed in as the Telegram identity owner (source account)
+ * after a fresh Telegram OIDC login, with a pending intent for the target.
+ */
+export async function completeTelegramIdentityTransfer(intentId: string): Promise<string> {
+  const { data, error } = await supabase.rpc("complete_telegram_identity_transfer", {
+    _intent_id: intentId,
+  });
+  if (error) throw error;
+  return String(data);
+}
+
+export function isTelegramIdentityConflictError(error: unknown): boolean {
+  const raw =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : "";
+  const msg = raw.toLowerCase();
+  return (
+    msg.includes("identity_already_exists") ||
+    msg.includes("already linked") ||
+    msg.includes("identity is already linked") ||
+    msg.includes("bereits mit einem anderen peptix")
+  );
+}
+
 export function mapUsernameError(error: unknown): string {
   const raw = error instanceof Error ? error.message : typeof error === "string" ? error : "";
   if (/bereits verwendet|bereits vergeben/i.test(raw)) {
@@ -66,6 +157,9 @@ export function mapUsernameError(error: unknown): string {
   }
   if (/Kein verifizierter Telegram Benutzername/i.test(raw)) {
     return "Kein verifizierter Telegram Benutzername verfügbar. Bitte verwende ein Telegram-Konto mit Benutzername.";
+  }
+  if (/einzige Anmeldung des bisherigen PEPTIX Kontos/i.test(raw)) {
+    return "Dieses Telegram Konto ist die einzige Anmeldung des bisherigen PEPTIX Kontos und kann nicht übertragen werden.";
   }
   if (/Bitte melde dich mit Telegram an/i.test(raw)) {
     return "Bitte melde dich mit Telegram an. Dein bestehender PEPTIX Account wird anschließend mit deinem Telegram Konto verknüpft.";

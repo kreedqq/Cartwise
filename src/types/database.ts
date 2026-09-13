@@ -1576,6 +1576,18 @@ export interface Database {
         Args: Record<string, never>;
         Returns: string;
       };
+      create_telegram_transfer_intent: {
+        Args: Record<string, never>;
+        Returns: string;
+      };
+      cancel_telegram_transfer_intent: {
+        Args: { _intent_id: string };
+        Returns: undefined;
+      };
+      complete_telegram_identity_transfer: {
+        Args: { _intent_id: string };
+        Returns: string;
+      };
       admin_set_username: {
         Args: { _user_id: string; _username: string };
         Returns: string;

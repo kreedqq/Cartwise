@@ -4,7 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { toast } from "@/components/ui/toaster";
 import { supabase } from "@/lib/supabaseClient";
-import { completeOAuthCallback, mapAuthError, OAUTH_SUCCESS_PATH } from "@/services/auth";
+import { completeOAuthCallback, mapAuthError, OAUTH_SUCCESS_PATH, signOut } from "@/services/auth";
+import {
+  clearTelegramIdentityConflict,
+  clearTelegramTransferIntent,
+  clearUsernameChangeEligible,
+  completeTelegramIdentityTransfer,
+  isTelegramIdentityConflictError,
+  markTelegramIdentityConflict,
+  mapUsernameError,
+  readTelegramTransferIntent,
+} from "@/services/username";
 
 /**
  * Completes the OAuth PKCE round-trip. This route always renders HTML.
@@ -31,10 +41,14 @@ export default function AuthCallbackPage() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      // Transfer completion handles navigation itself.
+      if (readTelegramTransferIntent()) return;
       go(!!session);
     });
 
     async function complete() {
+      const transferIntentId = readTelegramTransferIntent();
+
       const result = await completeOAuthCallback({
         href: window.location.href,
         search: window.location.search,
@@ -43,15 +57,44 @@ export default function AuthCallbackPage() {
         exchangeCodeForSession: (url) => supabase.auth.exchangeCodeForSession(url),
       });
       if (cancelled) return;
+
       if (result.status === "authenticated") {
+        if (transferIntentId) {
+          window.clearTimeout(timeout);
+          try {
+            await completeTelegramIdentityTransfer(transferIntentId);
+            clearTelegramTransferIntent();
+            clearTelegramIdentityConflict();
+            const {
+              data: { session },
+            } = await supabase.auth.getSession();
+            if (session?.user?.id) clearUsernameChangeEligible(session.user.id);
+            await signOut();
+            toast.success("Telegram erfolgreich verknüpft. Bitte melde dich erneut mit E-Mail an.");
+            navigate("/login", { replace: true });
+          } catch (err) {
+            clearTelegramTransferIntent();
+            toast.error(mapUsernameError(err));
+            await signOut();
+            navigate("/login", { replace: true });
+          }
+          return;
+        }
         go(true);
         return;
       }
+
       if (result.status === "failed") {
         window.clearTimeout(timeout);
+        const { data } = await supabase.auth.getSession();
+        if (data.session && isTelegramIdentityConflictError(result.message)) {
+          markTelegramIdentityConflict();
+          toast("Telegram Konto bereits verknüpft");
+          navigate("/username-required", { replace: true });
+          return;
+        }
         toast.error(mapAuthError(result.message));
         // linkIdentity failures keep the existing PEPTIX session — return to the gate.
-        const { data } = await supabase.auth.getSession();
         navigate(data.session ? "/username-required" : "/login", { replace: true });
       }
     }

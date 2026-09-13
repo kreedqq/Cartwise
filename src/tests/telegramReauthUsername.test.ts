@@ -199,8 +199,7 @@ describe("telegram linking UI wiring", () => {
     expect(page).toContain("applyTelegramReauthUsername");
     expect(page).toContain("startTelegramAccountLink");
     expect(page).toContain("userHasTelegramIdentity");
-    expect(page).not.toContain("signInWithOAuth");
-    const linkHandler = page.slice(page.indexOf("async function handleTelegramLink"), page.indexOf("if (loading || !needsUsername)"));
+    const linkHandler = page.slice(page.indexOf("async function handleTelegramLink"), page.indexOf("async function handleConfirmTransfer"));
     expect(linkHandler).toContain("startTelegramAccountLink");
     expect(linkHandler).not.toMatch(/await\s+signOut\s*\(/);
     expect(page).not.toContain("Telegram Benutzername aktualisieren");
