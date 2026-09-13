@@ -79,6 +79,38 @@ describe("0076 telegram reauth username", () => {
   });
 });
 
+describe("0077 telegram identity linking RPC", () => {
+  const sql = read("supabase/migrations/0077_telegram_identity_linking.sql");
+
+  it("keeps preferred_username-only apply and does not rewrite 0076", () => {
+    expect(sql).toContain("apply_telegram_reauth_username");
+    expect(sql).toMatch(/identity_data->>'preferred_username'/);
+    expect(sql).not.toMatch(/identity_data->>'name'/);
+    expect(sql).not.toMatch(/identity_data->>'given_name'/);
+    expect(sql).not.toMatch(/identity_data->>'family_name'/);
+    expect(sql).not.toMatch(/identity_data->>'display_name'/);
+    expect(sql).not.toContain("0070_one_user_cart");
+  });
+
+  it("allows linkIdentity freshness without requiring JWT provider=custom:telegram alone", () => {
+    expect(sql).toContain("_fresh_telegram_jwt");
+    expect(sql).toContain("_fresh_linked_identity");
+    expect(sql).toContain("5 seconds");
+    expect(sql).toContain("5 minutes");
+    expect(sql).toContain("30 minutes");
+    expect(sql).toContain("app_metadata");
+    expect(sql).toContain("custom:telegram");
+  });
+
+  it("still fail-closes on missing preferred_username and duplicate username", () => {
+    expect(sql).toContain("Kein verifizierter Telegram Benutzername verfügbar");
+    expect(sql).toContain("Dieser Telegram Benutzername wird bereits verwendet.");
+    const missingIdx = sql.indexOf("Kein verifizierter Telegram Benutzername verfügbar");
+    const clearIdx = sql.lastIndexOf("username_required_on_next_login = false");
+    expect(clearIdx).toBeGreaterThan(missingIdx);
+  });
+});
+
 describe("telegram reauth client gate", () => {
   beforeEach(() => {
     sessionStorage.clear();
@@ -142,14 +174,14 @@ describe("telegram reauth client gate", () => {
     ).toMatch(/Kein verifizierter Telegram Benutzername/);
     expect(
       mapUsernameError(new Error("Bitte melde dich mit Telegram an, damit dein Telegram Benutzername aktualisiert werden kann.")),
-    ).toMatch(/melde dich mit Telegram/i);
+    ).toMatch(/bestehender PEPTIX Account|melde dich mit Telegram/i);
     expect(mapUsernameError(new Error("Dieser Telegram Benutzername wird bereits verwendet."))).toMatch(
       /bereits verwendet/,
     );
   });
 });
 
-describe("telegram reauth UI wiring", () => {
+describe("telegram linking UI wiring", () => {
   it("replaces free-text next-login admin action with Telegram reauth copy", () => {
     const page = read("src/pages/admin/AdminUsers.tsx");
     expect(page).toContain("Telegram Anmeldung beim nächsten Login erzwingen");
@@ -159,16 +191,28 @@ describe("telegram reauth UI wiring", () => {
     expect(page).not.toContain("Änderungsfreigabe widerrufen");
   });
 
-  it("shows Telegram CTA instead of a reauth username input form", () => {
+  it("shows Telegram linking CTA instead of signOut+signIn or a username form", () => {
     const page = read("src/pages/UsernameRequired.tsx");
     expect(page).toContain("Telegram Anmeldung erforderlich");
     expect(page).toContain("Mit Telegram anmelden");
+    expect(page).toContain("bestehender PEPTIX Account");
     expect(page).toContain("applyTelegramReauthUsername");
-    expect(page).toContain("TELEGRAM_OAUTH_PROVIDER");
-    expect(page).toContain("app_metadata?.provider");
-    expect(page).toContain("signOut");
+    expect(page).toContain("startTelegramAccountLink");
+    expect(page).toContain("userHasTelegramIdentity");
+    expect(page).not.toContain("signInWithOAuth");
+    const linkHandler = page.slice(page.indexOf("async function handleTelegramLink"), page.indexOf("if (loading || !needsUsername)"));
+    expect(linkHandler).toContain("startTelegramAccountLink");
+    expect(linkHandler).not.toMatch(/await\s+signOut\s*\(/);
     expect(page).not.toContain("Telegram Benutzername aktualisieren");
     expect(page).not.toContain("Neuer Telegram Benutzername");
+  });
+
+  it("exchanges OAuth codes even when a session already exists (linkIdentity)", () => {
+    const auth = read("src/services/auth.ts");
+    expect(auth).toContain("Always exchange when a code is present");
+    expect(auth).toContain("before.data.session");
+    const callback = read("src/pages/AuthCallback.tsx");
+    expect(callback).toContain("/username-required");
   });
 
   it("keeps initial claim form for users without a username", () => {

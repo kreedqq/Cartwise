@@ -6,7 +6,7 @@ export function usernameChangeEligibleKey(userId: string): string {
   return `${CHANGE_ELIGIBLE_PREFIX}${userId}`;
 }
 
-/** Mark that this browser session may show the admin-requested Telegram reauth gate. */
+/** Mark that this browser session may show the admin-requested Telegram linking gate. */
 export function markUsernameChangeEligible(userId: string): void {
   try {
     sessionStorage.setItem(usernameChangeEligibleKey(userId), "1");
@@ -46,8 +46,9 @@ export async function claimUsername(username: string): Promise<string> {
 }
 
 /**
- * Applies the verified Telegram OIDC preferred_username after admin reauth.
- * Server reads auth.identities only — never client-supplied names.
+ * Applies the verified Telegram OIDC preferred_username after admin-requested
+ * Telegram identity linking (or fresh Telegram session). Server reads
+ * auth.identities only — never client-supplied names.
  */
 export async function applyTelegramReauthUsername(): Promise<string> {
   const { data, error } = await supabase.rpc("apply_telegram_reauth_username");
@@ -67,7 +68,7 @@ export function mapUsernameError(error: unknown): string {
     return "Kein verifizierter Telegram Benutzername verfügbar. Bitte verwende ein Telegram-Konto mit Benutzername.";
   }
   if (/Bitte melde dich mit Telegram an/i.test(raw)) {
-    return "Bitte melde dich mit Telegram an, damit dein Telegram Benutzername aktualisiert werden kann.";
+    return "Bitte melde dich mit Telegram an. Dein bestehender PEPTIX Account wird anschließend mit deinem Telegram Konto verknüpft.";
   }
   if (/Keine Telegram Anmeldung angefordert/i.test(raw)) {
     return "Keine Telegram Anmeldung angefordert.";
@@ -80,7 +81,7 @@ export function mapUsernameError(error: unknown): string {
 
 /**
  * Initial missing username → always prompt.
- * Admin Telegram reauth → only after a fresh SIGNED_IN in this browser session.
+ * Admin Telegram linking → only after a fresh SIGNED_IN in this browser session.
  * Profile stays read-only either way.
  */
 export function shouldPromptForUsername(input: {
@@ -95,7 +96,7 @@ export function shouldPromptForUsername(input: {
   return isUsernameChangeEligible(input.user.id);
 }
 
-/** Admin-requested Telegram reauthentication (existing username + flag). */
+/** Admin-requested Telegram identity linking (existing username + flag). */
 export function isUsernameChangeRequest(profile: {
   username: string | null;
   username_required_on_next_login?: boolean;

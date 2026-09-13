@@ -1,23 +1,23 @@
-# Telegram Reauth Username (admin next-login)
+# Telegram Account Linking (admin next-login)
 
 ## Goal
-Replace free-text next-login username change with Telegram OIDC reauthentication that copies `preferred_username` from `auth.identities` (`custom:telegram`).
+Attach `custom:telegram` to the **existing** PEPTIX `auth.users` row via `linkIdentity`. Never create a second account with signOut + signInWithOAuth.
 
-## Security fix (pre-deploy)
-30-minute `last_sign_in_at` alone was insufficient: Email/Discord login after a recent Telegram link could consume the flag. `0076` now also requires:
-1. JWT `app_metadata.provider = custom:telegram`
-2. Telegram identity `last_sign_in_at >= JWT iat - 5 minutes`
-3. Absolute 30-minute ceiling
+## Status (this session)
+- Client: `linkTelegramIdentity` / `startTelegramAccountLink`; UsernameRequired no longer signs out before Telegram
+- Callback: exchange OAuth `code` even when a session already exists (required for linkIdentity)
+- Migration `0077_telegram_identity_linking.sql`: apply RPC accepts fresh linked identity (JWT may stay email) while keeping 0076 Path A + 30m ceiling
+- Tests updated; 0070 untouched; 0076 not rewritten
+- **Not done**: Manual Linking must be enabled in Supabase Auth Dashboard; `0077` not applied to prod; no commit/deploy; browser E2E pending
 
-## Architecture (reuse)
-- Flag: `profiles.username_required_on_next_login`
-- Admin RPC: `admin_set_username_required`
-- Admin direct edit: `admin_set_username` (clears flag)
-- Client gate: `SIGNED_IN` + sessionStorage
-- RPC: `apply_telegram_reauth_username`
-- `set_username`: initial claim only
+## Remaining
+1. Enable **Manual Linking** (Auth settings) on cartwise-prod
+2. Apply `0077` only after explicit approval (no blind `db push --linked`)
+3. Controlled QA: email user without Telegram → admin force → login → link → same `auth.users.id`
+4. Commit / deploy only when asked
 
-## Status
-- Migration ready for controlled production apply
-- Protected docs not part of this commit
-- Browser E2E needs interactive Telegram for `@Test`
+## Fail closed
+- Telegram identity already on another user
+- Duplicate `profiles.username`
+- Missing `preferred_username`
+- Email/Discord cannot consume the flag without fresh Telegram identity proof

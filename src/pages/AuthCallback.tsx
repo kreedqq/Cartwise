@@ -50,7 +50,9 @@ export default function AuthCallbackPage() {
       if (result.status === "failed") {
         window.clearTimeout(timeout);
         toast.error(mapAuthError(result.message));
-        navigate("/login", { replace: true });
+        // linkIdentity failures keep the existing PEPTIX session — return to the gate.
+        const { data } = await supabase.auth.getSession();
+        navigate(data.session ? "/username-required" : "/login", { replace: true });
       }
     }
 

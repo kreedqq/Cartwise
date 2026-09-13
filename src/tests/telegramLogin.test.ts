@@ -3,11 +3,13 @@ import { resolve } from "node:path";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 const signInWithOAuth = vi.fn();
+const linkIdentity = vi.fn();
 
 vi.mock("@/lib/supabaseClient", () => ({
   supabase: {
     auth: {
       signInWithOAuth: (...args: unknown[]) => signInWithOAuth(...args),
+      linkIdentity: (...args: unknown[]) => linkIdentity(...args),
     },
   },
 }));
@@ -15,6 +17,9 @@ vi.mock("@/lib/supabaseClient", () => ({
 const {
   getRedirectUrl,
   signInWithOAuth: startOAuth,
+  linkTelegramIdentity,
+  startTelegramAccountLink,
+  userHasTelegramIdentity,
   isSafeOAuthProviderUrl,
   isDiscordGoTrueAuthorizeUrl,
   isEnabledGoTrueOAuthAuthorizeUrl,
@@ -68,7 +73,12 @@ describe("Telegram OAuth provider", () => {
 describe("Telegram login", () => {
   beforeEach(() => {
     signInWithOAuth.mockReset();
+    linkIdentity.mockReset();
     signInWithOAuth.mockResolvedValue({
+      data: { url: TELEGRAM_AUTHORIZE, provider: TELEGRAM_OAUTH_PROVIDER },
+      error: null,
+    });
+    linkIdentity.mockResolvedValue({
       data: { url: TELEGRAM_AUTHORIZE, provider: TELEGRAM_OAUTH_PROVIDER },
       error: null,
     });
@@ -173,6 +183,68 @@ describe("Telegram redirect safety", () => {
   });
 });
 
+describe("Telegram identity linking", () => {
+  beforeEach(() => {
+    signInWithOAuth.mockReset();
+    linkIdentity.mockReset();
+    linkIdentity.mockResolvedValue({
+      data: { url: TELEGRAM_AUTHORIZE, provider: TELEGRAM_OAUTH_PROVIDER },
+      error: null,
+    });
+    signInWithOAuth.mockResolvedValue({
+      data: { url: TELEGRAM_AUTHORIZE, provider: TELEGRAM_OAUTH_PROVIDER },
+      error: null,
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("detects a linked custom:telegram identity on the Auth user", () => {
+    expect(userHasTelegramIdentity({ identities: [{ provider: "email" }] })).toBe(false);
+    expect(userHasTelegramIdentity({ identities: [{ provider: "custom:telegram" }] })).toBe(true);
+    expect(userHasTelegramIdentity(null)).toBe(false);
+  });
+
+  it("calls linkIdentity for users without a Telegram identity", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ url: TELEGRAM }));
+    const assign = vi.fn();
+    vi.stubGlobal("location", { origin: window.location.origin, assign });
+
+    await linkTelegramIdentity(fetchImpl);
+
+    expect(linkIdentity).toHaveBeenCalled();
+    expect(signInWithOAuth).not.toHaveBeenCalled();
+    const [payload] = linkIdentity.mock.calls[0] as [{ provider: string; options: Record<string, unknown> }];
+    expect(payload.provider).toBe("custom:telegram");
+    expect(payload.options.skipBrowserRedirect).toBe(true);
+    expect(payload.options.redirectTo).toBe(getRedirectUrl(OAUTH_CALLBACK_PATH));
+    expect(payload.options.scopes).toBe("openid profile");
+    expect(assign).toHaveBeenCalled();
+  });
+
+  it("uses linkIdentity when starting the admin linking flow without Telegram", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ url: TELEGRAM }));
+    const assign = vi.fn();
+    vi.stubGlobal("location", { origin: window.location.origin, assign });
+
+    await startTelegramAccountLink({ identities: [{ provider: "email" }] }, fetchImpl);
+    expect(linkIdentity).toHaveBeenCalled();
+    expect(signInWithOAuth).not.toHaveBeenCalled();
+  });
+
+  it("uses signInWithOAuth only when Telegram is already linked to this user", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ url: TELEGRAM }));
+    const assign = vi.fn();
+    vi.stubGlobal("location", { origin: window.location.origin, assign });
+
+    await startTelegramAccountLink({ identities: [{ provider: "custom:telegram" }] }, fetchImpl);
+    expect(signInWithOAuth).toHaveBeenCalled();
+    expect(linkIdentity).not.toHaveBeenCalled();
+  });
+});
+
 describe("Discord login remains unchanged", () => {
   beforeEach(() => {
     signInWithOAuth.mockReset();
@@ -210,8 +282,19 @@ describe("Telegram identity without insecure merge", () => {
     const combined = `${auth}\n${username}`;
     expect(combined).not.toMatch(/from\(["'`]profiles["'`]\).*username/i);
     expect(combined).not.toMatch(/SELECT\s+.*profiles.*username/i);
-    expect(combined).not.toMatch(/linkIdentity|mergeAccount|mergeUser/i);
     expect(auth).not.toMatch(/preferred_username/);
+    // Manual linkIdentity is allowed; automatic merge-by-username is not.
+    expect(combined).not.toMatch(/mergeAccount|mergeUser/i);
+  });
+
+  it("links Telegram to the signed-in user via linkIdentity (no signOut-first OAuth)", () => {
+    const auth = readSource("src/services/auth.ts");
+    const page = readSource("src/pages/UsernameRequired.tsx");
+    expect(auth).toContain("linkIdentity");
+    expect(auth).toContain("linkTelegramIdentity");
+    expect(auth).toContain("startTelegramAccountLink");
+    expect(page).toContain("startTelegramAccountLink");
+    expect(page).not.toMatch(/await signOut\(\);\s*\n\s*await signInWithOAuth/);
   });
 
   it("does not invent an email or use the Telegram handle as email", () => {

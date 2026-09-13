@@ -10,9 +10,9 @@ import { publicUsername } from "@/lib/username";
 import {
   mapAuthError,
   POST_LOGIN_PATH,
-  signInWithOAuth,
   signOut,
-  TELEGRAM_OAUTH_PROVIDER,
+  startTelegramAccountLink,
+  userHasTelegramIdentity,
 } from "@/services/auth";
 import {
   applyTelegramReauthUsername,
@@ -29,6 +29,7 @@ export default function UsernameRequiredPage() {
   const isReauth = isUsernameChangeRequest(profile);
   const destination = POST_LOGIN_PATH;
   const currentHandle = publicUsername(profile);
+  const hasTelegram = userHasTelegramIdentity(user);
 
   const [reauthError, setReauthError] = React.useState<string | null>(null);
   const [reauthBusy, setReauthBusy] = React.useState(false);
@@ -44,9 +45,9 @@ export default function UsernameRequiredPage() {
 
   React.useEffect(() => {
     if (!isReauth || !needsUsername || loading || applyAttempted.current) return;
-    // Only auto-apply when this session is already Telegram OIDC. Email/Discord
-    // sessions stay on the CTA; the server also rejects non-Telegram JWTs.
-    if (user?.app_metadata?.provider !== TELEGRAM_OAUTH_PROVIDER) return;
+    // After linkIdentity / Telegram reauth the JWT provider may still be email.
+    // Apply when a Telegram identity is present; the RPC enforces freshness.
+    if (!hasTelegram) return;
     applyAttempted.current = true;
     let cancelled = false;
 
@@ -69,21 +70,20 @@ export default function UsernameRequiredPage() {
     return () => {
       cancelled = true;
     };
-  }, [isReauth, needsUsername, loading, user?.id, user?.app_metadata?.provider, refreshProfile, navigate, destination]);
+  }, [isReauth, needsUsername, loading, hasTelegram, user?.id, refreshProfile, navigate, destination]);
 
   async function handleSignOut() {
     await signOut();
     navigate("/login", { replace: true });
   }
 
-  async function handleTelegramReauth() {
+  async function handleTelegramLink() {
     setTelegramBusy(true);
     setReauthError(null);
     try {
-      // End any Email/Discord session so the next auth is a real Telegram OIDC login
-      // for this browser — then apply_telegram_reauth_username can consume the flag.
-      await signOut();
-      await signInWithOAuth(TELEGRAM_OAUTH_PROVIDER);
+      // Keep the existing PEPTIX session. linkIdentity attaches Telegram to this
+      // auth.users.id. Never signOut first — that would allow a duplicate account.
+      await startTelegramAccountLink(user);
     } catch (error) {
       setReauthError(mapAuthError(error));
       setTelegramBusy(false);
@@ -101,8 +101,8 @@ export default function UsernameRequiredPage() {
             <>
               <h1 className="text-lg font-semibold">Telegram Anmeldung erforderlich</h1>
               <p className="text-sm text-muted-foreground">
-                Bitte melde dich mit Telegram an, damit dein Telegram Benutzername automatisch aktualisiert werden
-                kann.
+                Bitte melde dich mit Telegram an. Dein bestehender PEPTIX Account wird anschließend mit deinem Telegram
+                Konto verknüpft.
               </p>
             </>
           ) : (
@@ -132,13 +132,13 @@ export default function UsernameRequiredPage() {
               className="w-full"
               loading={telegramBusy}
               disabled={reauthBusy}
-              onClick={() => void handleTelegramReauth()}
+              onClick={() => void handleTelegramLink()}
             >
               Mit Telegram anmelden
             </Button>
             <p className="text-xs text-muted-foreground">
-              Nach erfolgreicher Telegram Anmeldung wird dein verifizierter Telegram Benutzername übernommen und
-              anschließend wieder gesperrt. E-Mail oder Discord können diesen Schritt nicht ersetzen.
+              Nach erfolgreicher Verknüpfung wird dein verifizierter Telegram Benutzername automatisch übernommen und
+              gesperrt. Es entsteht kein zweites PEPTIX Konto. E-Mail oder Discord können diesen Schritt nicht ersetzen.
             </p>
           </div>
         ) : (

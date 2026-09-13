@@ -313,6 +313,33 @@ describe("completeOAuthCallback", () => {
     expect(result).toEqual({ status: "authenticated" });
   });
 
+  it("fails linkIdentity when exchange errors but the prior session remains", async () => {
+    const result = await completeOAuthCallback({
+      href: "https://peptix.app/auth/callback?code=abc",
+      search: "?code=abc",
+      getSession: vi.fn().mockResolvedValue({ data: { session }, error: null }),
+      exchangeCodeForSession: vi.fn().mockResolvedValue({
+        error: { message: "Identity is already linked to another user" },
+      }),
+    });
+    expect(result).toEqual({
+      status: "failed",
+      message: "Identity is already linked to another user",
+    });
+  });
+
+  it("exchanges the code even when a session already exists", async () => {
+    const exchangeCodeForSession = vi.fn().mockResolvedValue({ error: null });
+    const result = await completeOAuthCallback({
+      href: "https://peptix.app/auth/callback?code=abc",
+      search: "?code=abc",
+      getSession: vi.fn().mockResolvedValue({ data: { session }, error: null }),
+      exchangeCodeForSession,
+    });
+    expect(exchangeCodeForSession).toHaveBeenCalled();
+    expect(result).toEqual({ status: "authenticated" });
+  });
+
   it("fails to login only when exchange fails and no session exists", async () => {
     const result = await completeOAuthCallback({
       href: "https://peptix.app/auth/callback?code=abc",

@@ -77,10 +77,6 @@ export async function completeOAuthCallback(args: {
   const oauthError = readOAuthCallbackError(args.search ?? "", args.hash ?? "");
   if (oauthError) return { status: "failed", message: oauthError };
 
-  const existing = await args.getSession();
-  if (existing.error) return { status: "failed", message: existing.error.message };
-  if (existing.data.session) return { status: "authenticated" };
-
   const hrefCode = (() => {
     try {
       return new URL(args.href).searchParams.get("code");
@@ -92,15 +88,31 @@ export async function completeOAuthCallback(args: {
   const searchCode = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search).get("code");
   const code = hrefCode ?? searchCode;
 
+  // Always exchange when a code is present — including linkIdentity returns while
+  // an email/Discord session already exists. Skipping exchange would leave the
+  // Telegram identity unlinked and keep auth.users.id only coincidentally stable.
   if (code) {
+    const before = await args.getSession();
+    if (before.error) return { status: "failed", message: before.error.message };
+
     const { error } = await args.exchangeCodeForSession(args.href);
     const after = await args.getSession();
-    if (after.data.session) return { status: "authenticated" };
+    if (after.data.session) {
+      // Link/sign-in code failed but a prior session remains → surface the error
+      // (e.g. Telegram already linked to another PEPTIX account).
+      if (error && before.data.session) {
+        return { status: "failed", message: error.message };
+      }
+      return { status: "authenticated" };
+    }
     if (error) return { status: "failed", message: error.message };
     if (after.error) return { status: "failed", message: after.error.message };
     return { status: "failed", message: "session missing" };
   }
 
+  const existing = await args.getSession();
+  if (existing.error) return { status: "failed", message: existing.error.message };
+  if (existing.data.session) return { status: "authenticated" };
   return { status: "pending" };
 }
 
@@ -327,6 +339,52 @@ export async function signInWithOAuth(provider: OAuthProvider, fetchImpl?: Fetch
   return data;
 }
 
+/** True when the Auth user already has a linked `custom:telegram` identity. */
+export function userHasTelegramIdentity(
+  user: { identities?: Array<{ provider?: string | null }> | null } | null | undefined,
+): boolean {
+  return Boolean(user?.identities?.some((identity) => identity.provider === TELEGRAM_OAUTH_PROVIDER));
+}
+
+/**
+ * Links Telegram OIDC to the **current** signed-in PEPTIX user (manual linking).
+ * Does not sign out and must not create a second auth.users row.
+ * Requires Dashboard → Auth → Enable Manual Linking.
+ */
+export async function linkTelegramIdentity(fetchImpl?: FetchLike) {
+  const origin = window.location.origin;
+  const { data, error } = await supabase.auth.linkIdentity({
+    // `custom:telegram` is a dashboard Custom OIDC id; supabase-js Provider is built-ins only.
+    provider: TELEGRAM_OAUTH_PROVIDER as "discord",
+    options: {
+      redirectTo: getRedirectUrl(OAUTH_CALLBACK_PATH),
+      skipBrowserRedirect: true,
+      scopes: TELEGRAM_OAUTH_SCOPES,
+      queryParams: { origin },
+    },
+  });
+  if (error) throw error;
+  if (!data.url) throw new Error("provider is not enabled");
+  const resolved = await resolveOAuthRedirectUrl(data.url, fetchImpl);
+  beginOAuthRedirect(withTelegramOriginParam(resolved, origin));
+  return data;
+}
+
+/**
+ * Admin-requested Telegram step while signed in:
+ * - no Telegram identity yet → linkIdentity (same auth.users.id)
+ * - already linked → fresh Telegram OAuth for that identity (same user when the same Telegram account is used)
+ * Never signs out first (that would allow a duplicate account on plain signInWithOAuth).
+ */
+export async function startTelegramAccountLink(user: {
+  identities?: Array<{ provider?: string | null }> | null;
+} | null, fetchImpl?: FetchLike) {
+  if (userHasTelegramIdentity(user)) {
+    return signInWithOAuth(TELEGRAM_OAUTH_PROVIDER, fetchImpl);
+  }
+  return linkTelegramIdentity(fetchImpl);
+}
+
 export function mapAuthError(error: unknown): string {
   const raw =
     error instanceof Error
@@ -355,8 +413,15 @@ export function mapAuthError(error: unknown): string {
   ) {
     return "Anmeldung abgebrochen. Du kannst es erneut versuchen.";
   }
-  if (msg.includes("identity_already_exists") || msg.includes("already linked")) {
-    return "Dieses Konto ist bereits mit einer anderen Anmeldung verknüpft. Bitte mit der ursprünglichen Methode anmelden.";
+  if (msg.includes("manual linking") || msg.includes("linking is disabled") || msg.includes("manual_linking")) {
+    return "Telegram-Verknüpfung ist serverseitig nicht aktiviert. Bitte kontaktiere den Support.";
+  }
+  if (
+    msg.includes("identity_already_exists") ||
+    msg.includes("already linked") ||
+    msg.includes("identity is already linked")
+  ) {
+    return "Dieses Telegram Konto ist bereits mit einem anderen PEPTIX Konto verknüpft.";
   }
   if (msg.includes("redirect") && (msg.includes("not allowed") || msg.includes("invalid"))) {
     return "Die Weiterleitungs-URL ist nicht erlaubt. Bitte versuche es erneut oder nutze E-Mail und Passwort.";
