@@ -12,6 +12,7 @@ Only material changes. Dates are local project days.
 ### Added
 
 - Migration `0089`: `customer_roles.can_use_kit_requests` (default false / fail closed). Seed: Group Buy = true. Server assert on create/join/preview/requestable; open list returns empty when denied; leave/list_my stay for existing participation. Admin role catalog checkbox + `get_my_can_use_kit_requests` for UI gating.
+- Migration `0090`: production verification guard after an initial 0089 history stub; confirms role flag + RPC patches.
 
 ### Notes
 

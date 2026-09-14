@@ -1,6 +1,7 @@
 -- 0089_kit_request_role_permission.sql
 -- Role-gated Kit Gesuche (fail closed). Extends customer_roles; does not touch
 -- 0070 / 0085 / 0086 / 0087. Admin kit RPCs stay admin-gated only.
+-- Uses exact-string patching (handles multi-line and single-line auth checks).
 
 alter table public.customer_roles
   add column if not exists can_use_kit_requests boolean not null default false;
@@ -8,7 +9,6 @@ alter table public.customer_roles
 comment on column public.customer_roles.can_use_kit_requests is
   'When true, users with this customer role may use Kit Gesuche (create/list/join). Fail closed: default false.';
 
--- Explicit seed: Group Buy allowed. NEU and all others stay false (fail closed).
 update public.customer_roles
 set can_use_kit_requests = true
 where upper(trim(name)) = 'GROUP BUY';
@@ -83,15 +83,21 @@ $$;
 revoke all on function public.get_my_can_use_kit_requests() from public, anon;
 grant execute on function public.get_my_can_use_kit_requests() to authenticated;
 
--- Patch customer-facing kit RPCs that require an active kit permission.
--- leave / list_my / cancel own: keep usable for existing participation (no assert).
--- get_kit_request: allow creator/participant without permission (patched below).
--- list_open: empty payload when denied (no data leak).
+-- create / join / preview / requestable
 do $mig$
 declare
   r record;
   def text;
   patched text;
+  needle_ml text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501';
+  end if;$n$;
+  insert_ml text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501';
+  end if;
+
+  perform public.assert_user_can_use_kit_requests(_uid);$n$;
+  needle_sl text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501'; end if;$n$;
+  insert_sl text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501'; end if;
+  perform public.assert_user_can_use_kit_requests(_uid);$n$;
 begin
   for r in
     select p.oid, p.proname
@@ -109,29 +115,40 @@ begin
     if position('assert_user_can_use_kit_requests' in def) > 0 then
       continue;
     end if;
-
-    patched := regexp_replace(
-      def,
-      E'(raise exception ''Nicht angemeldet\\.'' using errcode = ''42501'';\\s*end if;)',
-      E'\\1\n\n  perform public.assert_user_can_use_kit_requests(_uid);',
-      1,
-      'n'
-    );
-
-    if patched = def then
+    if position(needle_ml in def) > 0 then
+      patched := replace(def, needle_ml, insert_ml);
+    elsif position(needle_sl in def) > 0 then
+      patched := replace(def, needle_sl, insert_sl);
+    else
       raise exception '0089: could not patch % for kit permission assert', r.proname;
     end if;
-
     execute patched;
   end loop;
 end;
 $mig$;
 
--- get_kit_request: permission OR already involved (creator / participant).
+-- get_kit_request: permission OR creator/participant (CRLF and LF variants)
 do $mig$
 declare
   def text;
-  patched text;
+  needle_crlf text := E'if not found or not coalesce(_kit.is_open_request, false) then\r\n    raise exception ''Kit-Gesuch wurde nicht gefunden.'' using errcode = ''P0002'';\r\n  end if;';
+  insert_crlf text := E'if not found or not coalesce(_kit.is_open_request, false) then\r\n    raise exception ''Kit-Gesuch wurde nicht gefunden.'' using errcode = ''P0002'';\r\n  end if;\r\n\r\n  if not public.has_role(_uid, ''admin'')\r\n     and not public.user_can_use_kit_requests(_uid)\r\n     and _kit.creator_user_id is distinct from _uid\r\n     and not exists (\r\n       select 1 from public.kit_share_participants ksp\r\n       where ksp.kit_share_id = _kit.id and ksp.user_id = _uid\r\n     ) then\r\n    raise exception ''Kit-Gesuch wurde nicht gefunden.'' using errcode = ''P0002'';\r\n  end if;';
+  needle_lf text := $n$if not found or not coalesce(_kit.is_open_request, false) then
+    raise exception 'Kit-Gesuch wurde nicht gefunden.' using errcode = 'P0002';
+  end if;$n$;
+  insert_lf text := $n$if not found or not coalesce(_kit.is_open_request, false) then
+    raise exception 'Kit-Gesuch wurde nicht gefunden.' using errcode = 'P0002';
+  end if;
+
+  if not public.has_role(_uid, 'admin')
+     and not public.user_can_use_kit_requests(_uid)
+     and _kit.creator_user_id is distinct from _uid
+     and not exists (
+       select 1 from public.kit_share_participants ksp
+       where ksp.kit_share_id = _kit.id and ksp.user_id = _uid
+     ) then
+    raise exception 'Kit-Gesuch wurde nicht gefunden.' using errcode = 'P0002';
+  end if;$n$;
 begin
   select pg_get_functiondef(p.oid) into def
   from pg_proc p
@@ -144,26 +161,28 @@ begin
   end if;
 
   if position('user_can_use_kit_requests' in def) = 0 then
-    patched := regexp_replace(
-      def,
-      E'(if not found or not coalesce\\(_kit\\.is_open_request, false\\) then\\s*raise exception ''Kit-Gesuch wurde nicht gefunden\\.'' using errcode = ''P0002'';\\s*end if;)',
-      E'\\1\n\n  if not public.has_role(_uid, ''admin'')\n     and not public.user_can_use_kit_requests(_uid)\n     and _kit.creator_user_id is distinct from _uid\n     and not exists (\n       select 1 from public.kit_share_participants ksp\n       where ksp.kit_share_id = _kit.id and ksp.user_id = _uid\n     ) then\n    raise exception ''Kit-Gesuch wurde nicht gefunden.'' using errcode = ''P0002'';\n  end if;',
-      1,
-      'n'
-    );
-    if patched = def then
+    if position(needle_crlf in def) > 0 then
+      execute replace(def, needle_crlf, insert_crlf);
+    elsif position(needle_lf in def) > 0 then
+      execute replace(def, needle_lf, insert_lf);
+    else
       raise exception '0089: could not patch get_kit_request';
     end if;
-    execute patched;
   end if;
 end;
 $mig$;
 
--- list_open_kit_requests: fail closed with empty list (no kit catalog leak).
+-- list_open_kit_requests: empty list when denied
 do $mig$
 declare
   def text;
-  patched text;
+  needle text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501'; end if;$n$;
+  insert_txt text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501'; end if;
+  if not public.has_role(_uid, 'admin') and not public.user_can_use_kit_requests(_uid) then
+    _page_n := greatest(coalesce(_page, 1), 1);
+    _size := least(greatest(coalesce(_page_size, 20), 1), 50);
+    return jsonb_build_object('items', '[]'::jsonb, 'total', 0, 'page', _page_n, 'pageSize', _size);
+  end if;$n$;
 begin
   select pg_get_functiondef(p.oid) into def
   from pg_proc p
@@ -176,22 +195,14 @@ begin
   end if;
 
   if position('user_can_use_kit_requests' in def) = 0 then
-    patched := regexp_replace(
-      def,
-      E'(raise exception ''Nicht angemeldet\\.'' using errcode = ''42501'';\\s*end if;)',
-      E'\\1\n\n  if not public.has_role(_uid, ''admin'') and not public.user_can_use_kit_requests(_uid) then\n    _page_n := greatest(coalesce(_page, 1), 1);\n    _size := least(greatest(coalesce(_page_size, 20), 1), 50);\n    return jsonb_build_object(''items'', ''[]''::jsonb, ''total'', 0, ''page'', _page_n, ''pageSize'', _size);\n  end if;',
-      1,
-      'n'
-    );
-    if patched = def then
+    if position(needle in def) = 0 then
       raise exception '0089: could not patch list_open_kit_requests';
     end if;
-    execute patched;
+    execute replace(def, needle, insert_txt);
   end if;
 end;
 $mig$;
 
--- Admin upsert: persist can_use_kit_requests. Drop old 4-arg signature.
 drop function if exists public.admin_upsert_customer_role(uuid, text, numeric, boolean);
 
 create or replace function public.admin_upsert_customer_role(

@@ -25,7 +25,7 @@ describe("kit request role permissions", () => {
     expect(migration).toContain("'list_kit_requestable_product_ids'");
     expect(migration).toContain("assert_user_can_use_kit_requests(_uid)");
     expect(migration).toContain("list_open_kit_requests");
-    expect(migration).toContain("''items'', ''[]''::jsonb");
+    expect(migration).toContain("'items', '[]'::jsonb");
   });
 
   it("does not gate leave/list_my on the role flag (existing participation)", () => {
