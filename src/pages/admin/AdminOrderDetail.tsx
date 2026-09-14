@@ -21,14 +21,18 @@ import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { OrderShippingDetails } from "@/components/orders/OrderShippingCard";
 import { SharedKitAdminCard } from "@/components/orders/SharedKitAdminCard";
 import { AdminOrderTrackingForm } from "@/components/orders/AdminOrderTrackingForm";
+import { AdminOrderCorrectionDialog } from "@/components/orders/AdminOrderCorrectionDialog";
 import { CancelOrderDialog } from "@/components/orders/CancelOrderDialog";
+import { OrderRevisionHistory } from "@/components/orders/OrderRevisionHistory";
 import { OrderProgressTracker } from "@/components/orders/OrderProgressTracker";
 import { ShippingProgressSelect } from "@/components/orders/ShippingProgressSelect";
+import { originalOrderTotalUsd, useApplyOrderCorrection, useOrderRevisions } from "@/hooks/useOrderCorrection";
 import { useAdminOrder, useDeleteOrder, useOrderAdminNote, useOrderStatusHistory, useSetOrderStatus } from "@/hooks/useOrders";
 import { useAdminKitOrderContext, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
 import { useOrderProgress } from "@/hooks/useOrderProgress";
 import { resolveOrderProgress } from "@/lib/orderProgress";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
+import { kitSizeFromOrderItem } from "@/lib/orderKitDisplay";
 import { buildSharedKitsForOrder, kitSizeForOrderItem } from "@/lib/kitOrderSummary";
 import { formatDateTime, formatQuantity, formatRate, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { formatOrderItemQuantity } from "@/lib/quantityFormat";
@@ -62,6 +66,9 @@ export default function AdminOrderDetailPage() {
   const [adminNoteDraft, setAdminNoteDraft] = React.useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [cancelOpen, setCancelOpen] = React.useState(false);
+  const [correctOpen, setCorrectOpen] = React.useState(false);
+  const revisionsQuery = useOrderRevisions(orderId);
+  const applyCorrection = useApplyOrderCorrection(orderId);
   const adminNote = adminNoteDraft ?? noteQuery.data ?? "";
 
   if (orderQuery.isLoading) return <FullScreenSpinner label="Bestellung wird geladen …" />;
@@ -83,7 +90,7 @@ export default function AdminOrderDetailPage() {
     const map = new Map<string, number>();
     if (!kitQuery.data) return map;
     for (const item of order.items) {
-      const size = kitSizeForOrderItem(item, order, kitQuery.data);
+      const size = kitSizeFromOrderItem(item, kitSizeForOrderItem(item, order, kitQuery.data));
       if (size && item.product_id) map.set(item.product_id, size);
     }
     return map;
@@ -94,6 +101,10 @@ export default function AdminOrderDetailPage() {
     surchargeQuery.data.length === order.items.length
       ? orderRoleSurchargeFromSnapshots(surchargeQuery.data)
       : null;
+  const roleAtOrderLabel = surchargeQuery.data?.[0]?.customer_role_name_snapshot ?? null;
+  const revisions = revisionsQuery.data ?? [];
+  const originalTotalUsd = originalOrderTotalUsd(order, revisions);
+  const canCorrect = order.status !== "cancelled";
   const exportDoc = toOrderExportDoc(
     order,
     order.items,
@@ -136,6 +147,26 @@ export default function AdminOrderDetailPage() {
     } catch (error) {
       console.error("Bestellung stornieren fehlgeschlagen:", error);
       toast.error(error instanceof Error ? error.message : "Bestellung konnte nicht storniert werden.");
+    }
+  }
+
+  async function handleApplyCorrection(input: {
+    reason: string;
+    lineChanges: { orderItemId: string; quantity?: number; remove?: boolean }[];
+  }) {
+    try {
+      const result = await applyCorrection.mutateAsync({
+        expectedRevision: order.revision_number ?? 0,
+        reason: input.reason,
+        lineChanges: input.lineChanges,
+      });
+      setCorrectOpen(false);
+      toast.success(
+        `Revision ${result.revisionNumber}: Summe ${formatUsd(result.previousTotalUsd)} → ${formatUsd(result.newTotalUsd)}`,
+      );
+    } catch (error) {
+      console.error("Bestellkorrektur fehlgeschlagen:", error);
+      toast.error(error instanceof Error ? error.message : "Korrektur fehlgeschlagen.");
     }
   }
 
@@ -196,6 +227,11 @@ export default function AdminOrderDetailPage() {
               disabled={setStatus.isPending}
               onValueChange={(status) => void applyStatus(status)}
             />
+            {canCorrect && (
+              <Button variant="secondary" size="sm" onClick={() => setCorrectOpen(true)}>
+                Bestellung korrigieren
+              </Button>
+            )}
             {order.status !== "cancelled" && (
               <Button variant="destructive" size="sm" onClick={() => setCancelOpen(true)}>
                 Bestellung stornieren
@@ -245,7 +281,10 @@ export default function AdminOrderDetailPage() {
                   <TableCell className="text-right tabular-nums text-sm">
                     {formatOrderItemQuantity(
                       item,
-                      kitQuery.data ? kitSizeForOrderItem(item, order, kitQuery.data) : null,
+                      kitSizeFromOrderItem(
+                        item,
+                        kitQuery.data ? kitSizeForOrderItem(item, order, kitQuery.data) : null,
+                      ),
                       saleModeForShopArea(order.shop_area),
                     )}
                   </TableCell>
@@ -356,6 +395,23 @@ export default function AdminOrderDetailPage() {
         </AdminSection>
       </div>
 
+      <AdminSection title="Änderungsverlauf" padded>
+        {revisionsQuery.isLoading ? (
+          <p className="text-sm text-muted-foreground">Revisionen werden geladen …</p>
+        ) : revisionsQuery.isError ? (
+          <p className="text-sm text-destructive">Änderungsverlauf konnte nicht geladen werden.</p>
+        ) : (
+          <OrderRevisionHistory
+            order={order}
+            revisions={revisions}
+            originalTotalUsd={originalTotalUsd}
+            adminNamesById={Object.fromEntries(
+              [...(directoryQuery.data?.entries() ?? [])].map(([id, entry]) => [id, entry.displayName]),
+            )}
+          />
+        )}
+      </AdminSection>
+
       {/* Status history */}
       <AdminSection title="Statusverlauf" padded>
         <div className="space-y-2 text-sm">
@@ -374,6 +430,17 @@ export default function AdminOrderDetailPage() {
           )}
         </div>
       </AdminSection>
+
+      <AdminOrderCorrectionDialog
+        key={`${order.id}-${order.revision_number ?? 0}-${correctOpen ? "open" : "closed"}`}
+        open={correctOpen}
+        onOpenChange={setCorrectOpen}
+        order={order}
+        roleLabel={roleAtOrderLabel}
+        originalTotalUsd={originalTotalUsd}
+        loading={applyCorrection.isPending}
+        onConfirm={handleApplyCorrection}
+      />
 
       <CancelOrderDialog
         open={cancelOpen}

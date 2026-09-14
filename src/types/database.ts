@@ -290,6 +290,7 @@ export interface Database {
           total_usd: number;
           total_eur: number | null;
           exchange_rate: number | null;
+          revision_number: number;
           submitted_at: string;
           created_at: string;
           updated_at: string;
@@ -360,6 +361,9 @@ export interface Database {
           order_id: string;
           position: number;
           product_id: string | null;
+          kit_share_id_snapshot: string | null;
+          kit_size_vials_snapshot: number | null;
+          kit_participant_quantity_snapshot: number | null;
           product_code_snapshot: string;
           product_name_snapshot: string;
           dosage_vial_snapshot: string | null;
@@ -377,6 +381,33 @@ export interface Database {
         };
         Insert: Partial<Database["public"]["Tables"]["order_items"]["Row"]> & {
           order_id: string;
+        };
+        Update: never;
+        Relationships: never[];
+      };
+      order_revisions: {
+        Row: {
+          id: string;
+          order_id: string;
+          revision_number: number;
+          created_at: string;
+          created_by: string | null;
+          reason: string;
+          previous_total_usd: number;
+          new_total_usd: number;
+          previous_total_eur: number | null;
+          new_total_eur: number | null;
+          difference_usd: number;
+          difference_eur: number | null;
+          changes: Record<string, unknown>;
+        };
+        Insert: Partial<Database["public"]["Tables"]["order_revisions"]["Row"]> & {
+          order_id: string;
+          revision_number: number;
+          reason: string;
+          previous_total_usd: number;
+          new_total_usd: number;
+          difference_usd: number;
         };
         Update: never;
         Relationships: never[];
@@ -1692,6 +1723,15 @@ export interface Database {
         Returns: Record<string, unknown>;
       };
       admin_delete_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
+      admin_apply_order_correction: {
+        Args: {
+          _order_id: string;
+          _expected_revision: number;
+          _reason: string;
+          _line_changes: Record<string, unknown> | unknown[];
+        };
+        Returns: Record<string, unknown>;
+      };
       set_order_status: {
         Args: { _order_id: string; _status: OrderStatus; _admin_note: string | null };
         Returns: Database["public"]["Tables"]["orders"]["Row"];

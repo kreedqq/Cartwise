@@ -98,11 +98,17 @@ export function formatSharedKitShareLabel(
 }
 
 export function kitSizeForOrderItem(
-  item: Pick<Tables<"order_items">, "order_id" | "product_id" | "quantity">,
+  item: Pick<
+    Tables<"order_items">,
+    "order_id" | "product_id" | "quantity" | "kit_share_id_snapshot" | "kit_size_vials_snapshot"
+  >,
   order: Pick<Tables<"orders">, "id" | "cart_id" | "user_id"> | undefined,
   context: KitShareOrderContext,
   participants = context.participants,
 ): number | null {
+  const frozenSize = asQuantity(item.kit_size_vials_snapshot);
+  if (frozenSize > 0 && item.product_id) return frozenSize;
+
   const kitShareId = resolveKitShareIdForItem(item, order, context, participants);
   if (!kitShareId) return null;
   const kit = context.kits.find((row) => row.id === kitShareId);
@@ -203,11 +209,17 @@ function uniqueKitShareId(matches: KitShareContextParticipant[]): string | null 
  * Never infer from SKU, name, category, quantity, or "user is in some open kit".
  */
 export function resolveKitShareIdForItem(
-  item: Pick<Tables<"order_items">, "order_id" | "product_id" | "quantity">,
+  item: Pick<
+    Tables<"order_items">,
+    "order_id" | "product_id" | "quantity" | "kit_share_id_snapshot"
+  >,
   order: Pick<Tables<"orders">, "id" | "cart_id" | "user_id"> | undefined,
   context: KitShareOrderContext,
   participants = context.participants,
 ): string | null {
+  const frozenKitShareId = item.kit_share_id_snapshot?.trim();
+  if (frozenKitShareId) return frozenKitShareId;
+
   const kits = kitsById(context);
   const itemQuantity = asQuantity(item.quantity);
   const forOrder = participants.filter((participant) => participant.order_id === item.order_id);
@@ -305,15 +317,24 @@ export function buildSharedKitsForOrder(
       .map((member) => {
         const memberOrder = member.order_id ? ordersById.get(member.order_id) : undefined;
         const status = kitParticipantStatusLabel(memberOrder);
+        const isCurrent = member.order_id === orderId;
+        const displayQty =
+          isCurrent && orderItem
+            ? asQuantity(orderItem.kit_participant_quantity_snapshot ?? orderItem.quantity)
+            : asQuantity(member.quantity);
+        const displayKitSize =
+          isCurrent && orderItem?.kit_size_vials_snapshot
+            ? asQuantity(orderItem.kit_size_vials_snapshot)
+            : kit.kit_size_vials;
         return {
           userId: member.user_id,
           telegramLabel: kitParticipantTelegramLabel({
             order: memberOrder,
             profileUsername: context.usernamesByUserId?.[member.user_id],
           }),
-          quantity: member.quantity,
-          kitSize: kit.kit_size_vials,
-          shareLabel: formatSharedKitShareLabel(member.quantity, kit.kit_size_vials, categoryId),
+          quantity: displayQty,
+          kitSize: displayKitSize,
+          shareLabel: formatSharedKitShareLabel(displayQty, displayKitSize, categoryId),
           statusKey: status.statusKey,
           statusLabel: status.statusLabel,
           isCurrentOrder: member.order_id === orderId,
@@ -325,12 +346,17 @@ export function buildSharedKitsForOrder(
         return a.telegramLabel.localeCompare(b.telegramLabel, "de");
       });
 
+    const panelKitSize =
+      orderItem?.kit_size_vials_snapshot && asQuantity(orderItem.kit_size_vials_snapshot) > 0
+        ? asQuantity(orderItem.kit_size_vials_snapshot)
+        : kit.kit_size_vials;
+
     views.push({
       kitShareId,
       productName: orderItem?.product_name_snapshot?.trim() || "Nicht verfügbar",
       productCode: orderItem?.product_code_snapshot?.trim() || "—",
-      kitSize: kit.kit_size_vials,
-      kitSizeLabel: formatKitSizeLabel(kit.kit_size_vials, categoryId),
+      kitSize: panelKitSize,
+      kitSizeLabel: formatKitSizeLabel(panelKitSize, categoryId),
       categoryId,
       processingQuantity,
       complete,

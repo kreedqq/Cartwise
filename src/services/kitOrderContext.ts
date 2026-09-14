@@ -90,29 +90,57 @@ export async function listAdminKitOrderContext(): Promise<KitShareOrderContext> 
 }
 
 /**
- * Kit sizes for items on one order. Uses participant rows with this order_id only.
- * Does not return other customers' names or shares.
+ * Kit sizes for items on one order. Prefer frozen order_item snapshots (0092);
+ * fall back to live kit_shares only for legacy rows without snapshots.
  */
 export async function listKitSizesForOrder(orderId: string): Promise<Map<string, number>> {
+  const { data: items, error: itemsError } = await supabase
+    .from("order_items")
+    .select("product_id, kit_size_vials_snapshot, kit_share_id_snapshot")
+    .eq("order_id", orderId);
+  if (itemsError) throw itemsError;
+
+  const sizes = new Map<string, number>();
+  const legacyKitIds = new Set<string>();
+
+  for (const row of items ?? []) {
+    const productId = row.product_id;
+    if (!productId) continue;
+    const snapSize = readNumber(asRecord(row) ?? {}, "kit_size_vials_snapshot");
+    if (snapSize > 0) {
+      sizes.set(productId, snapSize);
+      continue;
+    }
+    const kitId = readNullableString(asRecord(row) ?? {}, "kit_share_id_snapshot");
+    if (kitId) legacyKitIds.add(kitId);
+  }
+
+  if (legacyKitIds.size === 0 && sizes.size > 0) return sizes;
+
   const { data: parts, error: partsError } = await supabase
     .from("kit_share_participants")
     .select("kit_share_id")
     .eq("order_id", orderId);
   if (partsError) throw partsError;
 
-  const kitIds = [...new Set((parts ?? []).map((row) => row.kit_share_id).filter(Boolean))];
-  if (kitIds.length === 0) return new Map();
+  for (const row of parts ?? []) {
+    const kitId = readNullableString(asRecord(row) ?? {}, "kit_share_id");
+    if (kitId) legacyKitIds.add(kitId);
+  }
+
+  if (legacyKitIds.size === 0) return sizes;
 
   const { data: kits, error: kitsError } = await supabase
     .from("kit_shares")
     .select("id, product_id, kit_size_vials")
-    .in("id", kitIds);
+    .in("id", [...legacyKitIds]);
   if (kitsError) throw kitsError;
 
-  const sizes = new Map<string, number>();
   for (const kit of kits ?? []) {
-    const size = readNumber(asRecord(kit) ?? {}, "kit_size_vials");
-    if (kit.product_id && size > 0) sizes.set(kit.product_id, size);
+    const record = asRecord(kit) ?? {};
+    const size = readNumber(record, "kit_size_vials");
+    const productId = readNullableString(record, "product_id");
+    if (productId && size > 0 && !sizes.has(productId)) sizes.set(productId, size);
   }
   return sizes;
 }

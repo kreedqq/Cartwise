@@ -15,7 +15,7 @@ import { OrderProgressTracker } from "@/components/orders/OrderProgressTracker";
 import { OrderTrackingCard } from "@/components/orders/OrderTrackingCard";
 import { useOrderProgress } from "@/hooks/useOrderProgress";
 import { resolveOrderProgress } from "@/lib/orderProgress";
-import { useMyOrder, useMyOrderStatusHistory } from "@/hooks/useOrders";
+import { useMyOrder } from "@/hooks/useOrders";
 import { useShopCart } from "@/hooks/useShopCart";
 import { useOrderTemplateMutations } from "@/hooks/useOrderTemplates";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
@@ -25,18 +25,18 @@ import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/or
 import { formatDateTime, formatEur, formatUsd, summarizeOrderCharges } from "@/lib/money";
 import { formatOrderItemQuantity } from "@/lib/quantityFormat";
 import { DEFAULT_SHOP_AREA, formatShopAreaLabel, isShopAreaKey, saleModeForShopArea } from "@/lib/shop/shopAreas";
+import { kitSizeFromOrderItem } from "@/lib/orderKitDisplay";
 import { listKitSizesForOrder } from "@/services/kitOrderContext";
 import { QUERY_KEYS } from "@/lib/constants";
 import { PAYMENT_METHOD_LABELS, isPaymentMethod } from "@/lib/shop/paymentMethod";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
-import { ORDER_STATUS_LABELS, formatOrderTelegramSnapshot, orderItemsToBulkLines } from "@/services/orders";
+import { formatOrderTelegramSnapshot, orderItemsToBulkLines } from "@/services/orders";
 import { toast } from "@/components/ui/toaster";
 
 export default function OrderDetailPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
   const orderQuery = useMyOrder(orderId);
-  const historyQuery = useMyOrderStatusHistory(orderId);
   const kitSizesQuery = useQuery({
     queryKey: QUERY_KEYS.orderKitSizes(orderId ?? ""),
     queryFn: () => listKitSizesForOrder(orderId as string),
@@ -62,7 +62,8 @@ export default function OrderDetailPage() {
   const kitSizes = kitSizesQuery.data;
 
   function itemKitSize(item: (typeof order.items)[number]) {
-    return item.product_id ? kitSizes?.get(item.product_id) ?? null : null;
+    const legacy = item.product_id ? kitSizes?.get(item.product_id) ?? null : null;
+    return kitSizeFromOrderItem(item, legacy);
   }
 
   const exportDoc = toOrderExportDoc(order, order.items, undefined, null, { audience: "customer", kitSizes });
@@ -204,17 +205,8 @@ export default function OrderDetailPage() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Verlauf</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            {(historyQuery.data ?? []).map((entry) => (
-              <div key={entry.id} className="flex justify-between gap-3">
-                <span>{ORDER_STATUS_LABELS[entry.new_status]}</span>
-                <span className="text-muted-foreground">{formatDateTime(entry.changed_at)}</span>
-              </div>
-            ))}
-            <div className="flex justify-between gap-3 border-t border-border pt-2">
+          <CardContent className="p-5 text-sm">
+            <div className="flex justify-between gap-3">
               <span>Zahlungsmethode</span>
               <span className="font-medium">
                 {isPaymentMethod(order.payment_method) ? PAYMENT_METHOD_LABELS[order.payment_method] : "—"}
@@ -227,7 +219,7 @@ export default function OrderDetailPage() {
               </div>
             )}
             {order.note && (
-              <p className="border-t border-border pt-2 text-muted-foreground">
+              <p className="mt-2 border-t border-border pt-2 text-muted-foreground">
                 Notiz: {order.note}
               </p>
             )}
