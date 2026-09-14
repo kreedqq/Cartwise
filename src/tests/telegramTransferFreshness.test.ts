@@ -28,7 +28,6 @@ describe("0082 telegram transfer freshness", () => {
   it("still moves only custom:telegram and blocks telegram-only sources", () => {
     expect(sql).toContain("update auth.identities");
     expect(sql).toContain("source_telegram_only");
-    expect(sql).toContain("Keep existing target username");
     expect(sql).toContain("provider_id");
   });
 });

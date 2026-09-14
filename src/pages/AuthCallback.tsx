@@ -123,7 +123,8 @@ export default function AuthCallbackPage() {
               phase: "complete_ok",
               intentId: transferIntentId,
               currentSessionUserId: sessionUserId,
-              applied,
+              telegramUsername: applied,
+              result: "ok",
             });
             clearTelegramTransferIntent();
             clearTelegramIdentityConflict();
@@ -137,6 +138,14 @@ export default function AuthCallbackPage() {
               intentId: transferIntentId,
               currentSessionUserId: sessionUserId,
               sessionProvider,
+              operation: "complete_telegram_identity_transfer",
+              result: "error",
+              error: mapUsernameError(err).slice(0, 180),
+            });
+            console.info("[peptix:username]", {
+              operation: "complete_telegram_identity_transfer",
+              flow: "transfer",
+              result: "error",
               error: mapUsernameError(err).slice(0, 180),
             });
             clearTelegramTransferIntent();
@@ -161,7 +170,7 @@ export default function AuthCallbackPage() {
           clearTelegramIdentityConflict();
         }
 
-        // Flow B: after linkIdentity, consume admin flag. Keep existing profiles.username.
+        // Flow B: after linkIdentity, set profiles.username from preferred_username.
         // Never run this on Flow A normal login.
         if (flowKind === "link") {
           try {
@@ -170,7 +179,9 @@ export default function AuthCallbackPage() {
               operation: "apply_telegram_reauth_username",
               flow: "link",
               reason: "post_link_success",
-              applied,
+              targetUserId: sessionUserId,
+              telegramUsername: applied,
+              result: "ok",
             });
             if (sessionUserId) clearUsernameChangeEligible(sessionUserId);
             clearTelegramIdentityConflict();
@@ -182,6 +193,8 @@ export default function AuthCallbackPage() {
               operation: "apply_telegram_reauth_username",
               flow: "link",
               reason: "post_link_failed",
+              targetUserId: sessionUserId,
+              result: "error",
               error: message.slice(0, 180),
               hasTelegramIdentity,
             });
