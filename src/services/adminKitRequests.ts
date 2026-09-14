@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { extractRpcErrorMessage } from "@/services/username";
 
 export type AdminKitRequestStatus = "open" | "full" | "cancelled" | "expired" | "ordered";
 
@@ -66,10 +67,18 @@ export type AdminKitRequestStatusFilter =
   | "ordered";
 
 function asRecord(data: unknown): Record<string, unknown> {
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
+  let value: unknown = data;
+  if (typeof value === "string") {
+    try {
+      value = JSON.parse(value);
+    } catch {
+      throw new Error("Ungültige Serverantwort.");
+    }
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new Error("Ungültige Serverantwort.");
   }
-  return data as Record<string, unknown>;
+  return value as Record<string, unknown>;
 }
 
 function mapListItem(raw: Record<string, unknown>): AdminKitRequestListItem {
@@ -202,11 +211,6 @@ export async function adminCancelKitRequest(id: string): Promise<AdminKitRequest
 }
 
 export function adminKitRpcErrorMessage(error: unknown, fallback: string): string {
-  if (error instanceof Error && error.message.trim()) return error.message;
-  if (error && typeof error === "object") {
-    const record = error as Record<string, unknown>;
-    if (typeof record.message === "string" && record.message.trim()) return record.message;
-    if (typeof record.details === "string" && record.details.trim()) return record.details;
-  }
-  return fallback;
+  const extracted = extractRpcErrorMessage(error).trim();
+  return extracted || fallback;
 }

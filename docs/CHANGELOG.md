@@ -2,6 +2,14 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-14 (Admin Kit Gesuche usable actions)
+
+### Fixed
+
+- Admin Kit Gesuche detail now exposes explicit **Bearbeiten**, **Teilnehmer verwalten**, and **Kit stornieren** actions; meta form is no longer always open with a buried „Metadaten speichern“ button.
+- Save toast is „Kit Gesuch gespeichert.“; Stammdaten show the note; cancelled status shows „Storniert“; list defaults to Alle and rows open the detail.
+- Admin RPC error mapping uses `extractRpcErrorMessage` (PostgREST plain objects); mutation success writes detail into the query cache then refetches.
+
 ## 2026-09-14 (Admin Kit Gesuche)
 
 ### Added

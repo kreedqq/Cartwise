@@ -18,9 +18,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAdminKitRequests } from "@/hooks/useAdminKitRequests";
-import { kitRequestCustomerStatusLabel } from "@/lib/kitRequests";
+import { kitRequestStatusLabel } from "@/lib/kitRequests";
 import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
-import type { AdminKitRequestStatusFilter } from "@/services/adminKitRequests";
+import {
+  adminKitRpcErrorMessage,
+  type AdminKitRequestStatusFilter,
+} from "@/services/adminKitRequests";
 
 const STATUS_FILTERS: Array<{ id: AdminKitRequestStatusFilter; label: string }> = [
   { id: "all", label: "Alle" },
@@ -44,8 +47,13 @@ function creatorHandle(username: string): string {
   return trimmed ? `@${trimmed}` : "Unbekannt";
 }
 
+function adminStatusLabel(status: string, remainingVials: number): string {
+  if (status === "open" && remainingVials > 0 && remainingVials <= 2) return "Fast voll";
+  return kitRequestStatusLabel(status);
+}
+
 export default function AdminKitRequestsPage() {
-  const [status, setStatus] = React.useState<AdminKitRequestStatusFilter>("open");
+  const [status, setStatus] = React.useState<AdminKitRequestStatusFilter>("all");
   const [search, setSearch] = React.useState("");
   const [page, setPage] = React.useState(1);
   const listQuery = useAdminKitRequests({ status, shopArea: null, search, page });
@@ -55,7 +63,7 @@ export default function AdminKitRequestsPage() {
     <div className="space-y-4">
       <AdminPageHeader
         title="Kit Gesuche"
-        description="Marketplace Kit Gesuche ansehen, Metadaten bearbeiten, Mengen verwalten und stornieren. Historische Bestellungen bleiben unverändert."
+        description="Marketplace Kit Gesuche öffnen, Metadaten bearbeiten, Teilnehmermengen verwalten und stornieren. Historische Bestellungen bleiben unverändert."
       />
 
       <AdminSection title="Filter" padded>
@@ -96,7 +104,10 @@ export default function AdminKitRequestsPage() {
         </div>
       ) : null}
       {listQuery.isError ? (
-        <ErrorState message="Kit Gesuche konnten nicht geladen werden." onRetry={() => listQuery.refetch()} />
+        <ErrorState
+          message={adminKitRpcErrorMessage(listQuery.error, "Kit Gesuche konnten nicht geladen werden.")}
+          onRetry={() => listQuery.refetch()}
+        />
       ) : null}
       {listQuery.data && listQuery.data.items.length === 0 ? (
         <EmptyState title="Keine Kit Gesuche für diesen Filter." />
@@ -119,28 +130,40 @@ export default function AdminKitRequestsPage() {
               </TableHeader>
               <TableBody>
                 {listQuery.data.items.map((item) => (
-                  <TableRow key={item.id}>
+                  <TableRow key={item.id} className="cursor-pointer hover:bg-secondary/40">
                     <TableCell className="min-w-[12rem]">
-                      <p className="font-medium">{item.productName}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatVendorDosageDisplay(item.variantLabel, item.productCode ?? item.vendorCode ?? "")}
-                        {item.vendorCode ? ` · ${item.vendorCode}` : null}
-                      </p>
+                      <Link to={`/admin/kit-requests/${item.id}`} className="block">
+                        <p className="font-medium">{item.productName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatVendorDosageDisplay(item.variantLabel, item.productCode ?? item.vendorCode ?? "")}
+                          {item.vendorCode ? ` · ${item.vendorCode}` : null}
+                        </p>
+                      </Link>
                     </TableCell>
                     <TableCell className="tabular-nums">
-                      {item.allocatedTotal}/{item.kitSizeVials}
-                      <span className="block text-xs text-muted-foreground">
-                        {item.remainingVials} frei · {item.participantCount} TN
-                      </span>
+                      <Link to={`/admin/kit-requests/${item.id}`} className="block">
+                        {item.allocatedTotal}/{item.kitSizeVials}
+                        <span className="block text-xs text-muted-foreground">
+                          {item.remainingVials} frei · {item.participantCount} TN
+                        </span>
+                      </Link>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary">
-                        {kitRequestCustomerStatusLabel(item.status, item.remainingVials)}
-                      </Badge>
+                      <Link to={`/admin/kit-requests/${item.id}`}>
+                        <Badge variant="secondary">
+                          {adminStatusLabel(item.status, item.remainingVials)}
+                        </Badge>
+                      </Link>
                     </TableCell>
-                    <TableCell>{creatorHandle(item.creatorUsername)}</TableCell>
-                    <TableCell className="text-xs">{item.shopArea}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{formatDate(item.createdAt)}</TableCell>
+                    <TableCell>
+                      <Link to={`/admin/kit-requests/${item.id}`}>{creatorHandle(item.creatorUsername)}</Link>
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      <Link to={`/admin/kit-requests/${item.id}`}>{item.shopArea}</Link>
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      <Link to={`/admin/kit-requests/${item.id}`}>{formatDate(item.createdAt)}</Link>
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button asChild size="sm" variant="outline">
                         <Link to={`/admin/kit-requests/${item.id}`}>Öffnen</Link>

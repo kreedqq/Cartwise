@@ -46,10 +46,34 @@ describe("0086 admin kit requests", () => {
     expect(read("src/App.tsx")).toContain("AdminKitRequestsPage");
     expect(read("src/App.tsx")).toContain("AdminKitRequestDetailPage");
     expect(read("src/pages/admin/AdminKitRequests.tsx")).toContain("useAdminKitRequests");
-    expect(read("src/pages/admin/AdminKitRequestDetail.tsx")).toContain("Kit stornieren");
-    expect(read("src/pages/admin/AdminKitRequestDetail.tsx")).toContain("Teilnehmer verwalten");
+    const detail = read("src/pages/admin/AdminKitRequestDetail.tsx");
+    expect(detail).toContain("Kit stornieren");
+    expect(detail).toContain("Teilnehmer verwalten");
+    expect(detail).toContain("Bearbeiten");
+    expect(detail).toContain("Kit Gesuch gespeichert.");
+    expect(detail).toContain("Möchtest du dieses Kit Gesuch wirklich stornieren?");
     expect(read("src/services/adminKitRequests.ts")).toContain("admin_cancel_kit_request");
+    expect(read("src/services/adminKitRequests.ts")).toContain("extractRpcErrorMessage");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Mitmachen");
+  });
+
+  it("keeps admin edit actions behind explicit buttons and server flags", () => {
+    const detail = read("src/pages/admin/AdminKitRequestDetail.tsx");
+    expect(detail).toContain("editingMeta");
+    expect(detail).toContain("managingParticipants");
+    expect(detail).toContain("canEditMeta");
+    expect(detail).toContain("canEditQuantities");
+    expect(detail).toContain("canCancel");
+    expect(read("src/services/adminKitRequests.ts")).toContain("canChangeProduct");
+    expect(detail).not.toContain("setProductId");
+  });
+
+  it("maps PostgREST plain-object errors for admin mutations", () => {
+    const service = read("src/services/adminKitRequests.ts");
+    expect(service).toContain("extractRpcErrorMessage");
+    expect(service).toContain("typeof value === \"string\"");
+    expect(service).toContain("admin_update_kit_request_meta");
+    expect(service).toContain("admin_update_kit_request_participant_quantity");
   });
 
   it("documents admin quantity scenarios with the shared capacity helpers", () => {

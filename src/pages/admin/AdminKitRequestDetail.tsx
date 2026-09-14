@@ -27,7 +27,7 @@ import {
 } from "@/hooks/useAdminKitRequests";
 import {
   canSetOwnKitQuantity,
-  kitRequestCustomerStatusLabel,
+  kitRequestStatusLabel,
   maxOwnKitQuantity,
   otherParticipantsQuantity,
   ownQuantityOptions,
@@ -52,6 +52,11 @@ function creatorHandle(username: string): string {
   return trimmed ? `@${trimmed}` : "Unbekannt";
 }
 
+function adminStatusLabel(status: string, remainingVials: number): string {
+  if (status === "open" && remainingVials > 0 && remainingVials <= 2) return "Fast voll";
+  return kitRequestStatusLabel(status);
+}
+
 function MetaRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="grid grid-cols-1 gap-1 sm:grid-cols-[10rem_1fr] sm:gap-3">
@@ -65,10 +70,12 @@ function MetaEditForm({
   detail,
   saving,
   onSave,
+  onCancel,
 }: {
   detail: AdminKitRequestDetail;
   saving: boolean;
   onSave: (input: { note: string; expiresAt: string; kitSize: string }) => void;
+  onCancel: () => void;
 }) {
   const [note, setNote] = React.useState(detail.note ?? "");
   const [expiresAt, setExpiresAt] = React.useState(detail.expiresAt ? detail.expiresAt.slice(0, 16) : "");
@@ -108,11 +115,20 @@ function MetaEditForm({
               ))}
             </SelectContent>
           </Select>
+          <p className="text-xs text-muted-foreground">
+            Nur Vielfache von 10. Mindestens {detail.allocatedTotal} (aktuelle Belegung).
+          </p>
         </div>
       </div>
-      <div className="mt-4">
+      <p className="mt-3 text-xs text-muted-foreground">
+        Produkt, Variante, Dosierung, Vendor Code und Shop Area sind nicht änderbar.
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
         <Button type="button" onClick={() => onSave({ note, expiresAt, kitSize })} disabled={saving}>
-          {saving ? "Speichern …" : "Metadaten speichern"}
+          {saving ? "Speichern …" : "Speichern"}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={saving}>
+          Abbrechen
         </Button>
       </div>
     </AdminSection>
@@ -127,6 +143,8 @@ export default function AdminKitRequestDetailPage() {
   const cancelMutation = useAdminCancelKitRequest();
 
   const [cancelOpen, setCancelOpen] = React.useState(false);
+  const [editingMeta, setEditingMeta] = React.useState(false);
+  const [managingParticipants, setManagingParticipants] = React.useState(false);
   const [editUserId, setEditUserId] = React.useState<string | null>(null);
   const [editQty, setEditQty] = React.useState("1");
 
@@ -134,13 +152,17 @@ export default function AdminKitRequestDetailPage() {
   if (detailQuery.isError || !detailQuery.data) {
     return (
       <ErrorState
-        message="Kit Gesuch konnte nicht geladen werden."
+        message={adminKitRpcErrorMessage(detailQuery.error, "Kit Gesuch konnte nicht geladen werden.")}
         onRetry={() => detailQuery.refetch()}
       />
     );
   }
 
   const detail = detailQuery.data;
+  const dosageLabel = formatVendorDosageDisplay(
+    detail.variantLabel,
+    detail.productCode ?? detail.vendorCode ?? "",
+  );
 
   const editingParticipant = detail.participants.find((p) => p.userId === editUserId) ?? null;
   const maxForEdit = editingParticipant
@@ -160,14 +182,17 @@ export default function AdminKitRequestDetailPage() {
 
   async function saveMeta(input: { note: string; expiresAt: string; kitSize: string }) {
     try {
+      const nextSize = Number(input.kitSize);
       await metaMutation.mutateAsync({
         id: detail.id,
         note: input.note,
         expiresAt: input.expiresAt ? new Date(input.expiresAt).toISOString() : null,
         clearExpiresAt: !input.expiresAt,
-        kitSizeVials: Number(input.kitSize) !== detail.kitSizeVials ? Number(input.kitSize) : null,
+        kitSizeVials: Number.isInteger(nextSize) && nextSize !== detail.kitSizeVials ? nextSize : null,
       });
-      toast.success("Metadaten gespeichert.");
+      setEditingMeta(false);
+      toast.success("Kit Gesuch gespeichert.");
+      await detailQuery.refetch();
     } catch (error) {
       toast.error(adminKitRpcErrorMessage(error, "Speichern fehlgeschlagen."));
     }
@@ -187,6 +212,7 @@ export default function AdminKitRequestDetailPage() {
       });
       setEditUserId(null);
       toast.success("Teilnehmermenge aktualisiert.");
+      await detailQuery.refetch();
     } catch (error) {
       toast.error(adminKitRpcErrorMessage(error, "Mengenänderung fehlgeschlagen."));
     }
@@ -196,7 +222,10 @@ export default function AdminKitRequestDetailPage() {
     try {
       await cancelMutation.mutateAsync(detail.id);
       setCancelOpen(false);
+      setEditingMeta(false);
+      setManagingParticipants(false);
       toast.success("Kit Gesuch storniert.");
+      await detailQuery.refetch();
     } catch (error) {
       toast.error(adminKitRpcErrorMessage(error, "Stornierung fehlgeschlagen."));
     }
@@ -212,28 +241,60 @@ export default function AdminKitRequestDetailPage() {
 
       <AdminPageHeader
         title={detail.productName}
-        description={`${formatVendorDosageDisplay(detail.variantLabel, detail.productCode ?? detail.vendorCode ?? "")} · ${detail.allocatedTotal}/${detail.kitSizeVials} Kit`}
-        actions={
-          detail.canCancel ? (
-            <Button type="button" variant="destructive" onClick={() => setCancelOpen(true)}>
-              Kit stornieren
-            </Button>
-          ) : null
-        }
+        description={`${dosageLabel} · ${detail.allocatedTotal}/${detail.kitSizeVials} Kit`}
       />
 
       <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="secondary">
-          {kitRequestCustomerStatusLabel(detail.status, detail.remainingVials)}
-        </Badge>
+        <Badge variant="secondary">{adminStatusLabel(detail.status, detail.remainingVials)}</Badge>
         <span className="text-sm text-muted-foreground">
           Noch {detail.remainingVials} Plätze · {detail.participantCount} Teilnehmer
         </span>
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        {detail.canEditMeta ? (
+          <Button
+            type="button"
+            variant={editingMeta ? "default" : "outline"}
+            onClick={() => {
+              setEditingMeta(true);
+              setManagingParticipants(false);
+              setEditUserId(null);
+            }}
+          >
+            Bearbeiten
+          </Button>
+        ) : null}
+        {detail.canEditQuantities ? (
+          <Button
+            type="button"
+            variant={managingParticipants ? "default" : "outline"}
+            onClick={() => {
+              setManagingParticipants(true);
+              setEditingMeta(false);
+            }}
+          >
+            Teilnehmer verwalten
+          </Button>
+        ) : null}
+        {detail.canCancel ? (
+          <Button type="button" variant="destructive" onClick={() => setCancelOpen(true)}>
+            Kit stornieren
+          </Button>
+        ) : null}
+      </div>
+
       <AdminSection title="Stammdaten" padded>
         <dl className="space-y-3">
+          <MetaRow label="Produkt" value={detail.productName} />
+          <MetaRow label="Variante / Dosierung" value={dosageLabel || "—"} />
+          <MetaRow label="Kit Größe" value={String(detail.kitSizeVials)} />
+          <MetaRow label="Belegung" value={`${detail.allocatedTotal} / ${detail.kitSizeVials}`} />
+          <MetaRow label="Freie Plätze" value={String(detail.remainingVials)} />
+          <MetaRow label="Status" value={adminStatusLabel(detail.status, detail.remainingVials)} />
           <MetaRow label="Ersteller" value={creatorHandle(detail.creatorUsername)} />
+          <MetaRow label="Telegram" value={creatorHandle(detail.creatorUsername)} />
+          <MetaRow label="Notiz" value={detail.note?.trim() ? detail.note : "—"} />
           <MetaRow label="Shop Area" value={detail.shopArea} />
           <MetaRow label="Vendor Code" value={detail.vendorCode ?? "—"} />
           <MetaRow label="Product Code" value={detail.productCode ?? "—"} />
@@ -246,21 +307,19 @@ export default function AdminKitRequestDetailPage() {
           <MetaRow label="Vollständig seit" value={formatDate(detail.completedAt)} />
           <MetaRow label="Cart Lines" value={String(detail.cartLineCount)} />
         </dl>
-        <p className="mt-4 text-xs text-muted-foreground">
-          Produkt- und Vendor-Identität können bei bestehenden Gesuchen nicht geändert werden.
-        </p>
       </AdminSection>
 
-      {detail.canEditMeta ? (
+      {editingMeta && detail.canEditMeta ? (
         <MetaEditForm
-          key={`${detail.id}-${detail.updatedAt}`}
+          key={`${detail.id}-${detail.updatedAt}-edit`}
           detail={detail}
           saving={metaMutation.isPending}
           onSave={(input) => void saveMeta(input)}
+          onCancel={() => setEditingMeta(false)}
         />
       ) : null}
 
-      <AdminSection title="Teilnehmer verwalten" padded>
+      <AdminSection title="Teilnehmer" padded>
         <ul className="space-y-3">
           {detail.participants.map((participant) => (
             <li key={participant.userId} className="rounded-lg border border-border px-3 py-3">
@@ -277,13 +336,15 @@ export default function AdminKitRequestDetailPage() {
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {participant.hasOrdered
-                      ? `Bestellt ${formatDate(participant.orderedAt)}`
+                      ? `Bestellt ${formatDate(participant.orderedAt)}${
+                          participant.orderId ? ` · Order ${participant.orderId}` : ""
+                        }`
                       : participant.hasCartItem
                         ? "Im Warenkorb"
                         : "Noch keine Bestellung"}
                   </p>
                 </div>
-                {detail.canEditQuantities && !participant.hasOrdered ? (
+                {managingParticipants && detail.canEditQuantities && !participant.hasOrdered ? (
                   <Button
                     type="button"
                     size="sm"
@@ -298,10 +359,11 @@ export default function AdminKitRequestDetailPage() {
                 ) : null}
               </div>
 
-              {editUserId === participant.userId ? (
+              {managingParticipants && editUserId === participant.userId ? (
                 <div className="mt-3 space-y-3 rounded-md bg-secondary/40 p-3">
                   <p className="text-sm">
-                    Aktuell {participant.quantity} · Andere {previewOthers} · Kit {detail.kitSizeVials} · Max {maxForEdit}
+                    Aktuell {participant.quantity} · Andere {previewOthers} · Kit {detail.kitSizeVials} · Max{" "}
+                    {maxForEdit}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {qtyOptions.map((qty) => (
@@ -343,6 +405,10 @@ export default function AdminKitRequestDetailPage() {
             Mengenänderungen sind in diesem Status nicht möglich
             {detail.anyParticipantOrdered ? " (bereits verarbeitet)." : "."}
           </p>
+        ) : !managingParticipants ? (
+          <p className="mt-3 text-sm text-muted-foreground">
+            Für Mengenänderungen zuerst „Teilnehmer verwalten“ wählen.
+          </p>
         ) : null}
       </AdminSection>
 
@@ -352,6 +418,8 @@ export default function AdminKitRequestDetailPage() {
         title="Kit stornieren?"
         description="Möchtest du dieses Kit Gesuch wirklich stornieren? Das Kit wird für weitere Beteiligungen geschlossen. Historische Bestellungen bleiben unverändert."
         confirmLabel="Kit stornieren"
+        cancelLabel="Abbrechen"
+        variant="destructive"
         loading={cancelMutation.isPending}
         onConfirm={() => void confirmCancel()}
       />
