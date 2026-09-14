@@ -13,6 +13,7 @@ import {
   listOpenKitRequests,
   syncCompletedKitRequestCarts,
 } from "@/services/kitRequests";
+import { updateKitShareQuantity } from "@/services/kitShares";
 
 export interface OpenKitRequestFilters {
   search: string;
@@ -90,6 +91,14 @@ export function useJoinKitRequest() {
   const invalidate = useInvalidateKitRequests();
   return useMutation({
     mutationFn: ({ id, quantity }: { id: string; quantity: number }) => joinKitRequest(id, quantity),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useUpdateKitRequestQuantity() {
+  const invalidate = useInvalidateKitRequests();
+  return useMutation({
+    mutationFn: ({ id, quantity }: { id: string; quantity: number }) => updateKitShareQuantity(id, quantity),
     onSuccess: () => invalidate(),
   });
 }

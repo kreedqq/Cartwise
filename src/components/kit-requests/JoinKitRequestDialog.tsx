@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toaster";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
-import { useJoinKitRequest } from "@/hooks/useKitRequests";
-import { kitRequestFailureMessage, remainingQuantityOptions } from "@/lib/kitRequests";
+import { useJoinKitRequest, useUpdateKitRequestQuantity } from "@/hooks/useKitRequests";
+import { kitRequestFailureMessage, ownQuantityOptions } from "@/lib/kitRequests";
 import { formatKitQuantity } from "@/lib/shop/kitUnits";
 import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
 import { isShopCategoryId, type ShopCategoryId } from "@/lib/shopCategories";
@@ -38,10 +38,12 @@ function JoinKitRequestDialogBody({
   request: KitRequestCard;
   onOpenChange: (open: boolean) => void;
 }) {
+  const isUpdate = request.isParticipant && request.myQuantity > 0;
   const joinMutation = useJoinKitRequest();
+  const updateMutation = useUpdateKitRequestQuantity();
   const rateQuery = useExchangeRate();
-  const options = remainingQuantityOptions(request.remainingVials);
-  const [quantity, setQuantity] = React.useState(options[0] ?? 1);
+  const options = ownQuantityOptions(request.kitSizeVials, request.allocatedTotal, request.myQuantity);
+  const [quantity, setQuantity] = React.useState(isUpdate ? request.myQuantity : (options[0] ?? 1));
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [previewPrice, setPreviewPrice] = React.useState<number | null>(null);
   const [previewUnit, setPreviewUnit] = React.useState<number | null>(null);
@@ -49,11 +51,17 @@ function JoinKitRequestDialogBody({
   const [joined, setJoined] = React.useState<{ quantity: number; full: boolean; price: number | null } | null>(null);
 
   const categoryId: ShopCategoryId = isShopCategoryId(request.category) ? request.category : "peptides";
+  const maxOwn = options[options.length - 1] ?? 0;
   const liveTotal =
     previewPrice ??
     (request.myUnitPriceUsd != null ? request.myUnitPriceUsd * quantity : null);
+  const pending = joinMutation.isPending || updateMutation.isPending;
 
   async function handlePrepareConfirm() {
+    if (isUpdate) {
+      setConfirmOpen(true);
+      return;
+    }
     setPreviewLoading(true);
     try {
       const preview = await previewKitRequestJoin(request.id, quantity);
@@ -61,7 +69,7 @@ function JoinKitRequestDialogBody({
       setPreviewUnit(preview.myUnitPriceUsd);
       setConfirmOpen(true);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Vorschau nicht verfügbar. Bitte aktualisieren.");
+      toast.error(kitRequestFailureMessage(error, "preview_kit_request_join"));
     } finally {
       setPreviewLoading(false);
     }
@@ -69,13 +77,21 @@ function JoinKitRequestDialogBody({
 
   async function handleConfirm() {
     try {
+      if (isUpdate) {
+        const view = await updateMutation.mutateAsync({ id: request.id, quantity });
+        const full = view.status === "full";
+        setJoined({ quantity: view.myQuantity, full, price: request.myUnitPriceUsd != null ? request.myUnitPriceUsd * view.myQuantity : null });
+        setConfirmOpen(false);
+        toast.success(full ? "Anteil aktualisiert. Das Kit ist vollständig." : "Dein Kit Anteil wurde aktualisiert.");
+        return;
+      }
       const result = await joinMutation.mutateAsync({ id: request.id, quantity });
       const full = result.status === "full" && result.cartSynced;
       setJoined({ quantity: result.myQuantity, full, price: previewPrice });
       setConfirmOpen(false);
       toast.success(full ? "Du bist dabei! Das Kit ist vollständig." : "Du bist dabei!");
     } catch (error) {
-      toast.error(kitRequestFailureMessage(error));
+      toast.error(kitRequestFailureMessage(error, isUpdate ? "update_kit_share_quantity" : "join_kit_request"));
     }
   }
 
@@ -89,7 +105,15 @@ function JoinKitRequestDialogBody({
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{joined ? "Du bist dabei!" : "Wie viele möchtest du übernehmen?"}</DialogTitle>
+            <DialogTitle>
+              {joined
+                ? isUpdate
+                  ? "Anteil aktualisiert"
+                  : "Du bist dabei!"
+                : isUpdate
+                  ? "Menge ändern"
+                  : "Wie viele möchtest du übernehmen?"}
+            </DialogTitle>
             <DialogDescription>
               {request.productName} · {formatVendorDosageDisplay(request.variantLabel, request.productCode)}
             </DialogDescription>
@@ -98,9 +122,6 @@ function JoinKitRequestDialogBody({
             <div className="space-y-3">
               <p className="text-sm">
                 Dein Anteil: {formatKitQuantity(joined.quantity, categoryId, request.kitSizeVials)}
-              </p>
-              <p className="text-sm">
-                {request.allocatedTotal + joined.quantity} von {request.kitSizeVials} Vials vergeben
               </p>
               {joined.price != null ? (
                 <div>
@@ -117,9 +138,15 @@ function JoinKitRequestDialogBody({
             </div>
           ) : (
           <div className="space-y-4">
-            <p className="text-sm">Noch {request.remainingVials} verfügbar</p>
+            <p className="text-sm">
+              {isUpdate
+                ? `Aktuell ${request.myQuantity} · maximal ${maxOwn} möglich`
+                : `Noch ${request.remainingVials} verfügbar`}
+            </p>
             <div className="space-y-2">
-              <p className="text-sm font-medium">Wie viele möchtest du übernehmen?</p>
+              <p className="text-sm font-medium">
+                {isUpdate ? "Neue Menge" : "Wie viele möchtest du übernehmen?"}
+              </p>
               <div className="flex flex-wrap gap-2">
                 {options.map((qty) => (
                   <Button
@@ -150,7 +177,7 @@ function JoinKitRequestDialogBody({
             <Button
               className="min-h-11 w-full sm:w-auto"
               onClick={() => void handlePrepareConfirm()}
-              disabled={previewLoading || options.length === 0}
+              disabled={previewLoading || options.length === 0 || (isUpdate && quantity === request.myQuantity)}
             >
               {previewLoading ? "Bitte warten …" : "Weiter"}
             </Button>
@@ -164,8 +191,8 @@ function JoinKitRequestDialogBody({
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title="Passt alles?"
-        confirmLabel="Mit diesem Anteil beitreten"
-        loading={joinMutation.isPending}
+        confirmLabel={isUpdate ? "Menge speichern" : "Mit diesem Anteil beitreten"}
+        loading={pending}
         onConfirm={() => void handleConfirm()}
         description={
           <div className="space-y-3 text-left text-sm text-foreground">
@@ -173,7 +200,7 @@ function JoinKitRequestDialogBody({
               {request.productName} · {formatVendorDosageDisplay(request.variantLabel, request.productCode)}
             </p>
             <p>Dein Anteil: {formatKitQuantity(quantity, categoryId, request.kitSizeVials)}</p>
-            <p>Noch verfügbare Plätze: {request.remainingVials}</p>
+            {!isUpdate ? <p>Noch verfügbare Plätze: {request.remainingVials}</p> : null}
             {previewPrice != null ? (
               <div>
                 <p className="text-xs text-muted-foreground">Preis</p>

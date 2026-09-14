@@ -94,7 +94,8 @@ describe("kit join and leave customer copy", () => {
     const join = read("src/components/kit-requests/JoinKitRequestDialog.tsx");
     expect(join).toContain("previewKitRequestJoin");
     expect(join).toContain("useJoinKitRequest");
-    expect(join).toContain("remainingQuantityOptions");
+    expect(join).toContain("ownQuantityOptions");
+    expect(join).toContain("useUpdateKitRequestQuantity");
     expect(join).toContain("Du bist dabei!");
     expect(join).toContain("Passt alles?");
     expect(join).toContain("Mit diesem Anteil beitreten");

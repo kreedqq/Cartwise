@@ -2,6 +2,25 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-14 (Kit Gesuche One-Cart Sync)
+
+### Fixed
+
+- Joining the last vial(s) of a Kit Gesuch failed after a successful preview: becoming `full` triggers cart sync into the One Cart, and `reject_retail_kit_cart_item` still blocked kits when `carts.shop_area = shop` even though the kit/item area is group_buy. Symptom: „5 frei, nur 4 möglich“ / generic join toast on 9/10 → 10/10.
+- Open marketplace participants can change their own quantity again (`update_kit_share_quantity` sets the allow GUC; cart sync only when full). Capacity remains `others + new_own <= kit_size`.
+- Vendor-only leave/cancel/`get_my_kit_share` resolve via `kit_share_catalog_product`.
+
+### Added
+
+- Migration `0085_fix_kit_request_one_cart_sync.sql`.
+
+## 2026-09-14 (Telegram Remove Orphan Providers)
+
+### Fixed
+
+- Admin remove deleted `auth.identities` but left `auth.users.raw_app_meta_data.providers` containing `custom:telegram` (prod evidence on controlled `@dddd`). That stale metadata plus a long-lived client conflict marker produced false „Telegram Konto bereits verknüpft“ after remove.
+- `0081`: remove reconciles providers from remaining identities, read-backs identity+providers, and can clean orphaned providers. Admin UI surfaces orphans. Conflict TTL reduced to 3 minutes; fresh link clears stale conflict markers.
+
 ## 2026-09-14 (Telegram Identity Management Final)
 
 ### Fixed

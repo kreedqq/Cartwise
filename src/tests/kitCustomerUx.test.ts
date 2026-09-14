@@ -14,6 +14,7 @@ describe("kit customer UX", () => {
     expect(kitRequestCustomerStatusLabel("full")).toBe("Voll");
     expect(kitRequestCustomerStatusLabel("cancelled")).toBe("Abgebrochen");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Mitmachen");
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Menge ändern");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Kit verlassen");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Vials vergeben");
     expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Du bist dabei!");

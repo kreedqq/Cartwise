@@ -45,6 +45,8 @@ export function KitRequestCardView({
   const percent = kitRequestProgressPercent(request.allocatedTotal, request.kitSizeVials);
   const canJoin =
     request.status === "open" && !request.isCreator && !request.isParticipant && request.remainingVials > 0;
+  const canChangeQuantity =
+    request.status === "open" && request.isParticipant && request.myQuantity > 0;
   const canLeave = request.status === "open" && request.isParticipant && !request.isCreator;
   const canCancel = request.status === "open" && request.isCreator;
   const showRetry = request.status === "full" && (request.isParticipant || request.isCreator) && onRetryCart;
@@ -124,7 +126,12 @@ export function KitRequestCardView({
             Mitmachen
           </Button>
         ) : null}
-        {request.isParticipant && !canJoin ? (
+        {canChangeQuantity && onJoin ? (
+          <Button className="min-h-11 w-full" variant="secondary" onClick={() => onJoin(request)} disabled={joining}>
+            Menge ändern ({request.myQuantity})
+          </Button>
+        ) : null}
+        {request.isParticipant && !canJoin && !canChangeQuantity ? (
           <Button className="min-h-11 w-full" variant="secondary" disabled>
             Dein Anteil
           </Button>

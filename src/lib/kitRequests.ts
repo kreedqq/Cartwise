@@ -42,6 +42,34 @@ export function isValidJoinQuantity(remaining: number, quantity: number): boolea
   return remainingQuantityOptions(remaining).includes(quantity);
 }
 
+/** Free slots excluding the caller's current row (others only). */
+export function otherParticipantsQuantity(allocatedTotal: number, ownQuantity: number): number {
+  const allocated = Number.isFinite(allocatedTotal) ? allocatedTotal : 0;
+  const own = Number.isFinite(ownQuantity) ? Math.max(0, ownQuantity) : 0;
+  return Math.max(0, allocated - own);
+}
+
+/** Max absolute own quantity for join or update: kit_size - others (own not double-counted). */
+export function maxOwnKitQuantity(kitSize: number, allocatedTotal: number, ownQuantity = 0): number {
+  if (!Number.isInteger(kitSize) || kitSize < 1) return 0;
+  return Math.max(0, kitSize - otherParticipantsQuantity(allocatedTotal, ownQuantity));
+}
+
+export function canSetOwnKitQuantity(
+  kitSize: number,
+  allocatedTotal: number,
+  ownCurrentQuantity: number,
+  ownNewQuantity: number,
+): boolean {
+  if (!Number.isInteger(ownNewQuantity) || ownNewQuantity < 1) return false;
+  return ownNewQuantity <= maxOwnKitQuantity(kitSize, allocatedTotal, ownCurrentQuantity);
+}
+
+/** Quantity buttons for join (own=0) or update (own>0): 1..maxOwn. */
+export function ownQuantityOptions(kitSize: number, allocatedTotal: number, ownQuantity = 0): number[] {
+  return remainingQuantityOptions(maxOwnKitQuantity(kitSize, allocatedTotal, ownQuantity));
+}
+
 export const KIT_REQUEST_CARD_GRID =
   "grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3";
 
@@ -63,15 +91,44 @@ export const KIT_REQUEST_TAB_TRIGGER_CLASS =
 export const KIT_REQUEST_MUTATION_FAILED_MESSAGE =
   "Das hat leider nicht funktioniert. Dein Kit wurde nicht verändert. Bitte versuche es noch einmal.";
 
+function extractKitRpcError(error: unknown): { message: string; code?: string; details?: string; hint?: string } {
+  if (error instanceof Error) {
+    const withFields = error as Error & { code?: string; details?: string; hint?: string };
+    return {
+      message: error.message,
+      code: withFields.code,
+      details: withFields.details,
+      hint: withFields.hint,
+    };
+  }
+  if (error && typeof error === "object") {
+    const record = error as Record<string, unknown>;
+    const message =
+      typeof record.message === "string" && record.message.trim()
+        ? record.message
+        : typeof record.details === "string" && record.details.trim()
+          ? record.details
+          : "unknown";
+    return {
+      message,
+      code: typeof record.code === "string" ? record.code : undefined,
+      details: typeof record.details === "string" ? record.details : undefined,
+      hint: typeof record.hint === "string" ? record.hint : undefined,
+    };
+  }
+  return { message: String(error) };
+}
+
 /** Customer toast stays generic. The real RPC/Postgrest detail stays in the console. */
-export function kitRequestFailureMessage(error: unknown): string {
-  const detail =
-    error instanceof Error
-      ? error.message
-      : error && typeof error === "object" && "message" in error
-        ? String((error as { message: unknown }).message)
-        : String(error);
-  console.error("kit request failed:", error, detail);
+export function kitRequestFailureMessage(error: unknown, operation = "kit_request"): string {
+  const extracted = extractKitRpcError(error);
+  console.error("[peptix:kit]", {
+    operation,
+    code: extracted.code ?? null,
+    message: extracted.message,
+    details: extracted.details ?? null,
+    hint: extracted.hint ?? null,
+  });
   return KIT_REQUEST_MUTATION_FAILED_MESSAGE;
 }
 
