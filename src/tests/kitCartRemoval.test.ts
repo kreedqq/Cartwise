@@ -31,6 +31,9 @@ describe("0093 kit cart removal tracking migration", () => {
     expect(sql).toContain("Bestellte Kit-Anteile können nicht wiederhergestellt werden");
     expect(sql).toContain("alreadyInCart");
     expect(sql).toContain("kit_cart.restore");
+    const fix = read("supabase/migrations/0095_fix_kit_cart_restore_audit.sql");
+    expect(fix).toContain("'participantUserId', _participant_user_id");
+    expect(fix).toMatch(/log_audit\([\s\S]*null,[\s\S]*jsonb_build_object/);
     expect(sql).toContain("kit_share_sync_participant_cart(_kit_share_id, _participant_user_id)");
     expect(sql).toContain("grant execute on function public.restore_kit_share_cart_line");
     expect(sql).toContain("to authenticated");

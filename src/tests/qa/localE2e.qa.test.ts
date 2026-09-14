@@ -422,8 +422,7 @@ describe("13 kit cart sync", () => {
 describe("14 kit cart removal and restore", () => {
   it("tracks user kit delete, restores idempotently, keeps sibling order intact", async () => {
     const { client: creator, account: creatorAcc } = await signIn("groupBuy");
-    const { data: master } = await creator.from("products").select("id").eq("code", "QA-KIT-001").single();
-    if (!master?.id) throw new Error("QA-KIT-001 missing");
+    const master = await shopProductByCode(creator, "group_buy_1", "QA-KIT-001");
 
     const created = await creator.rpc("create_kit_share", {
       _product_id: master.id,
