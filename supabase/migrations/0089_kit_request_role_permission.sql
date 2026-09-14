@@ -172,12 +172,21 @@ begin
 end;
 $mig$;
 
--- list_open_kit_requests: empty list when denied
+-- list_open_kit_requests: empty list when denied (multi-line and single-line auth checks)
 do $mig$
 declare
   def text;
-  needle text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501'; end if;$n$;
-  insert_txt text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501'; end if;
+  needle_ml text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501';
+  end if;$n$;
+  insert_ml text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501';
+  end if;
+  if not public.has_role(_uid, 'admin') and not public.user_can_use_kit_requests(_uid) then
+    _page_n := greatest(coalesce(_page, 1), 1);
+    _size := least(greatest(coalesce(_page_size, 20), 1), 50);
+    return jsonb_build_object('items', '[]'::jsonb, 'total', 0, 'page', _page_n, 'pageSize', _size);
+  end if;$n$;
+  needle_sl text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501'; end if;$n$;
+  insert_sl text := $n$raise exception 'Nicht angemeldet.' using errcode = '42501'; end if;
   if not public.has_role(_uid, 'admin') and not public.user_can_use_kit_requests(_uid) then
     _page_n := greatest(coalesce(_page, 1), 1);
     _size := least(greatest(coalesce(_page_size, 20), 1), 50);
@@ -195,10 +204,13 @@ begin
   end if;
 
   if position('user_can_use_kit_requests' in def) = 0 then
-    if position(needle in def) = 0 then
+    if position(needle_ml in def) > 0 then
+      execute replace(def, needle_ml, insert_ml);
+    elsif position(needle_sl in def) > 0 then
+      execute replace(def, needle_sl, insert_sl);
+    else
       raise exception '0089: could not patch list_open_kit_requests';
     end if;
-    execute replace(def, needle, insert_txt);
   end if;
 end;
 $mig$;

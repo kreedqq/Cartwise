@@ -22,7 +22,9 @@ export default defineConfig({
   test: {
     // Scoped to the real source tree so a stray copy of the project inside the
     // working directory can never be picked up as a second, stale test suite.
+    // Local Supabase QA lives in *.qa.test.ts and runs only via npm run test:qa.
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    exclude: ["src/tests/qa/**", "node_modules/**", "dist/**"],
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/tests/setup.ts"],

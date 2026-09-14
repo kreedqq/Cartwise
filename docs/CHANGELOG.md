@@ -2,6 +2,16 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-14 (Local isolated QA + checkout numeric fix)
+
+### Added
+
+- Local QA stack: `npm run test:qa` seeds localhost-only users/products and runs Vitest integration tests against `supabase start` (ports 55421+ to avoid Windows Hyper-V exclusions). Production URL abort guard (`cnjrjinvxycdkrmzcime` / `peptix.app` / `cartwise-prod`).
+- Migration `0091`: `cart_kit_share_is_checkout_ready` accepts `numeric` quantity (matches `cart_items.quantity`). Fixes create_order SQLSTATE 42883 after 0088.
+- Regression tests: `kitCheckoutQuantityType.test.ts`, QA `checkoutReadyNumeric.qa.test.ts`.
+- Local QA stack (`npm run test:qa`) with production URL abort guard.
+- Telegram production gate unchanged; local QA users get usernames without Telegram.
+
 ## 2026-09-14 (Order checkout + Kit role permission)
 
 ### Fixed
@@ -13,10 +23,6 @@ Only material changes. Dates are local project days.
 
 - Migration `0089`: `customer_roles.can_use_kit_requests` (default false / fail closed). Seed: Group Buy = true. Server assert on create/join/preview/requestable; open list returns empty when denied; leave/list_my stay for existing participation. Admin role catalog checkbox + `get_my_can_use_kit_requests` for UI gating.
 - Migration `0090`: production verification guard after an initial 0089 history stub; confirms role flag + RPC patches.
-
-### Notes
-
-- Migrations **not** applied to production yet. No commit/deploy until explicit approval. Does not modify 0070 / 0085 / 0086 / 0087.
 
 ## 2026-09-14 (Admin Backoffice IA)
 

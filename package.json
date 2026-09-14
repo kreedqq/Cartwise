@@ -13,6 +13,8 @@
     "format:check": "prettier --check .",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:qa": "node scripts/qa/run-local-qa.mjs",
+    "qa:seed": "node scripts/qa/seed-local-qa.mjs",
     "research:fetch": "node scripts/fetch-research-sources.mjs",
     "research:labels": "node scripts/fetch-regulatory-labels.mjs",
     "research:compile": "node scripts/compile-research-profiles.mjs",

@@ -61,4 +61,10 @@ describe("checkout order flow root cause + fix", () => {
     expect(migration).toContain("resolve_area_catalog_product");
     expect(migration).toMatch(/payment_method.*crypto.*bank_transfer.*paypal|crypto.*bank_transfer.*paypal/);
   });
+
+  it("aligns cart_kit_share_is_checkout_ready with numeric cart_items.quantity (0091)", () => {
+    const fix = read("supabase/migrations/0091_cart_kit_share_checkout_ready_numeric.sql");
+    expect(fix).toContain("_quantity numeric");
+    expect(fix).toContain("drop function if exists public.cart_kit_share_is_checkout_ready(uuid, uuid, integer)");
+  });
 });
