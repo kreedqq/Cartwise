@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/toaster";
 import { QUERY_KEYS } from "@/lib/constants";
+import { participantCartPresenceLabel } from "@/lib/kitParticipantCartPresence";
+import { useRestoreKitShareCartLine } from "@/hooks/useRestoreKitShareCartLine";
+import { extractRpcErrorMessage } from "@/services/username";
 import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { useCanUseKitRequests, useKitRequestableProductIds } from "@/hooks/useKitRequests";
 import { KIT_REQUEST_CREATE_LABEL, KIT_REQUEST_NOT_SHAREABLE_MESSAGE, KIT_REQUEST_ROLE_DENIED_MESSAGE } from "@/lib/kitRequests";
@@ -83,7 +86,7 @@ function resolveInitialVariantId(
 }
 
 function kitSyncErrorMessage(err: unknown): string {
-  const message = err instanceof Error ? err.message : "";
+  const message = extractRpcErrorMessage(err).trim();
   if (message && !/42501|permission denied|JWT/i.test(message)) {
     return message;
   }
@@ -106,6 +109,8 @@ export function KitShareDialog({
   const { user } = useAuth();
   const rateQuery = useExchangeRate();
   const queryClient = useQueryClient();
+  const restoreKitCart = useRestoreKitShareCartLine({ viewerUserId: user?.id });
+  const [restoringMyCart, setRestoringMyCart] = React.useState(false);
   const shareableVariants = React.useMemo(
     () => (group ? kitShareableVariants(group.variants) : []),
     [group],
@@ -374,6 +379,39 @@ export function KitShareDialog({
     }
   }
 
+  function handleRestoreMyKitCart() {
+    if (!kitView || !user?.id || !kitView.myCanRestoreCartLine) return;
+    setRestoringMyCart(true);
+    setError(null);
+    restoreKitCart.mutate(
+      { kitShareId: kitView.id, participantUserId: user.id },
+      {
+        onSuccess: async (result) => {
+          try {
+            const view = await getMyKitShare(kitView.id);
+            assertKitSharePricePrivacy(view);
+            setKitView(view);
+            await invalidateCarts();
+            if (result.alreadyInCart) {
+              toast.message("Dein Kit-Anteil befindet sich bereits im Warenkorb.");
+            } else {
+              toast.success("Dein Kit-Anteil wurde wieder in deinen Warenkorb gelegt.");
+            }
+          } catch (err) {
+            setError(kitSyncErrorMessage(err));
+          }
+        },
+        onError: (err) => {
+          setError(
+            extractRpcErrorMessage(err).trim() ||
+              "Dein Kit-Anteil konnte nicht wiederhergestellt werden.",
+          );
+        },
+        onSettled: () => setRestoringMyCart(false),
+      },
+    );
+  }
+
   const lockedProductName = kitView?.productName ?? group?.displayName ?? "Produkt";
   const lockedVariantLabel = kitView
     ? variantStrengthLabel({
@@ -507,6 +545,39 @@ export function KitShareDialog({
                     Du hast diesen Kit-Anteil bereits bestellt. Deine Menge ist ein fester Bestellwert und kann nicht
                     mehr geändert werden.
                   </p>
+                )}
+                {!kitView.myHasOrdered && kitView.myCartPresence && (
+                  <div
+                    className={
+                      kitView.myCartPresence === "removed_from_cart"
+                        ? "space-y-2 rounded-md border border-amber-500/40 bg-amber-500/5 px-3 py-2"
+                        : "space-y-1 rounded-md border border-border px-3 py-2"
+                    }
+                  >
+                    <p className="text-xs text-muted-foreground">Status deines Kit-Anteils</p>
+                    <p
+                      className={
+                        kitView.myCartPresence === "removed_from_cart"
+                          ? "text-sm font-medium text-amber-800 dark:text-amber-200"
+                          : "text-sm text-foreground"
+                      }
+                    >
+                      {participantCartPresenceLabel(kitView.myCartPresence)}
+                    </p>
+                    {kitView.myCanRestoreCartLine ? (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="w-full sm:w-auto"
+                        disabled={busy || restoringMyCart || restoreKitCart.isPending}
+                        loading={restoringMyCart || restoreKitCart.isPending}
+                        onClick={handleRestoreMyKitCart}
+                      >
+                        Wieder in Warenkorb legen
+                      </Button>
+                    ) : null}
+                  </div>
                 )}
               </div>
 

@@ -1,3 +1,4 @@
+import { mapServerKitCartPresence, type ParticipantCartPresenceState } from "@/lib/kitParticipantCartPresence";
 import { supabase } from "@/lib/supabaseClient";
 import type { PaymentMethod } from "@/lib/shop/paymentMethod";
 
@@ -26,6 +27,9 @@ export interface KitShareView {
   isCreator: boolean;
   /** True once the viewer has already submitted their own order for this kit share. */
   myHasOrdered: boolean;
+  /** Viewer-only cart state for this kit share (no foreign participant cart data). */
+  myCartPresence: ParticipantCartPresenceState | null;
+  myCanRestoreCartLine: boolean;
   participants: KitShareParticipantView[];
 }
 
@@ -54,6 +58,8 @@ function mapKitShareView(raw: Record<string, unknown>): KitShareView {
     canAddToCart: Boolean(raw.canAddToCart),
     isCreator: Boolean(raw.isCreator),
     myHasOrdered: Boolean(raw.myHasOrdered),
+    myCartPresence: mapServerKitCartPresence(raw.myCartPresence),
+    myCanRestoreCartLine: Boolean(raw.myCanRestoreCartLine),
     participants,
   };
 }

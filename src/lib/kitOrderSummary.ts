@@ -5,6 +5,12 @@ import {
   formatPartialKitQuantity,
   resolveProductCategoryId,
 } from "@/lib/quantityFormat";
+import {
+  canRestoreRemovedKitCartLine,
+  participantCartPresenceLabel,
+  resolveParticipantCartPresence,
+  type CartLinkWithUser,
+} from "@/lib/kitParticipantCartPresence";
 import type { ShopCategoryId } from "@/lib/shopCategories";
 import {
   formatOrderTelegramSnapshot,
@@ -29,6 +35,9 @@ export interface KitShareContextParticipant {
   user_id: string;
   quantity: number;
   order_id: string | null;
+  ordered_at?: string | null;
+  cart_line_removed_at?: string | null;
+  cart_line_last_in_cart_at?: string | null;
 }
 
 export interface KitShareCartLink {
@@ -36,6 +45,7 @@ export interface KitShareCartLink {
   kit_share_id: string;
   product_id: string | null;
   quantity: number;
+  user_id?: string;
 }
 
 export interface KitShareOrderContext {
@@ -56,6 +66,7 @@ export interface SharedKitParticipantView {
   statusLabel: string;
   isCurrentOrder: boolean;
   hasProcessingOrder: boolean;
+  canRestoreCartLine: boolean;
 }
 
 export interface SharedKitAdminView {
@@ -313,10 +324,15 @@ export function buildSharedKitsForOrder(
       code: orderItem?.product_code_snapshot,
     });
 
+    const cartLinksWithUser: CartLinkWithUser[] = (context.cartLinks ?? []).flatMap((link) =>
+      link.user_id ? [{ ...link, user_id: link.user_id }] : [],
+    );
+
     const participantViews: SharedKitParticipantView[] = members
       .map((member) => {
         const memberOrder = member.order_id ? ordersById.get(member.order_id) : undefined;
         const status = kitParticipantStatusLabel(memberOrder);
+        const cartPresence = resolveParticipantCartPresence(member, cartLinksWithUser);
         const isCurrent = member.order_id === orderId;
         const displayQty =
           isCurrent && orderItem
@@ -326,6 +342,11 @@ export function buildSharedKitsForOrder(
           isCurrent && orderItem?.kit_size_vials_snapshot
             ? asQuantity(orderItem.kit_size_vials_snapshot)
             : kit.kit_size_vials;
+        const statusLabel =
+          memberOrder != null
+            ? status.statusLabel
+            : participantCartPresenceLabel(cartPresence);
+
         return {
           userId: member.user_id,
           telegramLabel: kitParticipantTelegramLabel({
@@ -336,9 +357,10 @@ export function buildSharedKitsForOrder(
           kitSize: displayKitSize,
           shareLabel: formatSharedKitShareLabel(displayQty, displayKitSize, categoryId),
           statusKey: status.statusKey,
-          statusLabel: status.statusLabel,
+          statusLabel,
           isCurrentOrder: member.order_id === orderId,
           hasProcessingOrder: status.hasProcessingOrder,
+          canRestoreCartLine: canRestoreRemovedKitCartLine(member, cartLinksWithUser),
         };
       })
       .sort((a, b) => {

@@ -29,6 +29,7 @@ import { ShippingProgressSelect } from "@/components/orders/ShippingProgressSele
 import { originalOrderTotalUsd, useApplyOrderCorrection, useOrderRevisions } from "@/hooks/useOrderCorrection";
 import { useAdminOrder, useDeleteOrder, useOrderAdminNote, useOrderStatusHistory, useSetOrderStatus } from "@/hooks/useOrders";
 import { useAdminKitOrderContext, useAdminOrders, useAdminUserDirectory } from "@/hooks/useAdminOrders";
+import { useRestoreKitShareCartLine } from "@/hooks/useRestoreKitShareCartLine";
 import { useOrderProgress } from "@/hooks/useOrderProgress";
 import { resolveOrderProgress } from "@/lib/orderProgress";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
@@ -42,6 +43,7 @@ import { QUERY_KEYS } from "@/lib/constants";
 import { canPermanentlyDeleteOrder, formatOrderTelegramSnapshot, ORDER_STATUS_LABELS } from "@/services/orders";
 import { listRoleSurchargeLinesForOrder } from "@/services/roleSurcharge";
 import { toast } from "@/components/ui/toaster";
+import { extractRpcErrorMessage } from "@/services/username";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 import type { OrderStatus } from "@/types/database";
 
@@ -69,6 +71,8 @@ export default function AdminOrderDetailPage() {
   const [correctOpen, setCorrectOpen] = React.useState(false);
   const revisionsQuery = useOrderRevisions(orderId);
   const applyCorrection = useApplyOrderCorrection(orderId);
+  const restoreKitCart = useRestoreKitShareCartLine({ orderId });
+  const [restoringCartUserId, setRestoringCartUserId] = React.useState<string | null>(null);
   const adminNote = adminNoteDraft ?? noteQuery.data ?? "";
 
   if (orderQuery.isLoading) return <FullScreenSpinner label="Bestellung wird geladen …" />;
@@ -317,7 +321,32 @@ export default function AdminOrderDetailPage() {
       {sharedKits.length > 0 &&
         sharedKits.map((kit) => (
           <AdminSection key={kit.kitShareId} title="Geteiltes Kit">
-            <SharedKitAdminCard kit={kit} />
+            <SharedKitAdminCard
+              kit={kit}
+              restoringUserId={restoringCartUserId}
+              onRestoreCartLine={({ kitShareId, participantUserId }) => {
+                setRestoringCartUserId(participantUserId);
+                restoreKitCart.mutate(
+                  { kitShareId, participantUserId },
+                  {
+                    onSuccess: (result) => {
+                      if (result.alreadyInCart) {
+                        toast.message("Kit-Anteil befindet sich bereits im Warenkorb.");
+                      } else {
+                        toast.success("Kit-Anteil wieder in den Warenkorb gelegt.");
+                      }
+                    },
+                    onError: (error) => {
+                      const message =
+                        extractRpcErrorMessage(error).trim() ||
+                        "Kit-Anteil konnte nicht wiederhergestellt werden.";
+                      toast.error(message);
+                    },
+                    onSettled: () => setRestoringCartUserId(null),
+                  },
+                );
+              }}
+            />
           </AdminSection>
         ))}
 

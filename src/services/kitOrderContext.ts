@@ -26,8 +26,13 @@ function readNumber(row: Record<string, unknown>, key: string): number {
 export async function listAdminKitOrderContext(): Promise<KitShareOrderContext> {
   const [kitsResult, participantsResult, cartResult, profilesResult] = await Promise.all([
     supabase.from("kit_shares").select("id, product_id, kit_size_vials"),
-    supabase.from("kit_share_participants").select("kit_share_id, user_id, quantity, order_id"),
-    supabase.from("cart_items").select("cart_id, kit_share_id, product_id, quantity").not("kit_share_id", "is", null),
+    supabase
+      .from("kit_share_participants")
+      .select("kit_share_id, user_id, quantity, order_id, ordered_at, cart_line_removed_at, cart_line_last_in_cart_at"),
+    supabase
+      .from("cart_items")
+      .select("cart_id, kit_share_id, product_id, quantity, carts!inner(user_id)")
+      .not("kit_share_id", "is", null),
     supabase.from("profiles").select("id, username"),
   ]);
 
@@ -57,6 +62,9 @@ export async function listAdminKitOrderContext(): Promise<KitShareOrderContext> 
         user_id,
         quantity: readNumber(record, "quantity"),
         order_id: readNullableString(record, "order_id"),
+        ordered_at: readNullableString(record, "ordered_at"),
+        cart_line_removed_at: readNullableString(record, "cart_line_removed_at"),
+        cart_line_last_in_cart_at: readNullableString(record, "cart_line_last_in_cart_at"),
       },
     ];
   });
@@ -67,12 +75,16 @@ export async function listAdminKitOrderContext(): Promise<KitShareOrderContext> 
     const cart_id = readString(record, "cart_id");
     const kit_share_id = readString(record, "kit_share_id");
     if (!cart_id || !kit_share_id) return [];
+    const carts = record.carts;
+    const cartRecord = Array.isArray(carts) ? asRecord(carts[0]) : asRecord(carts);
+    const user_id = cartRecord ? readString(cartRecord, "user_id") : "";
     return [
       {
         cart_id,
         kit_share_id,
         product_id: readNullableString(record, "product_id"),
         quantity: readNumber(record, "quantity"),
+        user_id: user_id || undefined,
       },
     ];
   });

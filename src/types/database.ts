@@ -344,6 +344,8 @@ export interface Database {
           quantity: number;
           ordered_at: string | null;
           order_id: string | null;
+          cart_line_removed_at: string | null;
+          cart_line_last_in_cart_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -1631,6 +1633,10 @@ export interface Database {
       add_kit_share_to_cart: {
         Args: { _kit_share_id: string };
         Returns: string;
+      };
+      restore_kit_share_cart_line: {
+        Args: { _kit_share_id: string; _participant_user_id: string };
+        Returns: Record<string, unknown>;
       };
       leave_kit_share: { Args: { _kit_share_id: string }; Returns: undefined };
       cancel_kit_share: { Args: { _kit_share_id: string }; Returns: undefined };

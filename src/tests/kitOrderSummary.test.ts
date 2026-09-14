@@ -1123,6 +1123,38 @@ describe("admin shared kit participants", () => {
     expect(views[0]?.complete).toBe(true);
   });
 
+  it("shows removed cart status for open participant while sibling order stays unchanged", () => {
+    const orders = [
+      makeOrder({ status: "pending" }),
+      makeOrder({
+        id: "order-2",
+        user_id: "user-penbuddy",
+        status: "pending",
+        telegram_username_snapshot: "Penbuddy",
+      }),
+    ];
+    const context: KitShareOrderContext = {
+      kits: [{ id: "kit-10", product_id: "prod-selank", kit_size_vials: 10 }],
+      participants: [
+        { kit_share_id: "kit-10", user_id: "user-pepsi", quantity: 3, order_id: "order-1" },
+        {
+          kit_share_id: "kit-10",
+          user_id: "user-penbuddy",
+          quantity: 7,
+          order_id: null,
+          cart_line_removed_at: "2026-03-01T12:00:00.000Z",
+        },
+      ],
+      cartLinks: [],
+      usernamesByUserId: { "user-pepsi": "TuelayE.", "user-penbuddy": "Penbuddy" },
+    };
+    const views = buildSharedKitsForOrder("order-1", [makeItem({ quantity: 3 })], orders, context);
+    const penbuddy = views[0]?.participants.find((p) => p.userId === "user-penbuddy");
+    expect(penbuddy?.statusLabel).toBe("Kit-Anteil entfernt");
+    expect(penbuddy?.canRestoreCartLine).toBe(true);
+    expect(views[0]?.participants.find((p) => p.userId === "user-pepsi")?.statusLabel).toBe("Eingegangen");
+  });
+
   it("uses the order snapshot and never display_name", () => {
     expect(
       kitParticipantTelegramLabel({

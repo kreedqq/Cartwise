@@ -33,6 +33,8 @@ const sampleView = {
   canAddToCart: true,
   isCreator: true,
   myHasOrdered: false,
+  myCartPresence: "in_cart" as const,
+  myCanRestoreCartLine: false,
   participants: [
     { isSelf: true, displayName: "Du", quantity: 3, hasOrdered: false },
     { isSelf: false, displayName: "Teilnehmer", quantity: 7, hasOrdered: false },
@@ -133,10 +135,27 @@ describe("kitShares service", () => {
   });
 
   it("defaults hasOrdered/myHasOrdered to false when the server omits them (older payload)", async () => {
-    rpc.mockResolvedValue({ data: sampleView, error: null });
+    const { myCartPresence: _p, myCanRestoreCartLine: _r, ...legacy } = sampleView;
+    rpc.mockResolvedValue({ data: legacy, error: null });
     const view = await getMyKitShare("kit-1");
     expect(view.myHasOrdered).toBe(false);
     expect(view.participants.every((p) => p.hasOrdered === false)).toBe(true);
+    expect(view.myCartPresence).toBeNull();
+    expect(view.myCanRestoreCartLine).toBe(false);
+  });
+
+  it("maps myCartPresence and myCanRestoreCartLine for self-restore UX", async () => {
+    rpc.mockResolvedValue({
+      data: {
+        ...sampleView,
+        myCartPresence: "removed_from_cart",
+        myCanRestoreCartLine: true,
+      },
+      error: null,
+    });
+    const view = await getMyKitShare("kit-1");
+    expect(view.myCartPresence).toBe("removed_from_cart");
+    expect(view.myCanRestoreCartLine).toBe(true);
   });
 
   it("adds kit share to cart via RPC with only kit share id", async () => {
