@@ -1682,6 +1682,15 @@ export interface Database {
         Returns: Record<string, unknown>;
       };
       admin_cancel_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
+      admin_set_kit_request_distribution: {
+        Args: { _kit_share_id: string; _allocations: unknown };
+        Returns: Record<string, unknown>;
+      };
+      admin_search_kit_request_users: {
+        Args: { _query: string; _limit?: number };
+        Returns: Record<string, unknown>;
+      };
+      admin_delete_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
       set_order_status: {
         Args: { _order_id: string; _status: OrderStatus; _admin_note: string | null };
         Returns: Database["public"]["Tables"]["orders"]["Row"];

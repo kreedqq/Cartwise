@@ -2,6 +2,18 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-14 (Admin Kit Verteilung)
+
+### Added
+
+- Migration `0087_admin_kit_request_distribution.sql`: atomic `admin_set_kit_request_distribution`, username search, safe `admin_delete_kit_request`.
+- Admin detail „Kit Verteilung“: add/remove participants, rewrite allocations in one save, live capacity, cancel + delete confirmations.
+- Participant guard allows admin remove when `peptix.allow_kit_request_join` is set; area trigger allows admin inserts.
+
+### Notes
+
+- Capacity remains `SUM(qty) <= kit_size`. Full kits use existing `kit_share_sync_all_participant_carts`. Ordered kits are fail-closed.
+
 ## 2026-09-14 (Admin Kit Gesuche usable actions)
 
 ### Fixed

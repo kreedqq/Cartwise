@@ -46,8 +46,20 @@ export interface AdminKitRequestDetail extends AdminKitRequestListItem {
   cartLineCount: number;
   canEditMeta: boolean;
   canEditQuantities: boolean;
+  canEditDistribution: boolean;
   canCancel: boolean;
+  canDelete: boolean;
   canChangeProduct: boolean;
+}
+
+export interface AdminKitUserSearchHit {
+  userId: string;
+  username: string;
+}
+
+export interface AdminKitDistributionAllocation {
+  userId: string;
+  quantity: number;
 }
 
 export interface AdminKitRequestListPage {
@@ -134,7 +146,9 @@ function mapDetail(raw: Record<string, unknown>): AdminKitRequestDetail {
     cartLineCount: Number(raw.cartLineCount ?? 0),
     canEditMeta: Boolean(raw.canEditMeta),
     canEditQuantities: Boolean(raw.canEditQuantities),
+    canEditDistribution: Boolean(raw.canEditDistribution ?? raw.canEditQuantities),
     canCancel: Boolean(raw.canCancel),
+    canDelete: Boolean(raw.canDelete),
     canChangeProduct: Boolean(raw.canChangeProduct),
   };
 }
@@ -208,6 +222,42 @@ export async function adminCancelKitRequest(id: string): Promise<AdminKitRequest
   const { data, error } = await supabase.rpc("admin_cancel_kit_request", { _kit_share_id: id });
   if (error) throw error;
   return mapDetail(asRecord(data));
+}
+
+export async function adminSetKitRequestDistribution(input: {
+  id: string;
+  allocations: AdminKitDistributionAllocation[];
+}): Promise<AdminKitRequestDetail> {
+  const { data, error } = await supabase.rpc("admin_set_kit_request_distribution", {
+    _kit_share_id: input.id,
+    _allocations: input.allocations.map((row) => ({
+      userId: row.userId,
+      quantity: row.quantity,
+    })),
+  });
+  if (error) throw error;
+  return mapDetail(asRecord(data));
+}
+
+export async function adminSearchKitRequestUsers(query: string): Promise<AdminKitUserSearchHit[]> {
+  const { data, error } = await supabase.rpc("admin_search_kit_request_users", {
+    _query: query,
+    _limit: 20,
+  });
+  if (error) throw error;
+  const raw = asRecord(data);
+  const items = Array.isArray(raw.items) ? (raw.items as Record<string, unknown>[]) : [];
+  return items.map((item) => ({
+    userId: String(item.userId),
+    username: String(item.username ?? ""),
+  }));
+}
+
+export async function adminDeleteKitRequest(id: string): Promise<{ deleted: boolean; id: string }> {
+  const { data, error } = await supabase.rpc("admin_delete_kit_request", { _kit_share_id: id });
+  if (error) throw error;
+  const raw = asRecord(data);
+  return { deleted: Boolean(raw.deleted), id: String(raw.id ?? id) };
 }
 
 export function adminKitRpcErrorMessage(error: unknown, fallback: string): string {

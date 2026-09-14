@@ -3,10 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/constants";
 import {
   adminCancelKitRequest,
+  adminDeleteKitRequest,
   adminGetKitRequest,
   adminListKitRequests,
+  adminSearchKitRequestUsers,
+  adminSetKitRequestDistribution,
   adminUpdateKitRequestMeta,
-  adminUpdateKitRequestParticipantQuantity,
   type AdminKitRequestDetail,
   type AdminKitRequestStatusFilter,
 } from "@/services/adminKitRequests";
@@ -40,8 +42,8 @@ export function useAdminKitRequest(id: string | undefined) {
 
 function useInvalidateAdminKitRequests() {
   const queryClient = useQueryClient();
-  return (detail?: AdminKitRequestDetail) => {
-    if (detail) {
+  return (detail?: AdminKitRequestDetail | { id: string }) => {
+    if (detail && "participants" in detail) {
       queryClient.setQueryData(QUERY_KEYS.adminKitRequest(detail.id), detail);
     }
     void queryClient.invalidateQueries({ queryKey: ["admin-kit-requests"] });
@@ -58,11 +60,20 @@ export function useAdminUpdateKitRequestMeta() {
   });
 }
 
-export function useAdminUpdateKitRequestParticipantQuantity() {
+export function useAdminSetKitRequestDistribution() {
   const invalidate = useInvalidateAdminKitRequests();
   return useMutation({
-    mutationFn: adminUpdateKitRequestParticipantQuantity,
+    mutationFn: adminSetKitRequestDistribution,
     onSuccess: (detail) => invalidate(detail),
+  });
+}
+
+export function useAdminSearchKitRequestUsers(query: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["admin-kit-request-user-search", query],
+    queryFn: () => adminSearchKitRequestUsers(query),
+    enabled: enabled && query.trim().length >= 2,
+    staleTime: 10_000,
   });
 }
 
@@ -71,5 +82,17 @@ export function useAdminCancelKitRequest() {
   return useMutation({
     mutationFn: adminCancelKitRequest,
     onSuccess: (detail) => invalidate(detail),
+  });
+}
+
+export function useAdminDeleteKitRequest() {
+  const invalidate = useInvalidateAdminKitRequests();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: adminDeleteKitRequest,
+    onSuccess: (result) => {
+      queryClient.removeQueries({ queryKey: QUERY_KEYS.adminKitRequest(result.id) });
+      invalidate({ id: result.id });
+    },
   });
 }
