@@ -57,6 +57,7 @@ export async function applyTelegramReauthUsername(): Promise<string> {
 }
 
 const TRANSFER_INTENT_KEY = "peptix:telegram-transfer-intent";
+const TRANSFER_INTENT_LOCAL_KEY = "peptix:telegram-transfer-intent-local";
 const TRANSFER_CONFLICT_KEY = "peptix:telegram-identity-conflict";
 /** Conflict UI is only valid across the immediate OAuth round-trip after identity_already_exists. */
 const TRANSFER_CONFLICT_TTL_MS = 3 * 60 * 1000;
@@ -98,11 +99,34 @@ export function storeTelegramTransferIntent(intentId: string): void {
   } catch {
     // ignore
   }
+  // Backup: some browsers drop sessionStorage across the OAuth redirect edge cases.
+  try {
+    localStorage.setItem(TRANSFER_INTENT_LOCAL_KEY, JSON.stringify({ id: intentId, at: Date.now() }));
+  } catch {
+    // ignore
+  }
 }
 
 export function readTelegramTransferIntent(): string | null {
   try {
-    return sessionStorage.getItem(TRANSFER_INTENT_KEY);
+    const fromSession = sessionStorage.getItem(TRANSFER_INTENT_KEY);
+    if (fromSession) return fromSession;
+  } catch {
+    // ignore
+  }
+  try {
+    const raw = localStorage.getItem(TRANSFER_INTENT_LOCAL_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { id?: string; at?: number };
+    if (!parsed?.id || typeof parsed.id !== "string") {
+      localStorage.removeItem(TRANSFER_INTENT_LOCAL_KEY);
+      return null;
+    }
+    if (!Number.isFinite(parsed.at) || Date.now() - Number(parsed.at) > 30 * 60 * 1000) {
+      localStorage.removeItem(TRANSFER_INTENT_LOCAL_KEY);
+      return null;
+    }
+    return parsed.id;
   } catch {
     return null;
   }
@@ -111,6 +135,11 @@ export function readTelegramTransferIntent(): string | null {
 export function clearTelegramTransferIntent(): void {
   try {
     sessionStorage.removeItem(TRANSFER_INTENT_KEY);
+  } catch {
+    // ignore
+  }
+  try {
+    localStorage.removeItem(TRANSFER_INTENT_LOCAL_KEY);
   } catch {
     // ignore
   }

@@ -108,8 +108,23 @@ export default function AuthCallbackPage() {
       if (result.status === "authenticated") {
         // Flow C only: explicit transfer confirmation must have set both markers.
         if (flowKind === "transfer" && transferIntentId) {
+          console.info("[peptix:transfer]", {
+            phase: "before_complete",
+            intentId: transferIntentId,
+            targetUserId: null,
+            currentSessionUserId: sessionUserId,
+            sessionProvider,
+            hasTelegramIdentity,
+            flowKind,
+          });
           try {
-            await completeTelegramIdentityTransfer(transferIntentId);
+            const applied = await completeTelegramIdentityTransfer(transferIntentId);
+            console.info("[peptix:transfer]", {
+              phase: "complete_ok",
+              intentId: transferIntentId,
+              currentSessionUserId: sessionUserId,
+              applied,
+            });
             clearTelegramTransferIntent();
             clearTelegramIdentityConflict();
             if (sessionUserId) clearUsernameChangeEligible(sessionUserId);
@@ -117,6 +132,13 @@ export default function AuthCallbackPage() {
             toast.success("Telegram erfolgreich verknüpft. Bitte melde dich erneut mit E-Mail an.");
             await finish("/login");
           } catch (err) {
+            console.info("[peptix:transfer]", {
+              phase: "complete_failed",
+              intentId: transferIntentId,
+              currentSessionUserId: sessionUserId,
+              sessionProvider,
+              error: mapUsernameError(err).slice(0, 180),
+            });
             clearTelegramTransferIntent();
             toast.error(mapUsernameError(err));
             await signOut();
@@ -127,6 +149,12 @@ export default function AuthCallbackPage() {
 
         // Stale transfer intent must never hijack Flow A/B.
         if (transferIntentId) {
+          console.info("[peptix:transfer]", {
+            phase: "stale_intent_ignored",
+            intentId: transferIntentId,
+            flowKind,
+            currentSessionUserId: sessionUserId,
+          });
           clearTelegramTransferIntent();
         }
         if (flowKind === "login") {
