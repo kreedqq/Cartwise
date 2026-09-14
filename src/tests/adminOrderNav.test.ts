@@ -63,6 +63,7 @@ describe("hub admin navigation", () => {
         "/admin/surcharges",
         "/admin/shipping-costs",
         "/admin/order-summary",
+        "/admin/kit-requests",
         "/admin/audit-log",
         "/admin/research",
         "/admin/announcements",
@@ -81,10 +82,12 @@ describe("hub admin navigation", () => {
     expect(orders?.items.map((item) => item.label)).toEqual([
       "Übersicht",
       "Bestell Zusammenfassung",
+      "Kit Gesuche",
       "Rollenaufschläge",
       "Versandkosten",
       "Zahlungsmethoden",
     ]);
+    expect(orders?.items.map((item) => item.to)).toContain("/admin/kit-requests");
     expect(orders?.items.map((item) => item.label)).not.toContain("Versand");
     expect(orders?.items.map((item) => item.label)).not.toContain("Eingegangene Bestellungen");
     const products = ADMIN_NAV_GROUPS.find((group) => group.id === "products");

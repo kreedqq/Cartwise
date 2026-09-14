@@ -37,6 +37,8 @@ export const QUERY_KEYS = {
   kitRequestableProductIds: (shopArea: string) => ["kit-requestable-product-ids", shopArea] as const,
   myKitRequests: ["my-kit-requests"] as const,
   myKitRequestParticipations: ["my-kit-request-participations"] as const,
+  adminKitRequests: (filters: unknown) => ["admin-kit-requests", filters] as const,
+  adminKitRequest: (id: string) => ["admin-kit-requests", id] as const,
   myOrders: (userId: string) => ["my-orders", userId] as const,
   myOrder: (userId: string, id: string) => ["my-orders", userId, id] as const,
   order: (id: string) => ["admin-order", id] as const,

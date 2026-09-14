@@ -2,6 +2,14 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-14 (Admin Kit Gesuche)
+
+### Added
+
+- Admin `/admin/kit-requests` under Bestellungen: list/detail, safe meta edits (`note`, `expires_at`, kit size ≥ allocated), participant quantity updates, cancel.
+- Migration `0086_admin_kit_requests.sql` — admin-only SECURITY DEFINER RPCs; capacity and full cart sync reuse existing engines; no product-identity edits; no order rewrites.
+- Production (`cartwise-prod`): admin kit RPCs live (`admin_list_kit_requests`, `admin_get_kit_request`, meta/quantity/cancel).
+
 ## 2026-09-14 (Kit Gesuche One-Cart Sync)
 
 ### Fixed

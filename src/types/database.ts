@@ -1652,6 +1652,36 @@ export interface Database {
         Returns: Record<string, unknown>;
       };
       get_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
+      admin_list_kit_requests: {
+        Args: {
+          _status?: string | null;
+          _shop_area?: string | null;
+          _search?: string | null;
+          _page?: number;
+          _page_size?: number;
+        };
+        Returns: Record<string, unknown>;
+      };
+      admin_get_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
+      admin_update_kit_request_meta: {
+        Args: {
+          _kit_share_id: string;
+          _note?: string | null;
+          _expires_at?: string | null;
+          _kit_size_vials?: number | null;
+          _clear_expires_at?: boolean;
+        };
+        Returns: Record<string, unknown>;
+      };
+      admin_update_kit_request_participant_quantity: {
+        Args: {
+          _kit_share_id: string;
+          _participant_user_id: string;
+          _quantity: number;
+        };
+        Returns: Record<string, unknown>;
+      };
+      admin_cancel_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
       set_order_status: {
         Args: { _order_id: string; _status: OrderStatus; _admin_note: string | null };
         Returns: Database["public"]["Tables"]["orders"]["Row"];
