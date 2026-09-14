@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-14** (Telegram identity management final / `0080`).
+Last documentation pass: **2026-09-14** (Admin Backoffice IA).
+
+**Update 2026-09-14 (Admin Backoffice IA)**: Admin chrome is ten commerce hubs with collapsible desktop sidebar + mobile drawer (`src/lib/adminNav.ts`). Chip hubs / `AdminSectionTabs` replaced. Import + Importverlauf are visible again; new `/admin/system` hosts Wartung. No DB/business-engine changes. Legacy redirects (`/admin/roles`, `/admin/shipping`, `/admin/shipping/:id`) kept.
 
 **Update 2026-09-14 (Telegram Identity Management Final)**: Flows separated as login / link / transfer / admin-remove. `apply_telegram_reauth_username` keeps existing `profiles.username` and only adopts `preferred_username` when unset. Transfer keeps target username when set; expired intents use `failed`+`expired` (not invalid `expired` status). New admin RPC `admin_remove_telegram_identity` (fail-closed if Telegram-only). Client extracts PostgREST error objects so RPC messages are not lost. Migration `0080` applied on `cartwise-prod`.
 
@@ -129,7 +131,7 @@ Sidebar: Übersicht `/dashboard`, Shop `/shop`, **Kit Gesuche** `/kit-gesuche`, 
 
 Mobile: same set plus Favorites in `MAIN_NAV_ITEMS`; peptide label **Lexikon & Rechner**; Kit Gesuche short label **Kits** on the bottom bar.
 
-Admin nav (five hubs, in-page tabs): Übersicht `/admin`; Bestellungen → Übersicht `/admin/orders`, Bestell Zusammenfassung `/admin/order-summary`, Versandkosten `/admin/shipping-costs`; Produkte → Produktkatalog / Import / Import-Verlauf; Benutzer & Rollen → Benutzer & Rollen `/admin/users`, Rollenaufschläge `/admin/surcharges`, Audit-Log `/admin/audit-log`; Inhalte → Research. `/admin/roles` still exists and redirects to `/admin/users`. `/admin/shipping` redirects to `/admin/orders`.
+Admin nav (commerce hubs, sidebar/drawer): Übersicht `/admin`; Bestellungen → Bestellungen `/admin/orders`, Kit Gesuche `/admin/kit-requests`, Bestellzusammenfassung `/admin/order-summary`, Versand `/admin/shipping-costs`; Produkte & Katalog → Produkte `/admin/products`, Import `/admin/pdf-import`, Importverlauf `/admin/import-history`; Shop Bereiche `/admin/shop-areas` (Händlerkatalog, Produkte, Kategorien, Preise, Bereichsdesign als Tabs); Kunden & Rollen → Benutzer `/admin/users`, Rollen `/admin/users#rollen`, Rollenaufschläge `/admin/surcharges`; Marketing & Inhalte → Ankündigungen `/admin/announcements`, Research `/admin/research`; Design `/admin/design`; Bewertungen `/admin/feedback`; Zahlungen `/admin/payment-methods`; System & Sicherheit → Wartung `/admin/system`, Audit Logs `/admin/audit-log`. `/admin/roles` redirects to `/admin/users`. `/admin/shipping` redirects to `/admin/orders`.
 
 ### Routes (`src/App.tsx`)
 
@@ -137,7 +139,7 @@ Public: `/login`, `/auth/callback`, `/register`, `/forgot-password`, `/reset-pas
 
 Protected: `/username-required`, `/shop`, `/kit-gesuche`, `/favorites`, `/dashboard`, `/carts/:cartId`, `/carts/:cartId/checkout`, `/orders`, `/orders/:orderId`, `/profile`, `/peptide`, `/peptide/rechner`, `/peptide/lexikon`, `/peptide/lexikon/:slug`.
 
-Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/order-summary`, `/admin/roles`, `/admin/surcharges`, `/admin/shipping`, `/admin/shipping/:orderId`, `/admin/shipping-costs`, `/admin/products`, `/admin/pdf-import`, `/admin/import-history`, `/admin/users`, `/admin/audit-log`, `/admin/research`.
+Admin: `/admin`, `/admin/orders`, `/admin/orders/:orderId`, `/admin/kit-requests`, `/admin/kit-requests/:kitRequestId`, `/admin/order-summary`, `/admin/roles`, `/admin/surcharges`, `/admin/shipping`, `/admin/shipping/:orderId`, `/admin/shipping-costs`, `/admin/products`, `/admin/shop-areas`, `/admin/pdf-import`, `/admin/import-history`, `/admin/users`, `/admin/system`, `/admin/audit-log`, `/admin/research`, `/admin/announcements`, `/admin/design`, `/admin/feedback`, `/admin/payment-methods`.
 
 `/` → `/dashboard`. Unknown → `NotFound`.
 

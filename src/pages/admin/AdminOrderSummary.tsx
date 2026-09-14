@@ -178,8 +178,10 @@ export default function AdminOrderSummaryPage() {
   return (
     <div className="min-w-0 space-y-4 overflow-x-hidden">
       <AdminPageHeader
-        title="Bestell Zusammenfassung"
-        description="Persistente Bestellgruppen. Mengen kommen aus allen zugeordneten Bestellungen, unabhängig vom Status."
+        section="Bestellungen"
+        subsection="Bestellzusammenfassung"
+        title="Bestellzusammenfassung erstellen"
+        description="Persistente Bestellgruppen. Mengen aus allen zugeordneten Bestellungen, unabhängig vom Status."
       />
 
       {loading && <Skeleton className="h-64 w-full" />}

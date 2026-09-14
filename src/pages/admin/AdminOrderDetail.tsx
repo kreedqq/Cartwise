@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, FileDown, Printer, Trash2 } from "lucide-react";
 
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminSection } from "@/components/admin/AdminSection";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -152,10 +153,21 @@ export default function AdminOrderDetailPage() {
 
   return (
     <div className="space-y-5">
-      {/* Back + breadcrumb */}
-      <Button variant="ghost" size="sm" className="-ml-2 text-muted-foreground" onClick={() => navigate("/admin/orders")}>
-        <ArrowLeft className="h-3.5 w-3.5" /> Übersicht
-      </Button>
+      <AdminPageHeader
+        section="Bestellungen"
+        subsection="Bestellungen"
+        title={order.order_number}
+        description={`${telegramHandle || "Kein Telegram Benutzername"} · ${formatDateTime(order.submitted_at)}`}
+        breadcrumbs={[
+          { label: "Bestellungen", to: "/admin/orders" },
+          { label: order.order_number },
+        ]}
+        actions={
+          <Button variant="outline" size="sm" onClick={() => navigate("/admin/orders")}>
+            <ArrowLeft className="h-3.5 w-3.5" /> Zurück
+          </Button>
+        }
+      />
 
       {/* Order header card */}
       <AdminSection padded>

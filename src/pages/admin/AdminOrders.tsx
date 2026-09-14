@@ -186,8 +186,9 @@ export default function AdminOrdersPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        title="Übersicht"
-        description={`${filtered.length} ${filtered.length === 1 ? "Bestellung" : "Bestellungen"}${hasFilters ? " gefunden" : " gesamt"}`}
+        section="Bestellungen"
+        title="Bestellungen"
+        description={`${filtered.length} ${filtered.length === 1 ? "Bestellung" : "Bestellungen"}${hasFilters ? " gefunden" : " gesamt"} · Status, Tracking und Details.`}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <EmergencyMaintenanceButton />

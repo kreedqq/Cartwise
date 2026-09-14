@@ -32,7 +32,9 @@ export default function AdminPaymentMethodsPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Zahlungsmethoden"
+        section="Zahlungen"
+        subsection="Zahlungsmethoden"
+        title="Zahlungsmethoden steuern"
         description="Lege fest, welche Zahlungsmethoden Kunden im Checkout auswählen können."
       />
 

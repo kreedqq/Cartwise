@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { ADMIN_NAV_GROUPS } from "@/lib/adminNav";
+import { ADMIN_NAV_GROUPS, adminSectionForPath, adminTabIsActive } from "@/lib/adminNav";
 
 function read(path: string): string {
   return readFileSync(resolve(process.cwd(), path), "utf8");
@@ -18,10 +18,9 @@ describe("customer and admin order navigation", () => {
     expect(read("src/pages/Orders.tsx")).toContain("Meine Bestellungen");
   });
 
-  it("keeps the admin inbox on /admin/orders with the Übersicht tab", () => {
-    expect(read("src/lib/adminNav.ts")).toContain('label: "Übersicht"');
-    expect(read("src/pages/admin/AdminOrders.tsx")).toContain('title="Übersicht"');
-    expect(read("src/pages/admin/AdminOrderDetail.tsx")).toContain("Übersicht");
+  it("keeps the admin inbox on /admin/orders", () => {
+    expect(read("src/pages/admin/AdminOrders.tsx")).toContain('title="Bestellungen"');
+    expect(read("src/pages/admin/AdminOrderDetail.tsx")).toContain("Bestellungen");
     expect(read("src/App.tsx")).toContain('path="orders"');
     expect(read("src/App.tsx")).toContain('path="/orders"');
   });
@@ -34,24 +33,26 @@ describe("customer and admin order navigation", () => {
 });
 
 describe("hub admin navigation", () => {
-  it("exposes Ankündigungen first, then the existing admin hubs", () => {
+  it("exposes the commerce backoffice hubs in mental-model order", () => {
     expect(ADMIN_NAV_GROUPS.map((group) => group.label)).toEqual([
-      "Ankündigungen",
-      "Design",
-      "Feedback",
       "Übersicht",
       "Bestellungen",
-      "Produkte",
-      "Benutzer & Rollen",
-      "Inhalte",
+      "Produkte & Katalog",
+      "Shop Bereiche",
+      "Kunden & Rollen",
+      "Marketing & Inhalte",
+      "Design",
+      "Bewertungen",
+      "Zahlungen",
+      "System & Sicherheit",
     ]);
-    expect(ADMIN_NAV_GROUPS[0]?.to).toBe("/admin/announcements");
+    expect(ADMIN_NAV_GROUPS[0]?.to).toBe("/admin");
   });
 
-  it("keeps every existing admin destination as a hub or inner tab", () => {
+  it("keeps every existing admin destination as a hub or inner item", () => {
     const destinations = [
       ...ADMIN_NAV_GROUPS.map((group) => group.to),
-      ...ADMIN_NAV_GROUPS.flatMap((group) => group.items.map((item) => item.to)),
+      ...ADMIN_NAV_GROUPS.flatMap((group) => group.items.map((item) => item.to.split("#")[0]!)),
     ];
     expect(destinations).toEqual(
       expect.arrayContaining([
@@ -65,55 +66,75 @@ describe("hub admin navigation", () => {
         "/admin/order-summary",
         "/admin/kit-requests",
         "/admin/audit-log",
+        "/admin/system",
         "/admin/research",
         "/admin/announcements",
         "/admin/design",
         "/admin/feedback",
         "/admin/payment-methods",
+        "/admin/pdf-import",
+        "/admin/import-history",
       ]),
     );
-    expect(destinations).not.toContain("/admin/pdf-import");
-    expect(destinations).not.toContain("/admin/import-history");
     expect(destinations).not.toContain("/admin/roles");
   });
 
-  it("groups Bestellungen, Produkte, Benutzer & Rollen, and Inhalte as in-page tabs", () => {
+  it("groups Bestellungen and catalog functions under commerce hubs", () => {
     const orders = ADMIN_NAV_GROUPS.find((group) => group.id === "orders");
     expect(orders?.items.map((item) => item.label)).toEqual([
-      "Übersicht",
-      "Bestell Zusammenfassung",
+      "Bestellungen",
       "Kit Gesuche",
-      "Rollenaufschläge",
-      "Versandkosten",
-      "Zahlungsmethoden",
+      "Bestellzusammenfassung",
+      "Versand",
     ]);
     expect(orders?.items.map((item) => item.to)).toContain("/admin/kit-requests");
-    expect(orders?.items.map((item) => item.label)).not.toContain("Versand");
-    expect(orders?.items.map((item) => item.label)).not.toContain("Eingegangene Bestellungen");
-    const products = ADMIN_NAV_GROUPS.find((group) => group.id === "products");
-    expect(products?.items.map((item) => item.label)).toEqual([
-      "Produktkatalog",
-      "Verkaufsbereiche",
+    expect(orders?.items.map((item) => item.label)).not.toContain("Zahlungsmethoden");
+    expect(orders?.items.map((item) => item.label)).not.toContain("Rollenaufschläge");
+
+    const catalog = ADMIN_NAV_GROUPS.find((group) => group.id === "catalog");
+    expect(catalog?.items.map((item) => item.label)).toEqual([
+      "Produkte",
+      "Import",
+      "Importverlauf",
     ]);
-    const users = ADMIN_NAV_GROUPS.find((group) => group.id === "users");
-    expect(users?.items.map((item) => item.label)).toEqual([
-      "Benutzer & Rollen",
-      "Audit-Log",
+
+    const customers = ADMIN_NAV_GROUPS.find((group) => group.id === "customers");
+    expect(customers?.items.map((item) => item.label)).toEqual([
+      "Benutzer",
+      "Rollen",
+      "Rollenaufschläge",
     ]);
-    expect(users?.items.map((item) => item.label)).not.toContain("Benutzer");
-    expect(users?.items.map((item) => item.label)).not.toContain("Rollen & Preisaufschlag");
-    const content = ADMIN_NAV_GROUPS.find((group) => group.id === "content");
-    expect(content?.items.map((item) => item.label)).toEqual(["Research"]);
-    expect(content?.items.map((item) => item.to)).not.toContain("/admin/announcements");
+
+    const system = ADMIN_NAV_GROUPS.find((group) => group.id === "system");
+    expect(system?.items.map((item) => item.label)).toEqual(["Wartung", "Audit Logs"]);
   });
 
-  it("renders hub links globally and section tabs on the page, wrapping on small screens", () => {
+  it("resolves path sections without overlapping overview", () => {
+    expect(adminSectionForPath("/admin")?.id).toBe("overview");
+    expect(adminSectionForPath("/admin/orders")?.id).toBe("orders");
+    expect(adminSectionForPath("/admin/kit-requests/abc")?.id).toBe("orders");
+    expect(adminSectionForPath("/admin/payment-methods")?.id).toBe("payments");
+    expect(adminSectionForPath("/admin/shop-areas")?.id).toBe("shop-areas");
+    expect(adminTabIsActive("/admin/users", { to: "/admin/users", label: "Benutzer", matchPrefix: true })).toBe(
+      true,
+    );
+    expect(
+      adminTabIsActive("/admin/users", { to: "/admin/users#rollen", label: "Rollen" }, "#rollen"),
+    ).toBe(true);
+    expect(
+      adminTabIsActive("/admin/users", { to: "/admin/users", label: "Benutzer", matchPrefix: true }, "#rollen"),
+    ).toBe(false);
+  });
+
+  it("renders desktop sidebar and mobile drawer instead of chip hubs", () => {
     const nav = read("src/components/layout/AdminNav.tsx");
     const layout = read("src/pages/admin/AdminLayout.tsx");
-    expect(layout).toContain("AdminSectionTabs");
-    expect(nav).toContain("flex-wrap");
+    expect(layout).toContain("AdminSidebar");
+    expect(layout).toContain("AdminMobileNav");
+    expect(nav).toContain("AdminSidebar");
+    expect(nav).toContain("readAdminNavCollapsed");
     expect(nav).not.toContain("overflow-x-auto");
-    expect(nav).not.toContain("LucideIcon");
+    expect(read("src/lib/adminNav.ts")).toContain("localStorage");
   });
 
   it("keeps all previous admin routes in App.tsx", () => {
@@ -127,12 +148,14 @@ describe("hub admin navigation", () => {
       'path="shipping/:orderId"',
       'path="shipping-costs"',
       'path="order-summary"',
+      'path="kit-requests"',
       'path="products"',
       'path="shop-areas"',
       'path="pdf-import"',
       'path="import-history"',
       'path="users"',
       'path="audit-log"',
+      'path="system"',
       'path="research"',
       'path="announcements"',
       'path="design"',

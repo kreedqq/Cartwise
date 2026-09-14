@@ -115,7 +115,12 @@ export default function AdminAnnouncementsPage() {
 
   return (
     <div className="space-y-4">
-      <AdminPageHeader title="Ankündigungen" description="Veröffentlichte Einträge erscheinen im Kundenbereich. Bilder optional im 16:9-Rahmen." />
+      <AdminPageHeader
+        section="Marketing & Inhalte"
+        subsection="Ankündigungen"
+        title="Ankündigungen verwalten"
+        description="Veröffentlichte Einträge erscheinen im Kundenbereich. Bilder optional im 16:9-Rahmen."
+      />
 
       <AdminSection title={editing ? "Ankündigung bearbeiten" : "Neue Ankündigung"}>
         <form className="space-y-3 p-4" onSubmit={(event) => void handleSave(event)}>

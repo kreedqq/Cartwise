@@ -184,7 +184,9 @@ export default function AdminRoleSurchargesPage() {
   return (
     <div className="min-w-0 space-y-5 overflow-x-hidden">
       <AdminPageHeader
-        title="Rollenaufschläge"
+        section="Kunden & Rollen"
+        subsection="Rollenaufschläge"
+        title="Rollenaufschläge auswerten"
         description="Tatsächliche Aufschläge aus Bestell-Snapshots, gruppiert nach Bestellgruppe. Keine Neuberechnung über die heutige Kundenrolle."
         actions={
           <Button variant="outline" size="sm" onClick={handleExport} disabled={!globalReport}>

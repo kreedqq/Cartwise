@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-import { AdminNav, AdminSectionTabs } from "@/components/layout/AdminNav";
+import { AdminMobileNav, AdminSidebar } from "@/components/layout/AdminNav";
 import { EmergencyMaintenanceButton } from "@/components/admin/EmergencyMaintenanceButton";
 import { useResolvedSiteAccess } from "@/hooks/useAppPublicState";
 
@@ -10,22 +10,25 @@ export default function AdminLayout() {
   return (
     <div
       data-admin=""
-      className="bg-background -mx-4 -my-8 min-h-screen px-4 py-6 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10 lg:py-8"
+      className="bg-background -mx-4 -my-8 min-h-screen sm:-mx-6 lg:-mx-10"
     >
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <span className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Peptix&thinsp;/&thinsp;Admin
-        </span>
-        {access.maintenanceMode ? <EmergencyMaintenanceButton /> : null}
+      <div className="flex min-h-screen">
+        <AdminSidebar />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6 lg:px-8">
+            <span className="hidden text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground lg:inline">
+              Backoffice
+            </span>
+            <div className="ml-auto flex items-center gap-2">
+              {access.maintenanceMode ? <EmergencyMaintenanceButton /> : null}
+            </div>
+          </div>
+          <div className="flex-1 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            <AdminMobileNav />
+            <Outlet />
+          </div>
+        </div>
       </div>
-
-      <div className="mb-4 border-b border-border pb-3">
-        <AdminNav />
-      </div>
-
-      <AdminSectionTabs />
-
-      <Outlet />
     </div>
   );
 }

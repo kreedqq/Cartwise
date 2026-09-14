@@ -4,14 +4,16 @@ import {
   ArrowRight,
   ClipboardList,
   DollarSign,
+  Megaphone,
   Package,
+  Palette,
   RefreshCw,
-  ShieldCheck,
   Truck,
   Users,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminSection } from "@/components/admin/AdminSection";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -46,6 +48,12 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
+      <AdminPageHeader
+        section="Übersicht"
+        title="PEPTIX Backoffice"
+        description="Zentrale Kennzahlen und Schnellzugriff auf die wichtigsten Admin-Bereiche."
+      />
+
       {/* KPI row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
         <KpiCard
@@ -93,11 +101,14 @@ export default function AdminDashboardPage() {
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <QuickAction to="/admin/users" icon={ShieldCheck} label="Benutzer & Rollen" />
-        <QuickAction to="/admin/surcharges" icon={DollarSign} label="Rollenaufschläge" />
-        <QuickAction to="/admin/shipping-costs" icon={Truck} label="Versandkosten" />
-        <QuickAction to="/admin/products" icon={Package} label="Produkte verwalten" />
-        <QuickAction to="/admin/users" icon={Users} label="Benutzer verwalten" />
+        <QuickAction to="/admin/orders" icon={ClipboardList} label="Bestellungen" />
+        <QuickAction to="/admin/kit-requests" icon={Package} label="Kit Gesuche" />
+        <QuickAction to="/admin/products" icon={Package} label="Produkte" />
+        <QuickAction to="/admin/users" icon={Users} label="Benutzer" />
+        <QuickAction to="/admin/announcements" icon={Megaphone} label="Ankündigungen" />
+        <QuickAction to="/admin/feedback" icon={AlertCircle} label="Bewertungen" />
+        <QuickAction to="/admin/design" icon={Palette} label="Design" />
+        <QuickAction to="/admin/shipping-costs" icon={Truck} label="Versand" />
       </div>
 
       <QuantityDiscountsSwitch />

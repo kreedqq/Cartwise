@@ -33,7 +33,7 @@ const QUEUE_TABS: Array<{ id: ReviewQueueKind | "mapping"; label: string }> = [
   { id: "regulatory", label: "Regulatory Review" },
   { id: "claim", label: "Claims" },
   { id: "substance", label: "Review Queue" },
-  { id: "mapping", label: "Product Mapping" },
+  { id: "mapping", label: "Produktzuordnung" },
 ];
 
 export default function AdminResearchPage() {
@@ -67,7 +67,9 @@ export default function AdminResearchPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Research Queue"
+        section="Marketing & Inhalte"
+        subsection="Research"
+        title="Research verwalten"
         description="Postgres ist die Admin-Quelle. Das öffentliche Lexikon liest Postgres; catalog.ts + published.json sind der exklusive Fallback."
       />
 
@@ -292,7 +294,7 @@ function MappingTable({
   onPage: (page: number) => void;
 }) {
   if (query.isError) {
-    return <ErrorState message="Product mapping konnte nicht geladen werden." onRetry={() => void query.refetch()} />;
+    return <ErrorState message="Produktzuordnung konnte nicht geladen werden." onRetry={() => void query.refetch()} />;
   }
   const data = query.data;
   if (!data) return <p className="text-sm text-muted-foreground">Lade Mapping…</p>;

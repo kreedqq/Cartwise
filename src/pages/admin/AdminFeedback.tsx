@@ -56,7 +56,7 @@ export default function AdminFeedbackPage() {
   async function patch(row: OrderFeedback, next: Parameters<typeof updateMutation.mutateAsync>[0]["patch"]) {
     try {
       await updateMutation.mutateAsync({ id: row.id, patch: next });
-      toast.success("Feedback aktualisiert.");
+      toast.success("Bewertung aktualisiert.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Aktualisierung fehlgeschlagen.");
     }
@@ -64,7 +64,11 @@ export default function AdminFeedbackPage() {
 
   return (
     <div className="space-y-4">
-      <AdminPageHeader title="Feedback" description="Bestellbewertungen und allgemeine Bewertungen moderieren. Keine Bestellungen werden verändert." />
+      <AdminPageHeader
+        section="Bewertungen"
+        title="Bewertungen moderieren"
+        description="Bestellbezogene und allgemeine Bewertungen freigeben, ablehnen oder ausblenden. Bestellungen bleiben unverändert."
+      />
 
       <AdminSection title="Filter" padded>
         <div className="flex flex-wrap gap-2">
@@ -90,7 +94,7 @@ export default function AdminFeedbackPage() {
         </div>
       ) : null}
       {listQuery.isError ? (
-        <ErrorState message="Feedback konnte nicht geladen werden." onRetry={() => listQuery.refetch()} />
+        <ErrorState message="Bewertungen konnten nicht geladen werden." onRetry={() => listQuery.refetch()} />
       ) : null}
       {listQuery.data && items.length === 0 ? <EmptyState title="Keine Bewertungen für diesen Filter." /> : null}
 

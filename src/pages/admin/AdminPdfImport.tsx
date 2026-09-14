@@ -180,8 +180,10 @@ export default function AdminPdfImportPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        title="Globaler Produkt-Master"
-        description="Schreibt nur in die zentrale products-Tabelle. Macht keine Artikel in Shop, Group Buy 1 oder Group Buy 2 sichtbar. Händlerkataloge liegen unter Verkaufsbereiche."
+        section="Produkte & Katalog"
+        subsection="Import"
+        title="Produktstamm importieren"
+        description="Schreibt nur in den globalen Produktstamm. Händlerkataloge bleiben unter Shop Bereiche."
       />
       {stage === "upload" && (
         <Card>

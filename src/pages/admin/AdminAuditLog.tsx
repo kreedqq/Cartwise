@@ -16,7 +16,12 @@ export default function AdminAuditLogPage() {
 
   return (
     <div className="space-y-4">
-      <AdminPageHeader title="Audit-Log" description="Protokoll aller Produkt- und Rollenänderungen (letzte 200 Einträge)." />
+      <AdminPageHeader
+        section="System & Sicherheit"
+        subsection="Audit Logs"
+        title="Audit Logs einsehen"
+        description="Protokoll der Admin- und Systemänderungen (letzte 200 Einträge)."
+      />
 
       {!query.data || query.data.length === 0 ? (
         <EmptyState

@@ -2,6 +2,20 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-14 (Admin Backoffice IA)
+
+### Changed
+
+- Admin navigation restructured into commerce hubs: Übersicht, Bestellungen, Produkte & Katalog, Shop Bereiche, Kunden & Rollen, Marketing & Inhalte, Design, Bewertungen, Zahlungen, System & Sicherheit.
+- Desktop left sidebar (collapsible, localStorage) and mobile drawer replace the chip hub + section tabs pattern.
+- Page headers show section / subsection context. Import and Importverlauf are visible again. New `/admin/system` hosts Wartung controls.
+- Legacy routes (`/admin/roles`, `/admin/shipping`, `/admin/shipping/:id`) unchanged.
+- Review: Rollenaufschläge moved under Kunden & Rollen; page titles action-oriented; Shop-Bereich tab „Kategorien“ + „Bereichsdesign“; German terminology tightened.
+
+### Notes
+
+- No business-logic, pricing, kit, order, or database changes.
+
 ## 2026-09-14 (Admin Kit Verteilung)
 
 ### Added

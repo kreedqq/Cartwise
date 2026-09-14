@@ -30,8 +30,10 @@ export default function AdminImportHistoryPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        title="Master-Verlauf"
-        description="Verlauf der globalen Produkt-Master-Importe. Schreibt nur in products, nicht in Shop / Group Buy 1 / Group Buy 2."
+        section="Produkte & Katalog"
+        subsection="Importverlauf"
+        title="Importverlauf einsehen"
+        description="Vergangene Importe in den globalen Produktstamm. Schreibt nicht in Shop- oder Group-Buy-Bereiche."
       />
 
       {!importsQuery.data || importsQuery.data.length === 0 ? (

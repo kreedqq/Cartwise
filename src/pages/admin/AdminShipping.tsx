@@ -98,8 +98,10 @@ export default function AdminShippingPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Versandkosten"
-        description="Versandkosten aus China aufteilen und Deutschland-Versand individuell setzen."
+        section="Bestellungen"
+        subsection="Versand"
+        title="Versandkosten verwalten"
+        description="China- und Deutschland-Versand getrennt halten. EUR zuerst, USD sekundär."
       />
       <Card>
         <CardHeader>

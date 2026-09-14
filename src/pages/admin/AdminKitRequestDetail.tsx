@@ -430,8 +430,15 @@ export default function AdminKitRequestDetailPage() {
       </div>
 
       <AdminPageHeader
+        section="Bestellungen"
+        subsection="Kit Gesuche"
         title={detail.productName}
         description={`${dosageLabel} · ${detail.allocatedTotal}/${detail.kitSizeVials} Kit`}
+        breadcrumbs={[
+          { label: "Bestellungen", to: "/admin/orders" },
+          { label: "Kit Gesuche", to: "/admin/kit-requests" },
+          { label: detail.productName },
+        ]}
       />
 
       <div className="flex flex-wrap items-center gap-2">
@@ -469,11 +476,11 @@ export default function AdminKitRequestDetailPage() {
           <MetaRow label="Status" value={adminStatusLabel(detail.status, detail.remainingVials)} />
           <MetaRow label="Ersteller" value={creatorHandle(detail.creatorUsername)} />
           <MetaRow label="Notiz" value={detail.note?.trim() ? detail.note : "—"} />
-          <MetaRow label="Shop Area" value={detail.shopArea} />
-          <MetaRow label="Vendor Code" value={detail.vendorCode ?? "—"} />
-          <MetaRow label="Product ID" value={detail.masterProductId ?? "—"} />
-          <MetaRow label="Area Product ID" value={detail.areaProductId ?? "—"} />
-          <MetaRow label="Kit Share ID" value={detail.id} />
+          <MetaRow label="Verkaufsbereich" value={detail.shopArea} />
+          <MetaRow label="Händlercode" value={detail.vendorCode ?? "—"} />
+          <MetaRow label="Produkt-ID" value={detail.masterProductId ?? "—"} />
+          <MetaRow label="Bereichsprodukt-ID" value={detail.areaProductId ?? "—"} />
+          <MetaRow label="Kit-ID" value={detail.id} />
           <MetaRow label="Erstellt" value={formatDate(detail.createdAt)} />
           <MetaRow label="Ablauf" value={formatDate(detail.expiresAt)} />
         </dl>

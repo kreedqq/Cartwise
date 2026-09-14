@@ -48,6 +48,12 @@ export default function AdminUsersPage() {
   const assignmentsQuery = useQuery({ queryKey: ["user-customer-roles"], queryFn: listUserCustomerRoles });
 
   const [managed, setManaged] = React.useState<UserWithRoles | null>(null);
+
+  React.useEffect(() => {
+    if (window.location.hash !== "#rollen") return;
+    const el = document.getElementById("rollen");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
   const [adminTarget, setAdminTarget] = React.useState<{ user: UserWithRoles; grant: boolean } | null>(null);
   const [deleteTarget, setDeleteTarget] = React.useState<UserWithRoles | null>(null);
   const [usernameEditTarget, setUsernameEditTarget] = React.useState<UserWithRoles | null>(null);
@@ -223,8 +229,10 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Benutzer & Rollen"
-        description="Benutzer verwalten, Kundenrollen zuweisen und Rollenaufschläge konfigurieren."
+        section="Kunden & Rollen"
+        subsection="Benutzer"
+        title="Benutzer verwalten"
+        description="Kundenkonten, Telegram-Verbindung, Username und Rollenzuweisung."
       />
       <AdminCartPriceRefresh />
 
@@ -328,7 +336,12 @@ export default function AdminUsersPage() {
         </AdminSection>
       ))}
 
-      <AdminSection title="Rollen & Preisaufschlag" description="Katalog der Kundenrollen und ihrer Aufschläge." padded>
+      <AdminSection
+        id="rollen"
+        title="Rollen & Preisaufschlag"
+        description="Katalog der Kundenrollen und ihrer Aufschläge."
+        padded
+      >
         <AdminRoleCatalog />
       </AdminSection>
 

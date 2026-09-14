@@ -108,8 +108,10 @@ export default function AdminProductsPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        title="Produkte"
-        description="Produktkatalog verwalten, importieren und exportieren."
+        section="Produkte & Katalog"
+        subsection="Produkte"
+        title="Produkte verwalten"
+        description="Globaler Produktstamm: Codes, Varianten, Status. Bereichskataloge liegen unter Shop Bereiche."
         actions={
           <>
             <Button variant="outline" size="sm" onClick={() => setCsvOpen(true)}>

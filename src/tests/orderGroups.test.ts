@@ -309,9 +309,12 @@ describe("order group schema and admin-only access", () => {
     expect(read("src/pages/admin/AdminRoleSurcharges.tsx")).not.toContain("supabase.from");
   });
 
-  it("moves Rollenaufschläge under Bestellungen", () => {
-    expect(read("src/lib/adminNav.ts")).toContain('to: "/admin/surcharges", label: "Rollenaufschläge"');
-    expect(read("src/lib/adminNav.ts")).toContain("pathname.startsWith(\"/admin/surcharges\")");
+  it("keeps Rollenaufschläge reachable under Kunden & Rollen", () => {
+    expect(read("src/lib/adminNav.ts")).toContain('to: "/admin/surcharges"');
+    expect(read("src/lib/adminNav.ts")).toContain('label: "Rollenaufschläge"');
+    expect(read("src/lib/adminNav.ts")).toContain('pathname.startsWith("/admin/surcharges")');
+    expect(read("src/lib/adminNav.ts")).toContain('id: "customers"');
+    expect(read("src/pages/admin/AdminRoleSurcharges.tsx")).toContain('section="Kunden & Rollen"');
   });
 
   it("keeps admin order list selection and ungrouped section without horizontal overflow wrappers", () => {

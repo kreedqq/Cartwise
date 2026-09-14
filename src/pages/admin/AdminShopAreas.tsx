@@ -98,8 +98,9 @@ export default function AdminShopAreasPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
+        section="Shop Bereiche"
         title="Verkaufsbereiche"
-        description="Händlerdatei bestimmt das Sortiment. Grundpreis × Bereichs-% × Rolle = Endpreis. Der globale Produkt-Master bleibt unverändert."
+        description="Pro Bereich: Händlerkatalog, Produkte, Preise, Kategorien und Bereichsdesign. Eine Konfigurationsquelle je Verkaufsbereich."
       />
 
       {areasQuery.isLoading && <Skeleton className="h-64 w-full" />}
@@ -140,8 +141,9 @@ export default function AdminShopAreasPage() {
             <TabsTrigger value="allgemein">Allgemein</TabsTrigger>
             <TabsTrigger value="haendlerkatalog">Händlerkatalog</TabsTrigger>
             <TabsTrigger value="produkte">Produkte</TabsTrigger>
+            <TabsTrigger value="kategorien">Kategorien</TabsTrigger>
             <TabsTrigger value="preise">Preise</TabsTrigger>
-            <TabsTrigger value="design">Design</TabsTrigger>
+            <TabsTrigger value="design">Bereichsdesign</TabsTrigger>
           </TabsList>
           <TabsContent value="allgemein">
             <AreaIdentityCard key={`${areaKey}|identity`} area={selected} onChanged={invalidate} />
@@ -151,6 +153,9 @@ export default function AdminShopAreasPage() {
           </TabsContent>
           <TabsContent value="produkte">
             <VendorProductsPanel areaKey={areaKey} profile={lockedProfile} products={products} onChanged={invalidate} />
+          </TabsContent>
+          <TabsContent value="kategorien">
+            <AreaCategoriesTab areaKey={areaKey} onChanged={invalidate} />
           </TabsContent>
           <TabsContent value="preise">
             <AreaSettingsCard
@@ -712,12 +717,11 @@ function VendorProductsPanel({
 
   return (
     <div className="space-y-4">
-      <AreaCategoriesEditor areaKey={areaKey} categories={categories} onChanged={onChanged} />
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Produkte {formatShopAreaLabel(areaKey)}</CardTitle>
           <CardDescription>
-            Nur der Händlerkatalog dieses Bereichs. Die Kategorie gilt nur hier, nicht im globalen Produkt-Master.
+            Nur der Händlerkatalog dieses Bereichs. Die Kategorie gilt nur hier, nicht im globalen Produktstamm.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -761,6 +765,37 @@ function VendorProductsPanel({
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function AreaCategoriesTab({
+  areaKey,
+  onChanged,
+}: {
+  areaKey: ShopAreaKey;
+  onChanged: () => Promise<void>;
+}) {
+  const categoriesQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("categories"),
+    queryFn: () => listAdminShopAreaCategories(areaKey),
+  });
+
+  if (categoriesQuery.isLoading) return <Skeleton className="h-40 w-full" />;
+  if (categoriesQuery.isError) {
+    return (
+      <ErrorState
+        message="Kategorien konnten nicht geladen werden."
+        onRetry={() => void categoriesQuery.refetch()}
+      />
+    );
+  }
+
+  return (
+    <AreaCategoriesEditor
+      areaKey={areaKey}
+      categories={categoriesQuery.data ?? []}
+      onChanged={onChanged}
+    />
   );
 }
 

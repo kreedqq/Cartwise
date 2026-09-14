@@ -62,8 +62,10 @@ export default function AdminKitRequestsPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        title="Kit Gesuche"
-        description="Marketplace Kit Gesuche öffnen, Metadaten bearbeiten, Teilnehmermengen verwalten und stornieren. Historische Bestellungen bleiben unverändert."
+        section="Bestellungen"
+        subsection="Kit Gesuche"
+        title="Kit Gesuche verwalten"
+        description="Offene Kits, Teilnehmer und Verteilungen bearbeiten. Historische Bestellungen bleiben unverändert."
       />
 
       <AdminSection title="Filter" padded>
@@ -90,7 +92,7 @@ export default function AdminKitRequestsPage() {
               setSearch(event.target.value);
               setPage(1);
             }}
-            placeholder="Suche Produkt, Code, Vendor oder Ersteller …"
+            placeholder="Suche Produkt, Code, Händler oder Ersteller …"
             className="max-w-md"
           />
         </div>

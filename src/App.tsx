@@ -54,6 +54,7 @@ const AdminAnnouncementsPage = lazy(() => import("@/pages/admin/AdminAnnouncemen
 const AdminDesignPage = lazy(() => import("@/pages/admin/AdminDesign"));
 const AdminPaymentMethodsPage = lazy(() => import("@/pages/admin/AdminPaymentMethods"));
 const AdminFeedbackPage = lazy(() => import("@/pages/admin/AdminFeedback"));
+const AdminSystemPage = lazy(() => import("@/pages/admin/AdminSystem"));
 const PeptideHubPage = lazy(() => import("@/pages/peptide/PeptideHub"));
 const PeptideCalculatorPage = lazy(() => import("@/pages/peptide/PeptideCalculator"));
 const PeptideLexiconPage = lazy(() => import("@/pages/peptide/PeptideLexicon"));
@@ -168,6 +169,7 @@ export default function App() {
                     <Route path="import-history" element={<AdminImportHistoryPage />} />
                     <Route path="users" element={<AdminUsersPage />} />
                     <Route path="audit-log" element={<AdminAuditLogPage />} />
+                    <Route path="system" element={<AdminSystemPage />} />
                     <Route path="research" element={<AdminResearchPage />} />
                     <Route path="announcements" element={<AdminAnnouncementsPage />} />
                     <Route path="design" element={<AdminDesignPage />} />

@@ -6,20 +6,18 @@ function read(path: string): string {
   return readFileSync(resolve(process.cwd(), path), "utf8");
 }
 
-describe("admin Bestell Zusammenfassung", () => {
-  it("adds the Bestell Zusammenfassung tab next to Übersicht", () => {
+describe("admin Bestellzusammenfassung", () => {
+  it("keeps Bestellzusammenfassung under Bestellungen with Versand", () => {
     const nav = read("src/lib/adminNav.ts");
-    expect(nav).toContain('label: "Bestell Zusammenfassung"');
+    expect(nav).toContain('label: "Bestellzusammenfassung"');
     expect(nav).toContain('to: "/admin/order-summary"');
     expect(nav).toContain('label: "Übersicht"');
-    expect(nav).not.toContain('label: "Versand"');
-    expect(nav.indexOf('label: "Übersicht"')).toBeLessThan(nav.indexOf('label: "Bestell Zusammenfassung"'));
-    expect(nav.indexOf('label: "Bestell Zusammenfassung"')).toBeLessThan(nav.indexOf('label: "Rollenaufschläge"'));
-    expect(nav.indexOf('label: "Rollenaufschläge"')).toBeLessThan(nav.indexOf('label: "Versandkosten"'));
-    expect(nav).toContain('label: "Versandkosten"');
+    expect(nav).toContain('label: "Versand"');
     expect(nav).toContain('to: "/admin/shipping-costs"');
+    expect(nav.indexOf('label: "Bestellungen"')).toBeLessThan(nav.indexOf('label: "Bestellzusammenfassung"'));
+    expect(nav.indexOf('label: "Bestellzusammenfassung"')).toBeLessThan(nav.indexOf('label: "Versand"'));
     expect(read("src/App.tsx")).toContain('path="order-summary"');
-    expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("Bestell Zusammenfassung");
+    expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("Bestellzusammenfassung");
     expect(read("src/pages/admin/AdminOrderSummary.tsx")).toContain("Als PDF exportieren");
   });
 

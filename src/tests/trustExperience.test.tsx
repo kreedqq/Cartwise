@@ -79,7 +79,7 @@ describe("site design", () => {
     expect(sql).not.toContain("update public.orders");
     expect(sql).not.toContain("update public.order_items");
     expect(read("src/services/siteDesign.ts")).toContain("site_design_settings");
-    expect(read("src/pages/admin/AdminDesign.tsx")).toContain('title="Design"');
+    expect(read("src/pages/admin/AdminDesign.tsx")).toContain('title="Globales Design steuern"');
     expect(read("src/pages/admin/AdminDesign.tsx")).toContain("SiteDesignPreview");
     expect(read("src/components/layout/SiteBackground.tsx")).not.toContain("MaintenanceScreen");
     expect(read("src/components/layout/SiteBackground.tsx")).not.toContain("maintenance-pause");

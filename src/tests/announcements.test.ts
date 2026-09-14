@@ -49,7 +49,7 @@ describe("announcements", () => {
     expect(read("src/pages/AuthCallback.tsx")).toContain("OAUTH_SUCCESS_PATH");
   });
 
-  it("puts Ankündigungen first in customer and admin navigation", () => {
+  it("puts Ankündigungen first for customers and under Marketing for admins", () => {
     const customer = buildCustomerNavItems([]);
     expect(customer[0]).toMatchObject({ to: "/announcements", label: "Ankündigungen" });
     expect(customer.map((item) => item.label)).toEqual([
@@ -61,10 +61,11 @@ describe("announcements", () => {
       "Meine Bestellungen",
       "Profil",
     ]);
-    expect(ADMIN_NAV_GROUPS[0]).toMatchObject({ label: "Ankündigungen", to: "/admin/announcements" });
-    expect(ADMIN_NAV_GROUPS[0]?.items).toEqual([]);
+    const marketing = ADMIN_NAV_GROUPS.find((group) => group.id === "marketing");
+    expect(marketing).toMatchObject({ label: "Marketing & Inhalte", to: "/admin/announcements" });
+    expect(marketing?.items.map((item) => item.label)).toEqual(["Ankündigungen", "Research"]);
     expect(read("src/App.tsx")).toContain('path="announcements"');
-    expect(read("src/pages/admin/AdminAnnouncements.tsx")).toContain('title="Ankündigungen"');
+    expect(read("src/pages/admin/AdminAnnouncements.tsx")).toContain('title="Ankündigungen verwalten"');
     expect(read("src/pages/admin/AdminAnnouncements.tsx")).toContain("useAdminAnnouncements");
     expect(read("src/pages/admin/AdminAnnouncements.tsx")).toContain("useCreateAnnouncement");
     expect(read("src/pages/admin/AdminAnnouncements.tsx")).toContain("useSetAnnouncementPublished");

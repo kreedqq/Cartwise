@@ -138,7 +138,7 @@ describe("shipping SQL and cancel wiring", () => {
     expect(read("src/components/orders/AdminOrderTrackingForm.tsx")).toContain("Test-E-Mail an mich");
     expect(read("src/services/orders.ts")).toContain('cancelled: "Storniert"');
     expect(read("src/pages/OrderDetail.tsx")).toContain("OrderTrackingCard");
-    expect(read("src/pages/admin/AdminShipping.tsx")).toContain("Versandkosten");
+    expect(read("src/pages/admin/AdminShipping.tsx")).toContain("Versand");
     expect(read("src/App.tsx")).toContain("shipping-costs");
     expect(read("src/App.tsx")).toContain('Navigate to="/admin/orders"');
   });
