@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import type { PaymentMethod } from "@/lib/shop/paymentMethod";
 import type { ShippingAddress } from "@/lib/shippingAddress";
+import { extractRpcErrorMessage } from "@/services/username";
 import type { OrderStatus, Tables } from "@/types/database";
 
 export interface OrderWithItems extends Tables<"orders"> {
@@ -165,7 +166,10 @@ export async function createOrder(
           _shipping_country: shipping.country,
         };
   const { data, error } = await supabase.rpc("create_order", payload);
-  if (error) throw error;
+  if (error) {
+    const message = extractRpcErrorMessage(error).trim() || "Bestellung konnte nicht übermittelt werden.";
+    throw new Error(message);
+  }
   return data as unknown as CreateOrderResult;
 }
 

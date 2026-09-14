@@ -13,6 +13,7 @@ import {
   listOpenKitRequests,
   syncCompletedKitRequestCarts,
 } from "@/services/kitRequests";
+import { getMyCanUseKitRequests } from "@/services/customerRoles";
 import { updateKitShareQuantity } from "@/services/kitShares";
 
 export interface OpenKitRequestFilters {
@@ -71,11 +72,18 @@ export function useInvalidateKitRequests() {
   };
 }
 
-export function useKitRequestableProductIds(shopArea: string) {
+export function useKitRequestableProductIds(shopArea: string, enabled = true) {
   return useQuery({
     queryKey: QUERY_KEYS.kitRequestableProductIds(shopArea),
     queryFn: () => listKitRequestableProductIds(shopArea),
-    enabled: Boolean(shopArea),
+    enabled: Boolean(shopArea) && enabled,
+  });
+}
+
+export function useCanUseKitRequests() {
+  return useQuery({
+    queryKey: QUERY_KEYS.canUseKitRequests,
+    queryFn: getMyCanUseKitRequests,
   });
 }
 

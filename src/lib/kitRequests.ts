@@ -79,6 +79,9 @@ export function isValidCreatorQuantity(kitSize: number, creatorQuantity: number)
 
 export const KIT_REQUEST_CREATE_LABEL = "Gesuch erstellen";
 
+export const KIT_REQUEST_ROLE_DENIED_MESSAGE =
+  "Kit Gesuche sind für deine aktuelle Rolle nicht freigeschaltet.";
+
 export const KIT_REQUEST_NOT_SHAREABLE_MESSAGE =
   "Dieses Produkt kann nicht als Kit Gesuch geteilt werden.";
 

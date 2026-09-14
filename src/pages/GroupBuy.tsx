@@ -31,6 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toaster";
 import {
   useCancelKitRequest,
+  useCanUseKitRequests,
   useLeaveKitRequest,
   useMyKitRequestParticipations,
   useMyKitRequests,
@@ -127,10 +128,16 @@ function GroupBuyContent({
   const storefrontQuery = useShopAreaStorefront(shopArea);
   const favoritesQuery = useFavorites();
   const rateQuery = useExchangeRate();
+  const canUseKitRequestsQuery = useCanUseKitRequests();
+  const canUseKitRequests = canUseKitRequestsQuery.data === true;
   const [selectedKey, setSelectedKey] = React.useState<string | null>(null);
   const [search, setSearch] = React.useState("");
   const [activeSection, setActiveSection] = React.useState<"catalog" | "kits">("catalog");
   const [createOpen, setCreateOpen] = React.useState(false);
+  const section =
+    canUseKitRequestsQuery.isSuccess && !canUseKitRequests && activeSection === "kits"
+      ? "catalog"
+      : activeSection;
 
   const products = React.useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
   const assignments = React.useMemo(
@@ -183,9 +190,11 @@ function GroupBuyContent({
       />
       <div className={AREA_PAGE_NAV_SLOT}>
         <KitAreaActionNav
-          section={activeSection}
+          section={section}
           onSection={setActiveSection}
+          canUseKitRequests={canUseKitRequests}
           onCreate={() => {
+            if (!canUseKitRequests) return;
             setActiveSection("kits");
             setCreateOpen(true);
           }}
@@ -193,11 +202,11 @@ function GroupBuyContent({
       </div>
 
       <div className={AREA_PAGE_CONTENT_SLOT}>
-      {activeSection === "catalog" && (
+      {section === "catalog" && (
         <GroupBuyCatalog
           shopArea={shopArea}
           areaName={areaName}
-          onKitCreated={() => setActiveSection("kits")}
+          onKitCreated={canUseKitRequests ? () => setActiveSection("kits") : undefined}
           products={products}
           counts={counts}
           visible={visible}
@@ -219,7 +228,7 @@ function GroupBuyContent({
         />
       )}
 
-      {activeSection === "kits" && (
+      {section === "kits" && canUseKitRequests && (
         <KitRequestsSection
           shopArea={shopArea}
           areaName={areaName}
@@ -230,12 +239,14 @@ function GroupBuyContent({
       )}
       </div>
       </div>
-      <CreateKitRequestDialog
-        shopArea={shopArea}
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        onCreated={() => setActiveSection("kits")}
-      />
+      {canUseKitRequests ? (
+        <CreateKitRequestDialog
+          shopArea={shopArea}
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          onCreated={() => setActiveSection("kits")}
+        />
+      ) : null}
       </AreaStorefrontChrome>
     </div>
   );

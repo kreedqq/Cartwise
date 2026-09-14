@@ -27,6 +27,7 @@ export function AdminRoleCatalog() {
   const [name, setName] = React.useState("");
   const [markup, setMarkup] = React.useState("25");
   const [active, setActive] = React.useState(true);
+  const [canUseKitRequests, setCanUseKitRequests] = React.useState(false);
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
@@ -37,6 +38,7 @@ export function AdminRoleCatalog() {
     setName("");
     setMarkup("25");
     setActive(true);
+    setCanUseKitRequests(false);
     setEditingId(null);
   }
 
@@ -49,10 +51,17 @@ export function AdminRoleCatalog() {
     }
     setSaving(true);
     try {
-      await upsertCustomerRole({ id: editingId, name: name.trim(), markupPercent, isActive: active });
+      await upsertCustomerRole({
+        id: editingId,
+        name: name.trim(),
+        markupPercent,
+        isActive: active,
+        canUseKitRequests,
+      });
       toast.success(editingId ? "Rolle gespeichert." : "Rolle erstellt.");
       resetForm();
       await queryClient.invalidateQueries({ queryKey: ["customer-roles"] });
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.canUseKitRequests });
     } catch (error) {
       console.error("Rolle speichern fehlgeschlagen:", error);
       toast.error(error instanceof Error ? error.message : "Rolle konnte nicht gespeichert werden.");
@@ -99,6 +108,16 @@ export function AdminRoleCatalog() {
                 Aktiv
               </Label>
             </div>
+            <div className="flex items-center gap-2 pb-2">
+              <Checkbox
+                id="role-kit-requests"
+                checked={canUseKitRequests}
+                onCheckedChange={(v) => setCanUseKitRequests(v === true)}
+              />
+              <Label htmlFor="role-kit-requests" className="font-normal">
+                Kit Gesuche erlaubt
+              </Label>
+            </div>
             <Button type="submit" loading={saving}>
               <Plus /> Speichern
             </Button>
@@ -117,6 +136,7 @@ export function AdminRoleCatalog() {
             <TableRow>
               <TableHead>Rolle</TableHead>
               <TableHead>Aufschlag</TableHead>
+              <TableHead>Kit Gesuche</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Aktionen</TableHead>
             </TableRow>
@@ -133,6 +153,7 @@ export function AdminRoleCatalog() {
                   )}
                 </TableCell>
                 <TableCell className="tabular-nums">{Number(role.markup_percent)} %</TableCell>
+                <TableCell>{role.can_use_kit_requests ? "Erlaubt" : "Nicht erlaubt"}</TableCell>
                 <TableCell>{role.is_active ? "Aktiv" : "Inaktiv"}</TableCell>
                 <TableCell className="text-right">
                   <Button
@@ -144,6 +165,7 @@ export function AdminRoleCatalog() {
                       setName(role.name);
                       setMarkup(String(role.markup_percent));
                       setActive(role.is_active);
+                      setCanUseKitRequests(role.can_use_kit_requests === true);
                     }}
                   >
                     Bearbeiten

@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toaster";
 import {
   useCancelKitRequest,
+  useCanUseKitRequests,
   useLeaveKitRequest,
   useMyKitRequestParticipations,
   useMyKitRequests,
@@ -44,6 +45,7 @@ import {
 } from "@/lib/shop/shopAreas";
 import {
   KIT_REQUEST_CARD_GRID,
+  KIT_REQUEST_ROLE_DENIED_MESSAGE,
   KIT_REQUEST_TAB_TRIGGER_CLASS,
   KIT_REQUEST_TABS_LIST_CLASS,
   kitRequestStatusLabel,
@@ -58,14 +60,29 @@ const PAGE_SIZE = 20;
 export default function KitRequestsPage() {
   const location = useLocation();
   const areasQuery = useMyShopAreas();
+  const canUseKitRequestsQuery = useCanUseKitRequests();
 
-  if (areasQuery.isLoading) return <FullScreenSpinner label="Group Buy wird geladen …" />;
+  if (areasQuery.isLoading || canUseKitRequestsQuery.isLoading) {
+    return <FullScreenSpinner label="Group Buy wird geladen …" />;
+  }
   if (areasQuery.isError) {
     return <ErrorState message="Shop-Bereiche konnten nicht geladen werden." onRetry={() => areasQuery.refetch()} />;
   }
 
   const groupBuyAreas = (areasQuery.data ?? []).filter((area) => isGroupBuyPricing(area.pricing_profile) && area.purchasable);
   if (groupBuyAreas.length === 0) return <Navigate to="/403" replace />;
+
+  if (canUseKitRequestsQuery.isSuccess && canUseKitRequestsQuery.data !== true) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-16">
+        <EmptyState
+          icon={Layers}
+          title="Kit Gesuche nicht freigeschaltet"
+          description={KIT_REQUEST_ROLE_DENIED_MESSAGE}
+        />
+      </div>
+    );
+  }
 
   if (location.pathname.startsWith("/kit-gesuche")) {
     return <Navigate to={groupBuyAreas[0].path} replace />;

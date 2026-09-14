@@ -2,7 +2,9 @@
 
 **Code is the source of truth.** If this file disagrees with `src/`, update this file.
 
-Last documentation pass: **2026-09-14** (Admin Backoffice IA).
+Last documentation pass: **2026-09-14** (Order checkout + Kit role permission).
+
+**Update 2026-09-14 (Order checkout + Kit role permission)**: Checkout SSoT remains `create_order` → `create_one_area_order`. Incomplete kit cart lines no longer abort area checkout (`0088`, local only). Kit Gesuche gated by `customer_roles.can_use_kit_requests` fail-closed (`0089`, local only; Group Buy seeded true). Admin kit RPCs unchanged. Not applied to production.
 
 **Update 2026-09-14 (Admin Backoffice IA)**: Admin chrome is ten commerce hubs with collapsible desktop sidebar + mobile drawer (`src/lib/adminNav.ts`). Chip hubs / `AdminSectionTabs` replaced. Import + Importverlauf are visible again; new `/admin/system` hosts Wartung. No DB/business-engine changes. Legacy redirects (`/admin/roles`, `/admin/shipping`, `/admin/shipping/:id`) kept.
 

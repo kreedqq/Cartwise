@@ -38,6 +38,7 @@ import {
 } from "@/lib/shippingAddress";
 import { toast } from "@/components/ui/toaster";
 import { cartItemDisplayName, cartItemQuantityLabel, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
+import { extractRpcErrorMessage } from "@/services/username";
 
 export default function CheckoutPage() {
   const { cartId } = useParams<{ cartId: string }>();
@@ -153,7 +154,8 @@ export default function CheckoutPage() {
       }
     } catch (error) {
       console.error("Bestellung absenden fehlgeschlagen:", error);
-      const message = error instanceof Error ? error.message : "Bestellung konnte nicht übermittelt werden.";
+      const message =
+        extractRpcErrorMessage(error).trim() || "Bestellung konnte nicht übermittelt werden.";
       toast.error(message);
       setConfirmOpen(false);
     }

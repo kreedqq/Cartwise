@@ -23,8 +23,8 @@ import {
 import { toast } from "@/components/ui/toaster";
 import { QUERY_KEYS } from "@/lib/constants";
 import { useShopAreaContext } from "@/context/ShopAreaContext";
-import { useKitRequestableProductIds } from "@/hooks/useKitRequests";
-import { KIT_REQUEST_CREATE_LABEL, KIT_REQUEST_NOT_SHAREABLE_MESSAGE } from "@/lib/kitRequests";
+import { useCanUseKitRequests, useKitRequestableProductIds } from "@/hooks/useKitRequests";
+import { KIT_REQUEST_CREATE_LABEL, KIT_REQUEST_NOT_SHAREABLE_MESSAGE, KIT_REQUEST_ROLE_DENIED_MESSAGE } from "@/lib/kitRequests";
 import { useAuth } from "@/context/AuthProvider";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
@@ -697,10 +697,15 @@ export function KitShareButton({
   onClick: () => void;
 }) {
   const { shopArea } = useShopAreaContext();
-  const requestableQuery = useKitRequestableProductIds(shopArea);
+  const canUseKitRequestsQuery = useCanUseKitRequests();
+  const requestableQuery = useKitRequestableProductIds(shopArea, canUseKitRequestsQuery.data === true);
   const requestableIds = requestableQuery.data == null ? null : new Set(requestableQuery.data);
   const shareableVariants = kitRequestableVariants(group.variants, requestableIds);
-  const canCreate = shareableVariants.length > 0;
+  const canCreate = canUseKitRequestsQuery.data === true && shareableVariants.length > 0;
+
+  if (canUseKitRequestsQuery.isSuccess && canUseKitRequestsQuery.data !== true) {
+    return null;
+  }
 
   return (
     <Button
@@ -710,7 +715,13 @@ export function KitShareButton({
       className="h-9 shrink-0"
       onClick={onClick}
       disabled={!canCreate}
-      title={!canCreate ? KIT_REQUEST_NOT_SHAREABLE_MESSAGE : undefined}
+      title={
+        !canCreate
+          ? canUseKitRequestsQuery.data !== true
+            ? KIT_REQUEST_ROLE_DENIED_MESSAGE
+            : KIT_REQUEST_NOT_SHAREABLE_MESSAGE
+          : undefined
+      }
     >
       <Users className="mr-1.5 h-4 w-4" />
       {KIT_REQUEST_CREATE_LABEL}

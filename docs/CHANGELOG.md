@@ -2,6 +2,21 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-14 (Order checkout + Kit role permission)
+
+### Fixed
+
+- Checkout root cause: One Cart `create_one_area_order` aborted the whole area order on incomplete (`open`) kit cart lines (`Ungültiger Kit-Anteil im Warenkorb.`). Migration `0088` skips not-yet-orderable kit lines and keeps them in the cart; `create_order` only iterates areas with orderable lines.
+- Checkout UI now surfaces PostgREST/RPC messages via `extractRpcErrorMessage` instead of only `instanceof Error`.
+
+### Added
+
+- Migration `0089`: `customer_roles.can_use_kit_requests` (default false / fail closed). Seed: Group Buy = true. Server assert on create/join/preview/requestable; open list returns empty when denied; leave/list_my stay for existing participation. Admin role catalog checkbox + `get_my_can_use_kit_requests` for UI gating.
+
+### Notes
+
+- Migrations **not** applied to production yet. No commit/deploy until explicit approval. Does not modify 0070 / 0085 / 0086 / 0087.
+
 ## 2026-09-14 (Admin Backoffice IA)
 
 ### Changed

@@ -502,6 +502,7 @@ export interface Database {
           markup_percent: number;
           is_active: boolean;
           is_default: boolean;
+          can_use_kit_requests: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -1781,9 +1782,16 @@ export interface Database {
         Returns: Database["public"]["Tables"]["products"]["Row"] | null;
       };
       get_my_customer_role_name: { Args: Record<string, never>; Returns: string | null };
+      get_my_can_use_kit_requests: { Args: Record<string, never>; Returns: boolean };
       sync_cart_selling_prices: { Args: { _cart_id: string }; Returns: undefined };
       admin_upsert_customer_role: {
-        Args: { _id: string | null; _name: string; _markup_percent: number; _is_active: boolean };
+        Args: {
+          _id: string | null;
+          _name: string;
+          _markup_percent: number;
+          _is_active: boolean;
+          _can_use_kit_requests?: boolean;
+        };
         Returns: Database["public"]["Tables"]["customer_roles"]["Row"];
       };
       admin_delete_customer_role: { Args: { _id: string }; Returns: undefined };

@@ -9,11 +9,13 @@ export function KitAreaActionNav({
   section,
   onSection,
   onCreate,
+  canUseKitRequests = true,
   className,
 }: {
   section: "catalog" | "kits";
   onSection: (section: "catalog" | "kits") => void;
   onCreate: () => void;
+  canUseKitRequests?: boolean;
   className?: string;
 }) {
   return (
@@ -25,17 +27,21 @@ export function KitAreaActionNav({
       >
         Produkte
       </Button>
-      <Button
-        className="min-h-11"
-        variant={section === "kits" ? "default" : "outline"}
-        onClick={() => onSection("kits")}
-      >
-        Kit Gesuche
-      </Button>
-      <Button className="min-h-11" onClick={onCreate}>
-        <Plus className="h-4 w-4" />
-        {KIT_REQUEST_CREATE_LABEL}
-      </Button>
+      {canUseKitRequests ? (
+        <>
+          <Button
+            className="min-h-11"
+            variant={section === "kits" ? "default" : "outline"}
+            onClick={() => onSection("kits")}
+          >
+            Kit Gesuche
+          </Button>
+          <Button className="min-h-11" onClick={onCreate}>
+            <Plus className="h-4 w-4" />
+            {KIT_REQUEST_CREATE_LABEL}
+          </Button>
+        </>
+      ) : null}
     </nav>
   );
 }
