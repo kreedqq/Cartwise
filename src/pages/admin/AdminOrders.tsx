@@ -192,6 +192,9 @@ export default function AdminOrdersPage() {
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <EmergencyMaintenanceButton />
+            <Button variant="default" size="sm" onClick={() => navigate("/admin/orders/create-for-customer")}>
+              Bestellung für Kunden erstellen
+            </Button>
             <Button variant="outline" size="sm" onClick={handleExport} disabled={filtered.length === 0}>
               <FileDown /> CSV-Export
             </Button>

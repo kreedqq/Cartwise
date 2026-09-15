@@ -2,6 +2,17 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-15 (Admin create order for customer)
+
+### Added
+
+- Migration `0099`: checkout subject GUC; patched `create_order` / `create_one_area_order` for on-behalf pricing and `orders.user_id`; `admin_create_order_for_customer` (cart staging + restore), preview, customer-priced catalog RPC, kit checkout options, audit `order.admin_create`.
+- Admin route `/admin/orders/create-for-customer` and wizard UI; services/hooks/tests.
+
+### Notes
+
+- Apply `0099` to production only after local `supabase db reset` / `test:qa` gates. No second pricing engine; server ignores client prices/roles.
+
 ## 2026-09-15 (Order ownership transfer + integrity classification)
 
 ### Added

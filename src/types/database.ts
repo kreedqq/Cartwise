@@ -1862,6 +1862,48 @@ export interface Database {
           count: number;
         };
       };
+      admin_get_customer_checkout_context: {
+        Args: { _customer_user_id: string };
+        Returns: {
+          userId: string;
+          username: string | null;
+          roleName: string | null;
+          markupPercent: number;
+          requestedByAdminId: string;
+        };
+      };
+      admin_list_shop_products_for_customer: {
+        Args: { _shop_area: string; _customer_user_id: string };
+        Returns: Database["public"]["Tables"]["products"]["Row"][];
+      };
+      admin_list_customer_kit_checkout_options: {
+        Args: { _customer_user_id: string; _shop_area?: string | null };
+        Returns: { items: Record<string, unknown>[] };
+      };
+      admin_preview_order_for_customer: {
+        Args: { _customer_user_id: string; _lines: unknown };
+        Returns: Record<string, unknown>;
+      };
+      admin_create_order_for_customer: {
+        Args: {
+          _customer_user_id: string;
+          _lines: unknown;
+          _note: string | null;
+          _payment_method: string;
+          _shipping_first_name: string;
+          _shipping_last_name: string;
+          _shipping_street: string | null;
+          _shipping_house_number: string | null;
+          _shipping_address_extra: string | null;
+          _shipping_postal_code: string;
+          _shipping_city: string;
+          _shipping_country: string;
+          _shipping_delivery_method: string;
+          _shipping_packstation_number: string | null;
+          _shipping_post_number: string | null;
+        };
+        Returns: Record<string, unknown>;
+      };
       admin_link_cart_item_submitted_order: {
         Args: { _cart_item_id: string; _reason: string };
         Returns: {

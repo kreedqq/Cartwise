@@ -49,6 +49,13 @@ export const QUERY_KEYS = {
   adminOrderItems: ["admin-order-items"] as const,
   adminKitOrderContext: ["admin-kit-order-context"] as const,
   adminOrderIntegrity: ["admin-order-integrity"] as const,
+  adminCustomerCheckoutContext: (userId: string) => ["admin-customer-checkout-context", userId] as const,
+  adminShopProductsForCustomer: (shopArea: string, userId: string) =>
+    ["admin-shop-products-for-customer", shopArea, userId] as const,
+  adminCustomerKitCheckoutOptions: (userId: string, shopArea: string) =>
+    ["admin-customer-kit-checkout-options", userId, shopArea] as const,
+  adminOrderCreatePreview: (userId: string, lines: unknown) =>
+    ["admin-order-create-preview", userId, lines] as const,
   adminOrderSummary: ["admin-order-summary"] as const,
   adminRoleSurcharges: ["admin-role-surcharges"] as const,
   adminUserDirectory: ["admin-user-directory"] as const,
