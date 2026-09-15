@@ -329,15 +329,26 @@ describe("order CSV / PDF snapshot source", () => {
   });
 
   it("uses the same quantity labels in PDF as on the website", () => {
-    const peptide = toOrderExportDoc(
-      makeOrder(),
+    const peptideCatalog = toOrderExportDoc(
+      makeOrder({ shop_area: "group_buy_1" }),
       [makeItem({ product_code_snapshot: "SK10", product_name_snapshot: "Selank", quantity: 5 })],
-      undefined,
-      null,
-      { kitSizes: new Map([["prod-1", 10]]) },
     );
-    expect(peptide.items[0]?.quantityLabel).toBe("5/10 Kit");
-    expect(buildOrderPrintHtml(peptide)).toContain("5/10 Kit");
+    expect(peptideCatalog.items[0]?.quantityLabel).toBe("5 Vials");
+    expect(buildOrderPrintHtml(peptideCatalog)).toContain("5 Vials");
+    expect(buildOrderPrintHtml(peptideCatalog)).not.toContain("/10 Kit");
+
+    const peptideKit = toOrderExportDoc(makeOrder(), [
+      makeItem({
+        product_code_snapshot: "SK10",
+        product_name_snapshot: "Selank",
+        quantity: 5,
+        kit_share_id_snapshot: "kit-1",
+        kit_size_vials_snapshot: 10,
+        kit_participant_quantity_snapshot: 5,
+      }),
+    ]);
+    expect(peptideKit.items[0]?.quantityLabel).toBe("5/10 Kit");
+    expect(buildOrderPrintHtml(peptideKit)).toContain("5/10 Kit");
 
     const oil = toOrderExportDoc(
       makeOrder(),

@@ -24,6 +24,8 @@ import { AdminOrderTrackingForm } from "@/components/orders/AdminOrderTrackingFo
 import { AdminOrderCorrectionDialog } from "@/components/orders/AdminOrderCorrectionDialog";
 import { CancelOrderDialog } from "@/components/orders/CancelOrderDialog";
 import { AdminOrderIntegrityBanner } from "@/components/orders/AdminOrderIntegrityBanner";
+import { AdminPostCheckoutCartSection } from "@/components/orders/AdminPostCheckoutCartSection";
+import { auditOrderCartIntegrity } from "@/services/adminOrderIntegrity";
 import { OrderRevisionHistory } from "@/components/orders/OrderRevisionHistory";
 import { OrderProgressTracker } from "@/components/orders/OrderProgressTracker";
 import { ShippingProgressSelect } from "@/components/orders/ShippingProgressSelect";
@@ -34,11 +36,10 @@ import { useRestoreKitShareCartLine } from "@/hooks/useRestoreKitShareCartLine";
 import { useOrderProgress } from "@/hooks/useOrderProgress";
 import { resolveOrderProgress } from "@/lib/orderProgress";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
-import { kitSizeFromOrderItem } from "@/lib/orderKitDisplay";
-import { buildSharedKitsForOrder, kitSizeForOrderItem } from "@/lib/kitOrderSummary";
+import { formatHistoricalOrderItemQuantity } from "@/lib/orderKitDisplay";
+import { buildSharedKitsForOrder } from "@/lib/kitOrderSummary";
 import { formatDateTime, formatQuantity, formatRate, formatUsd, summarizeOrderCharges } from "@/lib/money";
-import { formatOrderItemQuantity } from "@/lib/quantityFormat";
-import { formatShopAreaLabel, saleModeForShopArea } from "@/lib/shop/shopAreas";
+import { formatShopAreaLabel } from "@/lib/shop/shopAreas";
 import { orderRoleSurchargeFromSnapshots } from "@/lib/roleSurcharge";
 import { QUERY_KEYS } from "@/lib/constants";
 import { canPermanentlyDeleteOrder, formatOrderTelegramSnapshot, ORDER_STATUS_LABELS } from "@/services/orders";
@@ -75,6 +76,20 @@ export default function AdminOrderDetailPage() {
   const restoreKitCart = useRestoreKitShareCartLine({ orderId });
   const [restoringCartUserId, setRestoringCartUserId] = React.useState<string | null>(null);
   const adminNote = adminNoteDraft ?? noteQuery.data ?? "";
+  const orderForAudit = orderQuery.data;
+
+  const cartAuditQuery = useQuery({
+    queryKey: [...QUERY_KEYS.adminOrderIntegrity, orderForAudit?.id ?? ""],
+    queryFn: () =>
+      auditOrderCartIntegrity({
+        orderId: orderForAudit!.id,
+        cartId: orderForAudit!.cart_id,
+        orderSubmittedAt: orderForAudit!.submitted_at,
+        orderItems: orderForAudit!.items,
+      }),
+    enabled: Boolean(orderForAudit?.cart_id) && (orderForAudit?.items.length ?? 0) > 0,
+    staleTime: 60_000,
+  });
 
   if (orderQuery.isLoading) return <FullScreenSpinner label="Bestellung wird geladen …" />;
   if (orderQuery.isError) {
@@ -91,15 +106,6 @@ export default function AdminOrderDetailPage() {
     kitQuery.data && ordersQuery.data
       ? buildSharedKitsForOrder(order.id, order.items, ordersQuery.data, kitQuery.data)
       : [];
-  const kitSizes = (() => {
-    const map = new Map<string, number>();
-    if (!kitQuery.data) return map;
-    for (const item of order.items) {
-      const size = kitSizeFromOrderItem(item, kitSizeForOrderItem(item, order, kitQuery.data));
-      if (size && item.product_id) map.set(item.product_id, size);
-    }
-    return map;
-  })();
   const roleSurcharge =
     surchargeQuery.data &&
     order.items.length > 0 &&
@@ -118,7 +124,7 @@ export default function AdminOrderDetailPage() {
       email: customer?.email ?? null,
     },
     roleSurcharge,
-    { audience: "admin", kitSizes },
+    { audience: "admin" },
   );
 
   async function applyStatus(status: OrderStatus) {
@@ -206,9 +212,9 @@ export default function AdminOrderDetailPage() {
       />
 
       <AdminOrderIntegrityBanner
-        orderId={order.id}
         cartId={order.cart_id}
-        orderItems={order.items}
+        audit={cartAuditQuery.data}
+        isLoading={cartAuditQuery.isLoading}
       />
 
       {/* Order header card */}
@@ -263,8 +269,10 @@ export default function AdminOrderDetailPage() {
         </div>
       </AdminSection>
 
-      {/* Order items */}
-      <AdminSection title="Bestellpositionen">
+      <AdminSection
+        title="Vom Kunden abgesendet"
+        description="Eingefrorene Bestellpositionen zum Checkout-Zeitpunkt — nur order_items, unabhängig vom heutigen Warenkorb."
+      >
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -290,14 +298,7 @@ export default function AdminOrderDetailPage() {
                     )}
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-sm">
-                    {formatOrderItemQuantity(
-                      item,
-                      kitSizeFromOrderItem(
-                        item,
-                        kitQuery.data ? kitSizeForOrderItem(item, order, kitQuery.data) : null,
-                      ),
-                      saleModeForShopArea(order.shop_area),
-                    )}
+                    {formatHistoricalOrderItemQuantity(item)}
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-sm">
                     {formatUsd(item.normal_price_usd_snapshot)}
@@ -323,6 +324,18 @@ export default function AdminOrderDetailPage() {
             </TableBody>
           </Table>
         </div>
+      </AdminSection>
+
+      <AdminSection
+        title="Nach dem Checkout im Warenkorb"
+        description="Aktuelle offene Cart-Zeilen auf dem Bestell-Warenkorb — nicht Teil der abgesendeten Bestellung."
+        padded
+      >
+        <AdminPostCheckoutCartSection
+          cartId={order.cart_id}
+          loading={cartAuditQuery.isLoading}
+          lines={cartAuditQuery.data?.postCheckoutLines ?? []}
+        />
       </AdminSection>
 
       {sharedKits.length > 0 &&

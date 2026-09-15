@@ -110,27 +110,29 @@ describe("quantityFormat", () => {
   it("is the single quantity formatter used by shop, cart, orders, admin, and PDF", () => {
     const files = [
       "src/lib/orderSummary.ts",
-      "src/lib/orderExport.ts",
       "src/lib/kitOrderSummary.ts",
       "src/lib/shop/kitUnits.ts",
       "src/lib/shop/cartDisplay.ts",
-      "src/pages/OrderDetail.tsx",
-      "src/pages/admin/AdminOrderDetail.tsx",
       "src/pages/Checkout.tsx",
       "src/components/shop/ShopProductsTable.tsx",
       "src/components/cart/CartItemsTable.tsx",
     ].map((path) => readFileSync(resolve(process.cwd(), path), "utf8"));
     const joined = files.join("\n");
     expect(joined).toContain("formatCatalogQuantity");
-    expect(joined).toContain("formatOrderItemQuantity");
     expect(joined).toContain("formatProductQuantity");
     expect(joined).toContain("cartItemQuantityLabel");
     expect(joined).not.toContain("Kit/s");
     expect(readFileSync(resolve(process.cwd(), "src/lib/orderExport.ts"), "utf8")).toContain(
-      "formatOrderItemQuantity",
+      "formatHistoricalOrderItemQuantity",
     );
     expect(readFileSync(resolve(process.cwd(), "src/lib/orderExport.ts"), "utf8")).not.toMatch(
       /function format.*Quantity/,
+    );
+    expect(readFileSync(resolve(process.cwd(), "src/pages/OrderDetail.tsx"), "utf8")).toContain(
+      "formatHistoricalOrderItemQuantity",
+    );
+    expect(readFileSync(resolve(process.cwd(), "src/pages/admin/AdminOrderDetail.tsx"), "utf8")).toContain(
+      "formatHistoricalOrderItemQuantity",
     );
   });
 

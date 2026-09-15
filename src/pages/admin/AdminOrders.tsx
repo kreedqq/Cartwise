@@ -160,6 +160,10 @@ export default function AdminOrdersPage() {
             deliveryMethodLabel: delivery,
             roleSurchargeUsd: null,
             orderTotalUsd: order.total_usd,
+            kit_share_id_snapshot: item.kit_share_id_snapshot,
+            kit_size_vials_snapshot: item.kit_size_vials_snapshot,
+            kit_participant_quantity_snapshot: item.kit_participant_quantity_snapshot,
+            dosage_vial_snapshot: item.dosage_vial_snapshot,
           }));
         }),
       ),

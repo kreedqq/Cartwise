@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, FileDown, Printer, RefreshCw, Star } from "lucide-react";
 
@@ -23,11 +22,8 @@ import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { OrderShippingCard } from "@/components/orders/OrderShippingCard";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
 import { formatDateTime, formatEur, formatUsd, summarizeOrderCharges } from "@/lib/money";
-import { formatOrderItemQuantity } from "@/lib/quantityFormat";
-import { DEFAULT_SHOP_AREA, formatShopAreaLabel, isShopAreaKey, saleModeForShopArea } from "@/lib/shop/shopAreas";
-import { kitSizeFromOrderItem } from "@/lib/orderKitDisplay";
-import { listKitSizesForOrder } from "@/services/kitOrderContext";
-import { QUERY_KEYS } from "@/lib/constants";
+import { formatHistoricalOrderItemQuantity } from "@/lib/orderKitDisplay";
+import { DEFAULT_SHOP_AREA, formatShopAreaLabel, isShopAreaKey } from "@/lib/shop/shopAreas";
 import { PAYMENT_METHOD_LABELS, isPaymentMethod } from "@/lib/shop/paymentMethod";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
 import { formatOrderTelegramSnapshot, orderItemsToBulkLines } from "@/services/orders";
@@ -37,11 +33,6 @@ export default function OrderDetailPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
   const orderQuery = useMyOrder(orderId);
-  const kitSizesQuery = useQuery({
-    queryKey: QUERY_KEYS.orderKitSizes(orderId ?? ""),
-    queryFn: () => listKitSizesForOrder(orderId as string),
-    enabled: Boolean(orderId),
-  });
   const progressQuery = useOrderProgress(orderId);
   const rateQuery = useExchangeRate();
   const reorderArea = isShopAreaKey(orderQuery.data?.shop_area) ? orderQuery.data.shop_area : DEFAULT_SHOP_AREA;
@@ -59,14 +50,8 @@ export default function OrderDetailPage() {
   }
 
   const order = orderQuery.data;
-  const kitSizes = kitSizesQuery.data;
 
-  function itemKitSize(item: (typeof order.items)[number]) {
-    const legacy = item.product_id ? kitSizes?.get(item.product_id) ?? null : null;
-    return kitSizeFromOrderItem(item, legacy);
-  }
-
-  const exportDoc = toOrderExportDoc(order, order.items, undefined, null, { audience: "customer", kitSizes });
+  const exportDoc = toOrderExportDoc(order, order.items, undefined, null, { audience: "customer" });
 
   async function handleReorder() {
     setReordering(true);
@@ -167,7 +152,7 @@ export default function OrderDetailPage() {
                     )}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {formatOrderItemQuantity(item, itemKitSize(item), saleModeForShopArea(order.shop_area))}
+                    {formatHistoricalOrderItemQuantity(item)}
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-xs">
                     {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normalpreis"}

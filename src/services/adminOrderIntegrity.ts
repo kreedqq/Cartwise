@@ -4,19 +4,28 @@ import {
   type OrderIntegrityCartLine,
   type OrderIntegritySummary,
 } from "@/lib/orderIntegrity";
+import {
+  buildPostCheckoutCartLines,
+  type PostCheckoutCartLineView,
+} from "@/lib/postCheckoutCartDisplay";
 import type { Tables } from "@/types/database";
+
+export type AdminOrderCartAudit = OrderIntegritySummary & {
+  postCheckoutLines: PostCheckoutCartLineView[];
+};
 
 export async function auditOrderCartIntegrity(input: {
   orderId: string;
   cartId: string | null;
+  orderSubmittedAt: string;
   orderItems: Tables<"order_items">[];
-}): Promise<OrderIntegritySummary | null> {
+}): Promise<AdminOrderCartAudit | null> {
   if (!input.cartId) return null;
 
   const { data: cartItems, error } = await supabase
     .from("cart_items")
     .select(
-      "product_code_snapshot, quantity, kit_share_id, submitted_order_id, eur_value_snapshot",
+      "product_code_snapshot, product_name_snapshot, quantity, kit_share_id, submitted_order_id, eur_value_snapshot, created_at",
     )
     .eq("cart_id", input.cartId);
   if (error) throw error;
@@ -46,10 +55,19 @@ export async function auditOrderCartIntegrity(input: {
     }
   }
 
-  const cartLines: OrderIntegrityCartLine[] = (cartItems ?? []).map((ci) => {
+  type CartRow = NonNullable<typeof cartItems>[number];
+
+  const cartLines: (OrderIntegrityCartLine & {
+    productName: string;
+    createdAt: string;
+    dosageVial: string | null;
+  })[] = (cartItems ?? []).map((ci: CartRow) => {
     const meta = ci.kit_share_id ? kitMeta.get(ci.kit_share_id) : undefined;
     return {
       productCode: String(ci.product_code_snapshot ?? ""),
+      productName: String(ci.product_name_snapshot ?? ci.product_code_snapshot ?? ""),
+      createdAt: ci.created_at,
+      dosageVial: null,
       quantity: Number(ci.quantity),
       kitShareId: ci.kit_share_id,
       submittedOrderId: ci.submitted_order_id,
@@ -60,7 +78,7 @@ export async function auditOrderCartIntegrity(input: {
     };
   });
 
-  return summarizeOrderIntegrity({
+  const summary = summarizeOrderIntegrity({
     orderId: input.orderId,
     orderLines: input.orderItems.map((oi) => ({
       productCode: String(oi.product_code_snapshot ?? ""),
@@ -70,4 +88,13 @@ export async function auditOrderCartIntegrity(input: {
     })),
     cartLines,
   });
+
+  return {
+    ...summary,
+    postCheckoutLines: buildPostCheckoutCartLines({
+      orderId: input.orderId,
+      orderSubmittedAt: input.orderSubmittedAt,
+      cartLines,
+    }),
+  };
 }

@@ -19,10 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatKitShareLabelForOrderItem, isKitOrderLine, kitSizeFromOrderItem } from "@/lib/orderKitDisplay";
+import {
+  formatHistoricalOrderItemQuantity,
+  formatKitShareLabelForOrderItem,
+  isKitOrderLine,
+} from "@/lib/orderKitDisplay";
 import { formatUsd } from "@/lib/money";
-import { formatOrderItemQuantity } from "@/lib/quantityFormat";
-import { saleModeForShopArea } from "@/lib/shop/shopAreas";
 import { cartItemDisplayName } from "@/lib/shop/cartDisplay";
 import type { Tables } from "@/types/database";
 
@@ -80,7 +82,6 @@ export function AdminOrderCorrectionDialog({
   const reasonText =
     preset === "Sonstiges" ? customReason.trim() : preset;
 
-  const saleMode = saleModeForShopArea(order.shop_area);
 
   const previewTotalUsd = order.items.reduce((sum, item) => {
     const draft = drafts.find((d) => d.orderItemId === item.id);
@@ -163,7 +164,6 @@ export function AdminOrderCorrectionDialog({
             {order.items.map((item) => {
               const draft = drafts.find((d) => d.orderItemId === item.id);
               if (!draft) return null;
-              const kitSize = kitSizeFromOrderItem(item, null);
               const kitLabel = formatKitShareLabelForOrderItem(item);
               return (
                 <div key={item.id} className="space-y-2 rounded-md border border-border p-3">
@@ -193,7 +193,9 @@ export function AdminOrderCorrectionDialog({
                       />
                       <p className="text-[10px] text-muted-foreground">
                         Anzeige:{" "}
-                        {formatOrderItemQuantity(item, kitSize, saleMode)}
+                        {isKitOrderLine(item)
+                          ? formatHistoricalOrderItemQuantity(item)
+                          : formatHistoricalOrderItemQuantity({ ...item, quantity: draft.quantity })}
                       </p>
                     </div>
                     <label className="flex items-center gap-2 text-xs">

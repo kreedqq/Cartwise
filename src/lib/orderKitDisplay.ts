@@ -1,6 +1,21 @@
-import { asQuantity, formatPartialKitQuantity } from "@/lib/quantityFormat";
-import { resolveProductCategoryId } from "@/lib/quantityFormat";
+import {
+  asQuantity,
+  formatCatalogQuantity,
+  formatKitSplitQuantity,
+  resolveProductCategoryId,
+} from "@/lib/quantityFormat";
 import type { Tables } from "@/types/database";
+
+export type HistoricalOrderItemQuantityInput = Pick<
+  Tables<"order_items">,
+  | "quantity"
+  | "kit_share_id_snapshot"
+  | "kit_size_vials_snapshot"
+  | "kit_participant_quantity_snapshot"
+  | "product_name_snapshot"
+  | "product_code_snapshot"
+  | "dosage_vial_snapshot"
+>;
 
 /** Kit size for display: frozen snapshot first, then optional legacy fallback. */
 export function kitSizeFromOrderItem(
@@ -20,15 +35,7 @@ export function isKitOrderLine(
 }
 
 export function formatKitShareLabelForOrderItem(
-  item: Pick<
-    Tables<"order_items">,
-    | "kit_share_id_snapshot"
-    | "quantity"
-    | "kit_size_vials_snapshot"
-    | "kit_participant_quantity_snapshot"
-    | "product_name_snapshot"
-    | "product_code_snapshot"
-  >,
+  item: HistoricalOrderItemQuantityInput,
 ): string | null {
   if (!item.kit_share_id_snapshot?.trim()) return null;
   const kitSize = asQuantity(item.kit_size_vials_snapshot);
@@ -37,6 +44,24 @@ export function formatKitShareLabelForOrderItem(
   const categoryId = resolveProductCategoryId({
     name: item.product_name_snapshot,
     code: item.product_code_snapshot,
+    dosageVial: item.dosage_vial_snapshot,
   });
-  return formatPartialKitQuantity(shareQty, kitSize, categoryId);
+  return formatKitSplitQuantity(
+    Math.floor(shareQty / kitSize),
+    shareQty % kitSize,
+    kitSize,
+    categoryId,
+  );
+}
+
+/** Frozen order line quantity: kit fraction only when kit_share_id_snapshot exists. */
+export function formatHistoricalOrderItemQuantity(item: HistoricalOrderItemQuantityInput): string {
+  const kitLabel = formatKitShareLabelForOrderItem(item);
+  if (kitLabel) return kitLabel;
+  const categoryId = resolveProductCategoryId({
+    name: item.product_name_snapshot,
+    code: item.product_code_snapshot,
+    dosageVial: item.dosage_vial_snapshot,
+  });
+  return formatCatalogQuantity(asQuantity(item.quantity), categoryId, "retail_unit");
 }

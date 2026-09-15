@@ -3,8 +3,7 @@ import { downloadCsv } from "@/services/csvProducts";
 import { ORDER_STATUS_LABELS } from "@/services/orders";
 import { BRAND_NAME } from "@/lib/constants";
 import { cartItemDisplayName, cartItemVariantSubtitle } from "@/lib/shop/cartDisplay";
-import { formatOrderItemQuantity } from "@/lib/quantityFormat";
-import { saleModeForShopArea } from "@/lib/shop/shopAreas";
+import { formatHistoricalOrderItemQuantity } from "@/lib/orderKitDisplay";
 import { formatShippingAddressLines, formatShippingRecipient, formatDeliveryMethodLabel, hasShippingSnapshot } from "@/lib/shippingAddress";
 import type { OrderStatus, Tables } from "@/types/database";
 
@@ -189,6 +188,10 @@ export function buildAdminOrderItemsCsv(
     deliveryMethodLabel: string | null;
     roleSurchargeUsd: number | null;
     orderTotalUsd: number;
+    kit_share_id_snapshot?: string | null;
+    kit_size_vials_snapshot?: number | null;
+    kit_participant_quantity_snapshot?: number | null;
+    dosage_vial_snapshot?: string | null;
   }>,
 ): string {
   const header = [
@@ -211,10 +214,14 @@ export function buildAdminOrderItemsCsv(
       row.telegramUsername ?? "",
       row.productCode,
       row.productName,
-      formatOrderItemQuantity({
+      formatHistoricalOrderItemQuantity({
         quantity: row.quantity,
         product_name_snapshot: row.productName,
         product_code_snapshot: row.productCode,
+        kit_share_id_snapshot: row.kit_share_id_snapshot ?? null,
+        kit_size_vials_snapshot: row.kit_size_vials_snapshot ?? null,
+        kit_participant_quantity_snapshot: row.kit_participant_quantity_snapshot ?? null,
+        dosage_vial_snapshot: row.dosage_vial_snapshot ?? null,
       }),
       row.unitPriceUsd,
       row.lineTotalUsd,
@@ -365,7 +372,6 @@ export function toOrderExportDoc(
   const telegramUsername = order.telegram_username_snapshot?.trim() || undefined;
   const audience = options?.audience ?? "customer";
   const surchargeUnavailable = audience === "admin" && !roleSurcharge;
-  const kitSizes = options?.kitSizes;
   return {
     order_number: order.order_number,
     status: order.status,
@@ -389,11 +395,7 @@ export function toOrderExportDoc(
     roleSurchargeUnavailable: surchargeUnavailable,
     items: items.map((item) => ({
       ...item,
-      quantityLabel: formatOrderItemQuantity(
-        item,
-        item.product_id ? kitSizes?.get(item.product_id) ?? null : null,
-        saleModeForShopArea(order.shop_area),
-      ),
+      quantityLabel: formatHistoricalOrderItemQuantity(item),
     })),
   };
 }

@@ -39,7 +39,7 @@ export type OrderIntegritySummary = {
   hint: string | null;
 };
 
-function isKitCheckoutReady(line: OrderIntegrityCartLine): boolean {
+export function isKitCheckoutReadyLine(line: OrderIntegrityCartLine): boolean {
   if (!line.kitShareId) return true;
   if (line.kitStatus !== "full" && line.kitStatus !== "ordered") return false;
   if (line.kitAllocated == null || line.kitSizeVials == null) return false;
@@ -55,7 +55,7 @@ export function summarizeOrderIntegrity(input: {
   const linked = cartLines.filter((l) => l.submittedOrderId === orderId);
   const remaining = cartLines.filter((l) => !l.submittedOrderId);
   const remainingKit = remaining.filter((l) => l.kitShareId);
-  const remainingIncompleteKit = remainingKit.filter((l) => !isKitCheckoutReady(l));
+  const remainingIncompleteKit = remainingKit.filter((l) => !isKitCheckoutReadyLine(l));
 
   if (orderLines.length === 0) {
     return {
