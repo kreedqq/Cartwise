@@ -2,6 +2,18 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-15 (Kit customer lock + order integrity audit)
+
+### Added
+
+- Migration `0097`: server-side customer lock when kit is full or ordered (`FULL_LOCKED` / `ORDERED_LOCKED`); cart item guards; RPC patches for leave, quantity, distribution, checkout sync, admin distribution.
+- Read-only order integrity helpers (`orderIntegrity.ts`), admin banner on order detail, SQL audit script under `scripts/audit/`, QA #19 HeyAnna5 mixed-checkout pattern.
+
+### Notes
+
+- Production read-only audit: CW-2026-000063 (HeyAnna5) classified **expected remaining cart** (incomplete kits 5/10 still in cart; 32,19 + 76,83 ≈ 109,02 EUR). No auto-fix applied.
+- `0097` not applied to production until explicitly approved. Order ownership transfer remains a separate admin workflow.
+
 ## 2026-09-14 (Local isolated QA + checkout numeric fix)
 
 ### Added

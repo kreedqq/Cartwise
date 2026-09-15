@@ -48,6 +48,7 @@ export const QUERY_KEYS = {
   adminOrders: ["admin-orders"] as const,
   adminOrderItems: ["admin-order-items"] as const,
   adminKitOrderContext: ["admin-kit-order-context"] as const,
+  adminOrderIntegrity: ["admin-order-integrity"] as const,
   adminOrderSummary: ["admin-order-summary"] as const,
   adminRoleSurcharges: ["admin-role-surcharges"] as const,
   adminUserDirectory: ["admin-user-directory"] as const,

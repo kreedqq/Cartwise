@@ -657,3 +657,65 @@ describe("18 kit customer lock lifecycle (4+6)", () => {
     expect(leaveTry.error).toBeTruthy();
   });
 });
+
+describe("19 mixed cart checkout preserves incomplete kit lines (HeyAnna5 pattern)", () => {
+  it("orders checkout-ready lines only; incomplete kits stay in cart with EUR totals", async () => {
+    const { client } = await signIn("groupBuy");
+    const master = await shopProductByCode(client, "group_buy_1", "QA-KIT-001");
+    const cart = await getOrCreateCart(client);
+    await clearCartItems(client, cart.id);
+
+    const openKitA = await client.rpc("create_kit_share", {
+      _product_id: master.id,
+      _kit_size_vials: 10,
+      _my_quantity: 5,
+    });
+    expect(openKitA.error, rpcMessage(openKitA.error)).toBeNull();
+
+    const openKitB = await client.rpc("create_kit_share", {
+      _product_id: master.id,
+      _kit_size_vials: 10,
+      _my_quantity: 5,
+    });
+    expect(openKitB.error, rpcMessage(openKitB.error)).toBeNull();
+
+    await addCatalogLine(client, cart.id, "QA-PEP-001", 2, "group_buy_1", 0);
+
+    const fullKit = await client.rpc("create_kit_share", {
+      _product_id: master.id,
+      _kit_size_vials: 10,
+      _my_quantity: 10,
+    });
+    expect(fullKit.error, rpcMessage(fullKit.error)).toBeNull();
+
+    const { data: before } = await client
+      .from("cart_items")
+      .select("eur_value_snapshot, kit_share_id, submitted_order_id")
+      .eq("cart_id", cart.id);
+    const cartEurBefore = (before ?? []).reduce(
+      (s, r) => s + Number(r.eur_value_snapshot ?? 0),
+      0,
+    );
+    expect(cartEurBefore).toBeGreaterThan(0);
+
+    const ordered = await client.rpc("create_order", {
+      _cart_id: cart.id,
+      _note: "QA HeyAnna5 mixed cart pattern",
+      _payment_method: "crypto",
+      ...HOME_SHIPPING,
+    });
+    expect(ordered.error, rpcMessage(ordered.error)).toBeNull();
+
+    const { data: after } = await client
+      .from("cart_items")
+      .select("eur_value_snapshot, kit_share_id, submitted_order_id")
+      .eq("cart_id", cart.id);
+    const remaining = (after ?? []).filter((r) => !r.submitted_order_id);
+    expect(remaining.length).toBeGreaterThanOrEqual(2);
+    expect(remaining.every((r) => r.kit_share_id)).toBe(true);
+
+    const remainingEur = remaining.reduce((s, r) => s + Number(r.eur_value_snapshot ?? 0), 0);
+    expect(remainingEur).toBeGreaterThan(0);
+    expect(cartEurBefore).toBeGreaterThan(remainingEur);
+  });
+});

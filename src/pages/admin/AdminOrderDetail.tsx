@@ -23,6 +23,7 @@ import { SharedKitAdminCard } from "@/components/orders/SharedKitAdminCard";
 import { AdminOrderTrackingForm } from "@/components/orders/AdminOrderTrackingForm";
 import { AdminOrderCorrectionDialog } from "@/components/orders/AdminOrderCorrectionDialog";
 import { CancelOrderDialog } from "@/components/orders/CancelOrderDialog";
+import { AdminOrderIntegrityBanner } from "@/components/orders/AdminOrderIntegrityBanner";
 import { OrderRevisionHistory } from "@/components/orders/OrderRevisionHistory";
 import { OrderProgressTracker } from "@/components/orders/OrderProgressTracker";
 import { ShippingProgressSelect } from "@/components/orders/ShippingProgressSelect";
@@ -202,6 +203,12 @@ export default function AdminOrderDetailPage() {
             <ArrowLeft className="h-3.5 w-3.5" /> Zurück
           </Button>
         }
+      />
+
+      <AdminOrderIntegrityBanner
+        orderId={order.id}
+        cartId={order.cart_id}
+        orderItems={order.items}
       />
 
       {/* Order header card */}
