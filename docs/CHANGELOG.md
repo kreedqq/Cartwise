@@ -2,6 +2,19 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-15 (Order ownership transfer + integrity classification)
+
+### Added
+
+- Migration `0098`: `admin_transfer_orders`, `admin_link_cart_item_submitted_order` (provable kit cart link only), `admin_preflight_user_delete`.
+- Admin UI: transfer orders between users with audit reason; delete preflight hints.
+- Read-only legacy classification helpers and audit SQL notes (`orderIntegrityClassification.ts`, `scripts/audit/legacy-order-classification.sql`).
+
+### Notes
+
+- Production audit (read-only): 12 zero-link 2026 orders → **valid_legacy_state**; 7 kit cart anomalies → 4 provable missing link, 2 ambiguous (peptixx), 1 unknown. No production auto-repair.
+- CW-2026-000054 / 000048 already owned by **rime41** on prod; transfer feature for future admin use.
+
 ## 2026-09-15 (Kit customer lock + order integrity audit)
 
 ### Added

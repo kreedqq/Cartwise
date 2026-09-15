@@ -39,11 +39,15 @@ import { mapUsernameError } from "@/services/username";
 import { assignCustomerRole, listCustomerRoles, listUserCustomerRoles } from "@/services/customerRoles";
 import { setUserRole } from "@/services/roles";
 import { AdminCartPriceRefresh } from "@/components/admin/AdminCartPriceRefresh";
+import { AdminOrderOwnershipTransfer } from "@/components/admin/AdminOrderOwnershipTransfer";
+import { useAdminOrders } from "@/hooks/useAdminOrders";
+import { adminPreflightUserDelete } from "@/services/adminOrderOwnership";
 
 export default function AdminUsersPage() {
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
   const usersQuery = useQuery({ queryKey: ["admin-users"], queryFn: listUsersWithRoles });
+  const ordersQuery = useAdminOrders();
   const rolesQuery = useQuery({ queryKey: ["customer-roles"], queryFn: listCustomerRoles });
   const assignmentsQuery = useQuery({ queryKey: ["user-customer-roles"], queryFn: listUserCustomerRoles });
 
@@ -66,6 +70,8 @@ export default function AdminUsersPage() {
   const [flagLoading, setFlagLoading] = React.useState(false);
   const [removeTelegramLoading, setRemoveTelegramLoading] = React.useState(false);
   const [usernameSaving, setUsernameSaving] = React.useState(false);
+  const [transferOpen, setTransferOpen] = React.useState(false);
+  const [deletePreflight, setDeletePreflight] = React.useState<string | null>(null);
 
   const roles = rolesQuery.data ?? [];
   const assignmentByUser = React.useMemo(() => {
@@ -195,6 +201,17 @@ export default function AdminUsersPage() {
       toast.error(mapUsernameError(error));
     } finally {
       setRemoveTelegramLoading(false);
+    }
+  }
+
+  async function openDeleteDialog(user: UserWithRoles) {
+    setDeletePreflight(null);
+    setDeleteTarget(user);
+    try {
+      const p = await adminPreflightUserDelete(user.id);
+      setDeletePreflight(p.blockers.length > 0 ? p.blockers.join(" ") : p.note);
+    } catch {
+      setDeletePreflight(null);
     }
   }
 
@@ -480,11 +497,19 @@ export default function AdminUsersPage() {
               <section className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Account</h3>
                 <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full sm:w-auto"
+                  onClick={() => setTransferOpen(true)}
+                >
+                  Bestellungen übertragen
+                </Button>
+                <Button
                   variant="destructive"
                   className="w-full sm:w-auto"
                   disabled={managedIsSelf}
                   title={managedIsSelf ? "Du kannst deinen eigenen Account nicht löschen." : undefined}
-                  onClick={() => setDeleteTarget(managed)}
+                  onClick={() => void openDeleteDialog(managed)}
                 >
                   Benutzer dauerhaft entfernen
                 </Button>
@@ -590,6 +615,16 @@ export default function AdminUsersPage() {
         onConfirm={handleAdminConfirm}
       />
 
+      {managed ? (
+        <AdminOrderOwnershipTransfer
+          open={transferOpen}
+          onOpenChange={setTransferOpen}
+          fromUser={managed}
+          allUsers={users}
+          orders={ordersQuery.data ?? []}
+        />
+      ) : null}
+
       <ConfirmDialog
         open={!!deleteTarget}
         onOpenChange={(open) => !open && !deleteLoading && setDeleteTarget(null)}
@@ -603,8 +638,11 @@ export default function AdminUsersPage() {
             </p>
             <p>
               Der bestehende Account wird gelöscht. Der Benutzer muss sich anschließend neu registrieren. Historische
-              Bestellungen bleiben erhalten.
+              Bestellungen bleiben erhalten (Owner wird NULL, Snapshots bleiben).
             </p>
+            {deletePreflight ? (
+              <p className="text-xs text-muted-foreground">{deletePreflight}</p>
+            ) : null}
           </div>
         }
         confirmLabel="Dauerhaft entfernen"

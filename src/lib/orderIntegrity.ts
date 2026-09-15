@@ -77,7 +77,7 @@ export function summarizeOrderIntegrity(input: {
       cartLinesRemaining: remaining.length,
       remainingKitLines: remainingKit.length,
       remainingIncompleteKitLines: remainingIncompleteKit.length,
-      hint: "Keine Cart-Zeilen mit submitted_order_id — Legacy oder Cart-Wechsel prüfen.",
+      hint: "Keine Cart-Zeilen mit submitted_order_id — oft VALID_LEGACY_STATE (Pre-Linking); manuell prüfen.",
     };
   }
 

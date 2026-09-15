@@ -1847,6 +1847,41 @@ export interface Database {
       admin_list_telegram_orphan_user_ids: { Args: Record<string, never>; Returns: string[] };
       admin_remove_telegram_identity: { Args: { _user_id: string }; Returns: undefined };
       admin_delete_user: { Args: { _user_id: string }; Returns: undefined };
+      admin_transfer_orders: {
+        Args: {
+          _from_user_id: string;
+          _to_user_id: string;
+          _order_ids: string[];
+          _reason: string;
+        };
+        Returns: {
+          fromUserId: string;
+          toUserId: string;
+          orderIds: string[];
+          orderNumbers: string[];
+          count: number;
+        };
+      };
+      admin_link_cart_item_submitted_order: {
+        Args: { _cart_item_id: string; _reason: string };
+        Returns: {
+          cartItemId: string;
+          submittedOrderId: string;
+          kitShareId: string | null;
+        };
+      };
+      admin_preflight_user_delete: {
+        Args: { _user_id: string };
+        Returns: {
+          userId: string;
+          orderCount: number;
+          openCartCount: number;
+          kitParticipantCount: number;
+          canDeleteViaAdminRpc: boolean;
+          blockers: string[];
+          note: string;
+        };
+      };
       admin_set_de_shipping: {
         Args: { _order_id: string; _amount: number | null; _currency: ShippingCurrency | null };
         Returns: Database["public"]["Tables"]["orders"]["Row"];
