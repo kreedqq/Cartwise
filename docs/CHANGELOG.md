@@ -12,7 +12,7 @@ Only material changes. Dates are local project days.
 ### Notes
 
 - Production read-only audit: CW-2026-000063 (HeyAnna5) classified **expected remaining cart** (incomplete kits 5/10 still in cart; 32,19 + 76,83 ≈ 109,02 EUR). No auto-fix applied.
-- `0097` not applied to production until explicitly approved. Order ownership transfer remains a separate admin workflow.
+- `0097` applied to production (`cartwise-prod`) via linked SQL apply. Order ownership transfer remains a separate admin workflow.
 
 ## 2026-09-14 (Local isolated QA + checkout numeric fix)
 
