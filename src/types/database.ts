@@ -1738,6 +1738,19 @@ export interface Database {
         };
         Returns: Record<string, unknown>;
       };
+      kit_sync_recovery_evaluate: {
+        Args: { _order_id: string; _kit_share_id: string };
+        Returns: Record<string, unknown>;
+      };
+      admin_apply_historical_kit_sync_recovery: {
+        Args: {
+          _order_id: string;
+          _expected_revision: number;
+          _kit_share_id: string;
+          _reason: string;
+        };
+        Returns: Record<string, unknown>;
+      };
       set_order_status: {
         Args: { _order_id: string; _status: OrderStatus; _admin_note: string | null };
         Returns: Database["public"]["Tables"]["orders"]["Row"];

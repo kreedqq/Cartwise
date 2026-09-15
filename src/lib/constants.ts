@@ -63,6 +63,8 @@ export const QUERY_KEYS = {
   orderTemplates: ["order-templates"] as const,
   orderAdminNote: (id: string) => ["orders", id, "admin-note"] as const,
   orderRevisions: (id: string) => ["orders", id, "revisions"] as const,
+  historicalKitRecoveryPreview: (orderId: string, kitShareId: string) =>
+    ["historical-kit-recovery-preview", orderId, kitShareId] as const,
   orderKitSizes: (id: string) => ["orders", id, "kit-sizes"] as const,
   orderProgress: (id: string) => ["orders", id, "progress"] as const,
   adminOrderProgress: ["admin-order-progress"] as const,

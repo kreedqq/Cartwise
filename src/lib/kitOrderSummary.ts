@@ -30,6 +30,8 @@ export interface KitShareContextKit {
   product_id: string;
   kit_size_vials: number;
   status?: string | null;
+  completed_at?: string | null;
+  vendor_code?: string | null;
 }
 
 export interface KitShareContextParticipant {
@@ -70,6 +72,8 @@ export interface SharedKitParticipantView {
   hasProcessingOrder: boolean;
   canRestoreCartLine: boolean;
   canAdminSyncNotInCartLine: boolean;
+  /** Customer on this order; kit full before checkout but no frozen order line (server validates recovery). */
+  canOfferHistoricalKitRecovery: boolean;
 }
 
 export interface SharedKitAdminView {
@@ -309,6 +313,18 @@ export function buildSharedKitsForOrder(
     if (kitShareId) kitIds.add(kitShareId);
   }
 
+  if (currentOrder?.user_id && currentOrder.submitted_at) {
+    const submittedAt = new Date(currentOrder.submitted_at).getTime();
+    for (const participant of participants) {
+      if (participant.user_id !== currentOrder.user_id || participant.order_id) continue;
+      const kit = kits.get(participant.kit_share_id);
+      if (!kit || kit.status !== "full" || !kit.completed_at) continue;
+      if (new Date(kit.completed_at).getTime() > submittedAt) continue;
+      if (items.some((line) => line.kit_share_id_snapshot === participant.kit_share_id)) continue;
+      kitIds.add(participant.kit_share_id);
+    }
+  }
+
   const views: SharedKitAdminView[] = [];
   for (const kitShareId of kitIds) {
     const kit = kits.get(kitShareId);
@@ -337,6 +353,7 @@ export function buildSharedKitsForOrder(
         const status = kitParticipantStatusLabel(memberOrder);
         const cartPresence = resolveParticipantCartPresence(member, cartLinksWithUser);
         const isCurrent = member.order_id === orderId;
+        const isOrderCustomer = currentOrder?.user_id === member.user_id;
         const displayQty =
           isCurrent && orderItem
             ? asQuantity(orderItem.kit_participant_quantity_snapshot ?? orderItem.quantity)
@@ -369,6 +386,14 @@ export function buildSharedKitsForOrder(
             cartLinksWithUser,
             kit.status,
           ),
+          canOfferHistoricalKitRecovery:
+            isOrderCustomer &&
+            !orderItem &&
+            !member.order_id &&
+            kit.status === "full" &&
+            Boolean(kit.completed_at) &&
+            Boolean(currentOrder?.submitted_at) &&
+            new Date(kit.completed_at as string).getTime() <= new Date(currentOrder.submitted_at).getTime(),
         };
       })
       .sort((a, b) => {
@@ -383,8 +408,8 @@ export function buildSharedKitsForOrder(
 
     views.push({
       kitShareId,
-      productName: orderItem?.product_name_snapshot?.trim() || "Nicht verfügbar",
-      productCode: orderItem?.product_code_snapshot?.trim() || "—",
+      productName: orderItem?.product_name_snapshot?.trim() || kit.vendor_code?.trim() || "Nicht verfügbar",
+      productCode: orderItem?.product_code_snapshot?.trim() || kit.vendor_code?.trim() || "—",
       kitSize: panelKitSize,
       kitSizeLabel: formatKitSizeLabel(panelKitSize, categoryId),
       categoryId,

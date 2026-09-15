@@ -25,7 +25,7 @@ function readNumber(row: Record<string, unknown>, key: string): number {
 /** Admin-only: kit identity, participants, and cart links already readable via existing admin SELECT policies. */
 export async function listAdminKitOrderContext(): Promise<KitShareOrderContext> {
   const [kitsResult, participantsResult, cartResult, profilesResult] = await Promise.all([
-    supabase.from("kit_shares").select("id, product_id, kit_size_vials, status"),
+    supabase.from("kit_shares").select("id, product_id, kit_size_vials, status, completed_at, vendor_code"),
     supabase
       .from("kit_share_participants")
       .select("kit_share_id, user_id, quantity, order_id, ordered_at, cart_line_removed_at, cart_line_last_in_cart_at"),
@@ -53,6 +53,8 @@ export async function listAdminKitOrderContext(): Promise<KitShareOrderContext> 
         product_id,
         kit_size_vials: readNumber(record, "kit_size_vials"),
         status: readNullableString(record, "status"),
+        completed_at: readNullableString(record, "completed_at"),
+        vendor_code: readNullableString(record, "vendor_code"),
       },
     ];
   });

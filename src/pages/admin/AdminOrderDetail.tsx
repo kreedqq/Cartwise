@@ -22,6 +22,7 @@ import { OrderShippingDetails } from "@/components/orders/OrderShippingCard";
 import { SharedKitAdminCard } from "@/components/orders/SharedKitAdminCard";
 import { AdminOrderTrackingForm } from "@/components/orders/AdminOrderTrackingForm";
 import { AdminOrderCorrectionDialog } from "@/components/orders/AdminOrderCorrectionDialog";
+import { AdminHistoricalKitRecoveryDialog } from "@/components/orders/AdminHistoricalKitRecoveryDialog";
 import { CancelOrderDialog } from "@/components/orders/CancelOrderDialog";
 import { AdminOrderIntegrityBanner } from "@/components/orders/AdminOrderIntegrityBanner";
 import { AdminPostCheckoutCartSection } from "@/components/orders/AdminPostCheckoutCartSection";
@@ -71,6 +72,10 @@ export default function AdminOrderDetailPage() {
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [cancelOpen, setCancelOpen] = React.useState(false);
   const [correctOpen, setCorrectOpen] = React.useState(false);
+  const [historicalRecovery, setHistoricalRecovery] = React.useState<{
+    kitShareId: string;
+    kitLabel: string;
+  } | null>(null);
   const revisionsQuery = useOrderRevisions(orderId);
   const applyCorrection = useApplyOrderCorrection(orderId);
   const restoreKitCart = useRestoreKitShareCartLine({ orderId });
@@ -366,6 +371,12 @@ export default function AdminOrderDetailPage() {
                   },
                 );
               }}
+              onHistoricalKitRecovery={({ kitShareId }) => {
+                setHistoricalRecovery({
+                  kitShareId,
+                  kitLabel: `${kit.productCode} · ${kit.kitSizeLabel}`,
+                });
+              }}
               onRestoreCartLine={({ kitShareId, participantUserId }) => {
                 setRestoringCartUserId(participantUserId);
                 restoreKitCart.mutate(
@@ -501,6 +512,24 @@ export default function AdminOrderDetailPage() {
           )}
         </div>
       </AdminSection>
+
+      {historicalRecovery ? (
+        <AdminHistoricalKitRecoveryDialog
+          key={`${historicalRecovery.kitShareId}-${order.revision_number ?? 0}`}
+          open={Boolean(historicalRecovery)}
+          onOpenChange={(open) => {
+            if (!open) setHistoricalRecovery(null);
+          }}
+          orderId={order.id}
+          kitShareId={historicalRecovery.kitShareId}
+          kitLabel={historicalRecovery.kitLabel}
+          revisionNumber={order.revision_number ?? 0}
+          onApplied={() => {
+            toast.success("Historische Kit-Position ergänzt.");
+            setHistoricalRecovery(null);
+          }}
+        />
+      ) : null}
 
       <AdminOrderCorrectionDialog
         key={`${order.id}-${order.revision_number ?? 0}-${correctOpen ? "open" : "closed"}`}

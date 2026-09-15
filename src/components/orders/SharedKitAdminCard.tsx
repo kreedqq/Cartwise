@@ -12,6 +12,7 @@ type Props = {
   restoringUserId?: string | null;
   onRestoreCartLine?: (input: RestoreInput) => void;
   onAdminSyncNotInCartLine?: (input: RestoreInput) => void;
+  onHistoricalKitRecovery?: (input: RestoreInput) => void;
 };
 
 export function SharedKitAdminCard({
@@ -19,6 +20,7 @@ export function SharedKitAdminCard({
   restoringUserId,
   onRestoreCartLine,
   onAdminSyncNotInCartLine,
+  onHistoricalKitRecovery,
 }: Props) {
   const [syncConfirm, setSyncConfirm] = React.useState<{
     userId: string;
@@ -96,6 +98,23 @@ export function SharedKitAdminCard({
                         }
                       >
                         Anteil in Warenkorb legen
+                      </Button>
+                    ) : null}
+                    {participant.canOfferHistoricalKitRecovery && onHistoricalKitRecovery ? (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="secondary"
+                        className="w-full shrink-0 sm:w-auto"
+                        disabled={Boolean(restoringUserId)}
+                        onClick={() =>
+                          onHistoricalKitRecovery({
+                            kitShareId: kit.kitShareId,
+                            participantUserId: participant.userId,
+                          })
+                        }
+                      >
+                        Historische Bestellposition
                       </Button>
                     ) : null}
                     {participant.canRestoreCartLine && onRestoreCartLine ? (
