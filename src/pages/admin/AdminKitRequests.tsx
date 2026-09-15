@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAdminKitRequests } from "@/hooks/useAdminKitRequests";
+import { kitFullOrderSyncListLabel } from "@/lib/kitFullOrderSync";
 import { kitRequestStatusLabel } from "@/lib/kitRequests";
 import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
 import {
@@ -124,6 +125,7 @@ export default function AdminKitRequestsPage() {
                   <TableHead>Produkt</TableHead>
                   <TableHead>Belegung</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Bestell-Sync</TableHead>
                   <TableHead>Ersteller</TableHead>
                   <TableHead>Bereich</TableHead>
                   <TableHead>Erstellt</TableHead>
@@ -155,6 +157,17 @@ export default function AdminKitRequestsPage() {
                         <Badge variant="secondary">
                           {adminStatusLabel(item.status, item.remainingVials)}
                         </Badge>
+                      </Link>
+                    </TableCell>
+                    <TableCell className="max-w-[14rem] text-xs">
+                      <Link to={`/admin/kit-requests/${item.id}`} className="block text-muted-foreground">
+                        {item.status === "full"
+                          ? kitFullOrderSyncListLabel(
+                              item.orderSyncLabel,
+                              item.orderSyncSyncedCount,
+                              item.orderSyncParticipantCount,
+                            )
+                          : "—"}
                       </Link>
                     </TableCell>
                     <TableCell>

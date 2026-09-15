@@ -25,8 +25,13 @@ import {
   useAdminKitRequest,
   useAdminSearchKitRequestUsers,
   useAdminSetKitRequestDistribution,
+  useAdminSyncKitFullOrders,
   useAdminUpdateKitRequestMeta,
 } from "@/hooks/useAdminKitRequests";
+import {
+  kitFullOrderSyncListLabel,
+  kitFullOrderSyncParticipantLabel,
+} from "@/lib/kitFullOrderSync";
 import { kitRequestStatusLabel } from "@/lib/kitRequests";
 import { KIT_SIZE_OPTIONS } from "@/lib/shop/kitUnits";
 import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
@@ -350,6 +355,7 @@ export default function AdminKitRequestDetailPage() {
   const detailQuery = useAdminKitRequest(kitRequestId);
   const metaMutation = useAdminUpdateKitRequestMeta();
   const distributionMutation = useAdminSetKitRequestDistribution();
+  const orderSyncMutation = useAdminSyncKitFullOrders();
   const cancelMutation = useAdminCancelKitRequest();
   const deleteMutation = useAdminDeleteKitRequest();
 
@@ -388,6 +394,16 @@ export default function AdminKitRequestDetailPage() {
       await detailQuery.refetch();
     } catch (error) {
       toast.error(adminKitRpcErrorMessage(error, "Speichern fehlgeschlagen."));
+    }
+  }
+
+  async function runOrderSync() {
+    try {
+      await orderSyncMutation.mutateAsync(detail.id);
+      toast.success("Bestell-Synchronisation abgeschlossen.");
+      await detailQuery.refetch();
+    } catch (error) {
+      toast.error(adminKitRpcErrorMessage(error, "Synchronisation fehlgeschlagen."));
     }
   }
 
@@ -504,6 +520,58 @@ export default function AdminKitRequestDetailPage() {
           onSave={(input) => void saveMeta(input)}
           onCancel={() => setEditingMeta(false)}
         />
+      ) : null}
+
+      {detail.status === "full" ? (
+        <AdminSection
+          title="Bestell-Synchronisation"
+          description="Nach Kit-Full werden fehlende Kit-Anteile in bestehende Kundenbestellungen übernommen (Order Revision, historische Preise)."
+          padded
+        >
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <Badge variant="secondary">
+              {kitFullOrderSyncListLabel(
+                detail.orderSyncLabel,
+                detail.orderSyncSyncedCount,
+                detail.orderSyncParticipantCount,
+              )}
+            </Badge>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              loading={orderSyncMutation.isPending}
+              onClick={() => void runOrderSync()}
+            >
+              Bestellungen synchronisieren
+            </Button>
+          </div>
+          <ul className="space-y-2 text-sm">
+            {detail.participants.map((p) => {
+              const sync = p.orderSyncStatus;
+              const status = sync?.status != null ? String(sync.status) : null;
+              const reason = sync?.reason != null ? String(sync.reason) : null;
+              const orderId = sync?.orderId != null ? String(sync.orderId) : p.orderId;
+              return (
+                <li
+                  key={p.userId}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border px-3 py-2"
+                >
+                  <span className="font-medium">{creatorHandle(p.username)}</span>
+                  <span className="text-muted-foreground tabular-nums">{p.quantity} Anteil</span>
+                  <span className="text-xs text-muted-foreground">
+                    {kitFullOrderSyncParticipantLabel(status, reason)}
+                  </span>
+                  {orderId ? (
+                    <Button asChild variant="link" size="sm" className="h-auto px-0 text-xs">
+                      <Link to={`/admin/orders/${orderId}`}>Bestellung</Link>
+                    </Button>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+        </AdminSection>
       ) : null}
 
       <DistributionEditor

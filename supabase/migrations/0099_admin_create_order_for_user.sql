@@ -1196,14 +1196,14 @@ end;
 $$;
 
 revoke all on function public.admin_create_order_for_customer(
-  uuid, jsonb, text, text, text, text, text, text, text, text, text, text, text, text, text, text
+  uuid, jsonb, text, text, text, text, text, text, text, text, text, text, text, text, text
 ) from public, anon;
 grant execute on function public.admin_create_order_for_customer(
-  uuid, jsonb, text, text, text, text, text, text, text, text, text, text, text, text, text, text
+  uuid, jsonb, text, text, text, text, text, text, text, text, text, text, text, text, text
 ) to authenticated;
 
 comment on function public.admin_create_order_for_customer(
-  uuid, jsonb, text, text, text, text, text, text, text, text, text, text, text, text, text, text
+  uuid, jsonb, text, text, text, text, text, text, text, text, text, text, text, text, text
 ) is
   'Admin-only: stage lines on customer One Cart, run create_order with subject GUC, restore open cart lines.';
 

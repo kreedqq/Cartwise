@@ -8,6 +8,7 @@ import {
   adminListKitRequests,
   adminSearchKitRequestUsers,
   adminSetKitRequestDistribution,
+  adminSyncKitFullOrders,
   adminUpdateKitRequestMeta,
   type AdminKitRequestDetail,
   type AdminKitRequestStatusFilter,
@@ -65,6 +66,19 @@ export function useAdminSetKitRequestDistribution() {
   return useMutation({
     mutationFn: adminSetKitRequestDistribution,
     onSuccess: (detail) => invalidate(detail),
+  });
+}
+
+export function useAdminSyncKitFullOrders() {
+  const queryClient = useQueryClient();
+  const invalidate = useInvalidateAdminKitRequests();
+  return useMutation({
+    mutationFn: adminSyncKitFullOrders,
+    onSuccess: (detail) => {
+      invalidate(detail);
+      void queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      void queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
   });
 }
 

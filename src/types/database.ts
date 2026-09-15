@@ -1729,6 +1729,7 @@ export interface Database {
         Returns: Record<string, unknown>;
       };
       admin_delete_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
+      admin_sync_kit_full_orders: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
       admin_apply_order_correction: {
         Args: {
           _order_id: string;

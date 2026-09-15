@@ -25,6 +25,9 @@ export interface AdminKitRequestListItem {
   vendorCode: string | null;
   areaProductId: string | null;
   masterProductId: string | null;
+  orderSyncLabel: string | null;
+  orderSyncSyncedCount: number;
+  orderSyncParticipantCount: number;
 }
 
 export interface AdminKitRequestParticipant {
@@ -38,12 +41,14 @@ export interface AdminKitRequestParticipant {
   orderId: string | null;
   isCreator: boolean;
   hasCartItem: boolean;
+  orderSyncStatus?: Record<string, unknown> | null;
 }
 
 export interface AdminKitRequestDetail extends AdminKitRequestListItem {
   participants: AdminKitRequestParticipant[];
   anyParticipantOrdered: boolean;
   cartLineCount: number;
+  orderSync: Record<string, unknown> | null;
   canEditMeta: boolean;
   canEditQuantities: boolean;
   canEditDistribution: boolean;
@@ -118,6 +123,9 @@ function mapListItem(raw: Record<string, unknown>): AdminKitRequestListItem {
     vendorCode: raw.vendorCode == null ? null : String(raw.vendorCode),
     areaProductId: raw.areaProductId == null ? null : String(raw.areaProductId),
     masterProductId: raw.masterProductId == null ? null : String(raw.masterProductId),
+    orderSyncLabel: raw.orderSyncLabel == null ? null : String(raw.orderSyncLabel),
+    orderSyncSyncedCount: Number(raw.orderSyncSyncedCount ?? 0),
+    orderSyncParticipantCount: Number(raw.orderSyncParticipantCount ?? 0),
   };
 }
 
@@ -133,6 +141,10 @@ function mapParticipant(raw: Record<string, unknown>): AdminKitRequestParticipan
     orderId: raw.orderId == null ? null : String(raw.orderId),
     isCreator: Boolean(raw.isCreator),
     hasCartItem: Boolean(raw.hasCartItem),
+    orderSyncStatus:
+      raw.orderSyncStatus && typeof raw.orderSyncStatus === "object" && !Array.isArray(raw.orderSyncStatus)
+        ? (raw.orderSyncStatus as Record<string, unknown>)
+        : null,
   };
 }
 
@@ -146,6 +158,10 @@ function mapDetail(raw: Record<string, unknown>): AdminKitRequestDetail {
     participants,
     anyParticipantOrdered: Boolean(raw.anyParticipantOrdered),
     cartLineCount: Number(raw.cartLineCount ?? 0),
+    orderSync:
+      raw.orderSync && typeof raw.orderSync === "object" && !Array.isArray(raw.orderSync)
+        ? (raw.orderSync as Record<string, unknown>)
+        : null,
     canEditMeta: Boolean(raw.canEditMeta),
     canEditQuantities: Boolean(raw.canEditQuantities),
     canEditDistribution: Boolean(raw.canEditDistribution ?? raw.canEditQuantities),
@@ -260,6 +276,13 @@ export async function adminSearchKitRequestUsers(query: string): Promise<AdminKi
     userId: String(item.userId),
     username: String(item.username ?? ""),
   }));
+}
+
+export async function adminSyncKitFullOrders(id: string): Promise<AdminKitRequestDetail> {
+  const { data, error } = await supabase.rpc("admin_sync_kit_full_orders", { _kit_share_id: id });
+  if (error) throw error;
+  void data;
+  return adminGetKitRequest(id);
 }
 
 export async function adminDeleteKitRequest(id: string): Promise<{ deleted: boolean; id: string }> {
