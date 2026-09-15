@@ -8,6 +8,7 @@ import { getProductUnitLabel } from "@/lib/quantityFormat";
 import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EditKitShareButton } from "@/components/shop/EditKitShareButton";
 import type { KitRequestCard } from "@/services/kitRequests";
 
 function statusVariant(status: KitRequestCard["status"], remaining: number): "default" | "success" | "secondary" | "warning" | "destructive" {
@@ -131,7 +132,10 @@ export function KitRequestCardView({
             Menge ändern ({request.myQuantity})
           </Button>
         ) : null}
-        {request.isParticipant && !canJoin && !canChangeQuantity ? (
+        {request.isParticipant && !canJoin && !canChangeQuantity && request.status === "full" ? (
+          <EditKitShareButton kitShareId={request.id} presentation="participantCard" />
+        ) : null}
+        {request.isParticipant && !canJoin && !canChangeQuantity && request.status !== "full" ? (
           <Button className="min-h-11 w-full" variant="secondary" disabled>
             Dein Anteil
           </Button>

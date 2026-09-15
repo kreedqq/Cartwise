@@ -497,3 +497,101 @@ describe("14 kit cart removal and restore", () => {
     expect(creatorOrders?.length).toBeGreaterThan(0);
   });
 });
+
+describe("15 vendor-only kit cart removal and restore", () => {
+  it("restores vendor-only kit line with vendor_code and kit_share_id", async () => {
+    const { client: creator, account: creatorAcc } = await signIn("groupBuy");
+    const vendor = await shopProductByCode(creator, "group_buy_1", "QA-VENDOR-ONLY");
+    const created = await creator.rpc("create_kit_request", {
+      _product_id: vendor.id,
+      _kit_size_vials: 10,
+      _my_quantity: 5,
+      _shop_area: "group_buy_1",
+      _note: "QA vendor-only removal",
+    });
+    expect(created.error, rpcMessage(created.error)).toBeNull();
+    const kitId = kitIdFromRpc(created.data);
+
+    const { client: joiner, account: joinerAcc } = await signIn("admin");
+    const joined = await joiner.rpc("join_kit_request", { _kit_share_id: kitId, _quantity: 5 });
+    expect(joined.error, rpcMessage(joined.error)).toBeNull();
+
+    const joinerCart = await getOrCreateCart(joiner);
+    const { data: before } = await joiner
+      .from("cart_items")
+      .select("id, kit_share_id, vendor_code, shop_area, quantity")
+      .eq("cart_id", joinerCart.id)
+      .eq("kit_share_id", kitId);
+    expect((before ?? []).length).toBe(1);
+    expect(before![0]!.kit_share_id).toBe(kitId);
+    expect(String(before![0]!.vendor_code ?? "").toUpperCase()).toBe("QA-VENDOR-ONLY");
+
+    await joiner.from("cart_items").delete().eq("id", before![0]!.id);
+    const view = await joiner.rpc("get_my_kit_share", { _kit_share_id: kitId });
+    expect(view.data?.myCartPresence).toBe("removed_from_cart");
+
+    const restored = await joiner.rpc("restore_kit_share_cart_line", {
+      _kit_share_id: kitId,
+      _participant_user_id: joinerAcc.userId,
+    });
+    expect(restored.error, rpcMessage(restored.error)).toBeNull();
+    expect((restored.data as { restored?: boolean }).restored).toBe(true);
+
+    const { data: after } = await joiner
+      .from("cart_items")
+      .select("id, kit_share_id, vendor_code, shop_area, quantity")
+      .eq("cart_id", joinerCart.id)
+      .eq("kit_share_id", kitId);
+    expect(after ?? []).toHaveLength(1);
+    expect(Number(after![0]!.quantity)).toBe(5);
+    expect(after![0]!.kit_share_id).toBe(kitId);
+    expect(String(after![0]!.vendor_code ?? "").toUpperCase()).toBe("QA-VENDOR-ONLY");
+    expect(after![0]!.shop_area).toBe("group_buy_1");
+
+    const dup = await joiner.rpc("restore_kit_share_cart_line", {
+      _kit_share_id: kitId,
+      _participant_user_id: joinerAcc.userId,
+    });
+    expect(dup.data?.alreadyInCart).toBe(true);
+    void creatorAcc;
+  });
+});
+
+describe("16 kit participant not_in_cart vs removed", () => {
+  it("shows not_in_cart when participant has no cart line and no removal timestamp", async () => {
+    const { client: creator } = await signIn("groupBuy");
+    const master = await shopProductByCode(creator, "group_buy_1", "QA-KIT-001");
+    const created = await creator.rpc("create_kit_request", {
+      _product_id: master.id,
+      _kit_size_vials: 10,
+      _my_quantity: 7,
+      _shop_area: "group_buy_1",
+      _note: "QA not-in-cart open kit",
+    });
+    expect(created.error, rpcMessage(created.error)).toBeNull();
+    const kitId = kitIdFromRpc(created.data);
+
+    const { client: joiner, account: joinerAcc } = await signIn("admin");
+    const joined = await joiner.rpc("join_kit_request", { _kit_share_id: kitId, _quantity: 2 });
+    expect(joined.error, rpcMessage(joined.error)).toBeNull();
+
+    const joinerCart = await getOrCreateCart(joiner);
+    const { data: lines } = await joiner
+      .from("cart_items")
+      .select("id")
+      .eq("cart_id", joinerCart.id)
+      .eq("kit_share_id", kitId);
+    expect((lines ?? []).length).toBe(0);
+
+    const view = await joiner.rpc("get_my_kit_share", { _kit_share_id: kitId });
+    expect(view.error, rpcMessage(view.error)).toBeNull();
+    expect(view.data?.myCartPresence).toBe("not_in_cart");
+    expect(view.data?.myCanRestoreCartLine).toBe(false);
+
+    const denied = await joiner.rpc("restore_kit_share_cart_line", {
+      _kit_share_id: kitId,
+      _participant_user_id: joinerAcc.userId,
+    });
+    expect(denied.error).toBeTruthy();
+  });
+});
