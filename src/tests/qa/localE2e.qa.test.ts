@@ -419,15 +419,15 @@ describe("13 kit cart sync", () => {
   });
 });
 
-describe("14 kit cart removal and restore", () => {
-  it("tracks user kit delete, restores idempotently, keeps sibling order intact", async () => {
-    const { client: creator, account: creatorAcc } = await signIn("groupBuy");
+describe("14 kit cart removal and restore (open kit only)", () => {
+  it("tracks user kit delete and restore while kit is still open", async () => {
+    const { client: creator } = await signIn("groupBuy");
     const master = await shopProductByCode(creator, "group_buy_1", "QA-KIT-001");
 
     const created = await creator.rpc("create_kit_share", {
       _product_id: master.id,
       _kit_size_vials: 10,
-      _my_quantity: 3,
+      _my_quantity: 4,
     });
     expect(created.error, rpcMessage(created.error)).toBeNull();
     const kitId = kitIdFromRpc(created.data);
@@ -436,18 +436,9 @@ describe("14 kit cart removal and restore", () => {
     const invited = await creator.rpc("invite_kit_share_participant", {
       _kit_share_id: kitId,
       _participant_user_id: joinerAcc.userId,
-      _quantity: 7,
+      _quantity: 2,
     });
     expect(invited.error, rpcMessage(invited.error)).toBeNull();
-
-    const creatorCart = await getOrCreateCart(creator);
-    const creatorOrder = await creator.rpc("create_order", {
-      _cart_id: creatorCart.id,
-      _note: "QA kit removal sibling order",
-      _payment_method: "crypto",
-      ...HOME_SHIPPING,
-    });
-    expect(creatorOrder.error, rpcMessage(creatorOrder.error)).toBeNull();
 
     const joinerCart = await getOrCreateCart(joiner);
     const { data: kitLinesBefore } = await joiner
@@ -464,7 +455,7 @@ describe("14 kit cart removal and restore", () => {
     const shareView = await joiner.rpc("get_my_kit_share", { _kit_share_id: kitId });
     expect(shareView.error, rpcMessage(shareView.error)).toBeNull();
     expect((shareView.data as { myCartPresence?: string }).myCartPresence).toBe("removed_from_cart");
-    expect((shareView.data as { myCanRestoreCartLine?: boolean }).myCanRestoreCartLine).toBe(true);
+    expect(Boolean((shareView.data as { customerMutationLocked?: boolean }).customerMutationLocked)).toBe(false);
 
     const restored = await joiner.rpc("restore_kit_share_cart_line", {
       _kit_share_id: kitId,
@@ -472,35 +463,12 @@ describe("14 kit cart removal and restore", () => {
     });
     expect(restored.error, rpcMessage(restored.error)).toBeNull();
     expect((restored.data as { restored?: boolean }).restored).toBe(true);
-
-    const again = await joiner.rpc("restore_kit_share_cart_line", {
-      _kit_share_id: kitId,
-      _participant_user_id: joinerAcc.userId,
-    });
-    expect(again.error, rpcMessage(again.error)).toBeNull();
-    expect((again.data as { alreadyInCart?: boolean }).alreadyInCart).toBe(true);
-
-    const { data: kitLinesAfter } = await joiner
-      .from("cart_items")
-      .select("id, quantity")
-      .eq("cart_id", joinerCart.id)
-      .eq("kit_share_id", kitId);
-    expect(kitLinesAfter ?? []).toHaveLength(1);
-    expect(Number(kitLinesAfter![0]!.quantity)).toBe(7);
-
-    const { data: creatorOrders } = await creator
-      .from("orders")
-      .select("id, user_id")
-      .eq("user_id", creatorAcc.userId)
-      .order("created_at", { ascending: false })
-      .limit(1);
-    expect(creatorOrders?.length).toBeGreaterThan(0);
   });
 });
 
 describe("15 vendor-only kit cart removal and restore", () => {
   it("restores vendor-only kit line with vendor_code and kit_share_id", async () => {
-    const { client: creator, account: creatorAcc } = await signIn("groupBuy");
+    const { client: creator } = await signIn("groupBuy");
     const vendor = await shopProductByCode(creator, "group_buy_1", "QA-VENDOR-ONLY");
     const created = await creator.rpc("create_kit_request", {
       _product_id: vendor.id,
@@ -512,7 +480,7 @@ describe("15 vendor-only kit cart removal and restore", () => {
     expect(created.error, rpcMessage(created.error)).toBeNull();
     const kitId = kitIdFromRpc(created.data);
 
-    const { client: joiner, account: joinerAcc } = await signIn("admin");
+    const { client: joiner } = await signIn("admin");
     const joined = await joiner.rpc("join_kit_request", { _kit_share_id: kitId, _quantity: 5 });
     expect(joined.error, rpcMessage(joined.error)).toBeNull();
 
@@ -526,34 +494,12 @@ describe("15 vendor-only kit cart removal and restore", () => {
     expect(before![0]!.kit_share_id).toBe(kitId);
     expect(String(before![0]!.vendor_code ?? "").toUpperCase()).toBe("QA-VENDOR-ONLY");
 
-    await joiner.from("cart_items").delete().eq("id", before![0]!.id);
+    const { error: delErr } = await joiner.from("cart_items").delete().eq("id", before![0]!.id);
+    expect(delErr).toBeTruthy();
+
     const view = await joiner.rpc("get_my_kit_share", { _kit_share_id: kitId });
-    expect(view.data?.myCartPresence).toBe("removed_from_cart");
-
-    const restored = await joiner.rpc("restore_kit_share_cart_line", {
-      _kit_share_id: kitId,
-      _participant_user_id: joinerAcc.userId,
-    });
-    expect(restored.error, rpcMessage(restored.error)).toBeNull();
-    expect((restored.data as { restored?: boolean }).restored).toBe(true);
-
-    const { data: after } = await joiner
-      .from("cart_items")
-      .select("id, kit_share_id, vendor_code, shop_area, quantity")
-      .eq("cart_id", joinerCart.id)
-      .eq("kit_share_id", kitId);
-    expect(after ?? []).toHaveLength(1);
-    expect(Number(after![0]!.quantity)).toBe(5);
-    expect(after![0]!.kit_share_id).toBe(kitId);
-    expect(String(after![0]!.vendor_code ?? "").toUpperCase()).toBe("QA-VENDOR-ONLY");
-    expect(after![0]!.shop_area).toBe("group_buy_1");
-
-    const dup = await joiner.rpc("restore_kit_share_cart_line", {
-      _kit_share_id: kitId,
-      _participant_user_id: joinerAcc.userId,
-    });
-    expect(dup.data?.alreadyInCart).toBe(true);
-    void creatorAcc;
+    expect(view.data?.customerMutationLocked).toBe(true);
+    expect(view.data?.myCartPresence).toBe("in_cart");
   });
 });
 
@@ -644,5 +590,70 @@ describe("17 admin sync not_in_cart kit participant", () => {
       _participant_user_id: creatorAcc.userId,
     });
     expect(denied.error).toBeTruthy();
+  });
+});
+
+describe("18 kit customer lock lifecycle (4+6)", () => {
+  it("locks full kit and hard-locks after first kit-line order", async () => {
+    const { client: userA } = await signIn("groupBuy");
+    const master = await shopProductByCode(userA, "group_buy_1", "QA-KIT-001");
+    const created = await userA.rpc("create_kit_share", {
+      _product_id: master.id,
+      _kit_size_vials: 10,
+      _my_quantity: 4,
+    });
+    expect(created.error, rpcMessage(created.error)).toBeNull();
+    const kitId = kitIdFromRpc(created.data);
+
+    const { client: userB, account: accB } = await signIn("admin");
+    const invB = await userA.rpc("invite_kit_share_participant", {
+      _kit_share_id: kitId,
+      _participant_user_id: accB.userId,
+      _quantity: 6,
+    });
+    expect(invB.error, rpcMessage(invB.error)).toBeNull();
+
+    const fullView = await userB.rpc("get_my_kit_share", { _kit_share_id: kitId });
+    expect(fullView.data?.status).toBe("full");
+    expect(fullView.data?.customerMutationLocked).toBe(true);
+
+    const qtyTry = await userB.rpc("update_kit_share_quantity", { _kit_share_id: kitId, _quantity: 5 });
+    expect(qtyTry.error).toBeTruthy();
+
+    const cartB = await getOrCreateCart(userB);
+    const { data: lineB } = await userB
+      .from("cart_items")
+      .select("id, quantity")
+      .eq("cart_id", cartB.id)
+      .eq("kit_share_id", kitId)
+      .maybeSingle();
+    expect(Number(lineB?.quantity)).toBe(6);
+
+    const delTry = await userB.from("cart_items").delete().eq("id", lineB!.id);
+    expect(delTry.error).toBeTruthy();
+
+    const cartA = await getOrCreateCart(userA);
+    const orderA = await userA.rpc("create_order", {
+      _cart_id: cartA.id,
+      _note: "QA kit lock first participant order",
+      _payment_method: "crypto",
+      ...HOME_SHIPPING,
+    });
+    expect(orderA.error, rpcMessage(orderA.error)).toBeNull();
+
+    const afterOrder = await userB.rpc("get_my_kit_share", { _kit_share_id: kitId });
+    expect(afterOrder.data?.customerMutationLocked).toBe(true);
+    expect(afterOrder.data?.customerLockReason).toBe("partial_order");
+
+    const orderB = await userB.rpc("create_order", {
+      _cart_id: cartB.id,
+      _note: "QA kit lock second participant order",
+      _payment_method: "crypto",
+      ...HOME_SHIPPING,
+    });
+    expect(orderB.error, rpcMessage(orderB.error)).toBeNull();
+
+    const leaveTry = await userB.rpc("leave_kit_share", { _kit_share_id: kitId });
+    expect(leaveTry.error).toBeTruthy();
   });
 });

@@ -50,6 +50,8 @@ export interface AdminKitRequestDetail extends AdminKitRequestListItem {
   canCancel: boolean;
   canDelete: boolean;
   canChangeProduct: boolean;
+  customerMutationLocked: boolean;
+  customerLockReason: "full" | "partial_order" | "ordered" | null;
 }
 
 export interface AdminKitUserSearchHit {
@@ -150,6 +152,13 @@ function mapDetail(raw: Record<string, unknown>): AdminKitRequestDetail {
     canCancel: Boolean(raw.canCancel),
     canDelete: Boolean(raw.canDelete),
     canChangeProduct: Boolean(raw.canChangeProduct),
+    customerMutationLocked: Boolean(raw.customerMutationLocked),
+    customerLockReason:
+      raw.customerLockReason === "full" ||
+      raw.customerLockReason === "partial_order" ||
+      raw.customerLockReason === "ordered"
+        ? raw.customerLockReason
+        : null,
   };
 }
 

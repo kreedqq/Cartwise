@@ -37,10 +37,19 @@ interface CartItemsTableProps {
   currentRate: number | null;
   nextPosition: number;
   readOnly?: boolean;
+  isKitCartLineLocked?: (kitShareId: string | null) => boolean;
   shopArea?: string | null;
 }
 
-export function CartItemsTable({ items, cartId, currentRate, nextPosition, readOnly, shopArea }: CartItemsTableProps) {
+export function CartItemsTable({
+  items,
+  cartId,
+  currentRate,
+  nextPosition,
+  readOnly,
+  isKitCartLineLocked,
+  shopArea,
+}: CartItemsTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -66,7 +75,8 @@ export function CartItemsTable({ items, cartId, currentRate, nextPosition, readO
             cartId={cartId}
             currentRate={currentRate}
             nextPosition={nextPosition + index}
-            readOnly={readOnly}
+            readOnly={readOnly || isKitCartLineLocked?.(item.kit_share_id) === true}
+            kitLocked={isKitCartLineLocked?.(item.kit_share_id) === true}
             shopArea={shopArea}
           />
         ))}
@@ -82,6 +92,7 @@ function CartItemRowDesktop({
   currentRate,
   nextPosition,
   readOnly,
+  kitLocked,
   shopArea,
 }: {
   item: ComputedCartItem;
@@ -90,6 +101,7 @@ function CartItemRowDesktop({
   currentRate: number | null;
   nextPosition: number;
   readOnly?: boolean;
+  kitLocked?: boolean;
   shopArea?: string | null;
 }) {
   const row = useCartItemRow(item, cartId, currentRate);
@@ -127,9 +139,12 @@ function CartItemRowDesktop({
         {isKitShareCartItem(item) && (
           <>
             <span className="mt-1 inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-              Kit Anteil
+              Geteiltes Kit
             </span>
-            {item.kit_share_id && <EditKitShareButton kitShareId={item.kit_share_id} />}
+            {kitLocked ? (
+              <span className="mt-1 block text-[11px] text-muted-foreground">Kit gesperrt</span>
+            ) : null}
+            {item.kit_share_id && !kitLocked ? <EditKitShareButton kitShareId={item.kit_share_id} /> : null}
           </>
         )}
       </TableCell>

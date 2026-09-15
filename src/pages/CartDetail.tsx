@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCarts } from "@/hooks/useCarts";
 import { useCartItems } from "@/hooks/useCartItems";
 import { useCartComputed } from "@/hooks/useCartComputed";
+import { useKitShareCustomerLockMap } from "@/hooks/useKitShareCustomerLockMap";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 
 export default function CartDetailPage() {
@@ -29,6 +30,15 @@ export default function CartDetailPage() {
 
   const cart = cartsQuery.data?.find((c) => c.id === cartId);
   const { items, totals, duplicateCodes } = useCartComputed(itemsQuery.data);
+  const kitShareIds = React.useMemo(
+    () => items.map((item) => item.kit_share_id).filter((id): id is string => Boolean(id)),
+    [items],
+  );
+  const kitLockQuery = useKitShareCustomerLockMap(kitShareIds);
+  const isKitCartLineLocked = React.useCallback(
+    (kitShareId: string | null) => (kitShareId ? (kitLockQuery.data?.get(kitShareId) ?? false) : false),
+    [kitLockQuery.data],
+  );
   const nextPosition = (itemsQuery.data?.length ?? 0) === 0 ? 0 : Math.max(...(itemsQuery.data ?? []).map((i) => i.position)) + 1;
 
   if (cartsQuery.isLoading || itemsQuery.isLoading) return <FullScreenSpinner label="Warenkorb wird geladen …" />;
@@ -94,6 +104,7 @@ export default function CartDetailPage() {
                   currentRate={rate?.rate ?? null}
                   nextPosition={nextPosition}
                   readOnly={cart.status === "ordered"}
+                  isKitCartLineLocked={isKitCartLineLocked}
                   shopArea={cart.shop_area}
                 />
               </div>
@@ -104,6 +115,7 @@ export default function CartDetailPage() {
                   currentRate={rate?.rate ?? null}
                   nextPosition={nextPosition}
                   readOnly={cart.status === "ordered"}
+                  isKitCartLineLocked={isKitCartLineLocked}
                   shopArea={cart.shop_area}
                 />
               </div>

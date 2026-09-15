@@ -108,8 +108,39 @@ export async function getOrCreateCart(client: SupabaseClient) {
 }
 
 export async function clearCartItems(client: SupabaseClient, cartId: string) {
-  const { error } = await client.from("cart_items").delete().eq("cart_id", cartId);
-  if (error) throw error;
+  const { data: items, error: listErr } = await client
+    .from("cart_items")
+    .select("id, kit_share_id, submitted_order_id")
+    .eq("cart_id", cartId);
+  if (listErr) throw listErr;
+
+  for (const row of items ?? []) {
+    if (row.kit_share_id) {
+      if (row.submitted_order_id) continue;
+      await client.rpc("leave_kit_share", { _kit_share_id: row.kit_share_id });
+      continue;
+    }
+    const { error } = await client.from("cart_items").delete().eq("id", row.id);
+    if (error) throw error;
+  }
+
+  const { data: leftovers, error: leftErr } = await client
+    .from("cart_items")
+    .select("id, kit_share_id, submitted_order_id")
+    .eq("cart_id", cartId);
+  if (leftErr) throw leftErr;
+
+  for (const row of leftovers ?? []) {
+    if (row.kit_share_id) {
+      if (row.submitted_order_id) continue;
+      const { error } = await client.from("cart_items").delete().eq("id", row.id);
+      if (error && /gesperrt/i.test(String(error.message ?? ""))) continue;
+      if (error) throw error;
+      continue;
+    }
+    const { error } = await client.from("cart_items").delete().eq("id", row.id);
+    if (error) throw error;
+  }
 }
 
 export async function addCatalogLine(

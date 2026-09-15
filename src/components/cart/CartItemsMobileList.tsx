@@ -30,10 +30,19 @@ interface CartItemsMobileListProps {
   currentRate: number | null;
   nextPosition: number;
   readOnly?: boolean;
+  isKitCartLineLocked?: (kitShareId: string | null) => boolean;
   shopArea?: string | null;
 }
 
-export function CartItemsMobileList({ items, cartId, currentRate, nextPosition, readOnly, shopArea }: CartItemsMobileListProps) {
+export function CartItemsMobileList({
+  items,
+  cartId,
+  currentRate,
+  nextPosition,
+  readOnly,
+  isKitCartLineLocked,
+  shopArea,
+}: CartItemsMobileListProps) {
   return (
     <div className="space-y-3">
       {items.map((item, index) => (
@@ -44,7 +53,8 @@ export function CartItemsMobileList({ items, cartId, currentRate, nextPosition, 
           cartId={cartId}
           currentRate={currentRate}
           nextPosition={nextPosition + index}
-          readOnly={readOnly}
+          readOnly={readOnly || isKitCartLineLocked?.(item.kit_share_id) === true}
+          kitLocked={isKitCartLineLocked?.(item.kit_share_id) === true}
           shopArea={shopArea}
         />
       ))}
@@ -59,6 +69,7 @@ function CartItemCardMobile({
   currentRate,
   nextPosition,
   readOnly,
+  kitLocked,
   shopArea,
 }: {
   item: ComputedCartItem;
@@ -67,6 +78,7 @@ function CartItemCardMobile({
   currentRate: number | null;
   nextPosition: number;
   readOnly?: boolean;
+  kitLocked?: boolean;
   shopArea?: string | null;
 }) {
   const row = useCartItemRow(item, cartId, currentRate);
@@ -85,9 +97,12 @@ function CartItemCardMobile({
             {isKitShareCartItem(item) && (
               <>
                 <span className="mt-1 inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-                  Kit Anteil
+                  Geteiltes Kit
                 </span>
-                {item.kit_share_id && <EditKitShareButton kitShareId={item.kit_share_id} />}
+                {kitLocked ? (
+                  <span className="mt-1 block text-[11px] text-muted-foreground">Kit gesperrt</span>
+                ) : null}
+                {item.kit_share_id && !kitLocked ? <EditKitShareButton kitShareId={item.kit_share_id} /> : null}
               </>
             )}
           </div>

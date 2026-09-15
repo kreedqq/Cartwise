@@ -23,6 +23,7 @@ import {
 import { toast } from "@/components/ui/toaster";
 import { QUERY_KEYS } from "@/lib/constants";
 import { participantCartPresenceLabel } from "@/lib/kitParticipantCartPresence";
+import { kitShareCustomerLockHint, kitShareCustomerLockedFromView } from "@/lib/kitShareCustomerLock";
 import { useRestoreKitShareCartLine } from "@/hooks/useRestoreKitShareCartLine";
 import { extractRpcErrorMessage } from "@/services/username";
 import { useShopAreaContext } from "@/context/ShopAreaContext";
@@ -193,6 +194,11 @@ export function KitShareDialog({
 
   const quantityOptions = Array.from({ length: activeKitSize }, (_, i) => i + 1);
   const variantMissing = hasMultipleShareableVariants && !product;
+
+  const customerLocked = kitView ? kitShareCustomerLockedFromView(kitView) : false;
+  const customerLockHint = kitView
+    ? kitShareCustomerLockHint(customerLocked, kitView.customerLockReason)
+    : null;
 
   const editParticipants = kitView?.participants ?? [];
   const editTotal = editParticipants.reduce((sum, p) => {
@@ -526,7 +532,11 @@ export function KitShareDialog({
                   value={String(kitView.myQuantity)}
                   onValueChange={handleMyQuantityChange}
                   disabled={
-                    busy || kitView.status === "cancelled" || kitView.status === "ordered" || kitView.myHasOrdered
+                    busy ||
+                    customerLocked ||
+                    kitView.status === "cancelled" ||
+                    kitView.status === "ordered" ||
+                    kitView.myHasOrdered
                   }
                 >
                   <SelectTrigger className="min-w-[11rem] w-full" aria-label="Meine Kit-Menge">
@@ -540,6 +550,9 @@ export function KitShareDialog({
                     ))}
                   </SelectContent>
                 </Select>
+                {customerLockHint ? (
+                  <p className="text-xs text-muted-foreground">{customerLockHint}</p>
+                ) : null}
                 {kitView.myHasOrdered && (
                   <p className="text-xs text-muted-foreground">
                     Du hast diesen Kit-Anteil bereits bestellt. Deine Menge ist ein fester Bestellwert und kann nicht
@@ -627,7 +640,7 @@ export function KitShareDialog({
               <div className="space-y-2 rounded-lg border border-border p-3">
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-medium">Verteilung</p>
-                  {isCreator && kitView.participants.length > 1 && (
+                  {isCreator && kitView.participants.length > 1 && !customerLocked && (
                     <Button type="button" variant="ghost" size="sm" className="h-8 gap-1" onClick={startEditMode} disabled={busy}>
                       <Pencil className="h-3.5 w-3.5" />
                       Verteilung bearbeiten
@@ -653,6 +666,7 @@ export function KitShareDialog({
                         !p.isSelf &&
                         p.userId &&
                         !p.hasOrdered &&
+                        !customerLocked &&
                         kitView.status !== "cancelled" &&
                         kitView.status !== "ordered" && (
                           <Button
@@ -676,7 +690,9 @@ export function KitShareDialog({
                     Gesamt: {formatKitQuantity(kitView.allocatedTotal, categoryId, kitView.kitSizeVials)}
                   </p>
                   {kitView.status === "full" ? (
-                    <p className="font-medium text-success">Kit vollständig · Warenkörbe synchronisiert</p>
+                    <p className="font-medium text-success">
+                      Kit vollständig{customerLocked ? " · Gesperrt" : ""} · Warenkörbe synchronisiert
+                    </p>
                   ) : (
                     <p className="text-muted-foreground">
                       Noch {formatKitQuantity(kitView.remainingVials, categoryId, kitView.kitSizeVials)} verfügbar

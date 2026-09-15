@@ -35,6 +35,8 @@ const sampleView = {
   myHasOrdered: false,
   myCartPresence: "in_cart" as const,
   myCanRestoreCartLine: false,
+  customerMutationLocked: true,
+  customerLockReason: "full" as const,
   participants: [
     { isSelf: true, displayName: "Du", quantity: 3, hasOrdered: false },
     { isSelf: false, displayName: "Teilnehmer", quantity: 7, hasOrdered: false },

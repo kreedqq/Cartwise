@@ -228,6 +228,11 @@ function DistributionEditor({
           Frei <strong>{overCapacity ? 0 : free}</strong>
         </span>
         <Badge variant="secondary">{adminStatusLabel(detail.status, detail.remainingVials)}</Badge>
+        {detail.customerMutationLocked ? (
+          <Badge variant="outline">
+            {detail.customerLockReason === "partial_order" ? "Teilbestellt · gesperrt" : "Gesperrt"}
+          </Badge>
+        ) : null}
         {dirty ? <Badge variant="outline">Ungespeicherte Änderungen</Badge> : null}
         {overCapacity ? <Badge variant="destructive">Kit ist überbelegt</Badge> : null}
       </div>
@@ -443,6 +448,11 @@ export default function AdminKitRequestDetailPage() {
 
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="secondary">{adminStatusLabel(detail.status, detail.remainingVials)}</Badge>
+        {detail.customerMutationLocked ? (
+          <Badge variant="outline">
+            {detail.customerLockReason === "partial_order" ? "Teilbestellt · gesperrt" : "Gesperrt"}
+          </Badge>
+        ) : null}
         <span className="text-sm text-muted-foreground">
           Noch {detail.remainingVials} Plätze · {detail.participantCount} Teilnehmer
         </span>

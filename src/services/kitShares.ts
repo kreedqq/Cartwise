@@ -30,6 +30,9 @@ export interface KitShareView {
   /** Viewer-only cart state for this kit share (no foreign participant cart data). */
   myCartPresence: ParticipantCartPresenceState | null;
   myCanRestoreCartLine: boolean;
+  /** Server SSoT: customer may not mutate participants or kit cart lines when true. */
+  customerMutationLocked: boolean;
+  customerLockReason: "full" | "partial_order" | "ordered" | null;
   participants: KitShareParticipantView[];
 }
 
@@ -60,6 +63,13 @@ function mapKitShareView(raw: Record<string, unknown>): KitShareView {
     myHasOrdered: Boolean(raw.myHasOrdered),
     myCartPresence: mapServerKitCartPresence(raw.myCartPresence),
     myCanRestoreCartLine: Boolean(raw.myCanRestoreCartLine),
+    customerMutationLocked: Boolean(raw.customerMutationLocked),
+    customerLockReason:
+      raw.customerLockReason === "full" ||
+      raw.customerLockReason === "partial_order" ||
+      raw.customerLockReason === "ordered"
+        ? raw.customerLockReason
+        : null,
     participants,
   };
 }
