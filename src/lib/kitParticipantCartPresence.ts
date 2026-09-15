@@ -75,3 +75,13 @@ export function canRestoreRemovedKitCartLine(
 ): boolean {
   return resolveParticipantCartPresence(participant, cartLinks) === "removed_from_cart";
 }
+
+/** Admin-only manual sync when participant never had a tracked cart line (not_in_cart). */
+export function canAdminSyncNotInCartKitLine(
+  participant: KitParticipantCartFields,
+  cartLinks: CartLinkWithUser[],
+  kitStatus?: string | null,
+): boolean {
+  if (kitStatus === "cancelled" || kitStatus === "ordered") return false;
+  return resolveParticipantCartPresence(participant, cartLinks) === "not_in_cart";
+}

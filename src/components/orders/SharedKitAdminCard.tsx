@@ -1,14 +1,31 @@
+import * as React from "react";
+
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { SharedKitAdminView } from "@/lib/kitOrderSummary";
 
+type RestoreInput = { kitShareId: string; participantUserId: string };
+
 type Props = {
   kit: SharedKitAdminView;
   restoringUserId?: string | null;
-  onRestoreCartLine?: (input: { kitShareId: string; participantUserId: string }) => void;
+  onRestoreCartLine?: (input: RestoreInput) => void;
+  onAdminSyncNotInCartLine?: (input: RestoreInput) => void;
 };
 
-export function SharedKitAdminCard({ kit, restoringUserId, onRestoreCartLine }: Props) {
+export function SharedKitAdminCard({
+  kit,
+  restoringUserId,
+  onRestoreCartLine,
+  onAdminSyncNotInCartLine,
+}: Props) {
+  const [syncConfirm, setSyncConfirm] = React.useState<{
+    userId: string;
+    label: string;
+    shareLabel: string;
+  } | null>(null);
+
   return (
     <div className="space-y-3 px-4 py-4">
       <div>
@@ -62,6 +79,25 @@ export function SharedKitAdminCard({ kit, restoringUserId, onRestoreCartLine }: 
                         aktuelle Bestellung
                       </Badge>
                     )}
+                    {participant.canAdminSyncNotInCartLine && onAdminSyncNotInCartLine ? (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="w-full shrink-0 sm:w-auto"
+                        disabled={Boolean(restoringUserId)}
+                        loading={restoring}
+                        onClick={() =>
+                          setSyncConfirm({
+                            userId: participant.userId,
+                            label: participant.telegramLabel,
+                            shareLabel: participant.shareLabel,
+                          })
+                        }
+                      >
+                        Anteil in Warenkorb legen
+                      </Button>
+                    ) : null}
                     {participant.canRestoreCartLine && onRestoreCartLine ? (
                       <Button
                         type="button"
@@ -91,6 +127,34 @@ export function SharedKitAdminCard({ kit, restoringUserId, onRestoreCartLine }: 
         Kit Fortschritt: <span className="font-medium">{kit.progressLabel}</span>
         {kit.complete ? <span className="ml-2 font-medium text-primary">Kit vollständig</span> : null}
       </p>
+
+      <ConfirmDialog
+        open={syncConfirm != null}
+        onOpenChange={(open) => {
+          if (!open) setSyncConfirm(null);
+        }}
+        title="Kit-Anteil in den Warenkorb legen?"
+        description={
+          syncConfirm ? (
+            <>
+              <span className="font-medium">{syncConfirm.label}</span> ({syncConfirm.shareLabel}) soll den Anteil an
+              diesem Kit wieder in den aktiven Warenkorb des Teilnehmers legen. Die Kit-Verteilung und bestehende
+              Bestellungen bleiben unverändert.
+            </>
+          ) : null
+        }
+        confirmLabel="Anteil in Warenkorb legen"
+        cancelLabel="Abbrechen"
+        loading={Boolean(restoringUserId)}
+        onConfirm={() => {
+          if (!syncConfirm || !onAdminSyncNotInCartLine) return;
+          onAdminSyncNotInCartLine({
+            kitShareId: kit.kitShareId,
+            participantUserId: syncConfirm.userId,
+          });
+          setSyncConfirm(null);
+        }}
+      />
     </div>
   );
 }

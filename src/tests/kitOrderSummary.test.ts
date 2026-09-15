@@ -1152,6 +1152,7 @@ describe("admin shared kit participants", () => {
     const penbuddy = views[0]?.participants.find((p) => p.userId === "user-penbuddy");
     expect(penbuddy?.statusLabel).toBe("Kit-Anteil entfernt");
     expect(penbuddy?.canRestoreCartLine).toBe(true);
+    expect(penbuddy?.canAdminSyncNotInCartLine).toBe(false);
     expect(views[0]?.participants.find((p) => p.userId === "user-pepsi")?.statusLabel).toBe("Eingegangen");
   });
 

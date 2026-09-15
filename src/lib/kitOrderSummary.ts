@@ -6,6 +6,7 @@ import {
   resolveProductCategoryId,
 } from "@/lib/quantityFormat";
 import {
+  canAdminSyncNotInCartKitLine,
   canRestoreRemovedKitCartLine,
   participantCartPresenceLabel,
   resolveParticipantCartPresence,
@@ -28,6 +29,7 @@ export interface KitShareContextKit {
   id: string;
   product_id: string;
   kit_size_vials: number;
+  status?: string | null;
 }
 
 export interface KitShareContextParticipant {
@@ -67,6 +69,7 @@ export interface SharedKitParticipantView {
   isCurrentOrder: boolean;
   hasProcessingOrder: boolean;
   canRestoreCartLine: boolean;
+  canAdminSyncNotInCartLine: boolean;
 }
 
 export interface SharedKitAdminView {
@@ -361,6 +364,11 @@ export function buildSharedKitsForOrder(
           isCurrentOrder: member.order_id === orderId,
           hasProcessingOrder: status.hasProcessingOrder,
           canRestoreCartLine: canRestoreRemovedKitCartLine(member, cartLinksWithUser),
+          canAdminSyncNotInCartLine: canAdminSyncNotInCartKitLine(
+            member,
+            cartLinksWithUser,
+            kit.status,
+          ),
         };
       })
       .sort((a, b) => {

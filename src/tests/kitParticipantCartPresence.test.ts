@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  canAdminSyncNotInCartKitLine,
   canRestoreRemovedKitCartLine,
   participantCartPresenceLabel,
   participantHasKitCartLine,
@@ -82,5 +83,20 @@ describe("kit participant cart presence", () => {
     expect(canRestoreRemovedKitCartLine(removed, [])).toBe(true);
     expect(canRestoreRemovedKitCartLine({ ...removed, order_id: "order-1" }, [])).toBe(false);
     expect(canRestoreRemovedKitCartLine(baseParticipant, [])).toBe(false);
+  });
+
+  it("allows admin sync only for not_in_cart on active kits", () => {
+    expect(canAdminSyncNotInCartKitLine(baseParticipant, [], "full")).toBe(true);
+    expect(canAdminSyncNotInCartKitLine(baseParticipant, [], "open")).toBe(true);
+    expect(canAdminSyncNotInCartKitLine(baseParticipant, [], "cancelled")).toBe(false);
+    expect(canAdminSyncNotInCartKitLine(baseParticipant, [], "ordered")).toBe(false);
+    expect(
+      canAdminSyncNotInCartKitLine(
+        { ...baseParticipant, cart_line_removed_at: "2026-01-01T00:00:00.000Z" },
+        [],
+        "full",
+      ),
+    ).toBe(false);
+    expect(canAdminSyncNotInCartKitLine({ ...baseParticipant, order_id: "o1" }, [], "full")).toBe(false);
   });
 });

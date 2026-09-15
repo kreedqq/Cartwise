@@ -324,6 +324,28 @@ export default function AdminOrderDetailPage() {
             <SharedKitAdminCard
               kit={kit}
               restoringUserId={restoringCartUserId}
+              onAdminSyncNotInCartLine={({ kitShareId, participantUserId }) => {
+                setRestoringCartUserId(participantUserId);
+                restoreKitCart.mutate(
+                  { kitShareId, participantUserId },
+                  {
+                    onSuccess: (result) => {
+                      if (result.alreadyInCart) {
+                        toast.message("Kit-Anteil befindet sich bereits im Warenkorb.");
+                      } else {
+                        toast.success("Kit-Anteil in den Warenkorb gelegt.");
+                      }
+                    },
+                    onError: (error) => {
+                      const message =
+                        extractRpcErrorMessage(error).trim() ||
+                        "Kit-Anteil konnte nicht in den Warenkorb gelegt werden.";
+                      toast.error(message);
+                    },
+                    onSettled: () => setRestoringCartUserId(null),
+                  },
+                );
+              }}
               onRestoreCartLine={({ kitShareId, participantUserId }) => {
                 setRestoringCartUserId(participantUserId);
                 restoreKitCart.mutate(

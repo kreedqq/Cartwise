@@ -571,7 +571,7 @@ describe("16 kit participant not_in_cart vs removed", () => {
     expect(created.error, rpcMessage(created.error)).toBeNull();
     const kitId = kitIdFromRpc(created.data);
 
-    const { client: joiner, account: joinerAcc } = await signIn("admin");
+    const { client: joiner } = await signIn("admin");
     const joined = await joiner.rpc("join_kit_request", { _kit_share_id: kitId, _quantity: 2 });
     expect(joined.error, rpcMessage(joined.error)).toBeNull();
 
@@ -587,10 +587,61 @@ describe("16 kit participant not_in_cart vs removed", () => {
     expect(view.error, rpcMessage(view.error)).toBeNull();
     expect(view.data?.myCartPresence).toBe("not_in_cart");
     expect(view.data?.myCanRestoreCartLine).toBe(false);
+  });
+});
 
-    const denied = await joiner.rpc("restore_kit_share_cart_line", {
+describe("17 admin sync not_in_cart kit participant", () => {
+  it("admin can place not_in_cart share into cart; customer still denied", async () => {
+    const { client: creator, account: creatorAcc } = await signIn("groupBuy");
+    const master = await shopProductByCode(creator, "group_buy_1", "QA-KIT-001");
+    const created = await creator.rpc("create_kit_request", {
+      _product_id: master.id,
+      _kit_size_vials: 10,
+      _my_quantity: 7,
+      _shop_area: "group_buy_1",
+      _note: "QA admin not-in-cart sync",
+    });
+    expect(created.error, rpcMessage(created.error)).toBeNull();
+    const kitId = kitIdFromRpc(created.data);
+
+    const { client: joiner, account: joinerAcc } = await signIn("admin");
+    const joined = await joiner.rpc("join_kit_request", { _kit_share_id: kitId, _quantity: 2 });
+    expect(joined.error, rpcMessage(joined.error)).toBeNull();
+
+    const joinerCart = await getOrCreateCart(joiner);
+    const { data: linesBefore } = await joiner
+      .from("cart_items")
+      .select("id, quantity")
+      .eq("cart_id", joinerCart.id)
+      .eq("kit_share_id", kitId);
+    expect((linesBefore ?? []).length).toBe(0);
+
+    const synced = await joiner.rpc("restore_kit_share_cart_line", {
       _kit_share_id: kitId,
       _participant_user_id: joinerAcc.userId,
+    });
+    expect(synced.error, rpcMessage(synced.error)).toBeNull();
+    expect((synced.data as { restored?: boolean; adminNotInCart?: boolean }).restored).toBe(true);
+    expect((synced.data as { adminNotInCart?: boolean }).adminNotInCart).toBe(true);
+
+    const { data: linesAfter } = await joiner
+      .from("cart_items")
+      .select("id, quantity, kit_share_id")
+      .eq("cart_id", joinerCart.id)
+      .eq("kit_share_id", kitId);
+    expect(linesAfter ?? []).toHaveLength(1);
+    expect(Number(linesAfter![0]!.quantity)).toBe(2);
+
+    const dup = await joiner.rpc("restore_kit_share_cart_line", {
+      _kit_share_id: kitId,
+      _participant_user_id: joinerAcc.userId,
+    });
+    expect(dup.error).toBeNull();
+    expect(dup.data?.alreadyInCart).toBe(true);
+
+    const denied = await creator.rpc("restore_kit_share_cart_line", {
+      _kit_share_id: kitId,
+      _participant_user_id: creatorAcc.userId,
     });
     expect(denied.error).toBeTruthy();
   });

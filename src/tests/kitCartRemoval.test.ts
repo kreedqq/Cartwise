@@ -41,8 +41,20 @@ describe("0093 kit cart removal tracking migration", () => {
 
   it("wires admin restore UI without exposing internal state keys", () => {
     expect(read("src/components/orders/SharedKitAdminCard.tsx")).toContain("Wieder in Warenkorb legen");
+    expect(read("src/components/orders/SharedKitAdminCard.tsx")).toContain("Anteil in Warenkorb legen");
     expect(read("src/components/orders/SharedKitAdminCard.tsx")).not.toContain("REMOVED_FROM_CART");
     expect(read("src/pages/admin/AdminOrderDetail.tsx")).toContain("useRestoreKitShareCartLine");
+  });
+});
+
+describe("0096 kit cart admin not_in_cart sync", () => {
+  const sql = read("supabase/migrations/0096_kit_cart_admin_not_in_cart_sync.sql");
+
+  it("allows admin restore when cart_line_removed_at is null", () => {
+    expect(sql).toContain("adminNotInCart");
+    expect(sql).toContain("if not public.has_role(_actor, 'admin') then");
+    expect(sql).toContain("Für diesen Teilnehmer ist kein entfernter Kit-Anteil hinterlegt");
+    expect(sql).toContain("Dieses Kit kann nicht mehr in den Warenkorb gelegt werden");
   });
 });
 
