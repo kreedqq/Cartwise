@@ -61,6 +61,18 @@ export const QA_ACCOUNTS = [
     customerRole: "Stammkunde",
     isAdmin: false,
   },
+  ...Array.from({ length: 10 }, (_, i) => {
+    const n = String(i + 1).padStart(2, "0");
+    return {
+      key: `join${n}`,
+      email: `qa-join-${n}@local.test`,
+      password: `QaLocal-Join-${n}-2026!`,
+      username: `qa_join_${n}`,
+      displayName: `QA Join ${n}`,
+      customerRole: "Group Buy",
+      isAdmin: false,
+    };
+  }),
 ];
 
 function runSupabase(args) {

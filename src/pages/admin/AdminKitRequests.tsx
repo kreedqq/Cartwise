@@ -191,7 +191,13 @@ export default function AdminKitRequestsPage() {
           </div>
           {totalPages > 1 ? (
             <div className="flex items-center justify-between gap-2 border-t border-border px-4 py-3">
-              <Button type="button" variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 min-h-11"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
                 Zurück
               </Button>
               <p className="text-sm text-muted-foreground">
@@ -200,7 +206,7 @@ export default function AdminKitRequestsPage() {
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                className="h-11 min-h-11"
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
               >

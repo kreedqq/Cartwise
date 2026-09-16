@@ -153,7 +153,7 @@ function FilterSelect({
     <div className="space-y-1">
       <Label className="text-[11px] text-muted-foreground">{label}</Label>
       <Select value={value} onValueChange={onValueChange} disabled={disabled}>
-        <SelectTrigger className="min-h-11 w-full">
+        <SelectTrigger className="min-h-11 w-full" aria-label={`${label} filtern`}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

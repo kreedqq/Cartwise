@@ -28,7 +28,11 @@ import { useRestoreKitShareCartLine } from "@/hooks/useRestoreKitShareCartLine";
 import { extractRpcErrorMessage } from "@/services/username";
 import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { useCanUseKitRequests, useKitRequestableProductIds } from "@/hooks/useKitRequests";
-import { KIT_REQUEST_CREATE_LABEL, KIT_REQUEST_NOT_SHAREABLE_MESSAGE, KIT_REQUEST_ROLE_DENIED_MESSAGE } from "@/lib/kitRequests";
+import {
+  KIT_REQUEST_NOT_SHAREABLE_MESSAGE,
+  KIT_REQUEST_ROLE_DENIED_MESSAGE,
+  SHOP_GROUP_BUY_KIT_CTA,
+} from "@/lib/kitRequests";
 import { useAuth } from "@/context/AuthProvider";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
@@ -811,7 +815,7 @@ export function KitShareButton({
       }
     >
       <Users className="mr-1.5 h-4 w-4" />
-      {KIT_REQUEST_CREATE_LABEL}
+      {SHOP_GROUP_BUY_KIT_CTA}
     </Button>
   );
 }

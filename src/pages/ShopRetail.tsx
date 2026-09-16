@@ -32,6 +32,7 @@ import { DEFAULT_SHOP_AREA, type MyShopArea } from "@/lib/shop/shopAreas";
 import { areaDensityClass, areaThemeCssVars, parseAreaTheme } from "@/lib/shop/areaTheme";
 import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { isShopCategoryId } from "@/lib/shopCategories";
+import { buildShopCatalogSearchParams, readShopCatalogUrlState } from "@/lib/shop/shopCatalogUrlState";
 
 export default function ShopRetailPage({ area }: { area?: MyShopArea }) {
   const areasQuery = useMyShopAreas();
@@ -64,7 +65,8 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
   const favoritesQuery = useFavorites();
   const rateQuery = useExchangeRate();
   const [params, setParams] = useSearchParams();
-  const [search, setSearch] = React.useState("");
+  const urlCatalog = React.useMemo(() => readShopCatalogUrlState(params), [params]);
+  const [searchDraft, setSearchDraft] = React.useState(urlCatalog.search);
 
   const products = React.useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
   const assignments = React.useMemo(
@@ -87,16 +89,28 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
     ),
     [assignments, products],
   );
-  const selectedKey = params.get("cat");
-  const selected = visible.find((category) => category.category_key === selectedKey) ?? null;
+  const selected = visible.find((category) => category.category_key === urlCatalog.categoryKey) ?? null;
+
+  React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional URL → input sync
+    setSearchDraft(urlCatalog.search);
+  }, [urlCatalog.search]);
+
+  React.useEffect(() => {
+    const handle = window.setTimeout(() => {
+      const next = buildShopCatalogSearchParams(params, { search: searchDraft });
+      if (next.toString() !== params.toString()) setParams(next, { replace: true });
+    }, 250);
+    return () => window.clearTimeout(handle);
+  }, [searchDraft, params, setParams]);
 
   const filtered = React.useMemo(() => {
     if (!selected) return [];
-    const term = search.trim();
+    const term = urlCatalog.search.trim();
     return productsInAreaCategory(products, assignments, selected.category_key).filter((product) =>
       productMatchesShopSearch(product, term),
     );
-  }, [assignments, products, search, selected]);
+  }, [assignments, products, selected, urlCatalog.search]);
 
   const favoriteProductIds = React.useMemo(
     () => new Set((favoritesQuery.data ?? []).map((f) => f.productId)),
@@ -104,8 +118,8 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
   );
 
   function selectCategory(key: string) {
-    setSearch("");
-    setParams({ cat: key });
+    setSearchDraft("");
+    setParams(buildShopCatalogSearchParams(params, { categoryKey: key, search: "" }), { replace: true });
   }
 
   if (!selected) {
@@ -172,7 +186,12 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
         title={selected.label}
         description={`${filtered.length} Artikel · Einzelmenge wählen und in den Warenkorb legen.`}
         actions={
-          <Button variant="ghost" size="sm" onClick={() => setParams({})} className="gap-1.5">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setParams(buildShopCatalogSearchParams(params, { categoryKey: null, search: "" }), { replace: true })}
+            className="gap-1.5"
+          >
             <ArrowLeft className="h-4 w-4" />
             Alle Kategorien
           </Button>
@@ -201,8 +220,8 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
       <div className="relative w-full max-w-3xl">
         <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={searchDraft}
+          onChange={(e) => setSearchDraft(e.target.value)}
           placeholder={theme.searchPlaceholder || "Produktname suchen …"}
           className="h-11 pl-8"
         />
@@ -234,6 +253,7 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
             <ShopProductsTable
               products={filtered}
               rate={rateQuery.data?.rate ?? null}
+              rateLoading={rateQuery.isFetching && rateQuery.data?.rate == null}
               favoriteProductIds={favoriteProductIds}
               categoryId={tableCategoryId}
               categoryLabel={selected.label}
@@ -244,6 +264,7 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
             <ShopProductsMobileList
               products={filtered}
               rate={rateQuery.data?.rate ?? null}
+              rateLoading={rateQuery.isFetching && rateQuery.data?.rate == null}
               favoriteProductIds={favoriteProductIds}
               categoryId={tableCategoryId}
               pricingProfile={area.pricing_profile}

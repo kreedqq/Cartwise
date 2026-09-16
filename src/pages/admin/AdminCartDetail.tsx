@@ -23,7 +23,10 @@ import { useAdminCartMutations, useAdminOpenCartDetail } from "@/hooks/useAdminC
 import { QUERY_KEYS } from "@/lib/constants";
 import { listShopProductsForArea } from "@/services/shopAreas";
 import { cartItemQuantityLabel } from "@/lib/shop/cartDisplay";
+import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
+import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { formatUsd } from "@/lib/money";
+import { UI_SPACING } from "@/lib/design/tokens";
 import { formatShopAreaLabel, type ShopAreaKey } from "@/lib/shop/shopAreas";
 import { EMPTY_CHECKOUT_SHIPPING, parseCheckoutShipping } from "@/lib/shippingAddress";
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
@@ -42,11 +45,15 @@ function CartCatalogLineRow({
   shopArea,
   mutations,
   catalogProducts,
+  layout = "table",
+  rate = null,
 }: {
   item: CartItemRow;
   shopArea: ShopAreaKey;
   mutations: Mutations;
   catalogProducts: Tables<"products">[];
+  layout?: "table" | "card";
+  rate?: number | null;
 }) {
   const isKit = Boolean(item.kit_share_id);
   const [qtyDraft, setQtyDraft] = React.useState(String(item.quantity));
@@ -83,6 +90,41 @@ function CartCatalogLineRow({
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Entfernen fehlgeschlagen.");
     }
+  }
+
+  if (layout === "card") {
+    return (
+      <div className="rounded-xl border border-border p-4 text-sm space-y-2">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <p className="font-medium">{item.product_name_snapshot}</p>
+            <p className="text-xs text-muted-foreground">{item.product_code_snapshot ?? item.vendor_code}</p>
+          </div>
+          {isKit ? <span className="rounded-md bg-secondary px-2 py-0.5 text-xs">KIT</span> : null}
+        </div>
+        {isKit ? (
+          <p className="text-muted-foreground">
+            Anteil {item.quantity}
+            {item.kit_size_vials ? ` / ${item.kit_size_vials} Kit` : ""}
+          </p>
+        ) : (
+          <p className="tabular-nums">Menge {item.quantity}</p>
+        )}
+        {lineTotal != null ? (
+          <DualCurrencyPrice usd={lineTotal} rate={rate} size="compact" />
+        ) : null}
+        {!isKit ? (
+          <div className="flex flex-wrap gap-2 pt-1">
+            <ReplaceLineButton item={item} shopArea={shopArea} mutations={mutations} catalogProducts={catalogProducts} />
+            <Button type="button" size="sm" variant="ghost" loading={mutations.removeItem.isPending} onClick={() => void removeLine()}>
+              Entfernen
+            </Button>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">Kit über Kit-Gesuche / Integrität.</p>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -124,8 +166,14 @@ function CartCatalogLineRow({
           </div>
         )}
       </TableCell>
-      <TableCell>{item.unit_price_usd_snapshot != null ? formatUsd(item.unit_price_usd_snapshot) : "—"}</TableCell>
-      <TableCell>{lineTotal != null ? formatUsd(lineTotal) : "—"}</TableCell>
+      <TableCell>
+        {item.unit_price_usd_snapshot != null ? (
+          <DualCurrencyPrice usd={item.unit_price_usd_snapshot} rate={rate} size="compact" />
+        ) : (
+          "—"
+        )}
+      </TableCell>
+      <TableCell>{lineTotal != null ? <DualCurrencyPrice usd={lineTotal} rate={rate} size="compact" /> : "—"}</TableCell>
       <TableCell>{isKit ? item.kit_status ?? "Kit" : "—"}</TableCell>
       <TableCell>
         {!isKit ? (
@@ -281,6 +329,7 @@ export default function AdminCartDetailPage() {
     enabled: Boolean(defaultArea),
   });
   const paymentMethods = useEnabledPaymentMethods();
+  const rateQuery = useExchangeRate();
 
   const [addCode, setAddCode] = React.useState("");
   const [addQty, setAddQty] = React.useState("1");
@@ -298,7 +347,9 @@ export default function AdminCartDetailPage() {
     return <ErrorState message="Warenkorb konnte nicht geladen werden." onRetry={() => detailQuery.refetch()} />;
   }
 
-  const { cart, customer, items } = detailQuery.data;
+  const { cart, customer, items, summary } = detailQuery.data;
+  const totalUsd = Number(summary?.total_usd ?? summary?.totalUsd ?? 0);
+  const itemCount = items.length;
 
   async function onAddProduct() {
     if (productsQuery.isLoading) {
@@ -397,11 +448,39 @@ export default function AdminCartDetailPage() {
 
       <AdminPageHeader
         section="Bestellungen"
-        title={`Warenkorb · ${customer.username ?? "Kunde"}`}
-        description={`Status ${cart.status} · ${formatShopAreaLabel(defaultArea)}`}
+        title={`Warenkorb · ${customer.username ? `@${customer.username.replace(/^@+/, "")}` : "Kunde"}`}
+        description={`Status ${cart.status} · ${formatShopAreaLabel(defaultArea)} · Aktualisiert ${new Date(cart.updated_at).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })}`}
       />
 
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className={`rounded-xl border border-border bg-card p-4 ${UI_SPACING.stackMd}`}>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Zusammenfassung</p>
+            <p className="text-sm text-muted-foreground">{itemCount} Positionen</p>
+          </div>
+          {totalUsd > 0 ? (
+            <DualCurrencyPrice usd={totalUsd} rate={rateQuery.data?.rate ?? null} size="summary" align="right" />
+          ) : (
+            <p className="text-sm text-muted-foreground">—</p>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-3 md:hidden">
+        {items.map((item) => (
+          <CartCatalogLineRow
+            key={`m-${item.id}`}
+            item={item}
+            shopArea={defaultArea}
+            mutations={mutations}
+            catalogProducts={productsQuery.data ?? []}
+            layout="card"
+            rate={rateQuery.data?.rate ?? null}
+          />
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-lg border border-border md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -422,6 +501,7 @@ export default function AdminCartDetailPage() {
                 shopArea={defaultArea}
                 mutations={mutations}
                 catalogProducts={productsQuery.data ?? []}
+                rate={rateQuery.data?.rate ?? null}
               />
             ))}
           </TableBody>

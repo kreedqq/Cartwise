@@ -54,7 +54,9 @@ describe("0086 admin kit requests", () => {
     expect(detail).toContain("Möchtest du dieses Kit Gesuch wirklich stornieren?");
     expect(read("src/services/adminKitRequests.ts")).toContain("admin_cancel_kit_request");
     expect(read("src/services/adminKitRequests.ts")).toContain("extractRpcErrorMessage");
-    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Mitmachen");
+    expect(detail).toContain("KitIntegritySection");
+    expect(read("src/pages/admin/AdminDashboard.tsx")).toContain("AdminSystemHealthSection");
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("kitRequestActionLabel");
   });
 
   it("documents admin quantity scenarios with the shared capacity helpers", () => {

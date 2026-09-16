@@ -1968,6 +1968,8 @@ export interface Database {
         Returns: Record<string, unknown>;
       };
       admin_sync_orders_and_carts: { Args: Record<string, never>; Returns: Record<string, unknown> };
+      kit_share_project_state: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
+      kit_share_reconcile_report: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
       admin_link_cart_item_submitted_order: {
         Args: { _cart_item_id: string; _reason: string };
         Returns: {

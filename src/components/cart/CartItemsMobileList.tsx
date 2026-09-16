@@ -32,6 +32,7 @@ interface CartItemsMobileListProps {
   readOnly?: boolean;
   isKitCartLineLocked?: (kitShareId: string | null) => boolean;
   shopArea?: string | null;
+  rateLoading?: boolean;
 }
 
 export function CartItemsMobileList({
@@ -42,6 +43,7 @@ export function CartItemsMobileList({
   readOnly,
   isKitCartLineLocked,
   shopArea,
+  rateLoading = false,
 }: CartItemsMobileListProps) {
   return (
     <div className="space-y-3">
@@ -56,6 +58,7 @@ export function CartItemsMobileList({
           readOnly={readOnly || isKitCartLineLocked?.(item.kit_share_id) === true}
           kitLocked={isKitCartLineLocked?.(item.kit_share_id) === true}
           shopArea={shopArea}
+          rateLoading={rateLoading}
         />
       ))}
     </div>
@@ -71,6 +74,7 @@ function CartItemCardMobile({
   readOnly,
   kitLocked,
   shopArea,
+  rateLoading = false,
 }: {
   item: ComputedCartItem;
   index: number;
@@ -80,12 +84,20 @@ function CartItemCardMobile({
   readOnly?: boolean;
   kitLocked?: boolean;
   shopArea?: string | null;
+  rateLoading?: boolean;
 }) {
   const row = useCartItemRow(item, cartId, currentRate);
+  const kitAllocationLine = isKitShareCartItem(item);
+  const displayRate = item.exchange_rate_snapshot ?? currentRate;
+  const lineRateLoading = rateLoading && item.exchange_rate_snapshot == null && displayRate == null;
   const isProblem = item.resolution_status === "not_found" || item.resolution_status === "inactive";
 
   return (
-    <Card className={isProblem ? "border-destructive/40" : item.isDuplicateCode ? "border-warning/40" : undefined}>
+    <Card
+      data-cart-item-id={item.id}
+      data-kit-share-id={item.kit_share_id ?? undefined}
+      className={isProblem ? "border-destructive/40" : item.isDuplicateCode ? "border-warning/40" : undefined}
+    >
       <CardContent className="space-y-3 p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
@@ -142,11 +154,15 @@ function CartItemCardMobile({
               onChange={(e) => row.onQuantityChange(e.target.value)}
               onBlur={row.onQuantityBlur}
               invalid={!!row.quantityError}
-              disabled={readOnly}
+              disabled={readOnly || kitAllocationLine}
               inputMode="decimal"
               className="h-9 text-right tabular-nums"
+              aria-readonly={kitAllocationLine || undefined}
             />
             <p className="text-[11px] text-muted-foreground">{cartItemQuantityLabel({ ...item, shop_area: item.shop_area ?? shopArea })}</p>
+            {kitAllocationLine ? (
+              <p className="text-[11px] text-muted-foreground">Menge folgt deinem Kit-Anteil.</p>
+            ) : null}
           </div>
         </div>
         {row.quantityError && <p className="text-xs text-destructive">{row.quantityError}</p>}
@@ -174,7 +190,8 @@ function CartItemCardMobile({
             <p className="text-[10px] text-muted-foreground">Einzelpreis</p>
             <DualCurrencyPrice
               usd={item.unit_price_usd_snapshot}
-              rate={item.exchange_rate_snapshot}
+              rate={displayRate}
+              rateLoading={lineRateLoading}
               size="compact"
             />
           </div>

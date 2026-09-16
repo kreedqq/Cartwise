@@ -142,6 +142,9 @@ export async function updateCartItemQuantity(
   item: Tables<"cart_items">,
   newQuantity: number,
 ): Promise<Tables<"cart_items">> {
+  if (item.kit_share_id) {
+    throw new Error("Kit-Anteilsmengen werden über Kit-Synchronisation gesetzt und sind hier nicht editierbar.");
+  }
   const patch: Partial<Tables<"cart_items">> = { quantity: newQuantity };
   Object.assign(patch, repriceForQuantity(item, newQuantity) ?? {});
 

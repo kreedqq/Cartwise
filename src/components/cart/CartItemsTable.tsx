@@ -39,6 +39,7 @@ interface CartItemsTableProps {
   readOnly?: boolean;
   isKitCartLineLocked?: (kitShareId: string | null) => boolean;
   shopArea?: string | null;
+  rateLoading?: boolean;
 }
 
 export function CartItemsTable({
@@ -49,6 +50,7 @@ export function CartItemsTable({
   readOnly,
   isKitCartLineLocked,
   shopArea,
+  rateLoading = false,
 }: CartItemsTableProps) {
   return (
     <Table>
@@ -78,6 +80,7 @@ export function CartItemsTable({
             readOnly={readOnly || isKitCartLineLocked?.(item.kit_share_id) === true}
             kitLocked={isKitCartLineLocked?.(item.kit_share_id) === true}
             shopArea={shopArea}
+            rateLoading={rateLoading}
           />
         ))}
       </TableBody>
@@ -94,6 +97,7 @@ function CartItemRowDesktop({
   readOnly,
   kitLocked,
   shopArea,
+  rateLoading = false,
 }: {
   item: ComputedCartItem;
   index: number;
@@ -103,12 +107,20 @@ function CartItemRowDesktop({
   readOnly?: boolean;
   kitLocked?: boolean;
   shopArea?: string | null;
+  rateLoading?: boolean;
 }) {
   const row = useCartItemRow(item, cartId, currentRate);
+  const kitAllocationLine = isKitShareCartItem(item);
+  const displayRate = item.exchange_rate_snapshot ?? currentRate;
+  const lineRateLoading = rateLoading && item.exchange_rate_snapshot == null && displayRate == null;
   const isProblem = item.resolution_status === "not_found" || item.resolution_status === "inactive";
 
   return (
-    <TableRow className={isProblem ? "bg-destructive/[0.03]" : item.isDuplicateCode ? "bg-warning/[0.04]" : undefined}>
+    <TableRow
+      data-cart-item-id={item.id}
+      data-kit-share-id={item.kit_share_id ?? undefined}
+      className={isProblem ? "bg-destructive/[0.03]" : item.isDuplicateCode ? "bg-warning/[0.04]" : undefined}
+    >
       <TableCell className="text-muted-foreground">{index + 1}</TableCell>
       <TableCell>
         <div className="flex items-center gap-1.5">
@@ -154,18 +166,23 @@ function CartItemRowDesktop({
           onChange={(e) => row.onQuantityChange(e.target.value)}
           onBlur={row.onQuantityBlur}
           invalid={!!row.quantityError}
-          disabled={readOnly}
+          disabled={readOnly || kitAllocationLine}
           inputMode="decimal"
           className="h-8 text-right tabular-nums"
+          aria-readonly={kitAllocationLine || undefined}
         />
         {row.quantityError && <p className="mt-1 text-[11px] text-destructive">{row.quantityError}</p>}
         <SaveStatusIndicator status={row.quantityStatus} className="mt-1 justify-end" />
         <p className="mt-1 text-[11px] text-muted-foreground">{cartItemQuantityLabel({ ...item, shop_area: item.shop_area ?? shopArea })}</p>
+        {kitAllocationLine ? (
+          <p className="mt-0.5 text-[11px] text-muted-foreground">Menge folgt deinem Kit-Anteil.</p>
+        ) : null}
       </TableCell>
       <TableCell className="text-right">
         <DualCurrencyPrice
           usd={item.unit_price_usd_snapshot}
-          rate={item.exchange_rate_snapshot}
+          rate={displayRate}
+          rateLoading={lineRateLoading}
           size="compact"
           align="right"
         />

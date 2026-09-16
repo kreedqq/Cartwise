@@ -33,6 +33,13 @@ describe("DualCurrencyPrice", () => {
     expect(container.textContent).not.toMatch(/EUR 10,24|10,24 EUR/);
   });
 
+  it("shows loading ellipsis for EUR while rate is loading", () => {
+    render(<DualCurrencyPrice usd={10} rate={null} rateLoading />);
+    const eurNode = screen.getByTestId("dual-currency-price").querySelector('[data-currency="eur"]');
+    expect(eurNode?.textContent).toContain("…");
+    expect(eurNode?.getAttribute("aria-busy")).toBe("true");
+  });
+
   it("keeps precomputed EUR snapshots instead of converting again", () => {
     render(<DualCurrencyPrice usd={50} eur={40} rate={0.5} />);
     const root = screen.getByTestId("dual-currency-price");

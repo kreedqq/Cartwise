@@ -13,13 +13,13 @@ describe("kit customer UX", () => {
     expect(kitRequestCustomerStatusLabel("open", 1)).toBe("Fast voll");
     expect(kitRequestCustomerStatusLabel("full")).toBe("Voll");
     expect(kitRequestCustomerStatusLabel("cancelled")).toBe("Abgebrochen");
-    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Mitmachen");
-    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Menge ändern");
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain('kitRequestActionLabel("join")');
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("kitRequestActionLabel");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Kit verlassen");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Vials vergeben");
-    expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Du bist dabei!");
-    expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Passt alles?");
-    expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Mit diesem Anteil beitreten");
+    expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Mitmachen");
+    expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Dein Gesamtpreis");
+    expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Noch verfügbar");
     expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toContain("Kit Gesuch erstellen");
     expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toContain("Welches Produkt möchtest du teilen?");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("useExchangeRate");
@@ -33,6 +33,7 @@ describe("kit customer UX", () => {
     expect(read("src/pages/GroupBuy.tsx")).toContain("KitAreaActionNav");
     expect(read("src/pages/GroupBuy.tsx")).toContain("AREA_PAGE_NAV_SLOT");
     expect(read("src/pages/GroupBuy.tsx")).toContain("AREA_PAGE_CONTENT_SLOT");
+    expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("Warenkorb");
     expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("KitAreaActionNav");
     expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("KitRequestHint");
     expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain(

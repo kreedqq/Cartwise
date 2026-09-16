@@ -399,7 +399,7 @@ function CreateKitRequestWizard({
                 {step === 0 ? "Abbrechen" : "Zurück"}
               </Button>
               {step < STEPS.length - 1 ? (
-                <Button className="min-h-11 w-full sm:w-auto" disabled={!canContinue()} onClick={() => setStep((value) => value + 1)}>
+                <Button className="h-11 min-h-11 w-full sm:w-auto" disabled={!canContinue()} onClick={() => setStep((value) => value + 1)}>
                   Weiter
                 </Button>
               ) : (

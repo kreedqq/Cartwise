@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { KitIntegritySection } from "@/components/admin/KitIntegritySection";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminSection } from "@/components/admin/AdminSection";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
@@ -22,6 +23,7 @@ import { toast } from "@/components/ui/toaster";
 import {
   useAdminCancelKitRequest,
   useAdminDeleteKitRequest,
+  useAdminKitReconcileReport,
   useAdminKitRequest,
   useAdminSearchKitRequestUsers,
   useAdminSetKitRequestDistribution,
@@ -32,6 +34,7 @@ import {
   kitFullOrderSyncListLabel,
   kitFullOrderSyncParticipantLabel,
 } from "@/lib/kitFullOrderSync";
+import { KIT_ALMOST_FULL_REMAINING_THRESHOLD } from "@/lib/kit/kitShareState";
 import { kitRequestStatusLabel } from "@/lib/kitRequests";
 import { KIT_SIZE_OPTIONS } from "@/lib/shop/kitUnits";
 import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
@@ -60,7 +63,13 @@ function creatorHandle(username: string): string {
 }
 
 function adminStatusLabel(status: string, remainingVials: number): string {
-  if (status === "open" && remainingVials > 0 && remainingVials <= 2) return "Fast voll";
+  if (
+    status === "open" &&
+    remainingVials > 0 &&
+    remainingVials <= KIT_ALMOST_FULL_REMAINING_THRESHOLD
+  ) {
+    return "Fast voll";
+  }
   return kitRequestStatusLabel(status);
 }
 
@@ -353,6 +362,7 @@ export default function AdminKitRequestDetailPage() {
   const navigate = useNavigate();
   const { kitRequestId } = useParams<{ kitRequestId: string }>();
   const detailQuery = useAdminKitRequest(kitRequestId);
+  const reconcileQuery = useAdminKitReconcileReport(kitRequestId);
   const metaMutation = useAdminUpdateKitRequestMeta();
   const distributionMutation = useAdminSetKitRequestDistribution();
   const orderSyncMutation = useAdminSyncKitFullOrders();
@@ -521,6 +531,16 @@ export default function AdminKitRequestDetailPage() {
           onCancel={() => setEditingMeta(false)}
         />
       ) : null}
+
+      <KitIntegritySection
+        report={reconcileQuery.data}
+        loading={reconcileQuery.isLoading}
+        error={reconcileQuery.isError}
+        onRetry={() => void reconcileQuery.refetch()}
+        kitSize={detail.kitSizeVials}
+        allocatedTotal={detail.allocatedTotal}
+        participantCount={detail.participantCount}
+      />
 
       {detail.status === "full" ? (
         <AdminSection

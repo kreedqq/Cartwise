@@ -19,9 +19,14 @@ export async function getCart(id: string): Promise<Tables<"carts"> | null> {
   return data;
 }
 
-export async function createCart(_userId: string, note?: string): Promise<Tables<"carts">> {
+export async function getOrCreateUserCart(): Promise<Tables<"carts">> {
   const { data, error } = await supabase.rpc("get_or_create_user_cart");
   if (error) throw error;
+  return data;
+}
+
+export async function createCart(_userId: string, note?: string): Promise<Tables<"carts">> {
+  const data = await getOrCreateUserCart();
   if (!note) return data;
   return updateCartNote(data.id, data.version, note);
 }

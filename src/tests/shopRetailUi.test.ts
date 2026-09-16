@@ -32,8 +32,8 @@ describe("retail shop UI", () => {
     expect(shop).not.toMatch(/Preis \/ 10 Vials/);
     expect(shop).not.toMatch(/5\/10 Kit/);
     expect(shop).not.toContain("KitRequestsPage");
-    expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("showBulkColumn = !isRetailPricing");
-    expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("showKitShare = !isRetailPricing");
+    expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("showBulkColumn = !isRetail && quantityDiscountsEnabled");
+    expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("showKitShare = !isRetail");
   });
 
   it("retail variant label strips kit kit-size prefix and never returns 'Nx ...' format", () => {

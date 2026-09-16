@@ -29,7 +29,7 @@ export default function CartDetailPage() {
   const [priceUpdateOpen, setPriceUpdateOpen] = React.useState(false);
 
   const cart = cartsQuery.data?.find((c) => c.id === cartId);
-  const { items, totals, duplicateCodes } = useCartComputed(itemsQuery.data);
+  const { items, totals, duplicateCodes } = useCartComputed(itemsQuery.data, rateQuery.data?.rate ?? null);
   const kitShareIds = React.useMemo(
     () => items.map((item) => item.kit_share_id).filter((id): id is string => Boolean(id)),
     [items],
@@ -102,6 +102,7 @@ export default function CartDetailPage() {
                   items={items}
                   cartId={cart.id}
                   currentRate={rate?.rate ?? null}
+                  rateLoading={rateQuery.isLoading || rateQuery.isFetching}
                   nextPosition={nextPosition}
                   readOnly={cart.status === "ordered"}
                   isKitCartLineLocked={isKitCartLineLocked}
@@ -113,6 +114,7 @@ export default function CartDetailPage() {
                   items={items}
                   cartId={cart.id}
                   currentRate={rate?.rate ?? null}
+                  rateLoading={rateQuery.isLoading || rateQuery.isFetching}
                   nextPosition={nextPosition}
                   readOnly={cart.status === "ordered"}
                   isKitCartLineLocked={isKitCartLineLocked}

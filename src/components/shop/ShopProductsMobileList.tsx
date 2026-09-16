@@ -17,6 +17,7 @@ import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { useShopProductGroupRow } from "@/hooks/useShopProductGroupRow";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import { formatQuantity, hasBulkTier } from "@/lib/money";
+import { SHOP_RETAIL_ADD_CTA } from "@/lib/kitRequests";
 import { formatCatalogQuantity } from "@/lib/quantityFormat";
 import { shopPriceColumnLabels } from "@/lib/shop/priceLabels";
 import { isRetailPricing, type ShopPricingProfile } from "@/lib/shop/shopAreas";
@@ -43,6 +44,7 @@ interface ShopProductsMobileListProps {
   favoriteProductIds: Set<string>;
   categoryId?: ShopCategoryId;
   pricingProfile?: ShopPricingProfile;
+  rateLoading?: boolean;
   onKitCreated?: (id: string) => void;
 }
 
@@ -52,6 +54,7 @@ export function ShopProductsMobileList({
   favoriteProductIds,
   categoryId,
   pricingProfile = "group_buy",
+  rateLoading = false,
   onKitCreated,
 }: ShopProductsMobileListProps) {
   const { shopArea } = useShopAreaContext();
@@ -79,6 +82,7 @@ export function ShopProductsMobileList({
             saleMode={saleMode}
             showBulkColumn={showBulkColumn}
             showKitShare={showKitShare}
+            rateLoading={rateLoading}
             onKitShare={(productId) => setKitProductId(productId)}
           />
         ))}
@@ -110,6 +114,7 @@ function ShopProductGroupCard({
   saleMode,
   showBulkColumn,
   showKitShare,
+  rateLoading = false,
   onKitShare,
 }: {
   group: ShopProductGroup;
@@ -119,6 +124,7 @@ function ShopProductGroupCard({
   saleMode: "catalog" | "retail_unit";
   showBulkColumn: boolean;
   showKitShare: boolean;
+  rateLoading?: boolean;
   onKitShare: (productId: string) => void;
 }) {
   const row = useShopProductGroupRow(group, rate, favoriteProductIds);
@@ -165,6 +171,9 @@ function ShopProductGroupCard({
 
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold">{title}</p>
+            <p className="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-muted-foreground">
+              {product.code}
+            </p>
             {row.hasMultipleVariants ? (
               <Select value={row.selectedProductId} onValueChange={row.setSelectedProductId}>
                 <SelectTrigger className="mt-2 h-10 w-full" aria-label="Variante wählen">
@@ -198,7 +207,7 @@ function ShopProductGroupCard({
         <div className={showBulkColumn ? "grid grid-cols-2 gap-2 rounded-md bg-secondary/50 p-2.5 text-sm" : "rounded-md bg-secondary/50 p-2.5 text-sm"}>
           <div>
             <p className="text-[11px] text-muted-foreground">{priceLabels.unitPrice}</p>
-            <DualCurrencyPrice usd={product.price_usd} rate={rate} />
+            <DualCurrencyPrice usd={product.price_usd} rate={rate} rateLoading={rateLoading} size="catalog" />
           </div>
           {showBulkColumn ? (
           <div className="text-right">
@@ -240,7 +249,7 @@ function ShopProductGroupCard({
             onClick={row.handleAdd}
           >
             {row.status === "success" ? <Check className="text-success" /> : <ShoppingCart />}
-            {row.status === "success" ? "Hinzugefügt" : "In den Warenkorb"}
+            {row.status === "success" ? "Hinzugefügt" : isRetail ? SHOP_RETAIL_ADD_CTA : "In den Warenkorb"}
           </Button>
         </div>
       </CardContent>

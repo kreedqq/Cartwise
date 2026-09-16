@@ -10,6 +10,7 @@ import {
   listKitRequestableProductIds,
   listMyKitRequestParticipations,
   listMyKitRequests,
+  getKitRequest,
   listOpenKitRequests,
   syncCompletedKitRequestCarts,
 } from "@/services/kitRequests";
@@ -69,7 +70,17 @@ export function useInvalidateKitRequests() {
     void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myKitRequestParticipations });
     void queryClient.invalidateQueries({ queryKey: ["carts"] });
     void queryClient.invalidateQueries({ queryKey: ["cart-summaries"] });
+    // Kit sync mutates cart_items server-side; cart-items keys are not under ["carts"].
+    void queryClient.invalidateQueries({ queryKey: ["cart-items"] });
   };
+}
+
+export function useKitRequest(id: string | undefined) {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.myKitRequests, "detail", id ?? ""],
+    queryFn: () => getKitRequest(id!),
+    enabled: Boolean(id),
+  });
 }
 
 export function useKitRequestableProductIds(shopArea: string, enabled = true) {

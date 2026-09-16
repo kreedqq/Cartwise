@@ -46,7 +46,7 @@ export function PaymentMethodSelector({
               aria-checked={selected}
               onClick={() => onChange(method)}
               className={cn(
-                "flex w-full items-center gap-3 rounded-lg border px-3 py-3 text-left text-sm transition-colors",
+                "flex min-h-11 w-full items-center gap-3 rounded-lg border px-3 py-3 text-left text-sm transition-colors",
                 selected ? "border-primary bg-primary/10" : "border-border hover:bg-secondary/50",
               )}
             >

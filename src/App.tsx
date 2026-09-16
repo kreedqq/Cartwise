@@ -103,6 +103,7 @@ export default function App() {
                 <Route path="/newsfeed" element={<Navigate to="/announcements" replace />} />
                 <Route path="/neuigkeiten" element={<Navigate to="/announcements" replace />} />
                 <Route path="/shop" element={<ShopHubPage />} />
+                <Route path="/shop/:slug/kit-gesuche" element={<ShopAreaPage />} />
                 <Route path="/shop/:slug" element={<ShopAreaPage />} />
                 <Route path="/kit-gesuche" element={<KitRequestsPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />

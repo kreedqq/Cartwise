@@ -68,6 +68,9 @@ export function useCartItemRow(item: ComputedCartItem, cartId: string, currentRa
 
   const commitQuantity = React.useCallback(
     async (raw: string) => {
+      if (item.kit_share_id) {
+        return;
+      }
       const normalized = Number(raw.replace(",", "."));
       if (!isValidQuantity(normalized)) {
         setQuantityError("Menge muss zwischen 0,001 und 100.000 liegen.");

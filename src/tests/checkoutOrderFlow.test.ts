@@ -36,6 +36,12 @@ describe("checkout order flow root cause + fix", () => {
     expect(createOrderBody).toContain("from public.shop_area_products sap");
   });
 
+  it("blocks repeat checkout when all cart lines already have submitted_order_id", () => {
+    expect(checkout).toContain("submitted_order_id");
+    expect(checkout).toContain("alreadySubmitted");
+    expect(checkout).toContain('title="Bereits bestellt"');
+  });
+
   it("surfaces PostgREST RPC errors instead of only instanceof Error", () => {
     expect(checkout).toContain("extractRpcErrorMessage");
     expect(orders).toContain("extractRpcErrorMessage");

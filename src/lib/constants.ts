@@ -42,6 +42,8 @@ export const QUERY_KEYS = {
   canUseKitRequests: ["can-use-kit-requests"] as const,
   adminKitRequests: (filters: unknown) => ["admin-kit-requests", filters] as const,
   adminKitRequest: (id: string) => ["admin-kit-requests", id] as const,
+  adminKitReconcile: (id: string) => ["admin-kit-reconcile", id] as const,
+  adminSystemHealth: ["admin-system-health"] as const,
   kitShareCustomerLock: ["kit-share-customer-lock"] as const,
   myOrders: (userId: string) => ["my-orders", userId] as const,
   myOrder: (userId: string, id: string) => ["my-orders", userId, id] as const,

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -44,10 +45,14 @@ export default function AdminCartsPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-xs"
         />
-        <Select value={shopArea} onValueChange={setShopArea}>
-          <SelectTrigger className="w-[220px]">
-            <SelectValue placeholder="Shop-Bereich" />
-          </SelectTrigger>
+        <div className="space-y-1">
+          <Label id="admin-carts-area-label" htmlFor="admin-carts-area" className="sr-only">
+            Shop-Bereich
+          </Label>
+          <Select value={shopArea} onValueChange={setShopArea}>
+            <SelectTrigger id="admin-carts-area" className="w-[220px]" aria-labelledby="admin-carts-area-label">
+              <SelectValue placeholder="Shop-Bereich" />
+            </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Alle Bereiche</SelectItem>
             {(areasQuery.data ?? []).map((area) => (
@@ -56,7 +61,8 @@ export default function AdminCartsPage() {
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
+          </Select>
+        </div>
       </div>
 
       {cartsQuery.isLoading && <Skeleton className="h-48 w-full" />}

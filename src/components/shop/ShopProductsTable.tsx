@@ -35,6 +35,7 @@ import {
   showsStandaloneVariantLabel,
 } from "@/lib/shop/variantCoverage";
 import { useQuantityDiscountsEnabled } from "@/hooks/useAppPublicState";
+import { SHOP_RETAIL_ADD_CTA } from "@/lib/kitRequests";
 import type { Tables } from "@/types/database";
 
 interface ShopProductsTableProps {
@@ -44,6 +45,7 @@ interface ShopProductsTableProps {
   categoryId?: ShopCategoryId;
   categoryLabel?: string;
   pricingProfile?: ShopPricingProfile;
+  rateLoading?: boolean;
   onKitCreated?: (id: string) => void;
 }
 
@@ -54,6 +56,7 @@ export function ShopProductsTable({
   categoryId,
   categoryLabel,
   pricingProfile = "group_buy",
+  rateLoading = false,
   onKitCreated,
 }: ShopProductsTableProps) {
   const { shopArea } = useShopAreaContext();
@@ -63,24 +66,28 @@ export function ShopProductsTable({
     categoryId ?? shopCategoryIdFor(products[0] ?? { category: null, name: "", code: "" }),
     pricingProfile,
   );
-  const saleMode = isRetailPricing(pricingProfile) ? "retail_unit" : "catalog";
-  const showKitShare = !isRetailPricing(pricingProfile);
-  const showBulkColumn = !isRetailPricing(pricingProfile) && quantityDiscountsEnabled;
+  const isRetail = isRetailPricing(pricingProfile);
+  const saleMode = isRetail ? "retail_unit" : "catalog";
+  const showKitShare = !isRetail;
+  const showBulkColumn = !isRetail && quantityDiscountsEnabled;
   const [kitProductId, setKitProductId] = React.useState<string | null>(null);
 
   return (
     <>
-      <div className="rounded-2xl border border-border/80 bg-card/90 p-2 shadow-sm lg:p-4">
+      <div className="overflow-x-auto rounded-2xl border border-border/80 bg-card/90 p-2 shadow-sm lg:p-4">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-20 px-4">Info</TableHead>
+              {isRetail ? <TableHead className="min-w-[7rem] px-4">Code</TableHead> : null}
               <TableHead className="min-w-[16rem] px-4">Produkt</TableHead>
               <TableHead className="min-w-[12rem] px-4">Variante</TableHead>
+              {isRetail ? <TableHead className="min-w-[8rem] px-4">Kategorie</TableHead> : null}
               <TableHead className="min-w-[9rem] px-4">{priceLabels.unitPrice}</TableHead>
               {showBulkColumn ? <TableHead className="min-w-[10rem] px-4">{priceLabels.bulkPrice}</TableHead> : null}
+              {isRetail ? <TableHead className="min-w-[7rem] px-4">Verfügbar</TableHead> : null}
               <TableHead className="w-40 px-4 text-right">Menge</TableHead>
-              <TableHead className="w-48 px-4 text-right">Warenkorb</TableHead>
+              <TableHead className="w-48 px-4 text-right">{isRetail ? "Aktion" : "Warenkorb"}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -95,6 +102,8 @@ export function ShopProductsTable({
                 showBulkColumn={showBulkColumn}
                 showKitShare={showKitShare}
                 categoryLabel={categoryLabel}
+                isRetailTable={isRetail}
+                rateLoading={rateLoading}
                 onKitShare={(productId) => setKitProductId(productId)}
               />
             ))}
@@ -129,6 +138,8 @@ function ShopProductGroupTableRow({
   showBulkColumn,
   showKitShare,
   categoryLabel,
+  isRetailTable = false,
+  rateLoading = false,
   onKitShare,
 }: {
   group: ShopProductGroup;
@@ -139,6 +150,8 @@ function ShopProductGroupTableRow({
   showBulkColumn: boolean;
   showKitShare: boolean;
   categoryLabel?: string;
+  isRetailTable?: boolean;
+  rateLoading?: boolean;
   onKitShare: (productId: string) => void;
 }) {
   const row = useShopProductGroupRow(group, rate, favoriteProductIds);
@@ -182,10 +195,17 @@ function ShopProductGroupTableRow({
           </Button>
         </div>
       </TableCell>
+      {isRetailTable ? (
+        <TableCell className="px-4 py-4">
+          <p className="font-mono text-xs font-semibold uppercase tracking-wide text-foreground">{product.code}</p>
+        </TableCell>
+      ) : null}
       <TableCell className="px-4 py-4">
         <div className="min-w-0 space-y-1">
           <p className="text-sm font-medium">{title}</p>
-          {categoryLabel ? <p className="text-[11px] text-muted-foreground">{categoryLabel}</p> : null}
+          {!isRetailTable && categoryLabel ? (
+            <p className="text-[11px] text-muted-foreground">{categoryLabel}</p>
+          ) : null}
           {showKitShare && (
             <KitShareButton
               group={group}
@@ -217,8 +237,13 @@ function ShopProductGroupTableRow({
           <p className="text-sm text-muted-foreground">—</p>
         )}
       </TableCell>
+      {isRetailTable ? (
+        <TableCell className="px-4 py-4 text-sm text-muted-foreground">
+          {categoryLabel ?? product.category ?? "—"}
+        </TableCell>
+      ) : null}
       <TableCell className="px-4 py-4 text-sm">
-        <DualCurrencyPrice usd={product.price_usd} rate={rate} />
+        <DualCurrencyPrice usd={product.price_usd} rate={rate} rateLoading={rateLoading} size="catalog" />
       </TableCell>
       {showBulkColumn ? (
       <TableCell className="px-4 py-4 text-sm">
@@ -237,6 +262,13 @@ function ShopProductGroupTableRow({
           <p className="text-xs text-muted-foreground">{priceLabels.noBulk}</p>
         )}
       </TableCell>
+      ) : null}
+      {isRetailTable ? (
+        <TableCell className="px-4 py-4 text-sm">
+          <span className={product.is_active ? "text-success" : "text-muted-foreground"}>
+            {product.is_active ? "Verfügbar" : "Nicht verfügbar"}
+          </span>
+        </TableCell>
       ) : null}
       <TableCell className="px-4 py-4">
         <Select value={row.quantity} onValueChange={row.setQuantity}>
@@ -260,7 +292,7 @@ function ShopProductGroupTableRow({
           onClick={row.handleAdd}
         >
           {row.status === "success" ? <Check className="text-success" /> : <ShoppingCart />}
-          {row.status === "success" ? "Hinzugefügt" : "In den Warenkorb"}
+          {row.status === "success" ? "Hinzugefügt" : isRetail ? SHOP_RETAIL_ADD_CTA : "In den Warenkorb"}
         </Button>
       </TableCell>
     </TableRow>

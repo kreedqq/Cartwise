@@ -8,6 +8,26 @@ export interface ExchangeRateResult {
   error: string | null;
 }
 
+/** Same append-only table the get-exchange-rate edge function writes to (local fallback only). */
+async function fetchLatestRateFromDb(): Promise<ExchangeRateResult | null> {
+  const { data, error } = await supabase
+    .from("exchange_rates")
+    .select("rate, source, fetched_at")
+    .eq("base_currency", "USD")
+    .eq("quote_currency", "EUR")
+    .order("fetched_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error || !data?.rate) return null;
+  return {
+    rate: Number(data.rate),
+    source: data.source ?? "exchange_rates",
+    fetchedAt: data.fetched_at,
+    stale: true,
+    error: null,
+  };
+}
+
 export async function fetchExchangeRate(forceRefresh = false): Promise<ExchangeRateResult> {
   const { data, error } = await supabase.functions.invoke<ExchangeRateResult>("get-exchange-rate", {
     body: {},
@@ -15,8 +35,8 @@ export async function fetchExchangeRate(forceRefresh = false): Promise<ExchangeR
   });
 
   if (error) {
-    // Edge function unreachable entirely (not the same as a handled provider
-    // failure, which the function itself reports with rate: null).
+    const fromDb = await fetchLatestRateFromDb();
+    if (fromDb) return fromDb;
     return {
       rate: null,
       source: null,
@@ -33,7 +53,12 @@ export async function fetchExchangeRate(forceRefresh = false): Promise<ExchangeR
     return fetchExchangeRateForced();
   }
 
-  return data as ExchangeRateResult;
+  const result = data as ExchangeRateResult;
+  if (result.rate == null) {
+    const fromDb = await fetchLatestRateFromDb();
+    if (fromDb) return fromDb;
+  }
+  return result;
 }
 
 async function fetchExchangeRateForced(): Promise<ExchangeRateResult> {
@@ -46,6 +71,8 @@ async function fetchExchangeRateForced(): Promise<ExchangeRateResult> {
     },
   });
   if (!res.ok) {
+    const fromDb = await fetchLatestRateFromDb();
+    if (fromDb) return fromDb;
     return {
       rate: null,
       source: null,
@@ -54,5 +81,10 @@ async function fetchExchangeRateForced(): Promise<ExchangeRateResult> {
       error: "Wechselkurs-Dienst ist aktuell nicht erreichbar.",
     };
   }
-  return (await res.json()) as ExchangeRateResult;
+  const result = (await res.json()) as ExchangeRateResult;
+  if (result.rate == null) {
+    const fromDb = await fetchLatestRateFromDb();
+    if (fromDb) return fromDb;
+  }
+  return result;
 }

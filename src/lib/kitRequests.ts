@@ -1,3 +1,4 @@
+import { KIT_ALMOST_FULL_REMAINING_THRESHOLD } from "@/lib/kit/kitShareState";
 import { isValidKitSize } from "@/lib/shop/kitUnits";
 
 export const KIT_REQUEST_STATUSES = ["open", "full", "cancelled", "expired", "ordered"] as const;
@@ -13,7 +14,13 @@ export const KIT_REQUEST_STATUS_LABELS: Record<KitRequestStatus, string> = {
 
 /** Customer-facing status. "Fast voll" is presentation only — the server status stays open. */
 export function kitRequestCustomerStatusLabel(status: string, remainingVials = Number.POSITIVE_INFINITY): string {
-  if (status === "open" && remainingVials > 0 && remainingVials <= 2) return "Fast voll";
+  if (
+    status === "open" &&
+    remainingVials > 0 &&
+    remainingVials <= KIT_ALMOST_FULL_REMAINING_THRESHOLD
+  ) {
+    return "Fast voll";
+  }
   if (status === "cancelled") return "Abgebrochen";
   return kitRequestStatusLabel(status);
 }
@@ -78,6 +85,9 @@ export function isValidCreatorQuantity(kitSize: number, creatorQuantity: number)
 }
 
 export const KIT_REQUEST_CREATE_LABEL = "Gesuch erstellen";
+/** Group-buy product card CTA (create flow); nav uses KIT_REQUEST_CREATE_LABEL. */
+export const SHOP_GROUP_BUY_KIT_CTA = "Kit gemeinsam kaufen";
+export const SHOP_RETAIL_ADD_CTA = "Zum Warenkorb";
 
 export const KIT_REQUEST_ROLE_DENIED_MESSAGE =
   "Kit Gesuche sind für deine aktuelle Rolle nicht freigeschaltet.";

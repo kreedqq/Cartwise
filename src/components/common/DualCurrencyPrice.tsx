@@ -26,6 +26,7 @@ export function DualCurrencyPrice({
   usd,
   eur,
   rate,
+  rateLoading = false,
   unit,
   size = "catalog",
   align = "left",
@@ -34,6 +35,8 @@ export function DualCurrencyPrice({
   usd: number | null | undefined;
   eur?: number | null;
   rate?: number | null;
+  /** True while the central exchange-rate query is still loading (no invented FX). */
+  rateLoading?: boolean;
   unit?: string | null;
   size?: DualCurrencySize;
   align?: "left" | "right";
@@ -41,6 +44,10 @@ export function DualCurrencyPrice({
 }) {
   const eurAmount =
     eur !== undefined ? eur : typeof usd === "number" ? convertUsdToEur(usd, rate) : null;
+  const eurLine =
+    rateLoading && typeof usd === "number"
+      ? "…"
+      : formatEur(eurAmount);
   const classes = SIZE_CLASSES[size];
   const unitSuffix = unit?.trim() ? ` / ${unit.trim()}` : "";
 
@@ -49,8 +56,13 @@ export function DualCurrencyPrice({
       className={cn("min-w-0", align === "right" ? "text-right" : "text-left", className)}
       data-testid="dual-currency-price"
     >
-      <p className={classes.eur} data-currency="eur">
-        {formatEur(eurAmount)}
+      <p
+        className={classes.eur}
+        data-currency="eur"
+        aria-busy={rateLoading || undefined}
+        aria-label={rateLoading ? "EUR-Preis wird geladen" : undefined}
+      >
+        {eurLine}
         {unitSuffix}
       </p>
       <p className={classes.usd} data-currency="usd">

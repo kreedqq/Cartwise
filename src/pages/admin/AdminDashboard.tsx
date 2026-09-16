@@ -28,6 +28,7 @@ import { listUsersWithRoles } from "@/services/profiles";
 import { formatDateTime, formatUsd } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { OrderIdentity } from "@/components/orders/OrderIdentity";
+import { AdminSystemHealthSection } from "@/components/admin/AdminSystemHealthSection";
 
 export default function AdminDashboardPage() {
   const productsQuery = useQuery({ queryKey: ["admin-products-count"], queryFn: () => listAllProducts() });
@@ -110,6 +111,8 @@ export default function AdminDashboardPage() {
         <QuickAction to="/admin/design" icon={Palette} label="Design" />
         <QuickAction to="/admin/shipping-costs" icon={Truck} label="Versand" />
       </div>
+
+      <AdminSystemHealthSection />
 
       <QuantityDiscountsSwitch />
 

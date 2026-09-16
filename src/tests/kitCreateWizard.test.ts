@@ -61,7 +61,7 @@ describe("kit create wizard", () => {
     expect(shopTable).not.toMatch(/<KitShareDialog/);
     expect(shopMobile).toContain("CreateKitRequestDialog");
     expect(shopMobile).not.toMatch(/<KitShareDialog/);
-    expect(read("src/components/shop/KitShareDialog.tsx")).toContain("KIT_REQUEST_CREATE_LABEL");
+    expect(read("src/components/shop/KitShareDialog.tsx")).toContain("SHOP_GROUP_BUY_KIT_CTA");
     expect(read("src/components/shop/KitShareDialog.tsx")).not.toContain("+ Kit Gesuch");
   });
 
@@ -96,9 +96,9 @@ describe("kit join and leave customer copy", () => {
     expect(join).toContain("useJoinKitRequest");
     expect(join).toContain("ownQuantityOptions");
     expect(join).toContain("useUpdateKitRequestQuantity");
-    expect(join).toContain("Du bist dabei!");
-    expect(join).toContain("Passt alles?");
-    expect(join).toContain("Mit diesem Anteil beitreten");
+    expect(join).toContain("kitJoinUserMessage");
+    expect(join).toContain("Dein Gesamtpreis");
+    expect(join).toContain("Mitmachen");
     expect(join).toContain("DualCurrencyPrice");
     expect(join).not.toContain("create_kit_share");
   });

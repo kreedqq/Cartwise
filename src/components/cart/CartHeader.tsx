@@ -69,7 +69,7 @@ export function CartHeader({ cart }: { cart: Tables<"carts"> }) {
             <CartStatusBadge status={cart.status} />
             {open && (
               <Select value={cart.status} onValueChange={(v) => handleStatusChange(v as CartStatus)}>
-                <SelectTrigger className="h-8 w-52 text-xs">
+                <SelectTrigger className="h-8 w-52 text-xs" aria-label="Warenkorbstatus ändern">
                   <SelectValue placeholder="Status ändern" />
                 </SelectTrigger>
                 <SelectContent>

@@ -61,8 +61,16 @@ export default function CheckoutPage() {
   const cart = cartsQuery.data?.find((c) => c.id === cartId);
   const { items } = useCartComputed(itemsQuery.data);
 
-  const eligible = items.filter((i) => i.resolution_status === "resolved" && i.unit_price_usd_snapshot != null);
-  const excluded = items.filter((i) => i.resolution_status !== "resolved" || i.unit_price_usd_snapshot == null);
+  const pendingItems = items.filter((i) => i.quantity > 0 && i.submitted_order_id == null);
+  const alreadySubmitted =
+    pendingItems.length === 0 && items.some((i) => i.quantity > 0 && i.submitted_order_id != null);
+
+  const eligible = pendingItems.filter(
+    (i) => i.resolution_status === "resolved" && i.unit_price_usd_snapshot != null,
+  );
+  const excluded = pendingItems.filter(
+    (i) => i.resolution_status !== "resolved" || i.unit_price_usd_snapshot == null,
+  );
   const eligibleTotals = calculateCartTotals(
     eligible.map((item) => ({
       quantity: item.quantity,
@@ -90,7 +98,7 @@ export default function CheckoutPage() {
     return <EmptyState title="Warenkorb nicht gefunden" description="Dieser Warenkorb existiert nicht oder du hast keine Berechtigung, ihn zu sehen." />;
   }
 
-  if (cart.status === "ordered") {
+  if (cart.status === "ordered" || alreadySubmitted) {
     return (
       <EmptyState
         title="Bereits bestellt"

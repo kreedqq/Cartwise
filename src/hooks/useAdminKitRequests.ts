@@ -4,6 +4,7 @@ import { QUERY_KEYS } from "@/lib/constants";
 import {
   adminCancelKitRequest,
   adminDeleteKitRequest,
+  adminGetKitReconcileReport,
   adminGetKitRequest,
   adminListKitRequests,
   adminSearchKitRequestUsers,
@@ -41,6 +42,15 @@ export function useAdminKitRequest(id: string | undefined) {
   });
 }
 
+export function useAdminKitReconcileReport(kitShareId: string | undefined) {
+  return useQuery({
+    queryKey: QUERY_KEYS.adminKitReconcile(kitShareId ?? ""),
+    queryFn: () => adminGetKitReconcileReport(kitShareId!),
+    enabled: Boolean(kitShareId),
+    staleTime: 15_000,
+  });
+}
+
 function useInvalidateAdminKitRequests() {
   const queryClient = useQueryClient();
   return (detail?: AdminKitRequestDetail | { id: string }) => {
@@ -48,6 +58,9 @@ function useInvalidateAdminKitRequests() {
       queryClient.setQueryData(QUERY_KEYS.adminKitRequest(detail.id), detail);
     }
     void queryClient.invalidateQueries({ queryKey: ["admin-kit-requests"] });
+    if (detail?.id) {
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminKitReconcile(detail.id) });
+    }
     void queryClient.invalidateQueries({ queryKey: ["kit-requests"] });
     void queryClient.invalidateQueries({ queryKey: ["carts"] });
   };

@@ -3,14 +3,20 @@ import { readFileSync } from "node:fs";
 
 import { assertSafeLocalQaTarget } from "@/lib/qa/productionGuard";
 
-export type QaAccountKey = "admin" | "groupBuy" | "neu" | "kunde" | "stammkunde";
+export type QaAccountKey =
+  | "admin"
+  | "groupBuy"
+  | "neu"
+  | "kunde"
+  | "stammkunde"
+  | `join${string}`;
 
 export interface QaAccountFile {
   generatedAt: string;
   apiUrl: string;
   anonKey: string;
   accounts: Array<{
-    key: QaAccountKey;
+    key: string;
     email: string;
     password: string;
     username: string;
@@ -63,13 +69,13 @@ export function anonClient(): SupabaseClient {
   });
 }
 
-export async function signIn(key: QaAccountKey): Promise<{
+export async function signIn(key: QaAccountKey | string): Promise<{
   client: SupabaseClient;
   account: QaAccountFile["accounts"][number];
 }> {
   const accounts = loadQaAccounts();
   const account = accounts.accounts.find((a) => a.key === key);
-  if (!account) throw new Error(`Unknown QA account ${key}`);
+  if (!account) throw new Error(`Unknown QA account ${String(key)}`);
   const client = anonClient();
   const { error } = await client.auth.signInWithPassword({
     email: account.email,

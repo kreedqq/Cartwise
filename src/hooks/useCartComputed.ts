@@ -16,7 +16,7 @@ export interface ComputedCartItem extends Tables<"cart_items"> {
  * (see docs/KONZEPT.md assumption A3 - duplicates are allowed but flagged,
  * never silently merged).
  */
-export function useCartComputed(items: Tables<"cart_items">[] | undefined) {
+export function useCartComputed(items: Tables<"cart_items">[] | undefined, liveRate?: number | null) {
   return React.useMemo(() => {
     const list = items ?? [];
 
@@ -27,7 +27,8 @@ export function useCartComputed(items: Tables<"cart_items">[] | undefined) {
     }
 
     const computed: ComputedCartItem[] = list.map((item) => {
-      const line = computeLine(item.quantity, item.unit_price_usd_snapshot, item.exchange_rate_snapshot);
+      const effectiveRate = item.exchange_rate_snapshot ?? liveRate ?? null;
+      const line = computeLine(item.quantity, item.unit_price_usd_snapshot, effectiveRate);
       const code = item.product_code_snapshot ?? normalizeProductCode(item.product_code_input);
       return {
         ...item,
@@ -52,5 +53,5 @@ export function useCartComputed(items: Tables<"cart_items">[] | undefined) {
       .map(([code]) => code);
 
     return { items: computed, totals, duplicateCodes };
-  }, [items]);
+  }, [items, liveRate]);
 }

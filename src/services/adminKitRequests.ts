@@ -1,5 +1,8 @@
+import { parseKitReconcileReport, type KitReconcileReport } from "@/lib/kit/kitReconciliation";
 import { supabase } from "@/lib/supabaseClient";
 import { extractRpcErrorMessage } from "@/services/username";
+
+export type { KitReconcileReport };
 
 export type AdminKitRequestStatus = "open" | "full" | "cancelled" | "expired" | "ordered";
 
@@ -290,6 +293,12 @@ export async function adminDeleteKitRequest(id: string): Promise<{ deleted: bool
   if (error) throw error;
   const raw = asRecord(data);
   return { deleted: Boolean(raw.deleted), id: String(raw.id ?? id) };
+}
+
+export async function adminGetKitReconcileReport(kitShareId: string): Promise<KitReconcileReport> {
+  const { data, error } = await supabase.rpc("kit_share_reconcile_report", { _kit_share_id: kitShareId });
+  if (error) throw error;
+  return parseKitReconcileReport(data);
 }
 
 export function adminKitRpcErrorMessage(error: unknown, fallback: string): string {

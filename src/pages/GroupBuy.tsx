@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Layers, PackageSearch, Search } from "lucide-react";
 
 import { ShopProductsTable } from "@/components/shop/ShopProductsTable";
@@ -44,6 +44,9 @@ import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
+import { useQuery } from "@tanstack/react-query";
+import { getOrCreateUserCart } from "@/services/carts";
+import { KitRequestDetailDialog } from "@/components/kit-requests/KitRequestDetailDialog";
 import { ShopAreaProvider, useShopAreaContext } from "@/context/ShopAreaContext";
 import {
   isGroupBuyPricing,
@@ -66,7 +69,11 @@ import {
   AREA_PAGE_NAV_SLOT,
   AREA_PAGE_RHYTHM,
 } from "@/lib/shop/areaLayout";
-import { shopGroupsForCategory, productMatchesShopSearch } from "@/lib/shop/display";
+import { shopGroupsForCategory, productMatchesShopSearch, variantLabelForProduct } from "@/lib/shop/display";
+import {
+  buildShopCatalogSearchParams,
+  readShopCatalogUrlState,
+} from "@/lib/shop/shopCatalogUrlState";
 import {
   catalogProductsForKitFilters,
   countProductsByAreaCategory,
@@ -98,6 +105,8 @@ export default function GroupBuyPage({ area }: { area?: MyShopArea }) {
       (item) => item.slug === slug && isGroupBuyPricing(item.pricing_profile),
     );
   if (!current || !isGroupBuyPricing(current.pricing_profile)) return <Navigate to="/403" replace />;
+  const areaSlug = current.slug ?? slug;
+  if (!areaSlug) return <Navigate to="/403" replace />;
 
   return (
     <ShopAreaProvider
@@ -107,6 +116,7 @@ export default function GroupBuyPage({ area }: { area?: MyShopArea }) {
     >
       <GroupBuyContent
         shopArea={current.key}
+        areaSlug={areaSlug}
         areaName={current.name}
         areaDescription={current.subtitle}
       />
@@ -116,13 +126,18 @@ export default function GroupBuyPage({ area }: { area?: MyShopArea }) {
 
 function GroupBuyContent({
   shopArea,
+  areaSlug,
   areaName,
   areaDescription,
 }: {
   shopArea: ShopAreaKey;
+  areaSlug: string;
   areaName: string;
   areaDescription?: string | null;
 }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { theme } = useShopAreaContext();
   const productsQuery = useShopProducts(shopArea);
   const storefrontQuery = useShopAreaStorefront(shopArea);
@@ -130,14 +145,16 @@ function GroupBuyContent({
   const rateQuery = useExchangeRate();
   const canUseKitRequestsQuery = useCanUseKitRequests();
   const canUseKitRequests = canUseKitRequestsQuery.data === true;
-  const [selectedKey, setSelectedKey] = React.useState<string | null>(null);
-  const [search, setSearch] = React.useState("");
-  const [activeSection, setActiveSection] = React.useState<"catalog" | "kits">("catalog");
+  const urlCatalog = React.useMemo(() => readShopCatalogUrlState(searchParams), [searchParams]);
+  const [searchDraft, setSearchDraft] = React.useState(urlCatalog.search);
+  const kitsPath = `/shop/${areaSlug}/kit-gesuche`;
+  const catalogPath = `/shop/${areaSlug}`;
+  const pathSection: "catalog" | "kits" = location.pathname.endsWith("/kit-gesuche") ? "kits" : "catalog";
   const [createOpen, setCreateOpen] = React.useState(false);
   const section =
-    canUseKitRequestsQuery.isSuccess && !canUseKitRequests && activeSection === "kits"
+    canUseKitRequestsQuery.isSuccess && !canUseKitRequests && pathSection === "kits"
       ? "catalog"
-      : activeSection;
+      : pathSection;
 
   const products = React.useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
   const assignments = React.useMemo(
@@ -160,15 +177,36 @@ function GroupBuyContent({
     ),
     [assignments, products],
   );
-  const selectedCategory = visible.find((category) => category.category_key === selectedKey) ?? null;
+  const selectedCategory =
+    visible.find((category) => category.category_key === urlCatalog.categoryKey) ?? null;
+
+  React.useEffect(() => {
+    // Sync draft when user navigates with browser back/forward (URL is source of truth).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional URL → input sync
+    setSearchDraft(urlCatalog.search);
+  }, [urlCatalog.search]);
+
+  React.useEffect(() => {
+    const handle = window.setTimeout(() => {
+      const next = buildShopCatalogSearchParams(searchParams, { search: searchDraft });
+      if (next.toString() !== searchParams.toString()) {
+        setSearchParams(next, { replace: true });
+      }
+    }, 250);
+    return () => window.clearTimeout(handle);
+  }, [searchDraft, searchParams, setSearchParams]);
 
   const filtered = React.useMemo(() => {
     if (!selectedCategory) return [];
-    const term = search.trim();
-    return productsInAreaCategory(products, assignments, selectedCategory.category_key).filter((p) =>
-      productMatchesShopSearch(p, term),
-    );
-  }, [assignments, products, search, selectedCategory]);
+    const term = urlCatalog.search.trim();
+    const variantNeedle = urlCatalog.variant.trim().toLowerCase();
+    return productsInAreaCategory(products, assignments, selectedCategory.category_key)
+      .filter((p) => productMatchesShopSearch(p, term))
+      .filter((p) => {
+        if (!variantNeedle) return true;
+        return variantLabelForProduct(p).toLowerCase().includes(variantNeedle);
+      });
+  }, [assignments, products, selectedCategory, urlCatalog.search, urlCatalog.variant]);
 
   const favoriteProductIds = React.useMemo(
     () => new Set((favoritesQuery.data ?? []).map((f) => f.productId)),
@@ -176,9 +214,23 @@ function GroupBuyContent({
   );
 
   function selectCategory(key: string) {
-    setSearch("");
-    setSelectedKey(key);
+    setSearchDraft("");
+    setSearchParams(buildShopCatalogSearchParams(searchParams, { categoryKey: key, search: "", variant: "" }), {
+      replace: true,
+    });
   }
+
+  function clearCategory() {
+    setSearchParams(buildShopCatalogSearchParams(searchParams, { categoryKey: null, search: "", variant: "" }), {
+      replace: true,
+    });
+  }
+
+  const cartQuery = useQuery({
+    queryKey: ["header-user-cart"],
+    queryFn: getOrCreateUserCart,
+  });
+  const cartHref = cartQuery.data?.id ? `/carts/${cartQuery.data.id}` : null;
 
   return (
     <div className={areaDensityClass(theme)} data-shop-area={shopArea}>
@@ -191,11 +243,14 @@ function GroupBuyContent({
       <div className={AREA_PAGE_NAV_SLOT}>
         <KitAreaActionNav
           section={section}
-          onSection={setActiveSection}
+          onSection={(next) => {
+            navigate(next === "kits" ? kitsPath : catalogPath);
+          }}
+          cartHref={cartHref}
           canUseKitRequests={canUseKitRequests}
           onCreate={() => {
             if (!canUseKitRequests) return;
-            setActiveSection("kits");
+            navigate(kitsPath);
             setCreateOpen(true);
           }}
         />
@@ -206,7 +261,13 @@ function GroupBuyContent({
         <GroupBuyCatalog
           shopArea={shopArea}
           areaName={areaName}
-          onKitCreated={canUseKitRequests ? () => setActiveSection("kits") : undefined}
+          onKitCreated={
+            canUseKitRequests
+              ? () => {
+                  navigate(kitsPath);
+                }
+              : undefined
+          }
           products={products}
           counts={counts}
           visible={visible}
@@ -215,16 +276,17 @@ function GroupBuyContent({
           storefrontError={storefrontQuery.isError}
           onStorefrontRetry={() => void storefrontQuery.refetch()}
           filtered={filtered}
-          search={search}
+          search={searchDraft}
           selectedCategory={selectedCategory}
           favoriteProductIds={favoriteProductIds}
           rate={rateQuery.data?.rate ?? null}
+          rateLoading={rateQuery.isFetching && rateQuery.data?.rate == null}
           isLoading={productsQuery.isLoading}
           isError={productsQuery.isError}
           onRefetch={() => void productsQuery.refetch()}
           onSelectCategory={selectCategory}
-          onSearch={setSearch}
-          onClearCategory={() => setSelectedKey(null)}
+          onSearch={setSearchDraft}
+          onClearCategory={clearCategory}
         />
       )}
 
@@ -244,7 +306,7 @@ function GroupBuyContent({
           shopArea={shopArea}
           open={createOpen}
           onOpenChange={setCreateOpen}
-          onCreated={() => setActiveSection("kits")}
+          onCreated={() => navigate(kitsPath)}
         />
       ) : null}
       </AreaStorefrontChrome>
@@ -267,6 +329,7 @@ interface GroupBuyCatalogProps {
   selectedCategory: AreaCategory | null;
   favoriteProductIds: Set<string>;
   rate: number | null;
+  rateLoading?: boolean;
   isLoading: boolean;
   isError: boolean;
   onRefetch: () => void;
@@ -289,6 +352,7 @@ function GroupBuyCatalog({
   selectedCategory,
   favoriteProductIds,
   rate,
+  rateLoading = false,
   isLoading,
   isError,
   onRefetch,
@@ -403,6 +467,7 @@ function GroupBuyCatalog({
             <ShopProductsTable
               products={filtered}
               rate={rate}
+              rateLoading={rateLoading}
               favoriteProductIds={favoriteProductIds}
               categoryId={tableCategoryId}
               categoryLabel={selectedCategory.label}
@@ -414,6 +479,7 @@ function GroupBuyCatalog({
             <ShopProductsMobileList
               products={filtered}
               rate={rate}
+              rateLoading={rateLoading}
               favoriteProductIds={favoriteProductIds}
               categoryId={tableCategoryId}
               pricingProfile="group_buy"
@@ -452,6 +518,7 @@ function KitRequestsSection({
   const [joinTarget, setJoinTarget] = React.useState<KitRequestCard | null>(null);
   const [leaveTarget, setLeaveTarget] = React.useState<KitRequestCard | null>(null);
   const [cancelTarget, setCancelTarget] = React.useState<KitRequestCard | null>(null);
+  const [detailTarget, setDetailTarget] = React.useState<KitRequestCard | null>(null);
   const [myStatus, setMyStatus] = React.useState<string>("all");
 
   const groups = React.useMemo(() => {
@@ -609,6 +676,7 @@ function KitRequestsSection({
                     onJoin={setJoinTarget}
                     onLeave={setLeaveTarget}
                     onCancel={setCancelTarget}
+                    onDetails={setDetailTarget}
                     onRetryCart={(req) => void handleRetryCart(req)}
                   />
                 ))}
@@ -619,11 +687,16 @@ function KitRequestsSection({
                     Seite {page} von {totalPages} · {openQuery.data.total} Gesuche
                   </p>
                   <div className="flex gap-2">
-                    <Button className="flex-1 sm:flex-none" variant="outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+                    <Button
+                      className="h-11 min-h-11 flex-1 sm:flex-none"
+                      variant="outline"
+                      disabled={page <= 1}
+                      onClick={() => setPage((p) => p - 1)}
+                    >
                       Zurück
                     </Button>
                     <Button
-                      className="flex-1 sm:flex-none"
+                      className="h-11 min-h-11 flex-1 sm:flex-none"
                       variant="outline"
                       disabled={page >= totalPages}
                       onClick={() => setPage((p) => p + 1)}
@@ -657,6 +730,7 @@ function KitRequestsSection({
                 key={item.id}
                 request={item}
                 onCancel={setCancelTarget}
+                onDetails={setDetailTarget}
                 onRetryCart={(req) => void handleRetryCart(req)}
               />
             ))}
@@ -681,6 +755,7 @@ function KitRequestsSection({
                 key={item.id}
                 request={item}
                 onLeave={setLeaveTarget}
+                onDetails={setDetailTarget}
                 onRetryCart={(req) => void handleRetryCart(req)}
               />
             ))}
@@ -689,6 +764,19 @@ function KitRequestsSection({
       </Tabs>
 
       <JoinKitRequestDialog request={joinTarget} open={joinTarget != null} onOpenChange={(next) => !next && setJoinTarget(null)} />
+      <KitRequestDetailDialog
+        kitId={detailTarget?.id ?? null}
+        open={detailTarget != null}
+        onOpenChange={(next) => !next && setDetailTarget(null)}
+        onJoin={
+          detailTarget && detailTarget.status === "open" && !detailTarget.isParticipant
+            ? () => {
+                setJoinTarget(detailTarget);
+                setDetailTarget(null);
+              }
+            : undefined
+        }
+      />
 
       <ConfirmDialog
         open={leaveTarget != null}
@@ -738,7 +826,7 @@ function StatusFilter({ value, onChange }: { value: string; onChange: (value: st
     <div className="max-w-xs space-y-1.5">
       <Label>Status</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="min-h-11 w-full">
+        <SelectTrigger className="min-h-11 w-full" aria-label="Status filtern">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

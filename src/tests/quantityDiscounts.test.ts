@@ -54,7 +54,7 @@ describe("global quantity discount switch", () => {
   it("hides the bulk column in shop tables only when discounts are disabled", () => {
     const desktop = read("src/components/shop/ShopProductsTable.tsx");
     const mobile = read("src/components/shop/ShopProductsMobileList.tsx");
-    expect(desktop).toContain("showBulkColumn = !isRetailPricing(pricingProfile) && quantityDiscountsEnabled");
+    expect(desktop).toContain("showBulkColumn = !isRetail && quantityDiscountsEnabled");
     expect(mobile).toContain("showBulkColumn = !isRetailPricing(pricingProfile) && quantityDiscountsEnabled");
   });
 

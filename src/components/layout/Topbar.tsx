@@ -74,7 +74,7 @@ export function Topbar() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative"
+          className="relative h-11 w-11 min-h-11 min-w-11"
           aria-label={cartCount > 0 ? `Aktiver Warenkorb, ${cartCount} Artikel` : "Aktiver Warenkorb"}
           onClick={() => navigate(activeCart ? `/carts/${activeCart.id}` : "/dashboard")}
         >
@@ -86,7 +86,7 @@ export function Topbar() {
           )}
         </Button>
 
-        <Button variant="ghost" size="icon" onClick={toggle} aria-label="Farbschema umschalten">
+        <Button variant="ghost" size="icon" className="h-11 w-11 min-h-11 min-w-11" onClick={toggle} aria-label="Farbschema umschalten">
           {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>
 

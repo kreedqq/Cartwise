@@ -7,6 +7,7 @@ import { AdminOrderGroups } from "@/components/admin/AdminOrderGroups";
 import { AdminSection } from "@/components/admin/AdminSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,7 +38,9 @@ import { formatShopAreaLabel } from "@/lib/shop/shopAreas";
 import { EmergencyMaintenanceButton } from "@/components/admin/EmergencyMaintenanceButton";
 import { listAdminShopAreas } from "@/services/shopAreas";
 import type { OrderStatus } from "@/types/database";
+import { AdminGlobalSyncResultDialog } from "@/components/admin/AdminGlobalSyncResultDialog";
 import { useAdminGlobalSync } from "@/hooks/useAdminCarts";
+import type { AdminGlobalSyncResult } from "@/services/adminCarts";
 import { toast } from "@/components/ui/toaster";
 
 const STATUS_FILTERS: Array<{ value: "all" | OrderStatus; label: string }> = [
@@ -64,6 +67,8 @@ export default function AdminOrdersPage() {
   const surchargeQuery = useQuery({ queryKey: QUERY_KEYS.adminRoleSurcharges, queryFn: listRoleSurchargeLines });
   const areasQuery = useQuery({ queryKey: QUERY_KEYS.adminShopAreas, queryFn: listAdminShopAreas });
   const globalSync = useAdminGlobalSync();
+  const [syncResultOpen, setSyncResultOpen] = React.useState(false);
+  const [syncResult, setSyncResult] = React.useState<AdminGlobalSyncResult | null>(null);
   const [search, setSearch] = React.useState("");
   const [status, setStatus] = React.useState<"all" | OrderStatus>("all");
   const [payment, setPayment] = React.useState("all");
@@ -207,13 +212,16 @@ export default function AdminOrdersPage() {
               size="sm"
               loading={globalSync.isPending}
               onClick={() => {
-                void globalSync.mutateAsync().then((result) => {
-                  toast.message("Synchronisation abgeschlossen", {
-                    description: `Warenkörbe: ${result.cartsChecked}, geändert: ${result.cartItemsChanged} · Kits: ${result.kitsSynced}/${result.kitsChecked}`,
+                void globalSync
+                  .mutateAsync()
+                  .then((result) => {
+                    setSyncResult(result);
+                    setSyncResultOpen(true);
+                    toast.message("Synchronisation abgeschlossen");
+                  })
+                  .catch(() => {
+                    toast.error("Die Synchronisation konnte nicht abgeschlossen werden. Bitte erneut versuchen.");
                   });
-                }).catch((error) => {
-                  toast.error(error instanceof Error ? error.message : "Sync fehlgeschlagen.");
-                });
               }}
             >
               Bestellungen & Warenkörbe synchronisieren
@@ -236,10 +244,18 @@ export default function AdminOrdersPage() {
             className="pl-8 text-sm"
           />
         </div>
-        <Select value={status} onValueChange={(v) => setStatus(v as "all" | OrderStatus)}>
-          <SelectTrigger className="w-full flex-1 text-sm sm:w-44 sm:flex-none">
-            <SelectValue />
-          </SelectTrigger>
+        <div className="w-full flex-1 sm:w-44 sm:flex-none">
+          <Label id="admin-orders-status-label" htmlFor="admin-orders-status" className="sr-only">
+            Bestellstatus
+          </Label>
+          <Select value={status} onValueChange={(v) => setStatus(v as "all" | OrderStatus)}>
+            <SelectTrigger
+              id="admin-orders-status"
+              className="w-full text-sm"
+              aria-labelledby="admin-orders-status-label"
+            >
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
           <SelectContent>
             {STATUS_FILTERS.map((item) => (
               <SelectItem key={item.value} value={item.value}>
@@ -247,11 +263,20 @@ export default function AdminOrdersPage() {
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
-        <Select value={payment} onValueChange={setPayment}>
-          <SelectTrigger className="w-full flex-1 text-sm sm:w-44 sm:flex-none">
-            <SelectValue />
-          </SelectTrigger>
+          </Select>
+        </div>
+        <div className="w-full flex-1 sm:w-44 sm:flex-none">
+          <Label id="admin-orders-payment-label" htmlFor="admin-orders-payment" className="sr-only">
+            Zahlungsmethode
+          </Label>
+          <Select value={payment} onValueChange={setPayment}>
+            <SelectTrigger
+              id="admin-orders-payment"
+              className="w-full text-sm"
+              aria-labelledby="admin-orders-payment-label"
+            >
+              <SelectValue placeholder="Zahlung" />
+            </SelectTrigger>
           <SelectContent>
             {PAYMENT_FILTERS.map((item) => (
               <SelectItem key={item.value} value={item.value}>
@@ -259,11 +284,16 @@ export default function AdminOrdersPage() {
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
-        <Select value={shopArea} onValueChange={setShopArea}>
-          <SelectTrigger className="w-full flex-1 text-sm sm:w-44 sm:flex-none">
-            <SelectValue />
-          </SelectTrigger>
+          </Select>
+        </div>
+        <div className="w-full flex-1 sm:w-44 sm:flex-none">
+          <Label id="admin-orders-area-label" htmlFor="admin-orders-area" className="sr-only">
+            Shop-Bereich
+          </Label>
+          <Select value={shopArea} onValueChange={setShopArea}>
+            <SelectTrigger id="admin-orders-area" className="w-full text-sm" aria-labelledby="admin-orders-area-label">
+              <SelectValue placeholder="Bereich" />
+            </SelectTrigger>
           <SelectContent>
             {shopAreaFilters.map((item) => (
               <SelectItem key={item.value} value={item.value}>
@@ -271,7 +301,8 @@ export default function AdminOrdersPage() {
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
+          </Select>
+        </div>
       </div>
 
       {/* States */}
@@ -470,6 +501,12 @@ export default function AdminOrdersPage() {
           )}
         </div>
       )}
+
+      <AdminGlobalSyncResultDialog
+        open={syncResultOpen}
+        onOpenChange={setSyncResultOpen}
+        result={syncResult}
+      />
     </div>
   );
 }

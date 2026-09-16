@@ -125,12 +125,12 @@
   --card-foreground: 0 0% 5%;
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 5%;
-  --primary: 38 55% 42%;
+  --primary: 38 58% 32%;
   --primary-foreground: 0 0% 100%;
   --secondary: 36 15% 93%;
   --secondary-foreground: 0 0% 8%;
   --muted: 36 12% 91%;
-  --muted-foreground: 0 0% 35%;
+  --muted-foreground: 0 0% 32%;
   --accent: 38 46% 52%;
   --accent-foreground: 0 0% 100%;
   --border: 35 10% 87%;
@@ -146,6 +146,16 @@
   /* Force color inheritance from admin scope, not from dark-mode body */
   color: hsl(var(--foreground));
   background-color: hsl(var(--background));
+}
+
+/* WCAG AA: status badges on light admin surfaces */
+[data-admin] span.border-transparent.bg-warning\/10.text-warning {
+  background-color: hsl(36 55% 90%);
+  color: hsl(36 62% 26%);
+}
+
+[data-admin] .text-warning {
+  color: hsl(36 62% 26%);
 }
 
 @layer utilities {

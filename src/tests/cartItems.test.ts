@@ -34,7 +34,7 @@ vi.mock("@/lib/supabaseClient", () => ({
   },
 }));
 
-const { mergeDuplicateCartItems } = await import("@/services/cartItems");
+const { mergeDuplicateCartItems, updateCartItemQuantity } = await import("@/services/cartItems");
 
 function makeItem(overrides: Partial<Tables<"cart_items">>): Tables<"cart_items"> {
   const now = new Date().toISOString();
@@ -127,5 +127,12 @@ describe("mergeDuplicateCartItems", () => {
     await mergeDuplicateCartItems([keep]);
     expect(chain.update).not.toHaveBeenCalled();
     expect(chain.delete).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateCartItemQuantity", () => {
+  it("rejects kit share lines (allocation is synced server-side)", async () => {
+    const kitLine = makeItem({ kit_share_id: "kit-abc", quantity: 5 });
+    await expect(updateCartItemQuantity(kitLine, 1)).rejects.toThrow(/Kit-Anteilsmengen/);
   });
 });

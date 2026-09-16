@@ -294,11 +294,16 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
                     Seite {page} von {totalPages} · {openQuery.data.total} Gesuche
                   </p>
                   <div className="flex gap-2">
-                    <Button className="flex-1 sm:flex-none" variant="outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+                    <Button
+                      className="h-11 min-h-11 flex-1 sm:flex-none"
+                      variant="outline"
+                      disabled={page <= 1}
+                      onClick={() => setPage((p) => p - 1)}
+                    >
                       Zurück
                     </Button>
                     <Button
-                      className="flex-1 sm:flex-none"
+                      className="h-11 min-h-11 flex-1 sm:flex-none"
                       variant="outline"
                       disabled={page >= totalPages}
                       onClick={() => setPage((p) => p + 1)}
@@ -414,8 +419,8 @@ function StatusFilter({ value, onChange }: { value: string; onChange: (value: st
     <div className="max-w-xs space-y-1.5">
       <Label>Status</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="min-h-11 w-full">
-          <SelectValue />
+        <SelectTrigger className="min-h-11 w-full" aria-label="Status filtern">
+          <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Alle</SelectItem>

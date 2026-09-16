@@ -1,4 +1,5 @@
-import { Plus } from "lucide-react";
+import { Plus, ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { KIT_REQUEST_CREATE_LABEL } from "@/lib/kitRequests";
@@ -9,12 +10,14 @@ export function KitAreaActionNav({
   section,
   onSection,
   onCreate,
+  cartHref,
   canUseKitRequests = true,
   className,
 }: {
   section: "catalog" | "kits";
   onSection: (section: "catalog" | "kits") => void;
   onCreate: () => void;
+  cartHref?: string | null;
   canUseKitRequests?: boolean;
   className?: string;
 }) {
@@ -41,6 +44,14 @@ export function KitAreaActionNav({
             {KIT_REQUEST_CREATE_LABEL}
           </Button>
         </>
+      ) : null}
+      {cartHref ? (
+        <Button className="min-h-11" variant="outline" asChild>
+          <Link to={cartHref}>
+            <ShoppingCart className="h-4 w-4" />
+            Warenkorb
+          </Link>
+        </Button>
       ) : null}
     </nav>
   );

@@ -10,6 +10,7 @@ describe("Group Buy navigation and kit structure", () => {
   it("routes Group Buy 1 and 2 to GroupBuyPage (catalog + kits), /kit-gesuche redirects via KitRequestsPage", () => {
     const app = read("src/App.tsx");
     expect(app).toContain('path="/shop" element={<ShopHubPage />}');
+    expect(app).toContain('path="/shop/:slug/kit-gesuche" element={<ShopAreaPage />}');
     expect(app).toContain('path="/shop/:slug" element={<ShopAreaPage />}');
     expect(app).toContain('path="/kit-gesuche" element={<KitRequestsPage />}');
     expect(read("src/components/layout/Sidebar.tsx")).toContain("useCustomerNavItems");
