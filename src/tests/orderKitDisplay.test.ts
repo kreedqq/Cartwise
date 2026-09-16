@@ -82,19 +82,32 @@ describe("orderKitDisplay snapshots", () => {
 });
 
 describe("formatHistoricalOrderItemQuantity", () => {
-  it("shows vial counts for group-buy catalog lines without kit snapshot", () => {
+  it("shows kit counts for group-buy catalog lines without kit snapshot", () => {
     expect(formatHistoricalOrderItemQuantity(item({ quantity: 1, product_code_snapshot: "AD10", product_name_snapshot: "Adamax" }))).toBe(
-      "1 Vial",
+      "1 Kit",
     );
     expect(formatHistoricalOrderItemQuantity(item({ quantity: 4, product_code_snapshot: "KP10", product_name_snapshot: "KPV" }))).toBe(
-      "4 Vials",
+      "4 Kits",
     );
     expect(formatHistoricalOrderItemQuantity(item({ quantity: 7, product_code_snapshot: "SM10", product_name_snapshot: "Semax" }))).toBe(
-      "7 Vials",
+      "7 Kits",
     );
   });
 
-  it("does not infer kit from quantity when kit_share_id_snapshot is missing", () => {
+  it("shows BA3 as kits when variant declares 10 vials per kit", () => {
+    expect(
+      formatHistoricalOrderItemQuantity(
+        item({
+          quantity: 2,
+          product_code_snapshot: "BA3",
+          product_name_snapshot: "BAC Water",
+          dosage_vial_snapshot: "3ml*10vials",
+        }),
+      ),
+    ).toBe("2 Kits");
+  });
+
+  it("ignores kit_size snapshot without kit_share_id_snapshot", () => {
     expect(
       formatHistoricalOrderItemQuantity(
         item({
@@ -104,17 +117,7 @@ describe("formatHistoricalOrderItemQuantity", () => {
           product_name_snapshot: "KPV",
         }),
       ),
-    ).toBe("4 Vials");
-    expect(
-      formatHistoricalOrderItemQuantity(
-        item({
-          quantity: 1,
-          kit_size_vials_snapshot: 10,
-          product_code_snapshot: "AD10",
-          product_name_snapshot: "Adamax",
-        }),
-      ),
-    ).toBe("1 Vial");
+    ).toBe("4 Kits");
   });
 
   it("shows kit fraction only with kit_share_id_snapshot", () => {

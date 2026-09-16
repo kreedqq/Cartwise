@@ -43,6 +43,8 @@ const AdminUsersPage = lazy(() => import("@/pages/admin/AdminUsers"));
 const AdminAuditLogPage = lazy(() => import("@/pages/admin/AdminAuditLog"));
 const AdminOrdersPage = lazy(() => import("@/pages/admin/AdminOrders"));
 const AdminCreateOrderForCustomerPage = lazy(() => import("@/pages/admin/AdminCreateOrderForCustomer"));
+const AdminCartsPage = lazy(() => import("@/pages/admin/AdminCarts"));
+const AdminCartDetailPage = lazy(() => import("@/pages/admin/AdminCartDetail"));
 const AdminOrderDetailPage = lazy(() => import("@/pages/admin/AdminOrderDetail"));
 const AdminOrderSummaryPage = lazy(() => import("@/pages/admin/AdminOrderSummary"));
 const AdminKitRequestsPage = lazy(() => import("@/pages/admin/AdminKitRequests"));
@@ -155,6 +157,8 @@ export default function App() {
                     <Route index element={<AdminDashboardPage />} />
                     <Route path="orders" element={<AdminOrdersPage />} />
                     <Route path="orders/create-for-customer" element={<AdminCreateOrderForCustomerPage />} />
+                    <Route path="carts" element={<AdminCartsPage />} />
+                    <Route path="carts/:cartId" element={<AdminCartDetailPage />} />
                     <Route path="orders/:orderId" element={<AdminOrderDetailPage />} />
                     <Route path="order-summary" element={<AdminOrderSummaryPage />} />
                     <Route path="kit-requests" element={<AdminKitRequestsPage />} />

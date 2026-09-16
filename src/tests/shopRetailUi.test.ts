@@ -114,7 +114,7 @@ describe("admin Verkaufsbereiche", () => {
     expect(page).toContain("setAdminShopAreaProductCategory");
     expect(page).toContain("Zur Importkategorie zurücksetzen");
     expect(page).toContain("Kategorien");
-    expect(page).toContain("Manuelle Grundpreise für vorhandene Artikel behalten");
+    expect(page).toContain("Excel-Preise erzwingen");
     expect(page).toContain("Override entfernen");
     expect(page).toContain("Bereichs-%-Grundpreis");
     expect(page).toContain("base_price_factor_pct");

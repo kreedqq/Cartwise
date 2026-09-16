@@ -1918,6 +1918,56 @@ export interface Database {
         };
         Returns: Record<string, unknown>;
       };
+      admin_list_open_carts: {
+        Args: { _shop_area?: string | null; _search?: string | null };
+        Returns: unknown;
+      };
+      admin_get_open_cart_detail: { Args: { _cart_id: string }; Returns: Record<string, unknown> };
+      admin_update_open_cart_item_quantity: {
+        Args: { _cart_item_id: string; _quantity: number };
+        Returns: Record<string, unknown>;
+      };
+      admin_remove_open_cart_item: { Args: { _cart_item_id: string }; Returns: undefined };
+      admin_add_open_cart_catalog_line: {
+        Args: {
+          _cart_id: string;
+          _shop_area: string;
+          _vendor_code: string;
+          _product_id: string | null;
+          _quantity: number;
+        };
+        Returns: string;
+      };
+      admin_replace_open_cart_catalog_line: {
+        Args: {
+          _cart_item_id: string;
+          _shop_area: string;
+          _vendor_code: string;
+          _product_id: string | null;
+          _quantity: number;
+        };
+        Returns: string;
+      };
+      admin_checkout_open_cart: {
+        Args: {
+          _cart_id: string;
+          _note: string | null;
+          _payment_method: string;
+          _shipping_first_name: string;
+          _shipping_last_name: string;
+          _shipping_street: string | null;
+          _shipping_house_number: string | null;
+          _shipping_address_extra: string | null;
+          _shipping_postal_code: string;
+          _shipping_city: string;
+          _shipping_country: string;
+          _shipping_delivery_method: string;
+          _shipping_packstation_number: string | null;
+          _shipping_post_number: string | null;
+        };
+        Returns: Record<string, unknown>;
+      };
+      admin_sync_orders_and_carts: { Args: Record<string, never>; Returns: Record<string, unknown> };
       admin_link_cart_item_submitted_order: {
         Args: { _cart_item_id: string; _reason: string };
         Returns: {

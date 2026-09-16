@@ -37,6 +37,8 @@ import { formatShopAreaLabel } from "@/lib/shop/shopAreas";
 import { EmergencyMaintenanceButton } from "@/components/admin/EmergencyMaintenanceButton";
 import { listAdminShopAreas } from "@/services/shopAreas";
 import type { OrderStatus } from "@/types/database";
+import { useAdminGlobalSync } from "@/hooks/useAdminCarts";
+import { toast } from "@/components/ui/toaster";
 
 const STATUS_FILTERS: Array<{ value: "all" | OrderStatus; label: string }> = [
   { value: "all", label: "Alle Status" },
@@ -61,6 +63,7 @@ export default function AdminOrdersPage() {
   const membershipQuery = useOrderGroupMemberships();
   const surchargeQuery = useQuery({ queryKey: QUERY_KEYS.adminRoleSurcharges, queryFn: listRoleSurchargeLines });
   const areasQuery = useQuery({ queryKey: QUERY_KEYS.adminShopAreas, queryFn: listAdminShopAreas });
+  const globalSync = useAdminGlobalSync();
   const [search, setSearch] = React.useState("");
   const [status, setStatus] = React.useState<"all" | OrderStatus>("all");
   const [payment, setPayment] = React.useState("all");
@@ -198,6 +201,22 @@ export default function AdminOrdersPage() {
             <EmergencyMaintenanceButton />
             <Button variant="default" size="sm" onClick={() => navigate("/admin/orders/create-for-customer")}>
               Bestellung für Kunden erstellen
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              loading={globalSync.isPending}
+              onClick={() => {
+                void globalSync.mutateAsync().then((result) => {
+                  toast.message("Synchronisation abgeschlossen", {
+                    description: `Warenkörbe: ${result.cartsChecked}, geändert: ${result.cartItemsChanged} · Kits: ${result.kitsSynced}/${result.kitsChecked}`,
+                  });
+                }).catch((error) => {
+                  toast.error(error instanceof Error ? error.message : "Sync fehlgeschlagen.");
+                });
+              }}
+            >
+              Bestellungen & Warenkörbe synchronisieren
             </Button>
             <Button variant="outline" size="sm" onClick={handleExport} disabled={filtered.length === 0}>
               <FileDown /> CSV-Export

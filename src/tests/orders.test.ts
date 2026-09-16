@@ -333,8 +333,8 @@ describe("order CSV / PDF snapshot source", () => {
       makeOrder({ shop_area: "group_buy_1" }),
       [makeItem({ product_code_snapshot: "SK10", product_name_snapshot: "Selank", quantity: 5 })],
     );
-    expect(peptideCatalog.items[0]?.quantityLabel).toBe("5 Vials");
-    expect(buildOrderPrintHtml(peptideCatalog)).toContain("5 Vials");
+    expect(peptideCatalog.items[0]?.quantityLabel).toBe("5 Kits");
+    expect(buildOrderPrintHtml(peptideCatalog)).toContain("5 Kits");
     expect(buildOrderPrintHtml(peptideCatalog)).not.toContain("/10 Kit");
 
     const peptideKit = toOrderExportDoc(makeOrder(), [

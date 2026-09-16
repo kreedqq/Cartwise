@@ -10,7 +10,7 @@ export interface SiteAccessState {
 
 export const DEFAULT_SITE_ACCESS_STATE: SiteAccessState = {
   maintenanceMode: false,
-  quantityDiscountsEnabled: true,
+  quantityDiscountsEnabled: false,
   callerIsAdmin: false,
   siteAccessAllowed: true,
   paymentMethodFlags: null,

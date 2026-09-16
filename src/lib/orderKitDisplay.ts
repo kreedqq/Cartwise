@@ -63,5 +63,6 @@ export function formatHistoricalOrderItemQuantity(item: HistoricalOrderItemQuant
     code: item.product_code_snapshot,
     dosageVial: item.dosage_vial_snapshot,
   });
-  return formatCatalogQuantity(asQuantity(item.quantity), categoryId, "retail_unit");
+  // Standalone catalog lines (no kit share) use Kit nouns for peptide/water group-buy SKUs.
+  return formatCatalogQuantity(asQuantity(item.quantity), categoryId, "catalog");
 }

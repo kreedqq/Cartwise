@@ -55,6 +55,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       pathname.startsWith("/admin/shipping") ||
       pathname.startsWith("/admin/order-summary") ||
       pathname.startsWith("/admin/kit-requests") ||
+      pathname.startsWith("/admin/carts") ||
       pathname.startsWith("/admin/shipping-costs"),
     items: [
       {
@@ -62,6 +63,12 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         label: "Bestellungen",
         matchPrefix: true,
         description: "Bestellliste, Status, Tracking und Bestelldetails.",
+      },
+      {
+        to: "/admin/carts",
+        label: "Warenkörbe",
+        matchPrefix: true,
+        description: "Offene Kundenwarenkörbe verwalten und absenden.",
       },
       {
         to: "/admin/kit-requests",

@@ -39,6 +39,12 @@ import {
   type ShopPricingProfile,
 } from "@/lib/shop/shopAreas";
 import {
+  auditVendorCatalogAgainstShop,
+  LOCAL_QA_SEED_VENDOR_CODES,
+  summarizeVendorCatalogAudit,
+  type VendorCatalogAuditSummary,
+} from "@/lib/shop/vendorCatalogExcelAudit";
+import {
   matchVendorCatalogRows,
   vendorOverrideConflicts,
   type VendorCatalogMatchResult,
@@ -468,35 +474,78 @@ function VendorCatalogPanel({
   const [busy, setBusy] = React.useState(false);
   const [keepManuals, setKeepManuals] = React.useState(true);
   const [pending, setPending] = React.useState<{ file: File; result: VendorCatalogMatchResult } | null>(null);
+  const [auditSummary, setAuditSummary] = React.useState<VendorCatalogAuditSummary | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const auditInputRef = React.useRef<HTMLInputElement>(null);
 
   const conflicts = pending
     ? vendorOverrideConflicts(pending.result.matched, pricesQuery.data ?? [])
     : [];
 
-  async function onFile(file: File | undefined) {
-    if (!file) return;
+  async function parseVendorFile(file: File): Promise<VendorCatalogMatchResult> {
+    const parsed = await parseVendorCatalogFile(file);
+    return matchVendorCatalogRows(parsed.rows, products, categoriesQuery.data ?? []);
+  }
+
+  function validateVendorFile(file: File | undefined): file is File {
+    if (!file) return false;
     if (file.size > MAX_PDF_SIZE_BYTES) {
       toast.error("Datei ist größer als 10 MB.");
-      return;
+      return false;
     }
     if (!detectImportSourceKind(file.name)) {
       toast.error(`Erlaubt: ${ACCEPTED_IMPORT_LABEL}.`);
-      return;
+      return false;
     }
+    return true;
+  }
+
+  async function onFile(file: File | undefined) {
+    if (!validateVendorFile(file)) return;
     setBusy(true);
     try {
-      const parsed = await parseVendorCatalogFile(file);
-      setPending({
-        file,
-        result: matchVendorCatalogRows(parsed.rows, products, categoriesQuery.data ?? []),
-      });
+      const result = await parseVendorFile(file);
+      setPending({ file, result });
       setKeepManuals(true);
+      setAuditSummary(null);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Datei konnte nicht gelesen werden.");
     } finally {
       setBusy(false);
       if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  async function onAuditFile(file: File | undefined) {
+    if (!validateVendorFile(file)) return;
+    setBusy(true);
+    try {
+      const result = await parseVendorFile(file);
+      const productById = new Map(products.map((product) => [product.id, product]));
+      const summary = auditVendorCatalogAgainstShop(
+        areaKey,
+        result.matched,
+        catalogQuery.data ?? [],
+        pricesQuery.data ?? [],
+        productById,
+        { ignoreExtraVendorCodes: LOCAL_QA_SEED_VENDOR_CODES },
+      );
+      setAuditSummary(summary);
+      if (
+        summary.matched === summary.totalExcel &&
+        summary.priceMismatches === 0 &&
+        summary.variantMismatches === 0 &&
+        summary.extraInShop === 0
+      ) {
+        toast.success("Katalog stimmt mit Excel überein.");
+      } else {
+        toast.message("Katalog-Abweichungen gefunden.", { description: summarizeVendorCatalogAudit(summary) });
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Excel-Prüfung fehlgeschlagen.");
+    } finally {
+      setBusy(false);
+      if (auditInputRef.current) auditInputRef.current.value = "";
     }
   }
 
@@ -508,8 +557,8 @@ function VendorCatalogPanel({
         vendor_code: entry.code,
         product_id: entry.product_id,
         price_usd: entry.price_usd,
-        bulk_price_usd: entry.bulk_price_usd,
-        bulk_price_min_quantity: entry.bulk_price_min_quantity,
+        bulk_price_usd: null,
+        bulk_price_min_quantity: null,
         vendor_name: entry.name,
         vendor_dosage: entry.dosage_vial,
         vendor_raw: entry.vendor_raw,
@@ -597,7 +646,7 @@ function VendorCatalogPanel({
                 </p>
                 <label className="flex items-center gap-2 text-sm">
                   <Checkbox checked={keepManuals} onCheckedChange={(checked) => setKeepManuals(checked === true)} />
-                  Manuelle Grundpreise für vorhandene Artikel behalten
+                  Manuelle Grundpreise behalten (deaktivieren = Excel-Preise erzwingen)
                 </label>
                 <p className="text-xs text-muted-foreground">
                   {keepManuals
@@ -619,12 +668,110 @@ function VendorCatalogPanel({
           </div>
         )}
 
+        {auditSummary && (
+          <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-4 text-sm">
+            <p className="font-medium">Katalog gegen Excel (Read-only)</p>
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+              <div className="flex justify-between gap-2">
+                <dt className="text-muted-foreground">Excel Artikel</dt>
+                <dd className="font-medium tabular-nums">{auditSummary.totalExcel}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-muted-foreground">Treffer</dt>
+                <dd className="font-medium tabular-nums">{auditSummary.matched}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-muted-foreground">Preisabweichungen</dt>
+                <dd className="font-medium tabular-nums">{auditSummary.priceMismatches}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-muted-foreground">Variantenabweichungen</dt>
+                <dd className="font-medium tabular-nums">{auditSummary.variantMismatches}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-muted-foreground">Produktabweichungen</dt>
+                <dd className="font-medium tabular-nums">{auditSummary.productMismatches}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-muted-foreground">Fehlend</dt>
+                <dd className="font-medium tabular-nums">{auditSummary.missingInShop}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-muted-foreground">Duplikate</dt>
+                <dd className="font-medium tabular-nums">{auditSummary.duplicatesInShop}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-muted-foreground">Extra (Business)</dt>
+                <dd className="font-medium tabular-nums">{auditSummary.extraInShop}</dd>
+              </div>
+              {auditSummary.qaFixtureExtras > 0 ? (
+                <div className="flex justify-between gap-2 sm:col-span-2">
+                  <dt className="text-muted-foreground">QA Testdaten</dt>
+                  <dd className="font-medium tabular-nums">{auditSummary.qaFixtureExtras}</dd>
+                </div>
+              ) : null}
+            </dl>
+            <p className="text-xs text-muted-foreground">{summarizeVendorCatalogAudit(auditSummary)}</p>
+            {auditSummary.lines.some((line) => line.status !== "MATCH") && (
+              <div className="max-h-48 overflow-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Code</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Excel</TableHead>
+                      <TableHead>Shop</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {auditSummary.lines
+                      .filter(
+                        (line) =>
+                          line.status !== "MATCH" &&
+                          !(
+                            line.status === "EXTRA_IN_SHOP" &&
+                            LOCAL_QA_SEED_VENDOR_CODES.has(line.code.toUpperCase())
+                          ),
+                      )
+                      .slice(0, 40)
+                      .map((line) => (
+                        <TableRow key={`${line.code}-${line.status}`}>
+                          <TableCell>{line.code}</TableCell>
+                          <TableCell>{line.status}</TableCell>
+                          <TableCell>
+                            {line.excelPriceUsd != null ? formatUsd(line.excelPriceUsd) : "—"} · {line.excelVariant ?? "—"}
+                          </TableCell>
+                          <TableCell>
+                            {line.shopPriceUsd != null ? formatUsd(line.shopPriceUsd) : "—"} · {line.shopVariant ?? "—"}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+                {auditSummary.lines.filter((line) => line.status !== "MATCH").length > 40 ? (
+                  <p className="pt-2 text-xs text-muted-foreground">Weitere Abweichungen ausgeblendet.</p>
+                ) : null}
+              </div>
+            )}
+          </div>
+        )}
+
         <input
           ref={inputRef}
           type="file"
           accept={ACCEPTED_IMPORT_ACCEPT}
           className="hidden"
           onChange={(event) => void onFile(event.target.files?.[0])}
+        />
+        <input
+          id="vendor-catalog-audit-file"
+          ref={auditInputRef}
+          type="file"
+          accept={ACCEPTED_IMPORT_ACCEPT}
+          className="sr-only"
+          tabIndex={-1}
+          aria-hidden
+          onChange={(event) => void onAuditFile(event.target.files?.[0])}
         />
         <div className="flex flex-wrap gap-2">
           {pending ? (
@@ -643,6 +790,15 @@ function VendorCatalogPanel({
               </Button>
               <Button type="button" variant="outline" disabled={!docQuery.data || busy} onClick={() => void openCurrent()}>
                 Anzeigen
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={busy || catalogQuery.isLoading}
+                onClick={() => auditInputRef.current?.click()}
+                aria-controls="vendor-catalog-audit-file"
+              >
+                Katalog gegen Excel prüfen
               </Button>
             </>
           )}

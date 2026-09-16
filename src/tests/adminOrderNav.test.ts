@@ -83,6 +83,7 @@ describe("hub admin navigation", () => {
     const orders = ADMIN_NAV_GROUPS.find((group) => group.id === "orders");
     expect(orders?.items.map((item) => item.label)).toEqual([
       "Bestellungen",
+      "Warenkörbe",
       "Kit Gesuche",
       "Bestellzusammenfassung",
       "Versand",

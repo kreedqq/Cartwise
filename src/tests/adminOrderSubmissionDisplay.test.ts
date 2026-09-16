@@ -80,9 +80,14 @@ describe("admin order submission display", () => {
   it("uses order_items only for historical quantity labels", () => {
     expect(
       formatHistoricalOrderItemQuantity(
-        orderItem({ product_code_snapshot: "BA3", product_name_snapshot: "BAC Water", quantity: 2 }),
+        orderItem({
+          product_code_snapshot: "BA3",
+          product_name_snapshot: "BAC Water",
+          dosage_vial_snapshot: "3ml*10vials",
+          quantity: 2,
+        }),
       ),
-    ).toBe("2 Vials");
+    ).toBe("2 Kits");
     expect(
       formatHistoricalOrderItemQuantity(
         orderItem({
@@ -99,7 +104,7 @@ describe("admin order submission display", () => {
 
   it("keeps PDF and CSV on historical order_items only", () => {
     const items = [
-      orderItem(),
+      orderItem({ dosage_vial_snapshot: "3ml*10vials" }),
       orderItem({
         id: "oi-2",
         position: 1,
@@ -116,9 +121,9 @@ describe("admin order submission display", () => {
     const doc = toOrderExportDoc(makeOrder(), items, undefined, null, { audience: "admin" });
     expect(doc.items).toHaveLength(2);
     expect(doc.total_usd).toBe(37.32);
-    expect(doc.items.map((i) => i.quantityLabel)).toEqual(["2 Vials", "2/10 Kit"]);
+    expect(doc.items.map((i) => i.quantityLabel)).toEqual(["2 Kits", "2/10 Kit"]);
     const csv = buildOrderCsv(doc);
-    expect(csv).toContain("2 Vials");
+    expect(csv).toContain("2 Kits");
     expect(csv).toContain("2/10 Kit");
     expect(csv).not.toContain("KP10");
     expect(csv).not.toContain("5/10 Kit");
