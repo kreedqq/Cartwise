@@ -146,7 +146,7 @@ export default function AdminKitRequestsPage() {
                     </TableCell>
                     <TableCell className="tabular-nums">
                       <Link to={`/admin/kit-requests/${item.id}`} className="block">
-                        {item.allocatedTotal}/{item.kitSizeVials}
+                        {item.allocatedTotal} / {item.kitSizeVials}
                         <span className="block text-xs text-muted-foreground">
                           {item.remainingVials} frei · {item.participantCount} TN
                         </span>

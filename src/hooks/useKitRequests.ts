@@ -48,17 +48,17 @@ export function useOpenKitRequests(filters: OpenKitRequestFilters) {
   });
 }
 
-export function useMyKitRequests(shopArea: string) {
+export function useMyKitRequests(shopArea?: string | null) {
   return useQuery({
-    queryKey: [...QUERY_KEYS.myKitRequests, shopArea],
-    queryFn: () => listMyKitRequests(shopArea),
+    queryKey: [...QUERY_KEYS.myKitRequests, shopArea ?? null],
+    queryFn: () => listMyKitRequests(shopArea ?? null),
   });
 }
 
-export function useMyKitRequestParticipations(shopArea: string) {
+export function useMyKitRequestParticipations(shopArea?: string | null) {
   return useQuery({
-    queryKey: [...QUERY_KEYS.myKitRequestParticipations, shopArea],
-    queryFn: () => listMyKitRequestParticipations(shopArea),
+    queryKey: [...QUERY_KEYS.myKitRequestParticipations, shopArea ?? null],
+    queryFn: () => listMyKitRequestParticipations(shopArea ?? null),
   });
 }
 

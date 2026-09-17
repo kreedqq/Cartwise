@@ -16,7 +16,8 @@ describe("kit customer UX", () => {
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain('kitRequestActionLabel("join")');
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("kitRequestActionLabel");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Kit verlassen");
-    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Vials vergeben");
+    // "Vials vergeben" ARIA label now lives in KitProgress.tsx (the dedicated progress component)
+    expect(read("src/components/kit-requests/KitProgress.tsx")).toContain("Vials vergeben");
     expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Mitmachen");
     expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Dein Gesamtpreis");
     expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Noch verfügbar");
@@ -31,7 +32,7 @@ describe("kit customer UX", () => {
     expect(read("src/lib/kitRequests.ts")).toContain("overflow-x-auto");
     expect(read("src/pages/GroupBuy.tsx")).toContain("KIT_REQUEST_TABS_LIST_CLASS");
     expect(read("src/pages/GroupBuy.tsx")).toContain("KitAreaActionNav");
-    expect(read("src/pages/GroupBuy.tsx")).toContain("AREA_PAGE_NAV_SLOT");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("KitMarketplaceHero");
     expect(read("src/pages/GroupBuy.tsx")).toContain("AREA_PAGE_CONTENT_SLOT");
     expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("Warenkorb");
     expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("KitAreaActionNav");
@@ -48,10 +49,14 @@ describe("kit customer UX", () => {
     expect(read("src/components/kit-requests/KitRequestIntro.tsx")).toContain("KIT_REQUEST_CREATE_LABEL");
     expect(read("src/pages/GroupBuy.tsx")).not.toContain("+ Kit Gesuch");
     expect(read("src/pages/KitRequests.tsx")).not.toContain("+ Kit Gesuch");
-    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("{request.allocatedTotal} / {request.kitSizeVials}");
+    // Fraction is now rendered by KitProgress; card passes the raw data through as props
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("allocated={request.allocatedTotal}");
+    expect(read("src/components/kit-requests/KitProgress.tsx")).toContain("{allocated}");
+    expect(read("src/components/kit-requests/KitProgress.tsx")).toContain("{kitSize}");
     expect(read("src/pages/GroupBuy.tsx")).toContain("Keine offenen Kit Gesuche");
     expect(read("src/pages/KitRequests.tsx")).toContain("Keine offenen Kit Gesuche");
-    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Noch ${request.remainingVials} Plätze");
+    // "freie Plätze" wording is more descriptive than "Plätze" — updated label
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Noch ${request.remainingVials}");
     expect(read("src/pages/KitRequests.tsx")).toContain("parseAreaTheme");
     expect(read("src/pages/GroupBuy.tsx")).toContain("Ja, Anteil freigeben");
     expect(read("src/pages/KitRequests.tsx")).toContain("Ja, Anteil freigeben");
@@ -70,7 +75,7 @@ describe("kit customer UX", () => {
     expect(filter).toContain("Produkt suchen …");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("getProductUnitLabel");
     expect(read("src/pages/GroupBuy.tsx")).toContain("AREA_PAGE_RHYTHM");
-    expect(read("src/pages/GroupBuy.tsx")).toContain("AREA_GROUP_BUY_DESCRIPTION");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("KitMarketplaceHero");
     expect(card).toContain("min-h-11 w-full");
     expect(card).toContain("min-w-0");
     expect(read("src/lib/kitRequests.ts")).toContain("grid-cols-1");

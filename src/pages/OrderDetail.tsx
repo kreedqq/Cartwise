@@ -20,8 +20,9 @@ import { useOrderTemplateMutations } from "@/hooks/useOrderTemplates";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { OrderShippingCard } from "@/components/orders/OrderShippingCard";
+import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import { downloadOrderCsv, printOrderDocument, toOrderExportDoc } from "@/lib/orderExport";
-import { formatDateTime, formatEur, formatUsd, summarizeOrderCharges } from "@/lib/money";
+import { formatDateTime, summarizeOrderCharges } from "@/lib/money";
 import { formatHistoricalOrderItemQuantity } from "@/lib/orderKitDisplay";
 import { DEFAULT_SHOP_AREA, formatShopAreaLabel, isShopAreaKey } from "@/lib/shop/shopAreas";
 import { PAYMENT_METHOD_LABELS, isPaymentMethod } from "@/lib/shop/paymentMethod";
@@ -36,7 +37,7 @@ export default function OrderDetailPage() {
   const progressQuery = useOrderProgress(orderId);
   const rateQuery = useExchangeRate();
   const reorderArea = isShopAreaKey(orderQuery.data?.shop_area) ? orderQuery.data.shop_area : DEFAULT_SHOP_AREA;
-  const { addManyToActiveCart } = useShopCart(reorderArea);
+  const { addManyToActiveCart, activeCart } = useShopCart(reorderArea);
   const templates = useOrderTemplateMutations();
   const [templateName, setTemplateName] = React.useState("");
   const [reordering, setReordering] = React.useState(false);
@@ -65,7 +66,9 @@ export default function OrderDetailPage() {
           description: unavailable.map((i) => i.product_code_input).join(", "),
         });
       }
-      navigate("/dashboard");
+      // Navigate directly to cart instead of dashboard
+      const cartId = items[0]?.cart_id ?? activeCart?.id;
+      navigate(cartId ? `/carts/${cartId}` : "/orders");
     } catch (error) {
       console.error("Erneut bestellen fehlgeschlagen:", error);
       toast.error("Die Bestellung konnte nicht übernommen werden.");
@@ -135,10 +138,8 @@ export default function OrderDetailPage() {
                 <TableHead className="hidden sm:table-cell">Code</TableHead>
                 <TableHead>Artikel</TableHead>
                 <TableHead className="text-right">Menge</TableHead>
-                <TableHead className="hidden sm:table-cell">Preisart</TableHead>
                 <TableHead className="text-right">Einzelpreis</TableHead>
-                <TableHead className="text-right">Gesamt USD</TableHead>
-                <TableHead className="hidden sm:table-cell text-right">Gesamt EUR</TableHead>
+                <TableHead className="text-right">Gesamt</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -154,13 +155,21 @@ export default function OrderDetailPage() {
                   <TableCell className="text-right tabular-nums">
                     {formatHistoricalOrderItemQuantity(item)}
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell text-xs">
-                    {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normalpreis"}
+                  <TableCell className="text-right">
+                    <DualCurrencyPrice
+                      usd={item.unit_price_usd_snapshot}
+                      rate={order.exchange_rate}
+                      size="compact"
+                      align="right"
+                    />
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">{formatUsd(item.unit_price_usd_snapshot)}</TableCell>
-                  <TableCell className="text-right tabular-nums font-medium">{formatUsd(item.line_total_usd)}</TableCell>
-                  <TableCell className="hidden sm:table-cell text-right tabular-nums text-primary">
-                    {item.eur_value_snapshot != null ? formatEur(item.eur_value_snapshot) : "—"}
+                  <TableCell className="text-right">
+                    <DualCurrencyPrice
+                      usd={item.line_total_usd}
+                      eur={item.eur_value_snapshot}
+                      size="compact"
+                      align="right"
+                    />
                   </TableCell>
                 </TableRow>
               ))}

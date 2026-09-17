@@ -1,4 +1,5 @@
 ﻿import * as React from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
@@ -79,11 +80,20 @@ import type { Tables } from "@/types/database";
 
 export default function AdminShopAreasPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { areaKey: urlAreaKey } = useParams<{ areaKey?: string }>();
   const areasQuery = useQuery({ queryKey: QUERY_KEYS.adminShopAreas, queryFn: listAdminShopAreas });
   const accessQuery = useQuery({ queryKey: [...QUERY_KEYS.adminShopAreas, "access"], queryFn: listAdminShopAreaRoleAccess });
   const rolesQuery = useQuery({ queryKey: ["customer-roles"], queryFn: listCustomerRoles });
   const productsQuery = useQuery({ queryKey: ["admin-products"], queryFn: () => listAllProducts() });
-  const [areaKey, setAreaKey] = React.useState<ShopAreaKey>("shop");
+  // Derive areaKey directly from URL — makes the route `/admin/shop-areas/:key` shareable
+  // and browser-back-aware with no local state needed.
+  const areaKey: ShopAreaKey = isShopAreaKey(urlAreaKey ?? "") ? (urlAreaKey as ShopAreaKey) : "shop";
+
+  // Navigate to update the URL (and thereby re-derive areaKey)
+  function setAreaKey(key: ShopAreaKey) {
+    navigate(`/admin/shop-areas/${key}`, { replace: true });
+  }
   const [createOpen, setCreateOpen] = React.useState(false);
 
   async function invalidate() {

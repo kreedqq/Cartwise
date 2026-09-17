@@ -1,16 +1,17 @@
-import { useNavigate } from "react-router-dom";
-import { ClipboardList } from "lucide-react";
+import { ArrowRight, ClipboardList } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { useMyOrders } from "@/hooks/useOrders";
+import { PAGE_BLEED_PAD, PAGE_BLEED_TOP, UI_TYPE } from "@/lib/design/tokens";
 import { formatDateTime, summarizeOrderCharges } from "@/lib/money";
 import { formatShopAreaLabel } from "@/lib/shop/shopAreas";
-import { PageHeader } from "@/components/common/PageHeader";
 import { OrderIdentity } from "@/components/orders/OrderIdentity";
+import { cn } from "@/lib/utils";
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -18,11 +19,17 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        eyebrow="Historie"
-        title="Meine Bestellungen"
-        description="Alle abgeschickten Bestellungen mit Status und Gesamt Endpreis inkl. Versand."
-      />
+      <section className={cn(PAGE_BLEED_TOP, "border-b border-border/70")}>
+        <div className={cn(PAGE_BLEED_PAD, "py-10")}>
+          <p className={UI_TYPE.eyebrow}>Historie</p>
+          <h1 className="mt-2 font-display text-[clamp(2rem,4vw,3.2rem)] font-semibold tracking-tight">
+            Meine Bestellungen
+          </h1>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
+            Status, Fortschritt und Gesamtpreis inkl. Versand.
+          </p>
+        </div>
+      </section>
 
       {ordersQuery.isLoading && (
         <div className="space-y-2">
@@ -41,19 +48,26 @@ export default function OrdersPage() {
           icon={ClipboardList}
           title="Du hast noch keine Bestellungen."
           description="Lege Artikel in den Warenkorb und sende die erste Bestellung ab."
+          action={
+            <Button asChild size="sm">
+              <Link to="/shop">Zum Shop →</Link>
+            </Button>
+          }
         />
       )}
 
       {ordersQuery.data && ordersQuery.data.length > 0 && (
-        <div className="space-y-2">
+        <ol className="divide-y divide-border border-y border-border">
           {ordersQuery.data.map((order) => (
-            <Card
-              key={order.id}
-              className="cursor-pointer transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-md"
-              onClick={() => navigate(`/orders/${order.id}`)}
-            >
-              <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
-                <div>
+            <li key={order.id}>
+              <button
+                type="button"
+                className="group flex w-full items-center gap-4 py-4 text-left transition-colors hover:bg-secondary/30"
+                onClick={() => navigate(`/orders/${order.id}`)}
+              >
+                <span className="hidden h-12 w-px shrink-0 bg-primary sm:block" />
+                <OrderStatusBadge status={order.status} />
+                <div className="min-w-0 flex-1">
                   <OrderIdentity
                     orderNumber={order.order_number}
                     telegramSnapshot={order.telegram_username_snapshot}
@@ -63,28 +77,24 @@ export default function OrdersPage() {
                     {order.shop_area ? ` · ${formatShopAreaLabel(order.shop_area)}` : ""}
                   </p>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="text-sm font-semibold tabular-nums">
-                      {
-                        summarizeOrderCharges({
-                          productUsd: order.total_usd,
-                          productEur: order.total_eur,
-                          chinaAmount: order.china_shipping_amount,
-                          chinaCurrency: order.china_shipping_currency,
-                          deAmount: order.de_shipping_amount,
-                          deCurrency: order.de_shipping_currency,
-                          usdToEurRate: order.exchange_rate,
-                        }).grandDisplay
-                      }
-                    </p>
-                  </div>
-                  <OrderStatusBadge status={order.status} />
-                </div>
-              </CardContent>
-            </Card>
+                <p className="shrink-0 font-display text-base font-semibold tabular-nums">
+                  {
+                    summarizeOrderCharges({
+                      productUsd: order.total_usd,
+                      productEur: order.total_eur,
+                      chinaAmount: order.china_shipping_amount,
+                      chinaCurrency: order.china_shipping_currency,
+                      deAmount: order.de_shipping_amount,
+                      deCurrency: order.de_shipping_currency,
+                      usdToEurRate: order.exchange_rate,
+                    }).grandDisplay
+                  }
+                </p>
+                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/40 group-hover:text-primary" />
+              </button>
+            </li>
           ))}
-        </div>
+        </ol>
       )}
     </div>
   );

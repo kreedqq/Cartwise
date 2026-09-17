@@ -1,5 +1,7 @@
-import { Search } from "lucide-react";
+import * as React from "react";
+import { Filter, Search, X } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -12,6 +14,7 @@ import {
 import type { KitRequestSort } from "@/lib/kitRequests";
 import { formatProductVariant } from "@/lib/shop/variantCoverage";
 import type { ShopProductGroup } from "@/lib/shop/display";
+import { cn } from "@/lib/utils";
 
 interface CategoryOption {
   category_key: string;
@@ -37,10 +40,104 @@ interface KitRequestFilterBarProps {
   onSort: (value: KitRequestSort) => void;
 }
 
-export function KitRequestFilterBar({
-  searchId,
-  search,
-  onSearch,
+export function KitRequestFilterBar(props: KitRequestFilterBarProps) {
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+
+  const activeFilterCount = [
+    props.category != null,
+    props.productName != null,
+    props.variant != null,
+    props.minRemaining != null,
+    props.sort !== "newest",
+  ].filter(Boolean).length;
+
+  return (
+    <>
+      {/* ── Search (always visible) ──────────────────────────────────────── */}
+      <div className="flex min-w-0 items-center gap-2">
+        <div className="relative min-w-0 flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            id={props.searchId}
+            value={props.search}
+            onChange={(event) => props.onSearch(event.target.value)}
+            placeholder="Produkt suchen …"
+            className="min-h-11 pl-10"
+            aria-label="Produkt suchen"
+          />
+        </div>
+
+        {/* ── Mobile filter trigger ─────────────────────────────────────── */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="relative h-11 shrink-0 gap-1.5 sm:hidden"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Filter öffnen"
+        >
+          <Filter className="h-4 w-4" aria-hidden="true" />
+          Filter
+          {activeFilterCount > 0 && (
+            <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+              {activeFilterCount}
+            </span>
+          )}
+        </Button>
+      </div>
+
+      {/* ── Desktop filter grid (hidden on mobile) ───────────────────────── */}
+      <div className="hidden sm:block">
+        <FilterGrid {...props} />
+      </div>
+
+      {/* ── Mobile bottom-sheet ──────────────────────────────────────────── */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 sm:hidden" role="dialog" aria-modal="true" aria-label="Filter">
+          {/* Backdrop */}
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/60"
+            aria-label="Filter schließen"
+            onClick={() => setMobileOpen(false)}
+          />
+          {/* Sheet */}
+          <div className="absolute inset-x-0 bottom-0 flex flex-col rounded-t-2xl bg-background pb-6 shadow-elevated">
+            {/* Handle + header */}
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div className="mx-auto h-1 w-10 rounded-full bg-border" aria-hidden="true" />
+            </div>
+            <div className="flex items-center justify-between px-4 pb-2 pt-3">
+              <h2 className="text-base font-semibold">Filter</h2>
+              <Button type="button" variant="ghost" size="icon" onClick={() => setMobileOpen(false)} aria-label="Filter schließen">
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Filter controls */}
+            <div className="overflow-y-auto px-4 pb-6">
+              <FilterGrid {...props} />
+            </div>
+
+            {/* Apply button */}
+            <div className="border-t border-border px-4 py-3">
+              <Button className="w-full" size="lg" onClick={() => setMobileOpen(false)}>
+                Filter anwenden
+                {activeFilterCount > 0 && ` (${activeFilterCount} aktiv)`}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * The actual filter controls — rendered inline on desktop,
+ * rendered inside the bottom-sheet on mobile.
+ */
+function FilterGrid({
   category,
   onCategory,
   categories,
@@ -54,21 +151,10 @@ export function KitRequestFilterBar({
   onMinRemaining,
   sort,
   onSort,
-}: KitRequestFilterBarProps) {
+}: Omit<KitRequestFilterBarProps, "searchId" | "search" | "onSearch">) {
   return (
-    <div className="min-w-0 space-y-3">
-      <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          id={searchId}
-          value={search}
-          onChange={(event) => onSearch(event.target.value)}
-          placeholder="Produkt suchen …"
-          className="min-h-11 pl-10"
-          aria-label="Produkt suchen"
-        />
-      </div>
-      <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="space-y-3">
+      <div className={cn("grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4")}>
         <FilterSelect
           label="Kategorie"
           value={category ?? "all"}

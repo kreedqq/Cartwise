@@ -39,7 +39,7 @@ export function CartSummaryBar(props: CartSummaryBarProps) {
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        className="fixed inset-x-0 bottom-16 z-30 flex items-center justify-between border-t border-border bg-card/95 px-4 py-3 text-left shadow-[0_-4px_12px_rgba(0,0,0,0.06)] backdrop-blur lg:hidden"
+        className="fixed inset-x-0 bottom-16 z-30 flex items-center justify-between border-t border-border bg-card/95 px-4 py-3 text-left shadow-bottom-bar backdrop-blur lg:hidden"
       >
         <div>
           <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Gesamt</p>

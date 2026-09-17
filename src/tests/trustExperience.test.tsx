@@ -241,7 +241,7 @@ describe("responsive trust surfaces", () => {
     expect(read("src/pages/Feedback.tsx")).toContain("sm:grid-cols-2");
     expect(read("src/pages/Feedback.tsx")).toContain("xl:grid-cols-3");
     expect(read("src/pages/admin/AdminFeedback.tsx")).toContain("xl:grid-cols-2");
-    expect(read("src/services/auth.ts")).toContain('POST_LOGIN_PATH = "/announcements"');
+    expect(read("src/services/auth.ts")).toContain('POST_LOGIN_PATH = "/dashboard"');
     expect(read("src/components/media/MediaFrame.tsx")).toContain("aspect-[4/3]");
   });
 

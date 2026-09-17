@@ -28,6 +28,14 @@ function quantityDelta(participant: number, cart: number): number | null {
   return participant - cart;
 }
 
+/** After checkout the cart line is often cleared while the order snapshot keeps the share. */
+function participantCartDeltaIsExpected(row: KitReconcileReport["participants"][number]): boolean {
+  if (row.status === "HEALTHY") return true;
+  if (!row.orderId) return false;
+  if (row.orderSnapshotQuantity == null) return false;
+  return row.orderSnapshotQuantity === row.participantQuantity && row.cartQuantity === 0;
+}
+
 export function KitIntegritySection({
   report,
   loading,
@@ -150,9 +158,17 @@ export function KitIntegritySection({
                       </dd>
                     </div>
                   </dl>
-                  {delta != null && delta !== 0 ? (
+                  {delta != null && delta !== 0 && !participantCartDeltaIsExpected(row) ? (
                     <p className="mt-2 text-xs text-amber-800 dark:text-amber-200">
                       Abweichung: {Math.abs(delta)} Kit {delta > 0 ? "fehlen im Warenkorb" : "zu viel im Warenkorb"}
+                    </p>
+                  ) : null}
+                  {delta != null &&
+                  delta !== 0 &&
+                  participantCartDeltaIsExpected(row) &&
+                  row.orderId ? (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Anteil bestellt ({row.orderSnapshotQuantity} Kit) — Warenkorb leer nach Checkout.
                     </p>
                   ) : null}
                 </li>

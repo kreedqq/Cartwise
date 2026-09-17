@@ -30,10 +30,12 @@ const MOBILE = new Set(["375", "390", "412"]);
 
 const CUSTOMER_ROUTES = [
   "/login",
+  "/dashboard",
   "/shop",
   "/shop/retail?category=peptides",
   "/shop/group-buy-1?category=peptides&search=QA",
   "/shop/group-buy-1/kit-gesuche",
+  "/shop/group-buy-2",
   "/orders",
   "/profile",
 ];
@@ -85,7 +87,13 @@ async function main() {
       await adminPage.goto(`${BASE}${route}`, { waitUntil: "domcontentloaded", timeout: 60_000 }).catch(() => {});
       await adminPage.waitForTimeout(800);
       const metrics = await measureOverflow(adminPage);
-      const hasHealth = route === "/admin" ? await adminPage.getByText("Systemstatus").isVisible().catch(() => false) : null;
+      let hasHealth = null;
+      if (route === "/admin") {
+        const health = adminPage.getByText("Systemstatus");
+        await health.waitFor({ state: "visible", timeout: 30_000 }).catch(() => {});
+        await health.scrollIntoViewIfNeeded().catch(() => {});
+        hasHealth = await health.isVisible().catch(() => false);
+      }
       let touchFailures = [];
       if (MOBILE.has(vp.name)) {
         touchFailures = await auditPrimaryTouchTargets(adminPage);

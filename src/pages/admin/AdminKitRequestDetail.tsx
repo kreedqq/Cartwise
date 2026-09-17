@@ -2,7 +2,6 @@ import * as React from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { KitIntegritySection } from "@/components/admin/KitIntegritySection";
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminSection } from "@/components/admin/AdminSection";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -460,17 +459,17 @@ export default function AdminKitRequestDetailPage() {
         </Button>
       </div>
 
-      <AdminPageHeader
-        section="Bestellungen"
-        subsection="Kit Gesuche"
-        title={detail.productName}
-        description={`${dosageLabel} · ${detail.allocatedTotal}/${detail.kitSizeVials} Kit`}
-        breadcrumbs={[
-          { label: "Bestellungen", to: "/admin/orders" },
-          { label: "Kit Gesuche", to: "/admin/kit-requests" },
-          { label: detail.productName },
-        ]}
-      />
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-4">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Kit Gesuch</p>
+          <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight">{detail.productName}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{dosageLabel}</p>
+        </div>
+        <p className="font-display text-4xl font-semibold tabular-nums tracking-tight">
+          {detail.allocatedTotal}
+          <span className="text-muted-foreground"> / {detail.kitSizeVials}</span>
+        </p>
+      </div>
 
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="secondary">{adminStatusLabel(detail.status, detail.remainingVials)}</Badge>
@@ -502,25 +501,15 @@ export default function AdminKitRequestDetailPage() {
         ) : null}
       </div>
 
-      <AdminSection title="Stammdaten" padded>
-        <dl className="space-y-3">
-          <MetaRow label="Produkt" value={detail.productName} />
-          <MetaRow label="Variante / Dosierung" value={dosageLabel || "—"} />
-          <MetaRow label="Kit Größe" value={String(detail.kitSizeVials)} />
-          <MetaRow label="Belegung" value={`${detail.allocatedTotal} / ${detail.kitSizeVials}`} />
-          <MetaRow label="Freie Plätze" value={String(detail.remainingVials)} />
-          <MetaRow label="Status" value={adminStatusLabel(detail.status, detail.remainingVials)} />
-          <MetaRow label="Ersteller" value={creatorHandle(detail.creatorUsername)} />
-          <MetaRow label="Notiz" value={detail.note?.trim() ? detail.note : "—"} />
-          <MetaRow label="Verkaufsbereich" value={detail.shopArea} />
-          <MetaRow label="Händlercode" value={detail.vendorCode ?? "—"} />
-          <MetaRow label="Produkt-ID" value={detail.masterProductId ?? "—"} />
-          <MetaRow label="Bereichsprodukt-ID" value={detail.areaProductId ?? "—"} />
-          <MetaRow label="Kit-ID" value={detail.id} />
-          <MetaRow label="Erstellt" value={formatDate(detail.createdAt)} />
-          <MetaRow label="Ablauf" value={formatDate(detail.expiresAt)} />
-        </dl>
-      </AdminSection>
+      <KitIntegritySection
+        report={reconcileQuery.data}
+        loading={reconcileQuery.isLoading}
+        error={reconcileQuery.isError}
+        onRetry={() => void reconcileQuery.refetch()}
+        kitSize={detail.kitSizeVials}
+        allocatedTotal={detail.allocatedTotal}
+        participantCount={detail.participantCount}
+      />
 
       {editingMeta && detail.canEditMeta ? (
         <MetaEditForm
@@ -531,16 +520,6 @@ export default function AdminKitRequestDetailPage() {
           onCancel={() => setEditingMeta(false)}
         />
       ) : null}
-
-      <KitIntegritySection
-        report={reconcileQuery.data}
-        loading={reconcileQuery.isLoading}
-        error={reconcileQuery.isError}
-        onRetry={() => void reconcileQuery.refetch()}
-        kitSize={detail.kitSizeVials}
-        allocatedTotal={detail.allocatedTotal}
-        participantCount={detail.participantCount}
-      />
 
       {detail.status === "full" ? (
         <AdminSection
@@ -600,6 +579,25 @@ export default function AdminKitRequestDetailPage() {
         saving={distributionMutation.isPending}
         onSave={saveDistribution}
       />
+
+      <AdminSection title="Stammdaten" padded>
+        <dl className="space-y-3">
+          <MetaRow label="Ersteller" value={creatorHandle(detail.creatorUsername)} />
+          <MetaRow label="Notiz" value={detail.note?.trim() ? detail.note : "—"} />
+          <MetaRow label="Verkaufsbereich" value={detail.shopArea} />
+          <MetaRow label="Händlercode" value={detail.vendorCode ?? "—"} />
+          <MetaRow label="Erstellt" value={formatDate(detail.createdAt)} />
+          <MetaRow label="Ablauf" value={formatDate(detail.expiresAt)} />
+        </dl>
+      </AdminSection>
+
+      <AdminSection title="Technische Details" padded>
+        <dl className="space-y-3">
+          <MetaRow label="Produkt-ID" value={detail.masterProductId ?? "—"} />
+          <MetaRow label="Bereichsprodukt-ID" value={detail.areaProductId ?? "—"} />
+          <MetaRow label="Kit-ID" value={detail.id} />
+        </dl>
+      </AdminSection>
 
       <ConfirmDialog
         open={cancelOpen}

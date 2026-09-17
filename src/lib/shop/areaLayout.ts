@@ -38,9 +38,9 @@ export const AREA_SECTION_DESCRIPTION =
 export const AREA_ACTION_NAV = "flex min-w-0 flex-wrap gap-2";
 
 export const AREA_GROUP_BUY_DESCRIPTION =
-  "Gemeinsam bestellen, Kits teilen und von Mengenpreisen profitieren.";
+  "Teile ein Kit mit anderen. Du zahlst nur für deinen Anteil.";
 
 export const AREA_CATALOG_DESCRIPTION =
-  "Group Buy Preise, Kits, Mengenstaffeln und geteilte Bestellungen.";
+  "Group Buy Katalog: Kits teilen oder Produkte direkt in den Warenkorb legen.";
 
 export const AREA_KIT_REQUESTS_DESCRIPTION = "Offene Gesuche anderer Kunden";

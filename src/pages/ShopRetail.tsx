@@ -12,7 +12,7 @@ import { ShopProductsTable } from "@/components/shop/ShopProductsTable";
 import { ShopProductsMobileList } from "@/components/shop/ShopProductsMobileList";
 import { AreaStorefrontChrome } from "@/components/shop/AreaStorefrontChrome";
 import { ShopCategoryHub } from "@/components/shop/ShopCategoryHub";
-import { AreaSectionHeader, PageHeader } from "@/components/common/PageHeader";
+import { PageHeader } from "@/components/common/PageHeader";
 import { AREA_PAGE_CONTENT_SLOT, AREA_PAGE_RHYTHM } from "@/lib/shop/areaLayout";
 import { ShopAreaProvider } from "@/context/ShopAreaContext";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
@@ -46,6 +46,9 @@ export default function ShopRetailPage({ area }: { area?: MyShopArea }) {
     return <ErrorState message="Shop-Bereiche konnten nicht geladen werden." onRetry={() => areasQuery.refetch()} />;
   }
   if (!allowed || !currentArea) return <Navigate to="/403" replace />;
+
+  // When area prop is provided, ShopAreaPage already wraps with ShopAreaProvider — avoid double-nesting
+  if (area) return <ShopCatalog area={area} />;
 
   return (
     <ShopAreaProvider
@@ -131,18 +134,18 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
       >
         <AreaStorefrontChrome theme={theme} areaName={area.name}>
         <div className={AREA_PAGE_RHYTHM}>
-        <PageHeader
-          title={area.name}
-          description={
-            area.subtitle?.trim() ||
-            "Einzelverkauf. Peptide, Water und Oils als Vials, Orals als Packungen."
-          }
-        />
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary/80">Retail</p>
+        <h1 className="mt-2 font-display text-[clamp(2rem,4vw,3.2rem)] font-semibold leading-[0.95] tracking-tight">
+          {area.name}
+        </h1>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          {area.subtitle?.trim() ||
+            "Einzelverkauf. Peptide, Water und Oils als Vials, Orals als Packungen."}
+        </p>
         <div className={AREA_PAGE_CONTENT_SLOT}>
-        <AreaSectionHeader
-          title="Katalog"
-          description="Peptide, Water und Oils als Vials, Orals als Packungen. Keine Kits, keine Mengenstaffeln."
-        />
+        <p className="mb-4 max-w-2xl text-sm text-muted-foreground">
+          Peptide, Water und Oils als Vials, Orals als Packungen. Keine Kits, keine Mengenstaffeln.
+        </p>
         {(productsQuery.isLoading || storefrontQuery.isLoading) && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {Array.from({ length: 4 }).map((_, i) => (

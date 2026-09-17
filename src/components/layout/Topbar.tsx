@@ -52,7 +52,7 @@ export function Topbar() {
   const initials = accountInitials(profile?.username);
 
   return (
-    <header className="sticky top-0 z-30 flex min-h-[4.5rem] items-center justify-between gap-3 border-b border-border/80 bg-background/90 px-4 py-2 backdrop-blur-md sm:px-6 lg:min-h-24 [[data-site-background=on]_&]:bg-background/50 [[data-site-background=on]_&]:backdrop-saturate-125">
+    <header className="sticky top-0 z-30 flex min-h-16 items-center justify-between gap-3 border-b border-primary/15 bg-background/85 px-4 py-2 backdrop-blur-md sm:px-6 [[data-site-background=on]_&]:bg-background/50 [[data-site-background=on]_&]:backdrop-saturate-125">
       <div className="min-w-0 flex-1 lg:hidden">
         <BrandMark />
       </div>
@@ -72,7 +72,7 @@ export function Topbar() {
         )}
 
         <Button
-          variant="ghost"
+          variant={cartCount > 0 ? "default" : "ghost"}
           size="icon"
           className="relative h-11 w-11 min-h-11 min-w-11"
           aria-label={cartCount > 0 ? `Aktiver Warenkorb, ${cartCount} Artikel` : "Aktiver Warenkorb"}
@@ -80,7 +80,7 @@ export function Topbar() {
         >
           <ShoppingCart className="h-4 w-4" />
           {cartCount > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground ring-2 ring-background">
+            <span className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-background px-1 text-[11px] font-semibold leading-none text-primary ring-2 ring-primary">
               {cartCount > 99 ? "99+" : cartCount}
             </span>
           )}

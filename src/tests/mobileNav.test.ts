@@ -9,17 +9,21 @@ function read(path: string): string {
 }
 
 describe("mobile navigation", () => {
-  it("keeps the existing information architecture", () => {
+  it("puts dashboard first and announcements as a secondary item", () => {
     const items = buildCustomerNavItems([]);
     expect(items.map((item) => item.to)).toEqual([
-      "/announcements",
       "/dashboard",
       "/shop",
-      "/feedback",
-      "/peptide",
       "/orders",
+      "/peptide",
+      "/feedback",
       "/profile",
+      "/announcements",
     ]);
+    // Dashboard is the new landing page (primary home)
+    expect(items[0]).toMatchObject({ to: "/dashboard" });
+    // Announcements is secondary (deprioritised)
+    expect(items.find((i) => i.to === "/announcements")?.secondary).toBe(true);
   });
 
   it("scrolls instead of squeezing labels", () => {

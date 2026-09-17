@@ -55,7 +55,8 @@ describe("0086 admin kit requests", () => {
     expect(read("src/services/adminKitRequests.ts")).toContain("admin_cancel_kit_request");
     expect(read("src/services/adminKitRequests.ts")).toContain("extractRpcErrorMessage");
     expect(detail).toContain("KitIntegritySection");
-    expect(read("src/pages/admin/AdminDashboard.tsx")).toContain("AdminSystemHealthSection");
+    // AdminDashboard now uses fetchAdminSystemHealth directly (no wrapper component)
+    expect(read("src/pages/admin/AdminDashboard.tsx")).toContain("fetchAdminSystemHealth");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("kitRequestActionLabel");
   });
 

@@ -3,49 +3,68 @@
 @tailwind utilities;
 
 @layer base {
+  /* ─── Light mode base (activated when no .dark class is present) ─────── */
   :root {
-  --background: 24 10% 7%;
-  --foreground: 40 20% 95%;
+  --background: 40 20% 97%;
+  --foreground: 24 22% 8%;
 
-  --card: 24 9% 10%;
-  --card-foreground: 40 20% 95%;
+  --card: 0 0% 100%;
+  --card-foreground: 24 22% 8%;
 
-  --popover: 24 9% 10%;
-  --popover-foreground: 40 20% 95%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 24 22% 8%;
 
-  --primary: 38 52% 58%;
-  --primary-foreground: 24 22% 8%;
+  --primary: 38 52% 42%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 24 8% 14%;
-  --secondary-foreground: 40 16% 92%;
+  --secondary: 40 15% 93%;
+  --secondary-foreground: 24 18% 12%;
 
-  --muted: 24 8% 14%;
-  --muted-foreground: 32 10% 62%;
+  --muted: 40 12% 90%;
+  --muted-foreground: 32 10% 38%;
 
-  --accent: 32 48% 50%;
-  --accent-foreground: 40 20% 98%;
+  --accent: 38 46% 52%;
+  --accent-foreground: 0 0% 100%;
 
-  --destructive: 0 68% 48%;
+  --destructive: 0 72% 45%;
   --destructive-foreground: 0 0% 100%;
 
-  --success: 152 28% 42%;
-  --success-foreground: 152 40% 96%;
+  --success: 152 36% 35%;
+  --success-foreground: 152 40% 97%;
 
-  --warning: 36 72% 52%;
+  --warning: 36 72% 46%;
   --warning-foreground: 36 92% 97%;
 
-  --border: 28 8% 20%;
-  --input: 28 8% 20%;
-  --ring: 38 52% 58%;
+  --border: 35 12% 84%;
+  --input: 35 12% 83%;
+  --ring: 38 52% 42%;
 
-  --sidebar: 24 12% 5%;
-  --sidebar-foreground: 40 18% 94%;
-  --sidebar-muted: 32 10% 58%;
-  --sidebar-accent: 24 10% 11%;
+  --sidebar: 40 20% 94%;
+  --sidebar-foreground: 24 22% 8%;
+  --sidebar-muted: 32 10% 48%;
+  --sidebar-accent: 40 18% 90%;
 
-    --radius: 0.5rem;
+  --radius: 0.5rem;
+
+  /* ─── Radius scale ───────────────────────────────────────────────────── */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* ─── Motion scale ───────────────────────────────────────────────────── */
+  --motion-fast: 120ms ease-out;
+  --motion-default: 200ms ease-out;
+  --motion-slow: 350ms ease-out;
+
+  /* ─── Shadow scale ───────────────────────────────────────────────────── */
+  --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.08), 0 1px 2px hsl(0 0% 0% / 0.06);
+  --shadow-elevated: 0 4px 16px hsl(0 0% 0% / 0.12);
+  --shadow-bottom-bar: 0 -4px 12px hsl(0 0% 0% / 0.07);
   }
 
+  /* ─── Dark mode (applied when html.dark is present — default for customers) */
   .dark {
   --background: 24 10% 7%;
   --foreground: 40 20% 95%;
@@ -85,6 +104,11 @@
   --sidebar-foreground: 40 18% 94%;
   --sidebar-muted: 32 10% 58%;
   --sidebar-accent: 24 10% 11%;
+
+  /* Dark mode shadow scale (deeper) */
+  --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.3), 0 1px 2px hsl(0 0% 0% / 0.2);
+  --shadow-elevated: 0 4px 16px hsl(0 0% 0% / 0.35);
+  --shadow-bottom-bar: 0 -4px 12px hsl(0 0% 0% / 0.18);
   }
 
   * {
@@ -104,6 +128,26 @@
       radial-gradient(1200px 480px at 12% -10%, hsl(38 42% 22% / 0.16), transparent 58%),
       radial-gradient(900px 420px at 100% 0%, hsl(24 36% 20% / 0.14), transparent 55%);
     background-attachment: fixed;
+  }
+
+  main[data-page="dashboard"] {
+    background-image:
+      linear-gradient(180deg, hsl(38 42% 18% / 0.14), transparent 28rem),
+      radial-gradient(900px 380px at 88% -8%, hsl(38 50% 28% / 0.12), transparent 55%);
+  }
+
+  main[data-page="shop"] {
+    background-image: radial-gradient(900px 360px at 8% -12%, hsl(32 20% 18% / 0.1), transparent 60%);
+  }
+
+  main[data-page="kit"] {
+    background-image:
+      radial-gradient(720px 380px at 100% 0%, hsl(36 62% 28% / 0.16), transparent 52%),
+      linear-gradient(180deg, hsl(24 18% 10% / 0.4), transparent 22rem);
+  }
+
+  main[data-page="ops"] {
+    background-image: none;
   }
 
   h1,
@@ -167,5 +211,18 @@
   }
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* ─── Reduced motion ────────────────────────────────────────────────────── */
+/* Respects the OS-level "reduce motion" preference (WCAG 2.1 § 2.3.3). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

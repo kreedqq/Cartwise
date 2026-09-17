@@ -1,5 +1,12 @@
+import { Check } from "lucide-react";
+
 import { formatDateTime } from "@/lib/money";
-import type { OrderProgressView } from "@/lib/orderProgress";
+import {
+  ORDER_PROGRESS_TIMELINE_STEPS,
+  orderProgressTimelineState,
+  type OrderProgressView,
+} from "@/lib/orderProgress";
+import { UI_TYPE } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
 export function OrderProgressTracker({
@@ -13,6 +20,7 @@ export function OrderProgressTracker({
 }) {
   const percent = progress.progressPercent;
   const cancelled = progress.isCancelled;
+
   return (
     <section
       className={cn(
@@ -24,51 +32,89 @@ export function OrderProgressTracker({
         className,
       )}
     >
-      <p
-        className={cn(
-          "text-[11px] font-semibold uppercase tracking-[0.18em]",
-          cancelled ? "text-destructive/80" : "text-primary/80",
-        )}
-      >
+      <p className={cn(UI_TYPE.eyebrow, cancelled ? "text-destructive/80" : undefined)}>
         {cancelled ? "Storniert" : "Bestellfortschritt"}
       </p>
       <p className="mt-2 text-lg font-semibold tracking-tight text-foreground sm:text-xl">{progress.statusLabel}</p>
-      <div className="mt-4">
-        <div className="mb-2 flex items-center justify-between gap-3 text-xs text-muted-foreground">
-          <span>Fortschritt</span>
-          <span
-            className={cn(
-              "font-mono text-sm font-semibold tabular-nums",
-              cancelled ? "text-destructive" : "text-primary",
-            )}
-          >
-            {percent} %
-          </span>
-        </div>
-        <div
-          className="relative h-3 w-full overflow-hidden rounded-full bg-secondary/80 ring-1 ring-inset ring-border"
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={percent}
-          aria-label={`Bestellfortschritt ${percent} Prozent`}
-        >
-          <div
-            className={cn(
-              "h-full rounded-full transition-[width] duration-500",
-              cancelled
-                ? "bg-destructive/70"
-                : "bg-gradient-to-r from-primary/70 via-primary to-accent shadow-[0_0_18px_hsl(var(--primary)/0.45)]",
-            )}
-            style={{ width: `${percent}%` }}
-          />
-        </div>
-      </div>
-      {progress.comment ? (
-        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{progress.comment}</p>
-      ) : null}
+
+      <div
+        className="sr-only"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percent}
+        aria-label={`Bestellfortschritt ${percent} Prozent`}
+      />
+
+      {cancelled ? (
+        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+          {progress.comment || "Diese Bestellung wurde storniert."}
+        </p>
+      ) : (
+        <ol className="mt-5" aria-label="Bestellfortschritt">
+          {ORDER_PROGRESS_TIMELINE_STEPS.map((step, index) => {
+            const state = orderProgressTimelineState(progress.statusKey, step.key);
+            const isLast = index === ORDER_PROGRESS_TIMELINE_STEPS.length - 1;
+            return (
+              <li
+                key={step.key}
+                className="flex gap-3"
+                aria-current={state === "current" ? "step" : undefined}
+              >
+                <div className="flex w-6 shrink-0 flex-col items-center">
+                  <span
+                    className={cn(
+                      "flex h-6 w-6 items-center justify-center rounded-full border text-[11px]",
+                      state === "complete" && "border-primary bg-primary text-primary-foreground",
+                      state === "current" && "border-primary bg-background text-primary",
+                      state === "upcoming" && "border-border bg-secondary/60 text-muted-foreground",
+                    )}
+                    aria-hidden
+                  >
+                    {state === "complete" ? (
+                      <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+                    ) : (
+                      <span
+                        className={cn(
+                          "h-2 w-2 rounded-full",
+                          state === "current" ? "bg-primary" : "bg-transparent",
+                        )}
+                      />
+                    )}
+                  </span>
+                  {isLast ? null : (
+                    <span
+                      className={cn(
+                        "mt-1 w-px flex-1 min-h-[1.15rem]",
+                        state === "complete" ? "bg-primary/50" : "bg-border",
+                      )}
+                      aria-hidden
+                    />
+                  )}
+                </div>
+                <div className={cn("min-w-0 pb-4", isLast && "pb-0")}>
+                  <p
+                    className={cn(
+                      "text-sm leading-snug",
+                      state === "complete" && "font-medium text-foreground",
+                      state === "current" && "font-semibold text-foreground",
+                      state === "upcoming" && "text-muted-foreground",
+                    )}
+                  >
+                    {step.title}
+                  </p>
+                  {state === "current" && progress.comment ? (
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{progress.comment}</p>
+                  ) : null}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+
       {progress.updatedAt ? (
-        <p className="mt-3 text-[11px] text-muted-foreground">Aktualisiert: {formatDateTime(progress.updatedAt)}</p>
+        <p className="mt-4 text-[11px] text-muted-foreground">Aktualisiert: {formatDateTime(progress.updatedAt)}</p>
       ) : null}
     </section>
   );

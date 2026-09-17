@@ -22,6 +22,8 @@ describe("customer dashboard cart overview", () => {
     expect(page).toContain("OrderTemplatesCard");
     expect(page).toContain("useMyOrders");
     expect(page).not.toMatch(/cartsQuery\.data\.map\(\(cart\)/);
+    expect(page).toContain('const cartHref = openCarts[0] ? `/carts/${openCarts[0].id}` : "/shop"');
+    expect(page).not.toContain('to="/cart"');
   });
 
   it("opens the existing cart detail instead of listing cart lines on the dashboard", () => {

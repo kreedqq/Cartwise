@@ -15,6 +15,7 @@ import UsernameRequiredPage from "@/pages/UsernameRequired";
 import ConsentPage from "@/pages/Consent";
 import AnnouncementsPage from "@/pages/Announcements";
 import FeedbackPage from "@/pages/Feedback";
+import FavoritesPage from "@/pages/Favorites";
 
 import LoginPage from "@/pages/Login";
 import AuthCallbackPage from "@/pages/AuthCallback";
@@ -33,7 +34,7 @@ import ProfilePage from "@/pages/Profile";
 import ForbiddenPage from "@/pages/Forbidden";
 import NotFoundPage from "@/pages/NotFound";
 
-const AdminLayout = lazy(() => import("@/pages/admin/AdminLayout"));
+const AdminShell = lazy(() => import("@/pages/admin/AdminShell"));
 const AdminDashboardPage = lazy(() => import("@/pages/admin/AdminDashboard"));
 const AdminProductsPage = lazy(() => import("@/pages/admin/AdminProducts"));
 const AdminShopAreasPage = lazy(() => import("@/pages/admin/AdminShopAreas"));
@@ -97,6 +98,48 @@ export default function App() {
               <Route element={<UsernameGate />}>
               <Route path="/consent" element={<ConsentPage />} />
               <Route element={<ConsentGate />}>
+
+              {/* ── Admin routes: own shell, outside customer AppShell ───── */}
+              <Route element={<AdminRoute />}>
+                <Route
+                  path="/admin"
+                  element={
+                    <Suspense fallback={<FullScreenSpinner label="Admin-Bereich wird geladen …" />}>
+                      <AdminShell />
+                    </Suspense>
+                  }
+                >
+                  <Route index element={<AdminDashboardPage />} />
+                  <Route path="orders" element={<AdminOrdersPage />} />
+                  <Route path="orders/create-for-customer" element={<AdminCreateOrderForCustomerPage />} />
+                  <Route path="carts" element={<AdminCartsPage />} />
+                  <Route path="carts/:cartId" element={<AdminCartDetailPage />} />
+                  <Route path="orders/:orderId" element={<AdminOrderDetailPage />} />
+                  <Route path="order-summary" element={<AdminOrderSummaryPage />} />
+                  <Route path="kit-requests" element={<AdminKitRequestsPage />} />
+                  <Route path="kit-requests/:kitRequestId" element={<AdminKitRequestDetailPage />} />
+                  <Route path="roles" element={<AdminRolesPage />} />
+                  <Route path="surcharges" element={<AdminRoleSurchargesPage />} />
+                  <Route path="shipping" element={<Navigate to="/admin/orders" replace />} />
+                  <Route path="shipping/:orderId" element={<RedirectAdminShippingOrder />} />
+                  <Route path="shipping-costs" element={<AdminShippingPage />} />
+                  <Route path="payment-methods" element={<AdminPaymentMethodsPage />} />
+                  <Route path="products" element={<AdminProductsPage />} />
+                  <Route path="shop-areas" element={<AdminShopAreasPage />} />
+                  <Route path="shop-areas/:areaKey" element={<AdminShopAreasPage />} />
+                  <Route path="pdf-import" element={<AdminPdfImportPage />} />
+                  <Route path="import-history" element={<AdminImportHistoryPage />} />
+                  <Route path="users" element={<AdminUsersPage />} />
+                  <Route path="audit-log" element={<AdminAuditLogPage />} />
+                  <Route path="system" element={<AdminSystemPage />} />
+                  <Route path="research" element={<AdminResearchPage />} />
+                  <Route path="announcements" element={<AdminAnnouncementsPage />} />
+                  <Route path="design" element={<AdminDesignPage />} />
+                  <Route path="feedback" element={<AdminFeedbackPage />} />
+                </Route>
+              </Route>
+
+              {/* ── Customer routes: AppShell chrome ────────────────────── */}
               <Route element={<AppShell />}>
                 <Route path="/announcements" element={<AnnouncementsPage />} />
                 <Route path="/news" element={<Navigate to="/announcements" replace />} />
@@ -113,6 +156,7 @@ export default function App() {
                 <Route path="/orders/:orderId" element={<OrderDetailPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/feedback" element={<FeedbackPage />} />
+                <Route path="/favorites" element={<FavoritesPage />} />
                 <Route
                   path="/peptide"
                   element={
@@ -146,49 +190,12 @@ export default function App() {
                   }
                 />
 
-                <Route element={<AdminRoute />}>
-                  <Route
-                    path="/admin"
-                    element={
-                      <Suspense fallback={<FullScreenSpinner label="Admin-Bereich wird geladen …" />}>
-                        <AdminLayout />
-                      </Suspense>
-                    }
-                  >
-                    <Route index element={<AdminDashboardPage />} />
-                    <Route path="orders" element={<AdminOrdersPage />} />
-                    <Route path="orders/create-for-customer" element={<AdminCreateOrderForCustomerPage />} />
-                    <Route path="carts" element={<AdminCartsPage />} />
-                    <Route path="carts/:cartId" element={<AdminCartDetailPage />} />
-                    <Route path="orders/:orderId" element={<AdminOrderDetailPage />} />
-                    <Route path="order-summary" element={<AdminOrderSummaryPage />} />
-                    <Route path="kit-requests" element={<AdminKitRequestsPage />} />
-                    <Route path="kit-requests/:kitRequestId" element={<AdminKitRequestDetailPage />} />
-                    <Route path="roles" element={<AdminRolesPage />} />
-                    <Route path="surcharges" element={<AdminRoleSurchargesPage />} />
-                    <Route path="shipping" element={<Navigate to="/admin/orders" replace />} />
-                    <Route path="shipping/:orderId" element={<RedirectAdminShippingOrder />} />
-                    <Route path="shipping-costs" element={<AdminShippingPage />} />
-                    <Route path="payment-methods" element={<AdminPaymentMethodsPage />} />
-                    <Route path="products" element={<AdminProductsPage />} />
-                    <Route path="shop-areas" element={<AdminShopAreasPage />} />
-                    <Route path="pdf-import" element={<AdminPdfImportPage />} />
-                    <Route path="import-history" element={<AdminImportHistoryPage />} />
-                    <Route path="users" element={<AdminUsersPage />} />
-                    <Route path="audit-log" element={<AdminAuditLogPage />} />
-                    <Route path="system" element={<AdminSystemPage />} />
-                    <Route path="research" element={<AdminResearchPage />} />
-                    <Route path="announcements" element={<AdminAnnouncementsPage />} />
-                    <Route path="design" element={<AdminDesignPage />} />
-                    <Route path="feedback" element={<AdminFeedbackPage />} />
-                  </Route>
-                </Route>
               </Route>
               </Route>
               </Route>
             </Route>
 
-            <Route path="/" element={<Navigate to="/announcements" replace />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>

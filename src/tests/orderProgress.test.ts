@@ -9,6 +9,8 @@ import {
   isShippingProgressStatusKey,
   ORDER_PROGRESS_TEMPLATES,
   resolveOrderProgress,
+  ORDER_PROGRESS_TIMELINE_STEPS,
+  orderProgressTimelineState,
   SHIPPING_PROGRESS_STATUSES,
   shippingProgressWritePayload,
 } from "@/lib/orderProgress";
@@ -57,6 +59,25 @@ describe("orderProgress", () => {
     expect(clampProgressPercent(140)).toBe(100);
     expect(clampProgressPercent(7)).toBe(7);
     expect(clampProgressPercent(61)).toBe(61);
+  });
+
+  it("composes a display-only timeline from received plus the shipping statuses", () => {
+    expect(ORDER_PROGRESS_TIMELINE_STEPS.map((step) => step.title)).toEqual([
+      "Bestellung eingegangen",
+      "Bestellung wird bearbeitet",
+      "Beim Händler bestellt",
+      "Aus China versendet",
+      "In Deutschland eingetroffen",
+      "Für den Versand vorbereitet",
+      "Bestellung ist unterwegs",
+      "Bestellung abgeschlossen",
+    ]);
+    expect(orderProgressTimelineState("shipped", "received")).toBe("complete");
+    expect(orderProgressTimelineState("shipped", "submitted")).toBe("complete");
+    expect(orderProgressTimelineState("shipped", "shipped")).toBe("current");
+    expect(orderProgressTimelineState("shipped", "arrived")).toBe("upcoming");
+    expect(orderProgressTimelineState("received", "received")).toBe("current");
+    expect(orderProgressTimelineState("received", "processing")).toBe("upcoming");
   });
 
   it("maps the seven shipping statuses to fixed title, description, and percent", () => {
@@ -199,6 +220,8 @@ describe("order progress UI wiring", () => {
     expect(service).not.toMatch(/\.from\("order_progress"\)\.update/);
     expect(service).not.toMatch(/\.from\("order_progress"\)\.upsert/);
     expect(tracker).toContain("max-w-[50rem]");
+    expect(tracker).toContain("ORDER_PROGRESS_TIMELINE_STEPS");
+    expect(tracker).toContain("Bestellfortschritt");
     expect(tracker).not.toContain("50vw");
   });
 

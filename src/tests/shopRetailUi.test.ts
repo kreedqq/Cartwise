@@ -81,8 +81,8 @@ describe("ShopHub routing", () => {
 
   it("ShopHubPage shows area cards when multiple areas are accessible", () => {
     const hub = read("src/pages/ShopHub.tsx");
-    expect(hub).toContain("ShopAreaCard");
-    expect(hub).toContain("area.path");
+    expect(hub).toContain("ShopAreaShowcase");
+    expect(hub).toContain("areas.length === 1");
   });
 });
 

@@ -35,31 +35,38 @@ describe("announcements", () => {
     expect(read("src/hooks/useAnnouncements.ts")).toContain("listAllAnnouncements");
   });
 
-  it("exposes /announcements as the customer landing route", () => {
+  it("exposes /announcements as an accessible customer route (secondary nav)", () => {
     const app = read("src/App.tsx");
     expect(app).toContain('path="/announcements"');
-    expect(app).toContain('<Navigate to="/announcements" replace />');
+    // Root redirect now goes to /dashboard (personalised home)
+    expect(app).toContain('<Navigate to="/dashboard" replace />');
     expect(app).toContain('path="/news"');
     expect(app).toContain('path="/newsfeed"');
     expect(app).toContain('path="/neuigkeiten"');
     expect(app).toContain("ConsentGate");
-    expect(POST_LOGIN_PATH).toBe("/announcements");
-    expect(read("src/services/auth.ts")).toContain('POST_LOGIN_PATH = "/announcements"');
+    // Post-login destination is now the dashboard
+    expect(POST_LOGIN_PATH).toBe("/dashboard");
+    expect(read("src/services/auth.ts")).toContain('POST_LOGIN_PATH = "/dashboard"');
     expect(read("src/pages/Login.tsx")).toContain("POST_LOGIN_PATH");
     expect(read("src/pages/AuthCallback.tsx")).toContain("OAUTH_SUCCESS_PATH");
   });
 
-  it("puts Ankündigungen first for customers and under Marketing for admins", () => {
+  it("puts Übersicht first for customers and Ankündigungen as secondary nav; admin keeps it under Marketing", () => {
     const customer = buildCustomerNavItems([]);
-    expect(customer[0]).toMatchObject({ to: "/announcements", label: "Ankündigungen" });
+    // Dashboard is now the primary home
+    expect(customer[0]).toMatchObject({ to: "/dashboard", label: "Übersicht" });
+    // Ankündigungen is secondary (accessible but deprioritised)
+    const announcementsItem = customer.find((item) => item.to === "/announcements");
+    expect(announcementsItem).toBeDefined();
+    expect(announcementsItem?.secondary).toBe(true);
     expect(customer.map((item) => item.label)).toEqual([
-      "Ankündigungen",
       "Übersicht",
       "Shop",
-      "Feedback",
-      "Lexikon & Rechner",
       "Meine Bestellungen",
+      "Lexikon & Rechner",
+      "Feedback",
       "Profil",
+      "Ankündigungen",
     ]);
     const marketing = ADMIN_NAV_GROUPS.find((group) => group.id === "marketing");
     expect(marketing).toMatchObject({ label: "Marketing & Inhalte", to: "/admin/announcements" });

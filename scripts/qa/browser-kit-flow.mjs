@@ -87,7 +87,7 @@ async function assertKitCard(page, allocated) {
   await page.waitForTimeout(800);
   const card = page.locator("article").filter({ hasText: KIT_MARKER }).first();
   await card.waitFor({ state: "visible", timeout: 25_000 });
-  await card.getByText(`${allocated} / 10`).waitFor({ state: "visible" });
+  await card.getByText(`${allocated} / 10`, { exact: true }).waitFor({ state: "visible" });
   if (allocated === 10) {
     await card.getByText(/Voll|Kit vollständig/).first().waitFor({ state: "visible" });
   }

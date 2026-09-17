@@ -183,10 +183,11 @@ export async function fillCheckoutAndSubmit(page) {
   await page.locator("#shipping-postal").fill("10115");
   await page.locator("#shipping-city").fill("Berlin");
   await page.locator("#shipping-country").fill("Deutschland");
-  await page.getByRole("button", { name: "Bestellung absenden" }).click();
+  await page.getByRole("button", { name: /Bestellung absenden|Bestellung aufgeben/ }).first().click();
   const dialog = page.getByRole("alertdialog");
   await dialog.waitFor({ state: "visible", timeout: 20_000 });
-  await dialog.getByRole("button", { name: "Verbindlich bestellen" }).click();
+  const confirm = dialog.getByRole("button").filter({ hasNotText: /Abbrechen|Cancel/i });
+  await confirm.last().click();
   await page.waitForURL(/\/orders(\/|$)/, { timeout: 60_000 });
 }
 

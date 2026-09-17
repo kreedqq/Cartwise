@@ -150,7 +150,7 @@ function CartItemRowDesktop({
         )}
         {isKitShareCartItem(item) && (
           <>
-            <span className="mt-1 inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+            <span className="mt-1 inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-primary">
               Geteiltes Kit
             </span>
             {kitLocked ? (

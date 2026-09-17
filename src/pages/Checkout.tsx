@@ -1,13 +1,12 @@
 import * as React from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AlertTriangle, ArrowLeft } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ShoppingBag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { DeliveryMethodSelector } from "@/components/checkout/DeliveryMethodSelector";
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
@@ -54,6 +53,7 @@ export default function CheckoutPage() {
   const [shipping, setShipping] = React.useState<CheckoutShippingForm>(EMPTY_CHECKOUT_SHIPPING);
   const [shippingErrors, setShippingErrors] = React.useState<Partial<Record<CheckoutShippingField, string>>>({});
   const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const submitLockRef = React.useRef(false);
 
   const effectivePaymentMethod =
     paymentMethod != null && paymentMethods.methods.includes(paymentMethod) ? paymentMethod : null;
@@ -68,6 +68,9 @@ export default function CheckoutPage() {
   const eligible = pendingItems.filter(
     (i) => i.resolution_status === "resolved" && i.unit_price_usd_snapshot != null,
   );
+
+  // Kit-line detection: if any eligible item is part of a kit share, adapt button copy
+  const hasKitLines = eligible.some((i) => i.kit_share_id != null);
   const excluded = pendingItems.filter(
     (i) => i.resolution_status !== "resolved" || i.unit_price_usd_snapshot == null,
   );
@@ -128,19 +131,23 @@ export default function CheckoutPage() {
   }
 
   async function handleSubmit() {
-    if (!cart) return;
+    if (!cart || submitLockRef.current || createOrder.isPending) return;
+    submitLockRef.current = true;
     const address = validatedShipping();
     if (!address) {
+      submitLockRef.current = false;
       setConfirmOpen(false);
       toast.error("Bitte prüfe Lieferart und Lieferadresse.");
       return;
     }
     if (paymentMethods.methods.length === 0) {
+      submitLockRef.current = false;
       setPaymentError(PAYMENT_METHODS_UNAVAILABLE_MESSAGE);
       setConfirmOpen(false);
       return;
     }
     if (!effectivePaymentMethod) {
+      submitLockRef.current = false;
       setPaymentError(PAYMENT_METHOD_REQUIRED_MESSAGE);
       setConfirmOpen(false);
       return;
@@ -161,6 +168,7 @@ export default function CheckoutPage() {
         navigate(`/orders/${result.orderId}`);
       }
     } catch (error) {
+      submitLockRef.current = false;
       console.error("Bestellung absenden fehlgeschlagen:", error);
       const message =
         extractRpcErrorMessage(error).trim() || "Bestellung konnte nicht übermittelt werden.";
@@ -235,7 +243,6 @@ export default function CheckoutPage() {
                     <TableHead>Artikel</TableHead>
                     <TableHead className="text-right">Menge</TableHead>
                     <TableHead className="text-right">Einzelpreis</TableHead>
-                    <TableHead className="hidden sm:table-cell">Preisart</TableHead>
                     <TableHead className="text-right">Gesamt</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -264,11 +271,6 @@ export default function CheckoutPage() {
                           size="compact"
                           align="right"
                         />
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <Badge variant={item.applied_price_tier === "bulk" ? "default" : "secondary"}>
-                          {item.applied_price_tier === "bulk" ? "Mengenpreis" : "Normal"}
-                        </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <DualCurrencyPrice usd={item.totalUsd} eur={item.totalEur} size="compact" align="right" />
@@ -339,12 +341,23 @@ export default function CheckoutPage() {
                   usdToEurRate: eligible.find((i) => i.exchange_rate_snapshot)?.exchange_rate_snapshot ?? null,
                 })}
               />
-              <Button className="mt-1 w-full" size="lg" onClick={handleOpenConfirm}>
-                Bestellung absenden
+              {/* Desktop submit button — hidden on mobile (sticky bar handles it) */}
+              <Button className="mt-1 hidden w-full sm:flex" size="lg" onClick={handleOpenConfirm}>
+                {hasKitLines ? "Bestellung aufgeben (Kit wird synchronisiert)" : "Bestellung absenden"}
               </Button>
             </CardContent>
           </Card>
         </>
+      )}
+
+      {/* ── Mobile sticky submit bar ──────────────────────────────────────── */}
+      {eligible.length > 0 && (
+        <div className="fixed inset-x-0 bottom-16 z-30 border-t border-border bg-card/95 px-4 py-3 shadow-bottom-bar backdrop-blur sm:hidden">
+          <Button className="w-full" size="lg" onClick={handleOpenConfirm}>
+            <ShoppingBag className="mr-2 h-4 w-4" aria-hidden="true" />
+            {hasKitLines ? "Bestellung aufgeben" : "Bestellung absenden"}
+          </Button>
+        </div>
       )}
 
       <ConfirmDialog
@@ -360,7 +373,7 @@ export default function CheckoutPage() {
             </p>
           </div>
         }
-        confirmLabel="Verbindlich bestellen"
+        confirmLabel={hasKitLines ? "Jetzt verbindlich bestellen (Kit-Sync)" : "Verbindlich bestellen"}
         loading={createOrder.isPending}
         onConfirm={handleSubmit}
       />

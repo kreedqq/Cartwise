@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
+import { KitProgress } from "@/components/kit-requests/KitProgress";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,11 +14,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { useKitRequest } from "@/hooks/useKitRequests";
-import {
-  kitRequestCustomerStatusLabel,
-  kitRequestProgressPercent,
-} from "@/lib/kitRequests";
+import { kitRequestActionLabel } from "@/lib/kit/kitRequestActions";
+import { KIT_ALMOST_FULL_REMAINING_THRESHOLD } from "@/lib/kit/kitShareState";
+import { kitRequestCustomerStatusLabel } from "@/lib/kitRequests";
 import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
+import { cn } from "@/lib/utils";
 
 function creatorHandle(username: string): string {
   const trimmed = username.trim().replace(/^@+/, "");
@@ -63,22 +64,45 @@ export function KitRequestDetailDialog({
             </DialogHeader>
 
             <div className="space-y-4">
-              <div>
-                <p className="text-lg font-semibold tabular-nums">
-                  {request.allocatedTotal} / {request.kitSizeVials} Kit
-                </p>
-                <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-secondary">
-                  <div
-                    className="h-full rounded-full bg-primary"
-                    style={{
-                      width: `${kitRequestProgressPercent(request.allocatedTotal, request.kitSizeVials)}%`,
-                    }}
-                  />
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Noch {request.remainingVials} verfügbar
-                </p>
-              </div>
+              {(() => {
+                const isAlmostFull =
+                  request.status === "open" &&
+                  request.remainingVials > 0 &&
+                  request.remainingVials <= KIT_ALMOST_FULL_REMAINING_THRESHOLD;
+                const isLastSpot = request.status === "open" && request.remainingVials === 1;
+                const remainingLabel = isLastSpot
+                  ? "Letzter Platz!"
+                  : request.remainingVials > 0
+                    ? `Noch ${request.remainingVials} freie Plätze`
+                    : request.status === "full"
+                      ? "Kit vollständig"
+                      : null;
+                return (
+                  <div>
+                    <KitProgress
+                      allocated={request.allocatedTotal}
+                      kitSize={request.kitSizeVials}
+                      status={request.status}
+                      isAlmostFull={isAlmostFull}
+                      isLastSpot={isLastSpot}
+                    />
+                    {remainingLabel ? (
+                      <p
+                        className={cn(
+                          "mt-2 text-sm",
+                          isLastSpot || isAlmostFull
+                            ? "font-semibold text-warning"
+                            : request.status === "full"
+                              ? "font-medium text-success"
+                              : "text-muted-foreground",
+                        )}
+                      >
+                        {remainingLabel}
+                      </p>
+                    ) : null}
+                  </div>
+                );
+              })()}
 
               {request.isParticipant && request.myQuantity > 0 ? (
                 <div className="rounded-xl border border-border p-4">
@@ -124,8 +148,16 @@ export function KitRequestDetailDialog({
 
               {onJoin && request.status === "open" && !request.isParticipant && request.remainingVials > 0 ? (
                 <Button className="min-h-11 w-full" onClick={onJoin}>
-                  Mitmachen
+                  {kitRequestActionLabel("join")}
                 </Button>
+              ) : null}
+              {onJoin && request.status === "open" && request.isParticipant && !request.isCreator ? (
+                <Button className="min-h-11 w-full" variant="secondary" onClick={onJoin}>
+                  {kitRequestActionLabel("change_quantity")} ({request.myQuantity})
+                </Button>
+              ) : null}
+              {request.isParticipant && request.status === "open" ? (
+                <p className="text-center text-sm font-medium text-success">Du bist dabei.</p>
               ) : null}
             </div>
           </>

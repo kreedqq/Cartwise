@@ -1,9 +1,10 @@
 import * as React from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, useSearchParams } from "react-router-dom";
 import { Layers } from "lucide-react";
 
 import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitRequestDialog";
 import { JoinKitRequestDialog } from "@/components/kit-requests/JoinKitRequestDialog";
+import { KitOnboardingBanner } from "@/components/kit-requests/KitOnboardingBanner";
 import { KitRequestCardView } from "@/components/kit-requests/KitRequestCard";
 import { KitRequestFilterBar } from "@/components/kit-requests/KitRequestFilterBar";
 import { CreateKitRequestButton, KitRequestHint } from "@/components/kit-requests/KitRequestIntro";
@@ -53,6 +54,10 @@ import {
 } from "@/lib/kitRequests";
 import { shopGroupsForCategory } from "@/lib/shop/display";
 import { catalogProductsForKitFilters, visibleStorefrontCategories } from "@/lib/shop/areaCategories";
+import {
+  buildKitFilterSearchParams,
+  readKitFilterUrlState,
+} from "@/lib/shop/shopCatalogUrlState";
 import type { KitRequestCard } from "@/services/kitRequests";
 
 const PAGE_SIZE = 20;
@@ -104,15 +109,26 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
   const productsQuery = useShopProducts(shopArea);
   const storefrontQuery = useShopAreaStorefront(shopArea);
 
-  const [tab, setTab] = React.useState("open");
-  const [search, setSearch] = React.useState("");
-  const [category, setCategory] = React.useState<string | null>(null);
-  const [productName, setProductName] = React.useState<string | null>(null);
+  // URL-persistent filters — shareable, browser-back-aware
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlFilters = readKitFilterUrlState(searchParams);
+
+  const tab = urlFilters.kitTab;
+  const search = urlFilters.kitSearch;
+  const category = urlFilters.kitCategory;
+  const productName = urlFilters.kitProduct;
+  const variant = urlFilters.kitVariant;
+  const sort = (urlFilters.kitSort as KitRequestSort) ?? "newest";
+  const page = urlFilters.kitPage;
+
+  // productId is derived from variant selection; keep as ephemeral state
   const [productId, setProductId] = React.useState<string | null>(null);
-  const [variant, setVariant] = React.useState<string | null>(null);
   const [minRemaining, setMinRemaining] = React.useState<number | null>(null);
-  const [sort, setSort] = React.useState<KitRequestSort>("newest");
-  const [page, setPage] = React.useState(1);
+
+  function patchUrl(patch: Parameters<typeof buildKitFilterSearchParams>[1]) {
+    setSearchParams((prev) => buildKitFilterSearchParams(prev, patch), { replace: true });
+  }
+
   const [createOpen, setCreateOpen] = React.useState(false);
   const [joinTarget, setJoinTarget] = React.useState<KitRequestCard | null>(null);
   const [leaveTarget, setLeaveTarget] = React.useState<KitRequestCard | null>(null);
@@ -185,7 +201,15 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
       />
       <KitRequestHint />
 
-      <Tabs value={tab} onValueChange={setTab} className="min-w-0">
+      {/* Onboarding explainer — dismissable, only for users with no kit activity yet */}
+      <KitOnboardingBanner
+        hasExistingKitActivity={
+          (mineQuery.data?.length ?? 0) > 0 ||
+          (joinedQuery.data?.length ?? 0) > 0
+        }
+      />
+
+      <Tabs value={tab} onValueChange={(v) => patchUrl({ kitTab: v })} className="min-w-0">
         <TabsList className={KIT_REQUEST_TABS_LIST_CLASS}>
           <TabsTrigger value="open" className={KIT_REQUEST_TAB_TRIGGER_CLASS}>
             Offene Kit Gesuche
@@ -203,16 +227,12 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
             searchId="kit-search"
             search={search}
             onSearch={(value) => {
-              setSearch(value);
-              setPage(1);
+              patchUrl({ kitSearch: value, kitPage: 1 });
             }}
             category={category}
             onCategory={(value) => {
-              setCategory(value);
-              setProductName(null);
               setProductId(null);
-              setVariant(null);
-              setPage(1);
+              patchUrl({ kitCategory: value, kitProduct: null, kitVariant: null, kitPage: 1 });
             }}
             categories={
               storefrontQuery.data
@@ -225,28 +245,24 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
             }
             productName={productName}
             onProductName={(value) => {
-              setProductName(value);
               setProductId(null);
-              setVariant(null);
-              setPage(1);
+              patchUrl({ kitProduct: value, kitVariant: null, kitPage: 1 });
             }}
             groups={groups}
             variant={variant}
             onVariant={(nextVariant, nextProductId) => {
-              setVariant(nextVariant);
               setProductId(nextProductId);
-              setPage(1);
+              patchUrl({ kitVariant: nextVariant, kitPage: 1 });
             }}
             variantOptions={variantOptions}
             minRemaining={minRemaining}
             onMinRemaining={(value) => {
               setMinRemaining(value);
-              setPage(1);
+              patchUrl({ kitPage: 1 });
             }}
             sort={sort}
             onSort={(value) => {
-              setSort(value);
-              setPage(1);
+              patchUrl({ kitSort: value, kitPage: 1 });
             }}
           />
 
@@ -298,7 +314,7 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
                       className="h-11 min-h-11 flex-1 sm:flex-none"
                       variant="outline"
                       disabled={page <= 1}
-                      onClick={() => setPage((p) => p - 1)}
+                      onClick={() => patchUrl({ kitPage: page - 1 })}
                     >
                       Zurück
                     </Button>
@@ -306,7 +322,7 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
                       className="h-11 min-h-11 flex-1 sm:flex-none"
                       variant="outline"
                       disabled={page >= totalPages}
-                      onClick={() => setPage((p) => p + 1)}
+                      onClick={() => patchUrl({ kitPage: page + 1 })}
                     >
                       Weiter
                     </Button>

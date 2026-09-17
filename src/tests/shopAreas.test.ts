@@ -61,16 +61,17 @@ describe("shop area domain", () => {
       { key: "group_buy_2", name: "Group Buy 2", pricing_profile: "group_buy", sort_order: 30, path: "/shop/group-buy-2", base_price_factor_pct: 100 },
     ];
     const kundeItems = buildCustomerNavItems(kunde);
+    // Dashboard is primary home; Ankündigungen is secondary
     expect(kundeItems.map((item) => item.label)).toEqual([
-      "Ankündigungen",
       "Übersicht",
       "Shop",
-      "Feedback",
-      "Lexikon & Rechner",
       "Meine Bestellungen",
+      "Lexikon & Rechner",
+      "Feedback",
       "Profil",
+      "Ankündigungen",
     ]);
-    // No Favoriten in simplified nav
+    // Favoriten accessible via Dashboard shortcut, not in simplified nav
     expect(kundeItems.some((item) => item.label === "Favoriten")).toBe(false);
     // No kit-gesuche or group-buy in nav
     expect(kundeItems.some((item) => item.to === "/kit-gesuche")).toBe(false);
@@ -81,13 +82,13 @@ describe("shop area domain", () => {
     // Nav is the same regardless of which areas the user has access to (single Shop entry)
     const gbItems = buildCustomerNavItems(groupBuy);
     expect(gbItems.map((item) => item.to)).toEqual([
-      "/announcements",
       "/dashboard",
       "/shop",
-      "/feedback",
-      "/peptide",
       "/orders",
+      "/peptide",
+      "/feedback",
       "/profile",
+      "/announcements",
     ]);
     expect(gbItems.some((item) => item.to === "/kit-gesuche")).toBe(false);
   });

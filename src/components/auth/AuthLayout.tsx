@@ -12,7 +12,8 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       />
 
       <div className="relative z-10 flex min-h-[100dvh] items-center justify-center overflow-y-auto px-4 py-6 lg:justify-end lg:pr-[5vw]">
-        <div className="flex w-full max-w-[360px] flex-col rounded-[12px] border border-[rgba(255,255,255,0.10)] bg-[rgba(8,8,8,0.88)] px-5 py-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-[14px] sm:min-h-[500px] sm:w-[360px]">
+        {/* Glass panel: intentional dark-mode glassmorphism — rgba values are deliberate and not in the token system */}
+        <div className="flex w-full max-w-[360px] flex-col rounded-xl border border-white/10 bg-black/88 px-5 py-5 shadow-[0_20px_60px_hsl(0_0%_0%/0.35)] backdrop-blur-[14px] sm:min-h-[500px] sm:w-[360px]">
           {children}
         </div>
       </div>

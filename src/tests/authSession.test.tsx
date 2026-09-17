@@ -73,7 +73,7 @@ describe("login session redirects", () => {
     authValue.loading = false;
   });
 
-  it("navigates to announcements after a successful password sign-in once the session is present", async () => {
+  it("navigates to the dashboard after a successful password sign-in once the session is present", async () => {
     const user = userEvent.setup();
     signIn.mockImplementation(async () => {
       authValue.session = fakeSession;
@@ -88,7 +88,8 @@ describe("login session redirects", () => {
 
     await waitFor(() => {
       expect(signIn).toHaveBeenCalledWith("test@example.com", "secret");
-      expect(screen.getByText("Announcements ready")).toBeInTheDocument();
+      // POST_LOGIN_PATH is now /dashboard
+      expect(screen.getByText("Dashboard ready")).toBeInTheDocument();
       expect(screen.queryByText("LOGIN")).not.toBeInTheDocument();
     });
   });
@@ -101,12 +102,13 @@ describe("login session redirects", () => {
     expect(screen.queryByLabelText("E-Mail-Adresse")).not.toBeInTheDocument();
   });
 
-  it("redirects /login to announcements when a session already exists", async () => {
+  it("redirects /login to dashboard when a session already exists", async () => {
     authValue.loading = false;
     authValue.session = fakeSession;
     renderAuthRoutes("/login");
     await waitFor(() => {
-      expect(screen.getByText("Announcements ready")).toBeInTheDocument();
+      // POST_LOGIN_PATH is now /dashboard
+      expect(screen.getByText("Dashboard ready")).toBeInTheDocument();
     });
   });
 

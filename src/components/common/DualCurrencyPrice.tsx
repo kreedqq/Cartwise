@@ -1,7 +1,7 @@
 import { convertUsdToEur, formatEur, formatUsd } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
-type DualCurrencySize = "catalog" | "compact" | "summary";
+type DualCurrencySize = "catalog" | "compact" | "summary" | "hero";
 
 const SIZE_CLASSES: Record<DualCurrencySize, { eur: string; usd: string }> = {
   catalog: {
@@ -15,6 +15,10 @@ const SIZE_CLASSES: Record<DualCurrencySize, { eur: string; usd: string }> = {
   summary: {
     eur: "text-3xl font-semibold tabular-nums tracking-tight leading-tight text-primary [color:var(--area-price,inherit)]",
     usd: "mt-1 text-sm tabular-nums leading-tight text-muted-foreground",
+  },
+  hero: {
+    eur: "font-display text-4xl font-semibold tabular-nums tracking-tight leading-none text-primary sm:text-5xl [color:var(--area-price,inherit)]",
+    usd: "mt-2 text-sm tabular-nums leading-tight text-muted-foreground",
   },
 };
 

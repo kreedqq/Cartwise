@@ -126,7 +126,7 @@ describe("shop kit entry no longer uses invite-kit sync errors", () => {
 
 describe("shop layout uses available desktop width", () => {
   it("widens the shell, search, and shop columns without a mobile page overflow", () => {
-    expect(read("src/components/layout/AppShell.tsx")).toContain("max-w-[1680px]");
+    expect(read("src/components/layout/AppShell.tsx")).toContain("max-w-[1440px]");
     expect(read("src/pages/GroupBuy.tsx")).toContain("w-full max-w-3xl");
     expect(read("src/pages/ShopRetail.tsx")).toContain("w-full max-w-3xl");
     expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("min-w-[16rem]");

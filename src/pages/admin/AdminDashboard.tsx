@@ -1,13 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import {
   AlertCircle,
+  AlertTriangle,
   ArrowRight,
+  CheckCircle2,
   ClipboardList,
-  DollarSign,
+  Layers,
   Megaphone,
   Package,
   Palette,
-  RefreshCw,
+  ShoppingCart,
   Truck,
   Users,
 } from "lucide-react";
@@ -15,114 +17,115 @@ import { Link } from "react-router-dom";
 
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminSection } from "@/components/admin/AdminSection";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ExchangeRateStatusCard } from "@/components/admin/ExchangeRateStatusCard";
-import { DataIssuesCard } from "@/components/admin/DataIssuesCard";
 import { QuantityDiscountsSwitch } from "@/components/admin/QuantityDiscountsSwitch";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { PaymentMethodBadge } from "@/components/orders/PaymentMethodBadge";
-import { listAllProducts } from "@/services/products";
-import { listAllOrders } from "@/services/orders";
-import { listUsersWithRoles } from "@/services/profiles";
+import { OrderIdentity } from "@/components/orders/OrderIdentity";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { QUERY_KEYS } from "@/lib/constants";
 import { formatDateTime, formatUsd } from "@/lib/money";
 import { cn } from "@/lib/utils";
-import { OrderIdentity } from "@/components/orders/OrderIdentity";
-import { AdminSystemHealthSection } from "@/components/admin/AdminSystemHealthSection";
+import { fetchAdminSystemHealth, type AdminSystemHealthCard } from "@/services/adminSystemHealth";
+import { listAllOrders } from "@/services/orders";
 
 export default function AdminDashboardPage() {
-  const productsQuery = useQuery({ queryKey: ["admin-products-count"], queryFn: () => listAllProducts() });
-  const ordersQuery = useQuery({ queryKey: ["admin-orders-dashboard"], queryFn: listAllOrders });
-  const usersQuery = useQuery({ queryKey: ["admin-users-count"], queryFn: listUsersWithRoles });
+  // Use the system health service for all counts — avoids full dataset loads
+  const healthQuery = useQuery({
+    queryKey: QUERY_KEYS.adminSystemHealth,
+    queryFn: fetchAdminSystemHealth,
+    staleTime: 30_000,
+  });
 
-  const products = productsQuery.data ?? [];
+  // Keep a targeted recent-orders query (last 10 only) for the activity feed
+  const ordersQuery = useQuery({
+    queryKey: ["admin-orders-recent"],
+    queryFn: listAllOrders,
+    staleTime: 60_000,
+  });
+
+  const health = healthQuery.data;
   const orders = ordersQuery.data ?? [];
-  const users = usersQuery.data ?? [];
 
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  const thisMonth = orders.filter((o) => o.submitted_at >= startOfMonth);
-  const open = orders.filter((o) => o.status !== "completed" && o.status !== "cancelled");
-  const monthValue = thisMonth.reduce((sum, o) => sum + Number(o.total_usd), 0);
-
-  const isLoading = productsQuery.isLoading || ordersQuery.isLoading;
+  const attentionCards = (health?.cards ?? []).filter(
+    (c) => c.level === "error" || c.level === "needs_attention",
+  );
+  const healthyCards = (health?.cards ?? []).filter((c) => c.level === "healthy");
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         section="Übersicht"
-        title="PEPTIX Backoffice"
-        description="Zentrale Kennzahlen und Schnellzugriff auf die wichtigsten Admin-Bereiche."
+        title="Operations"
+        description="Was zuerst erledigt werden muss."
       />
 
-      {/* KPI row */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
-        <KpiCard
-          label="Bestelleingänge"
-          value={isLoading ? null : orders.length}
-          icon={ClipboardList}
-          color="gold"
-          to="/admin/orders"
-        />
-        <KpiCard
-          label="Offen / Aktiv"
-          value={isLoading ? null : open.length}
-          icon={AlertCircle}
-          color={open.length > 0 ? "warning" : "neutral"}
-          to="/admin/orders"
-        />
-        <KpiCard
-          label="Umsatz (Monat)"
-          value={isLoading ? null : formatUsd(monthValue)}
-          icon={DollarSign}
-          color="gold"
-        />
-        <KpiCard
-          label="Kunden"
-          value={usersQuery.isLoading ? null : users.length}
-          icon={Users}
-          color="neutral"
-          to="/admin/users"
-        />
-        <KpiCard
-          label="Produkte gesamt"
-          value={isLoading ? null : products.length}
-          icon={Package}
-          color="neutral"
-          to="/admin/products"
-        />
-        <KpiCard
-          label="Aktive Produkte"
-          value={isLoading ? null : products.filter((p) => p.is_active).length}
-          icon={Package}
-          color="neutral"
-          to="/admin/products"
-        />
-      </div>
+      {healthQuery.isLoading ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-lg" />
+          ))}
+        </div>
+      ) : attentionCards.length > 0 ? (
+        <section className="border border-warning/40 bg-warning/[0.06] p-4">
+          <h2 className="flex items-center gap-2 text-sm font-semibold text-warning">
+            <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+            Handlungsbedarf
+          </h2>
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {attentionCards.map((card) => (
+              <OpsCard key={card.id} card={card} />
+            ))}
+          </div>
+        </section>
+      ) : (
+        <div className="flex items-center gap-3 border border-success/30 bg-success/8 px-4 py-3">
+          <CheckCircle2 className="h-5 w-5 shrink-0 text-success" aria-hidden="true" />
+          <p className="text-sm font-medium text-success">Alle Systeme in Ordnung — keine offenen Probleme.</p>
+        </div>
+      )}
 
-      {/* Quick actions */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <nav className="flex flex-wrap gap-x-6 gap-y-2 border-y border-border py-3 text-sm font-medium">
         <QuickAction to="/admin/orders" icon={ClipboardList} label="Bestellungen" />
-        <QuickAction to="/admin/kit-requests" icon={Package} label="Kit Gesuche" />
-        <QuickAction to="/admin/products" icon={Package} label="Produkte" />
+        <QuickAction to="/admin/kit-requests" icon={Layers} label="Kit Gesuche" />
+        <QuickAction to="/admin/carts" icon={ShoppingCart} label="Warenkörbe" />
         <QuickAction to="/admin/users" icon={Users} label="Benutzer" />
+        <QuickAction to="/admin/products" icon={Package} label="Produkte" />
         <QuickAction to="/admin/announcements" icon={Megaphone} label="Ankündigungen" />
-        <QuickAction to="/admin/feedback" icon={AlertCircle} label="Bewertungen" />
         <QuickAction to="/admin/design" icon={Palette} label="Design" />
         <QuickAction to="/admin/shipping-costs" icon={Truck} label="Versand" />
-      </div>
+      </nav>
 
-      <AdminSystemHealthSection />
+      {/* ── System status row ─────────────────────────────────────────── */}
+      <section className="space-y-2">
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+          <CheckCircle2 className="h-4 w-4 text-success" aria-hidden="true" />
+          Systemstatus
+        </h2>
+        {healthyCards.length > 0 ? (
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+            {healthyCards.map((card) => (
+              <StatusPill key={card.id} card={card} />
+            ))}
+          </div>
+        ) : healthQuery.isLoading ? (
+          <Skeleton className="h-16 w-full rounded-lg" />
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Offene Punkte stehen oben unter Handlungsbedarf. Weitere Systeme sind derzeit nicht als ruhig gemeldet.
+          </p>
+        )}
+      </section>
+
+      {/* ── Exchange rate ─────────────────────────────────────────────── */}
+      <div className="max-w-sm">
+        <ExchangeRateStatusCard />
+      </div>
 
       <QuantityDiscountsSwitch />
 
-      {/* Status cards */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <ExchangeRateStatusCard />
-        <DataIssuesCard />
-      </div>
-
-      {/* Recent orders */}
+      {/* ── Recent orders ─────────────────────────────────────────────── */}
       <AdminSection
         title="Letzte Bestellungen"
         actions={
@@ -150,21 +153,31 @@ export default function AdminDashboardPage() {
               <Link
                 key={order.id}
                 to={`/admin/orders/${order.id}`}
-                className="flex items-center justify-between gap-3 px-4 py-2.5 transition-colors hover:bg-secondary/60"
+                className="group flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-secondary/60"
               >
-                <div className="min-w-0">
+                {/* Status badge first — primary signal for admin */}
+                <OrderStatusBadge status={order.status} />
+
+                {/* Identity + date */}
+                <div className="min-w-0 flex-1">
                   <OrderIdentity
                     orderNumber={order.order_number}
                     telegramSnapshot={order.telegram_username_snapshot}
                   />
-                  <p className="text-[11px] text-muted-foreground">{formatDateTime(order.submitted_at)}</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {formatDateTime(order.submitted_at)}
+                  </p>
                 </div>
+
+                {/* Amount + payment */}
                 <div className="flex shrink-0 items-center gap-2">
                   <span className="hidden sm:block">
                     <PaymentMethodBadge paymentMethod={order.payment_method} />
                   </span>
-                  <span className="text-xs tabular-nums text-foreground">{formatUsd(order.total_usd)}</span>
-                  <OrderStatusBadge status={order.status} />
+                  <span className="text-xs tabular-nums text-foreground">
+                    {formatUsd(order.total_usd)}
+                  </span>
+                  <ArrowRight className="h-3 w-3 text-muted-foreground/30 transition-all group-hover:translate-x-0.5 group-hover:text-muted-foreground/70" />
                 </div>
               </Link>
             ))}
@@ -175,75 +188,74 @@ export default function AdminDashboardPage() {
   );
 }
 
-/* ─── KPI card ──────────────────────────────────────────────────────────── */
-function KpiCard({
-  label,
-  value,
-  icon: Icon,
-  color,
-  to,
-}: {
-  label: string;
-  value: number | string | null;
-  icon: typeof Package;
-  color: "gold" | "warning" | "neutral";
-  to?: string;
-}) {
-  const iconClass = cn(
-    "flex h-7 w-7 shrink-0 items-center justify-center rounded-md",
-    color === "gold" && "bg-primary/12 text-primary",
-    color === "warning" && "bg-warning/15 text-warning",
-    color === "neutral" && "bg-muted text-muted-foreground",
-  );
-
+/* ─── Ops card (attention / needs_attention items) ──────────────────────── */
+function OpsCard({ card }: { card: AdminSystemHealthCard }) {
+  const isError = card.level === "error";
   const inner = (
-    <div className="flex items-center gap-3 p-3.5">
-      <span className={iconClass}>
-        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[11px] font-medium text-muted-foreground">{label}</p>
-        {value === null ? (
-          <Skeleton className="mt-1 h-5 w-12" />
+    <div
+      className={cn(
+        "group flex min-h-[5rem] flex-col gap-1 rounded-lg border p-3.5 transition-all",
+        isError
+          ? "border-destructive/35 bg-destructive/[0.08] hover:border-destructive/55 hover:shadow-[0_0_0_2px_hsl(var(--destructive)/0.12)]"
+          : "border-warning/35 bg-warning/[0.07] hover:border-warning/55 hover:shadow-[0_0_0_2px_hsl(var(--warning)/0.12)]",
+      )}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          {card.title}
+        </p>
+        {isError ? (
+          <AlertCircle className="h-3.5 w-3.5 shrink-0 text-destructive" aria-hidden />
         ) : (
-          <p className="text-lg font-bold tabular-nums tracking-tight text-foreground">{value}</p>
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-warning" aria-hidden />
         )}
       </div>
+      <p
+        className={cn(
+          "text-2xl font-bold tabular-nums tracking-tight leading-none",
+          isError ? "text-destructive" : "text-warning",
+        )}
+      >
+        {card.value}
+      </p>
+      <p className="text-xs leading-snug text-muted-foreground">{card.context}</p>
+      {card.href && (
+        <div className="mt-1 flex items-center gap-0.5 text-[11px] font-medium opacity-0 transition-opacity group-hover:opacity-100">
+          <span className={isError ? "text-destructive" : "text-warning"}>
+            Details ansehen
+          </span>
+          <ArrowRight className={cn("h-3 w-3", isError ? "text-destructive" : "text-warning")} />
+        </div>
+      )}
     </div>
   );
-
-  const cardClass =
-    "rounded-lg border border-border bg-card shadow-[0_1px_2px_0_hsl(var(--foreground)/0.04)] transition-shadow hover:shadow-[0_2px_8px_0_hsl(var(--foreground)/0.08)]";
-
-  if (to) {
-    return (
-      <Link to={to} className={cn(cardClass, "block")}>
-        {inner}
-      </Link>
-    );
+  if (card.href) {
+    return <Link to={card.href}>{inner}</Link>;
   }
-  return <div className={cardClass}>{inner}</div>;
+  return inner;
+}
+
+/* ─── Status pill (healthy cards) ──────────────────────────────────────── */
+function StatusPill({ card }: { card: AdminSystemHealthCard }) {
+  const inner = (
+    <div className="flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-2 text-xs transition-colors hover:border-primary/30">
+      <CheckCircle2 className="h-3 w-3 shrink-0 text-success" aria-hidden />
+      <span className="truncate font-medium text-foreground">{card.title}</span>
+      <span className="ml-auto shrink-0 text-muted-foreground">{card.value}</span>
+    </div>
+  );
+  if (card.href) {
+    return <Link to={card.href}>{inner}</Link>;
+  }
+  return inner;
 }
 
 /* ─── Quick action card ─────────────────────────────────────────────────── */
 function QuickAction({ to, icon: Icon, label }: { to: string; icon: typeof Package; label: string }) {
   return (
-    <Link
-      to={to}
-      className="flex items-center gap-2.5 rounded-lg border border-border bg-card px-3.5 py-2.5 text-xs font-medium text-foreground shadow-[0_1px_2px_0_hsl(var(--foreground)/0.04)] transition-all hover:border-primary/30 hover:shadow-[0_2px_8px_0_hsl(var(--foreground)/0.08)]"
-    >
-      <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-      <span className="truncate">{label}</span>
-      <ArrowRight className="ml-auto h-3 w-3 shrink-0 text-muted-foreground/50" />
+    <Link to={to} className="inline-flex items-center gap-1.5 text-foreground hover:text-primary">
+      <Icon className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden="true" />
+      <span>{label}</span>
     </Link>
-  );
-}
-
-/* ─── Refresh button helper ─────────────────────────────────────────────── */
-function _RefreshButton({ onClick, loading }: { onClick: () => void; loading: boolean }) {
-  return (
-    <Button variant="ghost" size="sm" onClick={onClick} loading={loading} className="h-7 gap-1 text-xs">
-      <RefreshCw className="h-3 w-3" /> Aktualisieren
-    </Button>
   );
 }

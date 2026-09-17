@@ -16,6 +16,7 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { AreaSectionHeader, PageHeader } from "@/components/common/PageHeader";
+import { KitMarketplaceHero } from "@/components/kit-requests/KitMarketplaceHero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,8 +45,7 @@ import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
-import { useQuery } from "@tanstack/react-query";
-import { getOrCreateUserCart } from "@/services/carts";
+import { useShopCart } from "@/hooks/useShopCart";
 import { KitRequestDetailDialog } from "@/components/kit-requests/KitRequestDetailDialog";
 import { ShopAreaProvider, useShopAreaContext } from "@/context/ShopAreaContext";
 import {
@@ -63,10 +63,8 @@ import {
 } from "@/lib/kitRequests";
 import {
   AREA_CATALOG_DESCRIPTION,
-  AREA_GROUP_BUY_DESCRIPTION,
   AREA_KIT_REQUESTS_DESCRIPTION,
   AREA_PAGE_CONTENT_SLOT,
-  AREA_PAGE_NAV_SLOT,
   AREA_PAGE_RHYTHM,
 } from "@/lib/shop/areaLayout";
 import { shopGroupsForCategory, productMatchesShopSearch, variantLabelForProduct } from "@/lib/shop/display";
@@ -108,18 +106,25 @@ export default function GroupBuyPage({ area }: { area?: MyShopArea }) {
   const areaSlug = current.slug ?? slug;
   if (!areaSlug) return <Navigate to="/403" replace />;
 
+  const content = (
+    <GroupBuyContent
+      shopArea={current.key}
+      areaSlug={areaSlug}
+      areaName={current.name}
+      areaDescription={current.subtitle}
+    />
+  );
+
+  // When area prop is provided, ShopAreaPage already wraps with ShopAreaProvider — avoid double-nesting
+  if (area) return content;
+
   return (
     <ShopAreaProvider
       shopArea={current.key}
       pricingProfile="group_buy"
       theme={parseAreaTheme(current.theme)}
     >
-      <GroupBuyContent
-        shopArea={current.key}
-        areaSlug={areaSlug}
-        areaName={current.name}
-        areaDescription={current.subtitle}
-      />
+      {content}
     </ShopAreaProvider>
   );
 }
@@ -208,6 +213,14 @@ function GroupBuyContent({
       });
   }, [assignments, products, selectedCategory, urlCatalog.search, urlCatalog.variant]);
 
+  // Global hub search — active when a search term is set but no category is selected
+  const globalSearchResults = React.useMemo(() => {
+    if (selectedCategory) return null;
+    const term = urlCatalog.search.trim();
+    if (!term) return null;
+    return products.filter((p) => productMatchesShopSearch(p, term));
+  }, [products, selectedCategory, urlCatalog.search]);
+
   const favoriteProductIds = React.useMemo(
     () => new Set((favoritesQuery.data ?? []).map((f) => f.productId)),
     [favoritesQuery.data],
@@ -226,35 +239,32 @@ function GroupBuyContent({
     });
   }
 
-  const cartQuery = useQuery({
-    queryKey: ["header-user-cart"],
-    queryFn: getOrCreateUserCart,
-  });
-  const cartHref = cartQuery.data?.id ? `/carts/${cartQuery.data.id}` : null;
+  const { activeCart } = useShopCart(shopArea);
+  const cartHref = activeCart?.id ? `/carts/${activeCart.id}` : null;
 
   return (
     <div className={areaDensityClass(theme)} data-shop-area={shopArea}>
       <AreaStorefrontChrome theme={theme} areaName={areaName}>
       <div className={AREA_PAGE_RHYTHM}>
-      <PageHeader
-        title={areaName}
-        description={areaDescription?.trim() || AREA_GROUP_BUY_DESCRIPTION}
+      <KitMarketplaceHero
+        areaName={areaName}
+        description={areaDescription}
+        actions={
+          <KitAreaActionNav
+            section={section}
+            onSection={(next) => {
+              navigate(next === "kits" ? kitsPath : catalogPath);
+            }}
+            cartHref={cartHref}
+            canUseKitRequests={canUseKitRequests}
+            onCreate={() => {
+              if (!canUseKitRequests) return;
+              navigate(kitsPath);
+              setCreateOpen(true);
+            }}
+          />
+        }
       />
-      <div className={AREA_PAGE_NAV_SLOT}>
-        <KitAreaActionNav
-          section={section}
-          onSection={(next) => {
-            navigate(next === "kits" ? kitsPath : catalogPath);
-          }}
-          cartHref={cartHref}
-          canUseKitRequests={canUseKitRequests}
-          onCreate={() => {
-            if (!canUseKitRequests) return;
-            navigate(kitsPath);
-            setCreateOpen(true);
-          }}
-        />
-      </div>
 
       <div className={AREA_PAGE_CONTENT_SLOT}>
       {section === "catalog" && (
@@ -276,6 +286,7 @@ function GroupBuyContent({
           storefrontError={storefrontQuery.isError}
           onStorefrontRetry={() => void storefrontQuery.refetch()}
           filtered={filtered}
+          globalSearchResults={globalSearchResults}
           search={searchDraft}
           selectedCategory={selectedCategory}
           favoriteProductIds={favoriteProductIds}
@@ -325,6 +336,8 @@ interface GroupBuyCatalogProps {
   storefrontError: boolean;
   onStorefrontRetry: () => void;
   filtered: Tables<"products">[];
+  /** Products matching global search across all categories (hub-level, no category required). */
+  globalSearchResults: Tables<"products">[] | null;
   search: string;
   selectedCategory: AreaCategory | null;
   favoriteProductIds: Set<string>;
@@ -348,6 +361,7 @@ function GroupBuyCatalog({
   storefrontError,
   onStorefrontRetry,
   filtered,
+  globalSearchResults,
   search,
   selectedCategory,
   favoriteProductIds,
@@ -369,27 +383,80 @@ function GroupBuyCatalog({
           title="Katalog"
           description={AREA_CATALOG_DESCRIPTION}
         />
-        {(isLoading || storefrontLoading) && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-[200px] w-full rounded-2xl" />
-            ))}
+
+        {/* Global hub search field — visible even without category selection */}
+        <div className="relative w-full max-w-xl">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => onSearch(e.target.value)}
+            placeholder={theme.searchPlaceholder || "Alle Produkte durchsuchen …"}
+            className="h-11 pl-8"
+            aria-label="Produkte suchen"
+          />
+        </div>
+
+        {/* Global search results */}
+        {globalSearchResults !== null && (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              {globalSearchResults.length === 0
+                ? "Keine Treffer — versuche einen anderen Suchbegriff."
+                : `${globalSearchResults.length} Treffer`}
+            </p>
+            {globalSearchResults.length > 0 && (
+              <>
+                <div className="hidden lg:block">
+                  <ShopProductsTable
+                    products={globalSearchResults}
+                    rate={rate}
+                    rateLoading={rateLoading}
+                    favoriteProductIds={favoriteProductIds}
+                    pricingProfile="group_buy"
+                    onKitCreated={onKitCreated}
+                  />
+                </div>
+                <div className="lg:hidden">
+                  <ShopProductsMobileList
+                    products={globalSearchResults}
+                    rate={rate}
+                    rateLoading={rateLoading}
+                    favoriteProductIds={favoriteProductIds}
+                    pricingProfile="group_buy"
+                    onKitCreated={onKitCreated}
+                  />
+                </div>
+              </>
+            )}
           </div>
         )}
-        {(isError || storefrontError) && (
-          <ErrorState
-            message="Produkte konnten nicht geladen werden."
-            onRetry={() => {
-              onRefetch();
-              onStorefrontRetry();
-            }}
-          />
-        )}
-        {!isLoading && !isError && !storefrontLoading && !storefrontError && visible.length === 0 && (
-          <EmptyState icon={PackageSearch} title="Aktuell sind keine Produkte verfügbar." />
-        )}
-        {!isLoading && !isError && !storefrontLoading && !storefrontError && visible.length > 0 && (
-          <ShopCategoryHub categories={visible} counts={counts} onSelect={onSelectCategory} />
+
+        {/* Category hub — shown when no search active */}
+        {globalSearchResults === null && (
+          <>
+            {(isLoading || storefrontLoading) && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-[200px] w-full rounded-2xl" />
+                ))}
+              </div>
+            )}
+            {(isError || storefrontError) && (
+              <ErrorState
+                message="Produkte konnten nicht geladen werden."
+                onRetry={() => {
+                  onRefetch();
+                  onStorefrontRetry();
+                }}
+              />
+            )}
+            {!isLoading && !isError && !storefrontLoading && !storefrontError && visible.length === 0 && (
+              <EmptyState icon={PackageSearch} title="Aktuell sind keine Produkte verfügbar." />
+            )}
+            {!isLoading && !isError && !storefrontLoading && !storefrontError && visible.length > 0 && (
+              <ShopCategoryHub categories={visible} counts={counts} onSelect={onSelectCategory} />
+            )}
+          </>
         )}
       </div>
     );
@@ -769,7 +836,7 @@ function KitRequestsSection({
         open={detailTarget != null}
         onOpenChange={(next) => !next && setDetailTarget(null)}
         onJoin={
-          detailTarget && detailTarget.status === "open" && !detailTarget.isParticipant
+          detailTarget && detailTarget.status === "open" && !detailTarget.isCreator
             ? () => {
                 setJoinTarget(detailTarget);
                 setDetailTarget(null);

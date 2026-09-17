@@ -139,6 +139,36 @@ export const SHIPPING_PROGRESS_STATUSES: readonly ShippingProgressStatus[] = [
 
 export type ShippingProgressStatusKey = (typeof SHIPPING_PROGRESS_STATUSES)[number]["key"];
 
+/**
+ * Customer/admin order timeline. Display-only composition of existing keys:
+ * received (default for a new order) plus the seven shipping statuses.
+ * Does not invent events, timestamps, or extra status values.
+ */
+export const ORDER_PROGRESS_TIMELINE_STEPS = [
+  { key: "received" as const, title: "Bestellung eingegangen" },
+  ...SHIPPING_PROGRESS_STATUSES.map((status) => ({ key: status.key, title: status.title })),
+] as const;
+
+export type OrderProgressTimelineState = "complete" | "current" | "upcoming";
+
+export function orderProgressTimelineIndex(statusKey: string | null | undefined): number {
+  if (!statusKey) return -1;
+  return ORDER_PROGRESS_TIMELINE_STEPS.findIndex((step) => step.key === statusKey);
+}
+
+export function orderProgressTimelineState(
+  currentStatusKey: string | null | undefined,
+  stepKey: (typeof ORDER_PROGRESS_TIMELINE_STEPS)[number]["key"],
+): OrderProgressTimelineState {
+  const current = orderProgressTimelineIndex(currentStatusKey);
+  const step = orderProgressTimelineIndex(stepKey);
+  if (step < 0) return "upcoming";
+  if (current < 0) return stepKey === currentStatusKey ? "current" : "upcoming";
+  if (step < current) return "complete";
+  if (step === current) return "current";
+  return "upcoming";
+}
+
 export function isShippingProgressStatusKey(value: string | null | undefined): value is ShippingProgressStatusKey {
   return Boolean(value && SHIPPING_PROGRESS_STATUSES.some((status) => status.key === value));
 }

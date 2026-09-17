@@ -175,18 +175,18 @@ function ShopProductGroupTableRow({
       <TableCell className="px-4 py-4">
         <div className="flex items-center gap-0.5">
           {group.lexiconHref ? (
-            <Button variant="ghost" size="icon" className="h-8 w-8" asChild title="Zum Lexikon">
+            <Button variant="ghost" size="icon" className="h-10 w-10" asChild title="Zum Lexikon">
               <Link to={group.lexiconHref} aria-label="Zum Lexikon">
                 <Info className="h-4 w-4 text-primary" />
               </Link>
             </Button>
           ) : (
-            <span className="inline-flex h-8 w-8 items-center justify-center" aria-hidden="true" />
+            <span className="inline-flex h-10 w-10 items-center justify-center" aria-hidden="true" />
           )}
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-10 w-10"
             disabled={row.favoritePending}
             onClick={row.toggleFavorite}
             aria-label={isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}

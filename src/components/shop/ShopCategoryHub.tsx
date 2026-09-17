@@ -20,35 +20,71 @@ export function ShopCategoryHub({
   counts: Record<string, number> | null;
   onSelect: (key: string) => void;
 }) {
+  const [featured, ...rest] = categories;
+  if (!featured) return null;
+
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {categories.map((category) => {
-        const Icon = KNOWN_ICONS[category.category_key] ?? Package;
-        const count = counts?.[category.category_key];
-        return (
-          <button
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+      <CategoryTile
+        category={featured}
+        count={counts?.[featured.category_key]}
+        onSelect={onSelect}
+        featured
+        className="lg:col-span-7"
+      />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
+        {rest.map((category) => (
+          <CategoryTile
             key={category.category_key}
-            type="button"
-            onClick={() => onSelect(category.category_key)}
-            className={cn(
-              "group relative flex min-h-[200px] flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card p-7 text-left transition-colors duration-200",
-              "hover:border-primary/45 hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            )}
-          >
-            <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-70" />
-            <Icon className="h-6 w-6 text-primary" />
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Katalog</p>
-              <p className="mt-2 font-display text-[1.65rem] font-semibold leading-tight tracking-tight sm:text-3xl">
-                {storefrontHeadline(category.label)}
-              </p>
-              <p className="mt-4 text-sm text-muted-foreground">
-                {count != null ? `${count} Artikel` : "Artikel"}
-              </p>
-            </div>
-          </button>
-        );
-      })}
+            category={category}
+            count={counts?.[category.category_key]}
+            onSelect={onSelect}
+          />
+        ))}
+      </div>
     </div>
+  );
+}
+
+function CategoryTile({
+  category,
+  count,
+  onSelect,
+  featured = false,
+  className,
+}: {
+  category: AreaCategory;
+  count: number | undefined;
+  onSelect: (key: string) => void;
+  featured?: boolean;
+  className?: string;
+}) {
+  const Icon = KNOWN_ICONS[category.category_key] ?? Package;
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(category.category_key)}
+      className={cn(
+        "group relative flex flex-col justify-between overflow-hidden border border-border/80 bg-card/30 text-left transition-colors",
+        "hover:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        featured ? "min-h-[18rem] p-7 sm:p-8" : "min-h-[8.5rem] p-5",
+        className,
+      )}
+    >
+      <span className="absolute left-0 top-0 h-full w-px bg-primary/40 opacity-70" />
+      <Icon className={cn("text-primary", featured ? "h-7 w-7" : "h-5 w-5")} />
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Katalog</p>
+        <p
+          className={cn(
+            "mt-2 font-display font-semibold leading-tight tracking-tight",
+            featured ? "text-[1.85rem] sm:text-4xl" : "text-xl",
+          )}
+        >
+          {storefrontHeadline(category.label)}
+        </p>
+        <p className="mt-3 text-sm text-muted-foreground">{count != null ? `${count} Artikel` : "Artikel"}</p>
+      </div>
+    </button>
   );
 }

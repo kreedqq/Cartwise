@@ -188,7 +188,8 @@ describe("OAuth client helpers", () => {
   });
 
   it("does not treat OAuth success as an admin landing page", () => {
-    expect(POST_LOGIN_PATH).toBe("/announcements");
+    // POST_LOGIN_PATH is now /dashboard (personalised home); OAUTH_SUCCESS_PATH keeps /announcements as OAuth callback
+    expect(POST_LOGIN_PATH).toBe("/dashboard");
     expect(OAUTH_SUCCESS_PATH).toBe("/announcements");
     expect(OAUTH_PROVIDERS).toContain("discord");
     expect(OAUTH_PROVIDERS).toEqual(["discord", "custom:telegram"]);
@@ -280,7 +281,9 @@ describe("OAuth UI surface", () => {
     expect(layout).not.toMatch(/grid-cols-2/);
     expect(layout).toMatch(/w-\[360px\]/);
     expect(layout).toMatch(/lg:pr-\[5vw\]/);
-    expect(layout).toMatch(/rgba\(8,8,8,0\.88\)/);
+    // Glass panel background — asserts that the dark glassmorphism background is still present
+    // (was rgba(8,8,8,0.88), now expressed as Tailwind's bg-black/88 which is semantically identical)
+    expect(layout).toMatch(/bg-black\/88/);
     expect(combined).not.toMatch(/Willkommen zurück/);
     expect(combined).not.toMatch(/Melde dich mit E-Mail an oder fahre mit Discord fort/);
     expect(combined).not.toMatch(/Geschützte Preise/);

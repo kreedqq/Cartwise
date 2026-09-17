@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { useShopCart } from "@/hooks/useShopCart";
 import { useFavoriteMutations } from "@/hooks/useFavorites";
+import { useCartDrawer } from "@/context/CartDrawerContext";
 import { toast } from "@/components/ui/toaster";
 import { isValidQuantity } from "@/lib/money";
 import type { Tables } from "@/types/database";
@@ -18,6 +19,7 @@ export function useShopProductRow(product: Tables<"products">, rate: number | nu
   const [status, setStatus] = React.useState<QuickAddStatus>("idle");
   const { addToActiveCart } = useShopCart();
   const { add: addFavorite, remove: removeFavorite } = useFavoriteMutations();
+  const { openDrawer } = useCartDrawer();
 
   async function handleAdd() {
     const qty = Number(quantity.replace(",", "."));
@@ -31,6 +33,14 @@ export function useShopProductRow(product: Tables<"products">, rate: number | nu
       if (item.resolution_status === "resolved") {
         setStatus("success");
         window.setTimeout(() => setStatus("idle"), 1500);
+        // Open cart drawer to confirm the add — pass price/qty for richer confirmation
+        openDrawer({
+          productName: item.product_name_snapshot ?? product.code,
+          cartId: item.cart_id,
+          quantity: item.quantity ?? qty,
+          unitPriceUsd: item.unit_price_usd_snapshot,
+          variantLabel: product.dosage_vial ?? null,
+        });
       } else {
         setStatus("idle");
         toast.error(`„${product.code}" konnte nicht hinzugefügt werden (nicht mehr verfügbar).`);

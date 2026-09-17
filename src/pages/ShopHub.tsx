@@ -1,15 +1,11 @@
-import * as React from "react";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
-import { PageHeader } from "@/components/common/PageHeader";
-import { Badge } from "@/components/ui/badge";
+import { ShopAreaShowcase } from "@/components/shop/ShopAreaShowcase";
+import { PAGE_BLEED_PAD, PAGE_BLEED_TOP, UI_TYPE } from "@/lib/design/tokens";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
-import { AreaGlyph } from "@/lib/shop/areaIcons";
-import { parseAreaTheme } from "@/lib/shop/areaTheme";
-import { isGroupBuyPricing, type MyShopArea } from "@/lib/shop/shopAreas";
-import { siteDesignImageUrl } from "@/services/siteDesign";
+import { cn } from "@/lib/utils";
 
 export default function ShopHubPage() {
   const areasQuery = useMyShopAreas();
@@ -21,66 +17,26 @@ export default function ShopHubPage() {
 
   const areas = areasQuery.data ?? [];
   if (areas.length === 0) return <Navigate to="/403" replace />;
-
-  if (areas.length === 1) {
-    return <Navigate to={areas[0].path} replace />;
-  }
+  if (areas.length === 1) return <Navigate to={areas[0].path} replace />;
 
   return (
     <div className="space-y-10">
-      <PageHeader
-        eyebrow="Peptix"
-        title="Shop"
-        description="Wähle einen Verkaufsbereich."
-      />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {areas.map((area) => (
-          <ShopAreaCard key={area.key} area={area} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ShopAreaCard({ area }: { area: MyShopArea }) {
-  const theme = parseAreaTheme(area.theme);
-  const subtitle =
-    theme.hub.description ||
-    area.subtitle ||
-    (isGroupBuyPricing(area.pricing_profile)
-      ? "Gemeinsamer Einkauf · Kits · Anteile"
-      : "Einzelverkauf · Vials · Packungen");
-  const hubImage = theme.hub.image
-    ? theme.hub.image.startsWith("http") || theme.hub.image.startsWith("/")
-      ? theme.hub.image
-      : siteDesignImageUrl(theme.hub.image)
-    : null;
-
-  return (
-    <Link
-      to={area.path}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-colors hover:border-primary/60 hover:bg-card/80"
-    >
-      {hubImage ? <img src={hubImage} alt="" className="h-28 w-full object-cover" /> : null}
-      <div className="flex flex-col gap-3 p-6">
-        <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <AreaGlyph iconKey={area.icon_key} className="h-5 w-5" />
-          </span>
-          <p className="text-base font-semibold">{theme.hub.title || area.name}</p>
+      <section className={cn(PAGE_BLEED_TOP, "relative overflow-hidden border-b border-primary/20")}>
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(820px_300px_at_80%_0%,hsl(var(--primary)/0.14),transparent_55%)]"
+        />
+        <div className={cn(PAGE_BLEED_PAD, "relative py-10 lg:py-14")}>
+          <p className={UI_TYPE.eyebrow}>Shop</p>
+          <h1 className="mt-3 max-w-3xl font-display text-[clamp(2rem,4.5vw,3.6rem)] font-semibold leading-[0.94] tracking-tight">
+            Entdecke deine PEPTIX Verkaufsbereiche
+          </h1>
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
+            Retail für den direkten Einzelkauf. Group Buy, wenn du ein Kit teilst und nur deinen Anteil zahlst.
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
-        {area.badge_text ? (
-          <Badge variant="secondary" className="w-fit">
-            {area.badge_text}
-          </Badge>
-        ) : null}
-        {area.status === "coming_soon" ? (
-          <p className="text-xs font-medium text-primary">Bald verfügbar</p>
-        ) : (
-          <p className="text-xs font-medium text-primary">Entdecken</p>
-        )}
-      </div>
-    </Link>
+      </section>
+      <ShopAreaShowcase areas={areas} heading="Wähle einen Bereich" />
+    </div>
   );
 }

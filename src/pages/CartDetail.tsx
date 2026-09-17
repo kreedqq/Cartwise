@@ -4,6 +4,8 @@ import { PackageOpen } from "lucide-react";
 
 import { CartHeader } from "@/components/cart/CartHeader";
 import { CartSummaryBar } from "@/components/cart/CartSummaryBar";
+import { Layers, ShoppingBag, Truck } from "lucide-react";
+import { Link } from "react-router-dom";
 import { CartItemsTable } from "@/components/cart/CartItemsTable";
 import { CartItemsMobileList } from "@/components/cart/CartItemsMobileList";
 import { AddItemBar } from "@/components/cart/AddItemBar";
@@ -13,6 +15,7 @@ import { DuplicateWarningBanner } from "@/components/cart/DuplicateWarningBanner
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCarts } from "@/hooks/useCarts";
 import { useCartItems } from "@/hooks/useCartItems";
@@ -40,6 +43,7 @@ export default function CartDetailPage() {
     [kitLockQuery.data],
   );
   const nextPosition = (itemsQuery.data?.length ?? 0) === 0 ? 0 : Math.max(...(itemsQuery.data ?? []).map((i) => i.position)) + 1;
+  const hasKitLines = items.some((item) => Boolean(item.kit_share_id));
 
   if (cartsQuery.isLoading || itemsQuery.isLoading) return <FullScreenSpinner label="Warenkorb wird geladen …" />;
 
@@ -70,6 +74,16 @@ export default function CartDetailPage() {
     <div className="space-y-6">
       <CartHeader cart={cart} />
 
+      {/* Shipping transparency banner */}
+      {cart.status !== "ordered" && (
+        <div className="flex items-start gap-3 rounded-lg border border-border/60 bg-secondary/40 px-4 py-3 text-sm text-muted-foreground">
+          <Truck className="mt-0.5 h-4 w-4 shrink-0 text-foreground/60" aria-hidden="true" />
+          <p>
+            <span className="font-medium text-foreground">Versand</span>: Versandkosten aus China und Deutschland werden nach Auftragseingang zugewiesen. Der Gesamtpreis inkl. Versand erscheint in der Bestellübersicht.
+          </p>
+        </div>
+      )}
+
       <DuplicateWarningBanner cartId={cart.id} duplicateCodes={duplicateCodes} items={items} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
@@ -90,13 +104,44 @@ export default function CartDetailPage() {
           {itemsQuery.isFetching && !itemsQuery.isLoading && <Skeleton className="h-2 w-full" />}
 
           {items.length === 0 ? (
-            <EmptyState
-              icon={PackageOpen}
-              title="Dein Warenkorb ist noch leer."
-              description="Füge oben einen Artikelcode und eine Menge hinzu, oder füge mehrere Zeilen auf einmal ein."
-            />
+            <div className="rounded-2xl border border-border/70 bg-card px-6 py-10 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-muted-foreground">
+                <PackageOpen className="h-5 w-5" />
+              </div>
+              <h3 className="mt-4 text-base font-semibold tracking-tight">
+                Warenkorb ist leer
+              </h3>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                Füge oben einen Artikelcode ein oder entdecke Produkte im Shop.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/shop">
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    Zum Shop
+                  </Link>
+                </Button>
+                <Button asChild size="sm" variant="ghost">
+                  <Link to="/kit-gesuche">
+                    <Layers className="h-3.5 w-3.5" />
+                    Kit Gesuche
+                  </Link>
+                </Button>
+              </div>
+            </div>
           ) : (
             <>
+              {/* Kit-items context banner — only when the cart has Kit-allocated lines */}
+              {hasKitLines && (
+                <div className="flex items-start gap-3 border border-primary/30 bg-primary/[0.05] px-4 py-4 text-sm">
+                  <span className="mt-0.5 h-10 w-px shrink-0 bg-primary" aria-hidden="true" />
+                  <Layers className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-foreground">Geteilte Kits</span>: Mengen folgen der Zuteilung und sind gesperrt. Nach Vollständigkeit werden Bestellungen automatisch synchronisiert.
+                  </p>
+                </div>
+              )}
+
               <div className="hidden lg:block">
                 <CartItemsTable
                   items={items}

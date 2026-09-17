@@ -129,9 +129,10 @@ describe("hub admin navigation", () => {
 
   it("renders desktop sidebar and mobile drawer instead of chip hubs", () => {
     const nav = read("src/components/layout/AdminNav.tsx");
-    const layout = read("src/pages/admin/AdminLayout.tsx");
-    expect(layout).toContain("AdminSidebar");
-    expect(layout).toContain("AdminMobileNav");
+    // AdminShell now owns the chrome — AdminLayout is a thin re-export
+    const shell = read("src/pages/admin/AdminShell.tsx");
+    expect(shell).toContain("AdminSidebar");
+    expect(shell).toContain("AdminMobileNav");
     expect(nav).toContain("AdminSidebar");
     expect(nav).toContain("readAdminNavCollapsed");
     expect(nav).not.toContain("overflow-x-auto");
