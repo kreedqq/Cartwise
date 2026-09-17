@@ -13,7 +13,7 @@ function read(path: string): string {
 
 describe("kit create wizard", () => {
   const wizard = read("src/components/kit-requests/CreateKitRequestDialog.tsx");
-  const shopTable = read("src/components/shop/ShopProductsTable.tsx");
+  const shopTable = read("src/components/shop/ShopProductGrid.tsx");
   const shopMobile = read("src/components/shop/ShopProductsMobileList.tsx");
   const createSql = read("supabase/migrations/0052_shop_area_product_config.sql");
 
@@ -127,10 +127,11 @@ describe("shop kit entry no longer uses invite-kit sync errors", () => {
 describe("shop layout uses available desktop width", () => {
   it("widens the shell, search, and shop columns without a mobile page overflow", () => {
     expect(read("src/components/layout/AppShell.tsx")).toContain("max-w-[1440px]");
-    expect(read("src/pages/GroupBuy.tsx")).toContain("w-full max-w-3xl");
-    expect(read("src/pages/ShopRetail.tsx")).toContain("w-full max-w-3xl");
-    expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("min-w-[16rem]");
-    expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("In den Warenkorb");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("ShopProductGrid");
+    expect(read("src/pages/ShopRetail.tsx")).toContain("ShopProductGrid");
+    expect(read("src/components/shop/ShopProductCompactRow.tsx")).toContain("Kit teilen");
+    expect(read("src/components/shop/ShopProductCompactRow.tsx")).toContain("Hinzufügen");
+    expect(read("src/components/shop/ShopProductCompactRow.tsx")).toContain("h-9 w-9");
     expect(read("src/components/shop/ShopProductsMobileList.tsx")).toContain("min-h-11 w-full");
     expect(read("src/components/shop/ShopProductsMobileList.tsx")).not.toContain("min-w-[9.5rem]");
     expect(read("src/components/layout/MobileNav.tsx")).toContain("useCustomerNavItems");

@@ -4,6 +4,7 @@ export const BRAND_TAGLINE = "B2B Bestellplattform";
 
 export const PDF_IMPORT_BUCKET = "pdf-imports";
 export const ANNOUNCEMENT_MEDIA_BUCKET = "announcement-media";
+export const PRODUCT_MEDIA_BUCKET = "product-media";
 export const SITE_DESIGN_BUCKET = "site-design";
 export const FEEDBACK_MEDIA_BUCKET = "feedback-media";
 export const MAX_PDF_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB

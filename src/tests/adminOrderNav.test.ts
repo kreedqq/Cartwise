@@ -37,14 +37,12 @@ describe("hub admin navigation", () => {
     expect(ADMIN_NAV_GROUPS.map((group) => group.label)).toEqual([
       "Übersicht",
       "Bestellungen",
-      "Produkte & Katalog",
-      "Shop Bereiche",
-      "Kunden & Rollen",
-      "Marketing & Inhalte",
-      "Design",
-      "Bewertungen",
-      "Zahlungen",
-      "System & Sicherheit",
+      "Warenkörbe",
+      "Produkte",
+      "Shop",
+      "Kunden",
+      "Inhalte",
+      "System",
     ]);
     expect(ADMIN_NAV_GROUPS[0]?.to).toBe("/admin");
   });
@@ -59,6 +57,8 @@ describe("hub admin navigation", () => {
         "/admin",
         "/admin/orders",
         "/admin/products",
+        "/admin/products/create",
+        "/admin/carts",
         "/admin/shop-areas",
         "/admin/users",
         "/admin/surcharges",
@@ -83,18 +83,19 @@ describe("hub admin navigation", () => {
     const orders = ADMIN_NAV_GROUPS.find((group) => group.id === "orders");
     expect(orders?.items.map((item) => item.label)).toEqual([
       "Bestellungen",
-      "Warenkörbe",
       "Kit Gesuche",
       "Bestellzusammenfassung",
       "Versand",
     ]);
     expect(orders?.items.map((item) => item.to)).toContain("/admin/kit-requests");
-    expect(orders?.items.map((item) => item.label)).not.toContain("Zahlungsmethoden");
-    expect(orders?.items.map((item) => item.label)).not.toContain("Rollenaufschläge");
 
-    const catalog = ADMIN_NAV_GROUPS.find((group) => group.id === "catalog");
-    expect(catalog?.items.map((item) => item.label)).toEqual([
+    const carts = ADMIN_NAV_GROUPS.find((group) => group.id === "carts");
+    expect(carts?.to).toBe("/admin/carts");
+
+    const products = ADMIN_NAV_GROUPS.find((group) => group.id === "products");
+    expect(products?.items.map((item) => item.label)).toEqual([
       "Produkte",
+      "Produkt anlegen",
       "Import",
       "Importverlauf",
     ]);
@@ -107,15 +108,20 @@ describe("hub admin navigation", () => {
     ]);
 
     const system = ADMIN_NAV_GROUPS.find((group) => group.id === "system");
-    expect(system?.items.map((item) => item.label)).toEqual(["Wartung", "Audit Logs"]);
+    expect(system?.items.map((item) => item.label)).toEqual([
+      "Zahlungsmethoden",
+      "Wartung",
+      "Audit Logs",
+    ]);
   });
 
   it("resolves path sections without overlapping overview", () => {
     expect(adminSectionForPath("/admin")?.id).toBe("overview");
     expect(adminSectionForPath("/admin/orders")?.id).toBe("orders");
     expect(adminSectionForPath("/admin/kit-requests/abc")?.id).toBe("orders");
-    expect(adminSectionForPath("/admin/payment-methods")?.id).toBe("payments");
-    expect(adminSectionForPath("/admin/shop-areas")?.id).toBe("shop-areas");
+    expect(adminSectionForPath("/admin/payment-methods")?.id).toBe("system");
+    expect(adminSectionForPath("/admin/shop-areas")?.id).toBe("shop");
+    expect(adminSectionForPath("/admin/carts")?.id).toBe("carts");
     expect(adminTabIsActive("/admin/users", { to: "/admin/users", label: "Benutzer", matchPrefix: true })).toBe(
       true,
     );

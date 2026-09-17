@@ -26,6 +26,8 @@ function shopRow(
     bulk_price_min_quantity: 10,
     currency: "USD",
     is_active: true,
+    image_path: null,
+    badge_key: null,
     last_price_change_at: null,
     created_at: "",
     updated_at: "",

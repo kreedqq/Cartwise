@@ -41,8 +41,8 @@ describe("kit request lifecycle stays on the existing engine", () => {
   });
 
   it("keeps shop create on CreateKitRequestDialog", () => {
-    expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("CreateKitRequestDialog");
+    expect(read("src/components/shop/ShopProductGrid.tsx")).toContain("CreateKitRequestDialog");
     expect(read("src/components/shop/ShopProductsMobileList.tsx")).toContain("CreateKitRequestDialog");
-    expect(read("src/components/shop/ShopProductsTable.tsx")).not.toMatch(/<KitShareDialog/);
+    expect(read("src/components/shop/ShopProductCompactRow.tsx")).not.toMatch(/<KitShareDialog/);
   });
 });

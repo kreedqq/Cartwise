@@ -64,10 +64,9 @@ describe("retail shop UI", () => {
     expect(page).toContain('pricingProfile="group_buy"');
     expect(page).toContain("JoinKitRequestDialog");
     expect(page).toContain("useLeaveKitRequest");
-    expect(page).toContain("ShopProductsTable");
+    expect(page).toContain("ShopProductGrid");
     expect(page).toContain("ShopCategoryHub");
-    expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("DualCurrencyPrice");
-    expect(read("src/components/shop/ShopProductsMobileList.tsx")).toContain("DualCurrencyPrice");
+    expect(read("src/components/shop/ShopProductCard.tsx")).toContain("DualCurrencyPrice");
   });
 });
 
@@ -81,7 +80,8 @@ describe("ShopHub routing", () => {
 
   it("ShopHubPage shows area cards when multiple areas are accessible", () => {
     const hub = read("src/pages/ShopHub.tsx");
-    expect(hub).toContain("ShopAreaShowcase");
+    expect(hub).toContain("ShopCatalogHero");
+    expect(hub).toContain("AreaEntry");
     expect(hub).toContain("areas.length === 1");
   });
 });

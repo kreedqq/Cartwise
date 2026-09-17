@@ -214,6 +214,7 @@ export async function measureOverflow(page) {
 export const PRIMARY_TOUCH_ROLES = [
   { role: "button", name: "Zum Warenkorb" },
   { role: "button", name: "In den Warenkorb" },
+  { role: "button", name: "Hinzufügen" },
   { role: "button", name: "Bestellung prüfen" },
   { role: "button", name: "Bestellung absenden" },
   { role: "button", name: "Mitmachen" },
@@ -228,7 +229,11 @@ export const PRIMARY_TOUCH_ROLES = [
 export async function auditPrimaryTouchTargets(page) {
   const failures = [];
   for (const spec of PRIMARY_TOUCH_ROLES) {
-    const loc = page.getByRole(spec.role, { name: spec.name }).first();
+    const nameOpt =
+      typeof spec.name === "string" && !spec.name.includes("|")
+        ? { name: spec.name, exact: true }
+        : { name: spec.name };
+    const loc = page.getByRole(spec.role, nameOpt).first();
     if (!(await loc.isVisible().catch(() => false))) continue;
     const box = await loc.boundingBox();
     if (!box) continue;

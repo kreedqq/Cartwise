@@ -37,6 +37,8 @@ import NotFoundPage from "@/pages/NotFound";
 const AdminShell = lazy(() => import("@/pages/admin/AdminShell"));
 const AdminDashboardPage = lazy(() => import("@/pages/admin/AdminDashboard"));
 const AdminProductsPage = lazy(() => import("@/pages/admin/AdminProducts"));
+const AdminProductCreatePage = lazy(() => import("@/pages/admin/AdminProductCreate"));
+const AdminProductEditPage = lazy(() => import("@/pages/admin/AdminProductEdit"));
 const AdminShopAreasPage = lazy(() => import("@/pages/admin/AdminShopAreas"));
 const AdminPdfImportPage = lazy(() => import("@/pages/admin/AdminPdfImport"));
 const AdminImportHistoryPage = lazy(() => import("@/pages/admin/AdminImportHistory"));
@@ -125,6 +127,8 @@ export default function App() {
                   <Route path="shipping-costs" element={<AdminShippingPage />} />
                   <Route path="payment-methods" element={<AdminPaymentMethodsPage />} />
                   <Route path="products" element={<AdminProductsPage />} />
+                  <Route path="products/create" element={<AdminProductCreatePage />} />
+                  <Route path="products/:productId/edit" element={<AdminProductEditPage />} />
                   <Route path="shop-areas" element={<AdminShopAreasPage />} />
                   <Route path="shop-areas/:areaKey" element={<AdminShopAreasPage />} />
                   <Route path="pdf-import" element={<AdminPdfImportPage />} />

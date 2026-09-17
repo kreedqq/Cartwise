@@ -98,6 +98,8 @@ export interface ProductWriteInput {
   bulkPriceUsd?: number | null;
   bulkPriceMinQuantity?: number | null;
   isActive: boolean;
+  imagePath?: string | null;
+  badgeKey?: string | null;
 }
 
 /**
@@ -117,7 +119,21 @@ function toProductColumns(input: ProductWriteInput) {
     bulk_price_usd: hasBulk ? input.bulkPriceUsd : null,
     bulk_price_min_quantity: hasBulk ? input.bulkPriceMinQuantity : null,
     is_active: input.isActive,
+    ...(input.imagePath !== undefined ? { image_path: input.imagePath } : {}),
+    ...(input.badgeKey !== undefined ? { badge_key: input.badgeKey } : {}),
   };
+}
+
+export async function updateProductMediaFields(
+  id: string,
+  fields: { imagePath?: string | null; badgeKey?: string | null },
+): Promise<Tables<"products">> {
+  const patch: Partial<Pick<Tables<"products">, "image_path" | "badge_key">> = {};
+  if (fields.imagePath !== undefined) patch.image_path = fields.imagePath;
+  if (fields.badgeKey !== undefined) patch.badge_key = fields.badgeKey;
+  const { data, error } = await supabase.from("products").update(patch).eq("id", id).select().single();
+  if (error) throw error;
+  return data;
 }
 
 export async function createProduct(input: ProductWriteInput): Promise<Tables<"products">> {

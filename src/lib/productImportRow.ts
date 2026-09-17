@@ -80,8 +80,20 @@ export const IMPORT_FIELD_TITLES: Record<ImportField, string> = {
  * recognised, so an admin does not have to rename columns by hand.
  */
 const HEADER_ALIASES: Record<ImportField, string[]> = {
-  code: ["code", "artikelcode", "artikelnummer", "artnr", "artikelnr", "sku", "itemcode", "articlecode", "artikel"],
-  name: ["name", "bezeichnung", "produkt", "produktname", "artikelname", "productname", "item"],
+  code: [
+    "code",
+    "artikelcode",
+    "artikelnummer",
+    "artnr",
+    "artikelnr",
+    "sku",
+    "itemcode",
+    "articlecode",
+    "artikel",
+    "abkuerzung",
+    "productcode",
+  ],
+  name: ["name", "bezeichnung", "produkt", "produktname", "artikelname", "productname", "item", "peptide"],
   dosageVial: [
     "dosagevial",
     "dosage",
@@ -426,6 +438,16 @@ export function parseProductTable(table: ImportCellValue[][]): ProductTableParse
   }
 
   const columnFields: (ImportField | null)[] = headerCells.map((c) => matchImportField(c));
+  return parseProductTableWithColumnMapping(table, headerIndex, headerCells, columnFields);
+}
+
+/** Parse data rows using an explicit column mapping (from auto-inference or manual override). */
+export function parseProductTableWithColumnMapping(
+  table: ImportCellValue[][],
+  headerIndex: number,
+  headerCells: string[],
+  columnFields: (ImportField | null)[],
+): ProductTableParseResult {
   const recognizedFields = Array.from(new Set(columnFields.filter((f): f is ImportField => f !== null)));
   const unknownHeaders = headerCells.filter((c, i) => c !== "" && columnFields[i] === null);
 
@@ -459,6 +481,18 @@ export function parseProductTable(table: ImportCellValue[][]): ProductTableParse
   }
 
   return { rows: flagDuplicateCodes(rows), recognizedFields, unknownHeaders };
+}
+
+/** Locate header row index for inference-first imports. */
+export function findProductTableHeaderIndex(table: ImportCellValue[][]): { headerIndex: number; headerCells: string[] } | null {
+  const limit = Math.min(table.length, TABLE_HEADER_SEARCH_DEPTH);
+  for (let i = 0; i < limit; i++) {
+    const cells = (table[i] ?? []).map(cellToText);
+    if (!looksLikeHeaderRow(cells)) continue;
+    if (!cells.some((c) => matchImportField(c) === "code")) continue;
+    return { headerIndex: i, headerCells: cells };
+  }
+  return null;
 }
 
 /** Flags rows whose parsed code appears more than once within the same batch. */

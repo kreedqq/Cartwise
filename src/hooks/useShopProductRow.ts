@@ -14,8 +14,25 @@ export type QuickAddStatus = "idle" | "loading" | "success";
  * directly to the active cart (creating it first if needed) with a brief
  * success flash, no dialog, no page change.
  */
-export function useShopProductRow(product: Tables<"products">, rate: number | null, isFavorite: boolean) {
-  const [quantity, setQuantity] = React.useState("1");
+function stepQuantityInOptions(current: string, direction: 1 | -1, options: readonly number[]): string {
+  const num = Number(current.replace(",", "."));
+  const idx = options.findIndex((value) => value === num);
+  if (idx >= 0) {
+    const nextIdx = idx + direction;
+    if (nextIdx >= 0 && nextIdx < options.length) return String(options[nextIdx]);
+    return String(options[idx]);
+  }
+  const fallback = options[0] ?? 1;
+  return String(fallback);
+}
+
+export function useShopProductRow(
+  product: Tables<"products">,
+  rate: number | null,
+  isFavorite: boolean,
+  quantityOptions: readonly number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+) {
+  const [quantity, setQuantity] = React.useState(String(quantityOptions[0] ?? 1));
   const [status, setStatus] = React.useState<QuickAddStatus>("idle");
   const { addToActiveCart } = useShopCart();
   const { add: addFavorite, remove: removeFavorite } = useFavoriteMutations();
@@ -66,9 +83,15 @@ export function useShopProductRow(product: Tables<"products">, rate: number | nu
     }
   }
 
+  function bumpQuantity(direction: 1 | -1) {
+    setQuantity((prev) => stepQuantityInOptions(prev, direction, quantityOptions));
+  }
+
   return {
     quantity,
     setQuantity,
+    bumpQuantity,
+    quantityOptions,
     status,
     handleAdd,
     toggleFavorite,

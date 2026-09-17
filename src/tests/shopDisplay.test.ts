@@ -24,6 +24,8 @@ function shopRow(code: string, name: string, overrides: Partial<Tables<"products
     bulk_price_min_quantity: null,
     currency: "USD",
     is_active: true,
+    image_path: null,
+    badge_key: null,
     last_price_change_at: null,
     created_at: "",
     updated_at: "",

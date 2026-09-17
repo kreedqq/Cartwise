@@ -11,11 +11,13 @@ describe("shopCatalogUrlState", () => {
       categoryKey: "peptides",
       search: "kpv",
       variant: "10mg",
+      sort: "",
     });
     expect(readShopCatalogUrlState(new URLSearchParams("cat=injectable-oils"))).toEqual({
       categoryKey: "injectable-oils",
       search: "",
       variant: "",
+      sort: "",
     });
   });
 

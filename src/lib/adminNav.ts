@@ -1,13 +1,11 @@
 import type { LucideIcon } from "lucide-react";
 import {
   ClipboardList,
-  CreditCard,
   LayoutDashboard,
-  MessageSquareHeart,
   Package,
-  Palette,
   Settings2,
   ShoppingBag,
+  ShoppingCart,
   Store,
   Users,
 } from "lucide-react";
@@ -16,9 +14,7 @@ import {
 export interface AdminNavItem {
   to: string;
   label: string;
-  /** Keep active for nested routes such as `/admin/orders/:id`. */
   matchPrefix?: boolean;
-  /** Optional description for page chrome. */
   description?: string;
 }
 
@@ -33,8 +29,7 @@ export interface AdminNavGroup {
 }
 
 /**
- * Single source of truth for Admin information architecture.
- * All existing routes remain reachable; labels follow German commerce vocabulary.
+ * Eight top-level hubs — secondary routes nest inside (collapsed by default).
  */
 export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
@@ -55,7 +50,6 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       pathname.startsWith("/admin/shipping") ||
       pathname.startsWith("/admin/order-summary") ||
       pathname.startsWith("/admin/kit-requests") ||
-      pathname.startsWith("/admin/carts") ||
       pathname.startsWith("/admin/shipping-costs"),
     items: [
       {
@@ -65,32 +59,41 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         description: "Bestellliste, Status, Tracking und Bestelldetails.",
       },
       {
-        to: "/admin/carts",
-        label: "Warenkörbe",
-        matchPrefix: true,
-        description: "Offene Kundenwarenkörbe verwalten und absenden.",
-      },
-      {
         to: "/admin/kit-requests",
         label: "Kit Gesuche",
         matchPrefix: true,
-        description: "Offene Kits, Teilnehmer und Verteilungen verwalten.",
+        description: "Offene Kits, Teilnehmer und Verteilungen.",
       },
       {
         to: "/admin/order-summary",
         label: "Bestellzusammenfassung",
-        description: "Produktaggregation, Kit-Zusammenfassung, PDF und CSV.",
+        description: "Produktaggregation und Export.",
       },
       {
         to: "/admin/shipping-costs",
         label: "Versand",
-        description: "China- und Deutschland-Versandkosten sowie Verteilung.",
+        description: "Versandkosten und Verteilung.",
       },
     ],
   },
   {
-    id: "catalog",
-    label: "Produkte & Katalog",
+    id: "carts",
+    label: "Warenkörbe",
+    to: "/admin/carts",
+    icon: ShoppingCart,
+    match: (pathname) => pathname.startsWith("/admin/carts"),
+    items: [
+      {
+        to: "/admin/carts",
+        label: "Warenkörbe",
+        matchPrefix: true,
+        description: "Offene Kundenwarenkörbe.",
+      },
+    ],
+  },
+  {
+    id: "products",
+    label: "Produkte",
     to: "/admin/products",
     icon: Package,
     match: (pathname) =>
@@ -101,23 +104,29 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       {
         to: "/admin/products",
         label: "Produkte",
-        description: "Globaler Produktstamm: Codes, Varianten und Status.",
+        matchPrefix: true,
+        description: "Produktstamm durchsuchen und bearbeiten.",
+      },
+      {
+        to: "/admin/products/create",
+        label: "Produkt anlegen",
+        description: "Neues Produkt manuell anlegen.",
       },
       {
         to: "/admin/pdf-import",
         label: "Import",
-        description: "Globalen Produktstamm aus PDF, CSV oder XLSX importieren.",
+        description: "Excel, CSV oder PDF importieren.",
       },
       {
         to: "/admin/import-history",
         label: "Importverlauf",
-        description: "Vergangene Importe in den globalen Produktstamm.",
+        description: "Vergangene Importe.",
       },
     ],
   },
   {
-    id: "shop-areas",
-    label: "Shop Bereiche",
+    id: "shop",
+    label: "Shop",
     to: "/admin/shop-areas",
     icon: Store,
     match: (pathname) => pathname.startsWith("/admin/shop-areas"),
@@ -125,13 +134,14 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       {
         to: "/admin/shop-areas",
         label: "Verkaufsbereiche",
-        description: "Händlerkatalog, Produkte, Preise, Kategorien und Bereichsdesign.",
+        matchPrefix: true,
+        description: "Händlerkatalog, Preise, Kategorien.",
       },
     ],
   },
   {
     id: "customers",
-    label: "Kunden & Rollen",
+    label: "Kunden",
     to: "/admin/users",
     icon: Users,
     match: (pathname) =>
@@ -143,93 +153,77 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         to: "/admin/users",
         label: "Benutzer",
         matchPrefix: true,
-        description: "Kundenkonten, Telegram-Verbindung und Username.",
+        description: "Kundenkonten und Telegram.",
       },
       {
         to: "/admin/users#rollen",
         label: "Rollen",
-        description: "Kundenrollen und Preisaufschläge konfigurieren.",
+        description: "Kundenrollen.",
       },
       {
         to: "/admin/surcharges",
         label: "Rollenaufschläge",
-        description: "Tatsächliche Rollenaufschläge aus Bestell-Snapshots.",
+        description: "Aufschläge aus Bestell-Snapshots.",
       },
     ],
   },
   {
-    id: "marketing",
-    label: "Marketing & Inhalte",
+    id: "content",
+    label: "Inhalte",
     to: "/admin/announcements",
     icon: ShoppingBag,
     match: (pathname) =>
-      pathname.startsWith("/admin/announcements") || pathname.startsWith("/admin/research"),
+      pathname.startsWith("/admin/announcements") ||
+      pathname.startsWith("/admin/feedback") ||
+      pathname.startsWith("/admin/research") ||
+      pathname.startsWith("/admin/design"),
     items: [
       {
         to: "/admin/announcements",
         label: "Ankündigungen",
-        description: "Ankündigungen erstellen, veröffentlichen und sortieren.",
+        description: "Ankündigungen verwalten.",
+      },
+      {
+        to: "/admin/feedback",
+        label: "Bewertungen",
+        description: "Kundenfeedback.",
       },
       {
         to: "/admin/research",
         label: "Research",
-        description: "Research Review und Substanz-Zuordnung.",
+        description: "Research Review.",
       },
-    ],
-  },
-  {
-    id: "design",
-    label: "Design",
-    to: "/admin/design",
-    icon: Palette,
-    match: (pathname) => pathname.startsWith("/admin/design"),
-    items: [
       {
         to: "/admin/design",
-        label: "Globales Design",
-        description: "Website-Hintergründe und globale Darstellung.",
-      },
-    ],
-  },
-  {
-    id: "reviews",
-    label: "Bewertungen",
-    to: "/admin/feedback",
-    icon: MessageSquareHeart,
-    match: (pathname) => pathname.startsWith("/admin/feedback"),
-    items: [],
-  },
-  {
-    id: "payments",
-    label: "Zahlungen",
-    to: "/admin/payment-methods",
-    icon: CreditCard,
-    match: (pathname) => pathname.startsWith("/admin/payment-methods"),
-    items: [
-      {
-        to: "/admin/payment-methods",
-        label: "Zahlungsmethoden",
-        description: "PayPal, Banküberweisung und weitere Zahlungsarten.",
+        label: "Design",
+        description: "Globales Design.",
       },
     ],
   },
   {
     id: "system",
-    label: "System & Sicherheit",
+    label: "System",
     to: "/admin/system",
     icon: Settings2,
     match: (pathname) =>
-      pathname.startsWith("/admin/system") || pathname.startsWith("/admin/audit-log"),
+      pathname.startsWith("/admin/system") ||
+      pathname.startsWith("/admin/audit-log") ||
+      pathname.startsWith("/admin/payment-methods"),
     items: [
+      {
+        to: "/admin/payment-methods",
+        label: "Zahlungsmethoden",
+        description: "Zahlungsarten.",
+      },
       {
         to: "/admin/system",
         label: "Wartung",
-        description: "Wartungsmodus und globale Shop-Schalter.",
+        description: "Wartungsmodus und Schalter.",
       },
       {
         to: "/admin/audit-log",
         label: "Audit Logs",
-        description: "Nachvollziehbare Admin-Aktionen und Systemereignisse.",
+        description: "Admin-Aktionen.",
       },
     ],
   },
@@ -239,7 +233,6 @@ const ADMIN_NAV_COLLAPSED_STORAGE_KEY = "peptix.adminNav.collapsed";
 const ADMIN_NAV_EXPANDED_STORAGE_KEY = "peptix.adminNav.expanded";
 
 export function adminSectionForPath(pathname: string): AdminNavGroup | undefined {
-  // Prefer the most specific non-overview match; overview only when exact /admin.
   const matches = ADMIN_NAV_GROUPS.filter((group) => group.match(pathname));
   if (matches.length === 0) return undefined;
   if (matches.length === 1) return matches[0];
@@ -260,7 +253,6 @@ export function adminTabIsActive(pathname: string, item: AdminNavItem, hash = ""
     : pathname === target;
   if (!pathMatches) return false;
 
-  // Hash siblings on the same path (e.g. Benutzer vs Rollen).
   if (pathname === "/admin/users" && normalizedHash === "rollen") {
     return false;
   }
@@ -272,7 +264,6 @@ export function adminActiveItem(pathname: string): AdminNavItem | undefined {
   if (!group) return undefined;
   const items = group.items.filter((item) => adminTabIsActive(pathname, item));
   if (items.length === 0) return undefined;
-  // Prefer the longest matching prefix (e.g. kit-requests over orders when both matchPrefix).
   return items.sort((a, b) => b.to.length - a.to.length)[0];
 }
 
@@ -288,7 +279,7 @@ export function writeAdminNavCollapsed(collapsed: boolean): void {
   try {
     localStorage.setItem(ADMIN_NAV_COLLAPSED_STORAGE_KEY, collapsed ? "1" : "0");
   } catch {
-    // ignore quota / private mode
+    // ignore
   }
 }
 

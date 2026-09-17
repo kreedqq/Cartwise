@@ -483,7 +483,13 @@ function VendorCatalogPanel({
   });
   const [busy, setBusy] = React.useState(false);
   const [keepManuals, setKeepManuals] = React.useState(true);
-  const [pending, setPending] = React.useState<{ file: File; result: VendorCatalogMatchResult } | null>(null);
+  const [pending, setPending] = React.useState<{
+    file: File;
+    result: VendorCatalogMatchResult;
+    unknownHeaders: string[];
+    inferenceColumnCount: number;
+    reviewColumnCount: number;
+  } | null>(null);
   const [auditSummary, setAuditSummary] = React.useState<VendorCatalogAuditSummary | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const auditInputRef = React.useRef<HTMLInputElement>(null);
@@ -492,9 +498,16 @@ function VendorCatalogPanel({
     ? vendorOverrideConflicts(pending.result.matched, pricesQuery.data ?? [])
     : [];
 
-  async function parseVendorFile(file: File): Promise<VendorCatalogMatchResult> {
+  async function parseVendorFile(file: File) {
     const parsed = await parseVendorCatalogFile(file);
-    return matchVendorCatalogRows(parsed.rows, products, categoriesQuery.data ?? []);
+    const result = matchVendorCatalogRows(parsed.rows, products, categoriesQuery.data ?? []);
+    const inf = parsed.inference.columns;
+    return {
+      result,
+      unknownHeaders: parsed.unknownHeaders,
+      inferenceColumnCount: inf.filter((c) => c.assignedField).length,
+      reviewColumnCount: inf.filter((c) => c.confidence === "medium" || c.confidence === "low").length,
+    };
   }
 
   function validateVendorFile(file: File | undefined): file is File {
@@ -514,8 +527,14 @@ function VendorCatalogPanel({
     if (!validateVendorFile(file)) return;
     setBusy(true);
     try {
-      const result = await parseVendorFile(file);
-      setPending({ file, result });
+      const parsed = await parseVendorFile(file);
+      setPending({
+        file,
+        result: parsed.result,
+        unknownHeaders: parsed.unknownHeaders,
+        inferenceColumnCount: parsed.inferenceColumnCount,
+        reviewColumnCount: parsed.reviewColumnCount,
+      });
       setKeepManuals(true);
       setAuditSummary(null);
     } catch (error) {
@@ -530,11 +549,11 @@ function VendorCatalogPanel({
     if (!validateVendorFile(file)) return;
     setBusy(true);
     try {
-      const result = await parseVendorFile(file);
+      const parsed = await parseVendorFile(file);
       const productById = new Map(products.map((product) => [product.id, product]));
       const summary = auditVendorCatalogAgainstShop(
         areaKey,
-        result.matched,
+        parsed.result.matched,
         catalogQuery.data ?? [],
         pricesQuery.data ?? [],
         productById,
@@ -624,11 +643,20 @@ function VendorCatalogPanel({
             <p className="text-sm font-medium">Vorschau: {pending.file.name}</p>
             <p className="text-sm">
               {pending.result.matched.length} Artikel erkannt · {pending.result.matched.length} importierbar
+              {pending.inferenceColumnCount > 0
+                ? ` · ${pending.inferenceColumnCount} Spalten automatisch zugeordnet`
+                : ""}
+              {pending.reviewColumnCount > 0 ? ` · ${pending.reviewColumnCount} Spalte(n) zur Prüfung` : ""}
               {pending.result.unlinkedCodes.length > 0
                 ? ` · ${pending.result.unlinkedCodes.length} ohne globale Produktverknüpfung`
                 : ""}
               {pending.result.unmatched.length > 0 ? ` · ${pending.result.unmatched.length} nicht importierbar` : ""}
             </p>
+            {pending.unknownHeaders.length > 0 ? (
+              <p className="text-xs text-muted-foreground">
+                Nicht erkannt (werden nicht importiert): <strong>{pending.unknownHeaders.join(", ")}</strong>
+              </p>
+            ) : null}
             {pending.result.unlinkedCodes.length > 0 && (
               <p className="text-xs text-muted-foreground">
                 {pending.result.unlinkedCodes.length} Artikel sind nicht mit dem globalen Produktmaster verknüpft. Sie

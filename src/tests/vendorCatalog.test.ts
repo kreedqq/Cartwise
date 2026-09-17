@@ -48,6 +48,8 @@ function makeProduct(
     bulk_price_min_quantity: null,
     currency: "USD",
     is_active: true,
+    image_path: null,
+    badge_key: null,
     last_price_change_at: null,
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-01-01T00:00:00Z",

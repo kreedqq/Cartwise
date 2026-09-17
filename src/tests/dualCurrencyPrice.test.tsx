@@ -70,10 +70,10 @@ describe("customer dual-currency surfaces", () => {
     expect(app).toContain("ShopHubPage");
     expect(app).toContain('path="/shop/:slug"');
     expect(app).toContain("ShopAreaPage");
-    expect(read("src/pages/ShopRetail.tsx")).toContain("ShopProductsTable");
-    expect(read("src/pages/ShopRetail.tsx")).toContain("ShopProductsMobileList");
-    expect(read("src/pages/GroupBuy.tsx")).toContain("ShopProductsTable");
-    expect(read("src/pages/GroupBuy.tsx")).toContain("ShopProductsMobileList");
+    expect(read("src/pages/ShopRetail.tsx")).toContain("ShopProductGrid");
+    expect(read("src/pages/GroupBuy.tsx")).toContain("ShopProductGrid");
+    expect(read("src/pages/ShopRetail.tsx")).not.toContain("ShopProductsTable");
+    expect(read("src/pages/GroupBuy.tsx")).not.toContain("ShopProductsMobileList");
     expect(read("src/pages/GroupBuy.tsx")).toContain("group_buy");
   });
 

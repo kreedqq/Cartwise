@@ -84,6 +84,8 @@ export interface Database {
           bulk_price_min_quantity: number | null;
           currency: "USD";
           is_active: boolean;
+          image_path: string | null;
+          badge_key: string | null;
           last_price_change_at: string | null;
           created_at: string;
           updated_at: string;

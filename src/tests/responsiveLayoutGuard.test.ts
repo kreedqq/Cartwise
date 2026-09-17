@@ -16,15 +16,14 @@ describe("responsive layout guard (touch targets + overflow hints)", () => {
     expect(read("src/pages/admin/AdminCartDetail.tsx")).toContain("md:hidden");
   });
 
-  it("scopes group-buy catalog to responsive product lists", () => {
-    expect(read("src/pages/GroupBuy.tsx")).toContain("ShopProductsMobileList");
-    expect(read("src/pages/GroupBuy.tsx")).toContain("hidden lg:block");
+  it("scopes group-buy catalog to the compact product list", () => {
+    expect(read("src/pages/GroupBuy.tsx")).toContain("ShopProductGrid");
+    expect(read("src/pages/GroupBuy.tsx")).not.toContain("ShopProductsMobileList");
   });
 
-  it("retail desktop table exposes code, availability, and retail CTA", () => {
-    const table = read("src/components/shop/ShopProductsTable.tsx");
-    expect(table).toContain("SHOP_RETAIL_ADD_CTA");
-    expect(table).toContain("Verfügbar");
-    expect(table).toContain("isRetailTable");
+  it("compact retail row exposes retail CTA constant", () => {
+    const row = read("src/components/shop/ShopProductCompactRow.tsx");
+    expect(row).toContain("SHOP_RETAIL_ADD_CTA");
+    expect(row).toContain("isRetail");
   });
 });

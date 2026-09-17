@@ -30,6 +30,7 @@ import {
   toReviewRows,
   type ImportReviewRow,
 } from "@/lib/importReview";
+import { inferenceSummary, type SheetInferenceResult } from "@/lib/importColumnInference";
 import { IMPORT_FIELD_TITLES, type ImportField, type ParsedProductImportRow } from "@/lib/productImportRow";
 import { MAX_PDF_SIZE_BYTES } from "@/lib/constants";
 
@@ -40,6 +41,7 @@ interface ParseOutcome {
   recognizedFields: ImportField[];
   unknownHeaders: string[];
   hasTextLayer: boolean | null;
+  inference?: SheetInferenceResult;
 }
 
 export default function AdminPdfImportPage() {
@@ -109,7 +111,16 @@ export default function AdminPdfImportPage() {
         return;
       }
 
-      showPreview({ ...parsed, hasTextLayer: null }, index);
+      showPreview(
+        {
+          rows: parsed.rows,
+          recognizedFields: parsed.recognizedFields,
+          unknownHeaders: parsed.unknownHeaders,
+          inference: parsed.inference,
+          hasTextLayer: null,
+        },
+        index,
+      );
     } catch (error) {
       console.error(error);
       toast.error("Datei konnte nicht gelesen werden. Ist sie beschädigt oder passwortgeschützt?");
@@ -245,12 +256,33 @@ export default function AdminPdfImportPage() {
           <CardHeader>
             <CardTitle>Import-Vorschau</CardTitle>
             <CardDescription>
-              Der Artikelcode ist der Schlüssel: bekannte Codes werden aktualisiert, unbekannte neu angelegt. Du
-              musst nichts manuell zuordnen - nur prüfen, ggf. korrigieren und einzelne Zeilen überspringen.
-              Fehlerhafte Zeilen werden nie importiert.
+              Automatische Feld-Erkennung — nur unklare Zeilen oder Spalten brauchen deine Aufmerksamkeit.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {outcome?.inference ? (
+              <div className="rounded-lg border border-border/80 bg-muted/30 p-3 text-sm">
+                <p className="font-medium">
+                  {rows.length} Zeilen erkannt · {summary.applicable} importierbar · {summary.error} fehlerhaft
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Spalten erkannt: {inferenceSummary(outcome.inference.columns).recognizedFields} · zur Prüfung:{" "}
+                  {inferenceSummary(outcome.inference.columns).reviewColumns}
+                </p>
+                <ul className="mt-2 space-y-1 text-xs">
+                  {outcome.inference.columns.map((col) => (
+                    <li key={col.columnIndex} className="flex flex-wrap gap-2">
+                      <span className="font-medium">{col.headerLabel}</span>
+                      <span className="text-muted-foreground">→</span>
+                      <span>
+                        {col.assignedField ? IMPORT_FIELD_TITLES[col.assignedField] : "Nicht erkannt"}
+                      </span>
+                      <Badge variant={col.confidence === "high" ? "secondary" : "outline"}>{col.confidence}</Badge>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             {outcome && outcome.recognizedFields.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5 text-xs">
                 <span className="text-muted-foreground">Erkannte Spalten:</span>
@@ -265,9 +297,8 @@ export default function AdminPdfImportPage() {
               <p className="flex items-start gap-2 rounded-md bg-warning/10 p-2.5 text-xs text-foreground">
                 <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" />
                 <span>
-                  Diese Spalten wurden nicht erkannt und werden nicht importiert:{" "}
-                  <strong>{outcome.unknownHeaders.join(", ")}</strong>. Benenne sie um, falls sie übernommen
-                  werden sollen.
+                  Nicht erkannt (nur in Vorschau sichtbar, nicht importiert):{" "}
+                  <strong>{outcome.unknownHeaders.join(", ")}</strong>
                 </span>
               </p>
             )}

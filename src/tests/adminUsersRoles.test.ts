@@ -19,14 +19,15 @@ vi.mock("@/lib/supabaseClient", () => ({
 const { adminSetUsernameRequired, adminDeleteUser, adminSetUsername, adminRemoveTelegramIdentity, listUsersWithRoles } = await import("@/services/profiles");
 
 describe("admin users and roles merge", () => {
-  it("keeps Benutzer and Rollen under Kunden & Rollen without the old split labels", () => {
+  it("keeps Benutzer and Rollen under the Kunden hub without the old split labels", () => {
     const nav = readSource("src/lib/adminNav.ts");
-    expect(nav).toContain('label: "Kunden & Rollen"');
+    expect(nav).toContain('label: "Kunden"');
     expect(nav).toContain('label: "Benutzer"');
     expect(nav).toContain('to: "/admin/users#rollen"');
     expect(nav).toContain('to: "/admin/surcharges"');
     expect(nav).toContain('to: "/admin/audit-log"');
     expect(nav).not.toContain('label: "Rollen & Preisaufschlag"');
+    expect(nav).not.toContain('label: "Kunden & Rollen"');
   });
 
   it("keeps /admin/roles as a deep link to the merged page", () => {

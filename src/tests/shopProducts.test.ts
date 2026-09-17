@@ -21,6 +21,8 @@ const SHOP_ROW = {
   price_usd: 125,
   currency: "USD",
   is_active: true,
+  image_path: null,
+  badge_key: null,
   last_price_change_at: null,
   created_at: "2026-01-01T00:00:00Z",
   updated_at: "2026-01-01T00:00:00Z",

@@ -2,8 +2,10 @@ import * as React from "react";
 import { Navigate, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Layers, PackageSearch, Search } from "lucide-react";
 
-import { ShopProductsTable } from "@/components/shop/ShopProductsTable";
-import { ShopProductsMobileList } from "@/components/shop/ShopProductsMobileList";
+import { ShopCatalogHeader } from "@/components/shop/ShopCatalogHeader";
+import { ShopCatalogToolbar } from "@/components/shop/ShopCatalogToolbar";
+import { ShopProductGrid } from "@/components/shop/ShopProductGrid";
+import { parseShopCatalogSort, type ShopCatalogSort } from "@/lib/shop/catalogSort";
 import { AreaStorefrontChrome } from "@/components/shop/AreaStorefrontChrome";
 import { ShopCategoryHub } from "@/components/shop/ShopCategoryHub";
 import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitRequestDialog";
@@ -15,7 +17,7 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
-import { AreaSectionHeader, PageHeader } from "@/components/common/PageHeader";
+import { AreaSectionHeader } from "@/components/common/PageHeader";
 import { KitMarketplaceHero } from "@/components/kit-requests/KitMarketplaceHero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -298,6 +300,10 @@ function GroupBuyContent({
           onSelectCategory={selectCategory}
           onSearch={setSearchDraft}
           onClearCategory={clearCategory}
+          catalogSort={urlCatalog.sort}
+          onCatalogSortChange={(sort) =>
+            setSearchParams(buildShopCatalogSearchParams(searchParams, { sort }), { replace: true })
+          }
         />
       )}
 
@@ -350,6 +356,8 @@ interface GroupBuyCatalogProps {
   onSearch: (term: string) => void;
   onClearCategory: () => void;
   onKitCreated?: () => void;
+  catalogSort: string;
+  onCatalogSortChange: (sort: string) => void;
 }
 
 function GroupBuyCatalog({
@@ -374,6 +382,8 @@ function GroupBuyCatalog({
   onSearch,
   onClearCategory,
   onKitCreated,
+  catalogSort,
+  onCatalogSortChange,
 }: GroupBuyCatalogProps) {
   const { theme } = useShopAreaContext();
   if (!selectedCategory) {
@@ -405,28 +415,15 @@ function GroupBuyCatalog({
                 : `${globalSearchResults.length} Treffer`}
             </p>
             {globalSearchResults.length > 0 && (
-              <>
-                <div className="hidden lg:block">
-                  <ShopProductsTable
-                    products={globalSearchResults}
-                    rate={rate}
-                    rateLoading={rateLoading}
-                    favoriteProductIds={favoriteProductIds}
-                    pricingProfile="group_buy"
-                    onKitCreated={onKitCreated}
-                  />
-                </div>
-                <div className="lg:hidden">
-                  <ShopProductsMobileList
-                    products={globalSearchResults}
-                    rate={rate}
-                    rateLoading={rateLoading}
-                    favoriteProductIds={favoriteProductIds}
-                    pricingProfile="group_buy"
-                    onKitCreated={onKitCreated}
-                  />
-                </div>
-              </>
+              <ShopProductGrid
+                products={globalSearchResults}
+                rate={rate}
+                rateLoading={rateLoading}
+                favoriteProductIds={favoriteProductIds}
+                pricingProfile="group_buy"
+                sort={catalogSort}
+                onKitCreated={onKitCreated}
+              />
             )}
           </div>
         )}
@@ -468,50 +465,45 @@ function GroupBuyCatalog({
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        eyebrow={areaName}
+      <ShopCatalogHeader
+        eyebrow={areaName ? `Group Buy · ${areaName}` : "Group Buy"}
         title={selectedCategory.label}
-        description={`${filtered.length} Artikel · Menge wählen und in den Warenkorb legen.`}
+        productCount={filtered.length}
         actions={
           <Button variant="ghost" size="sm" onClick={onClearCategory} className="gap-1.5">
             <ArrowLeft className="h-4 w-4" />
-            Alle Kategorien
+            Kategorien
           </Button>
         }
       />
 
-      <div className="flex flex-wrap gap-2">
-        {visible.map((category) => (
+      <ShopCatalogToolbar
+        searchValue={search}
+        onSearchChange={onSearch}
+        searchPlaceholder={theme.searchPlaceholder || "Produktname suchen …"}
+        sortValue={parseShopCatalogSort(catalogSort)}
+        onSortChange={(sort: ShopCatalogSort) => onCatalogSortChange(sort)}
+        categoryPills={visible.map((category) => (
           <button
             key={category.category_key}
             type="button"
             onClick={() => onSelectCategory(category.category_key)}
             className={cn(
-              "rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] transition-colors",
+              "rounded-full px-3 py-1 text-xs font-semibold transition-colors",
               category.category_key === selectedCategory.category_key
                 ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                : "bg-muted/80 text-muted-foreground hover:bg-muted",
             )}
           >
             {storefrontHeadline(category.label)}
           </button>
         ))}
-      </div>
-
-      <div className="relative w-full max-w-3xl">
-        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={search}
-          onChange={(e) => onSearch(e.target.value)}
-          placeholder={theme.searchPlaceholder || "Produktname suchen …"}
-          className="h-11 pl-8"
-        />
-      </div>
+      />
 
       {isLoading && (
-        <div className="space-y-2">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-14 w-full" />
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-[17rem] w-full rounded-xl sm:h-[18rem]" />
           ))}
         </div>
       )}
@@ -529,31 +521,17 @@ function GroupBuyCatalog({
       )}
 
       {filtered.length > 0 && (
-        <>
-          <div className="hidden lg:block">
-            <ShopProductsTable
-              products={filtered}
-              rate={rate}
-              rateLoading={rateLoading}
-              favoriteProductIds={favoriteProductIds}
-              categoryId={tableCategoryId}
-              categoryLabel={selectedCategory.label}
-              pricingProfile="group_buy"
-              onKitCreated={onKitCreated}
-            />
-          </div>
-          <div className="lg:hidden">
-            <ShopProductsMobileList
-              products={filtered}
-              rate={rate}
-              rateLoading={rateLoading}
-              favoriteProductIds={favoriteProductIds}
-              categoryId={tableCategoryId}
-              pricingProfile="group_buy"
-              onKitCreated={onKitCreated}
-            />
-          </div>
-        </>
+        <ShopProductGrid
+          products={filtered}
+          rate={rate}
+          rateLoading={rateLoading}
+          favoriteProductIds={favoriteProductIds}
+          categoryId={tableCategoryId}
+          categoryLabel={selectedCategory.label}
+          pricingProfile="group_buy"
+          sort={catalogSort}
+          onKitCreated={onKitCreated}
+        />
       )}
     </div>
   );

@@ -44,7 +44,17 @@ values
   ('QA-OIL-001', 'QA Injectable Oil', '10 ml', 'Local QA injectable oil', 'Injectable Oils', 16.0000, null, null, true),
   ('QA-ORAL-001', 'QA Oral Capsule', '250 mcg', 'Local QA oral', 'Orals', 22.0000, null, null, true),
   ('QA-WATER-001', 'QA Reconstitution Water', '10 ml', 'Local QA water', 'Reconstitution Water', 5.0000, null, null, true),
-  ('QA-KIT-001', 'QA Kit Peptide', '5 mg / Vial', 'Local QA kit-capable peptide', 'Peptides', 40.0000, 36.0000, 10, true)
+  ('QA-KIT-001', 'QA Kit Peptide', '5 mg / Vial', 'Local QA kit-capable peptide', 'Peptides', 40.0000, 36.0000, 10, true),
+  ('QA-DEN-01', 'Selank', '5 mg / Vial', 'Local QA density — research peptide', 'Peptides', 48.0000, 44.0000, 10, true),
+  ('QA-DEN-02', 'Semax', '5 mg / Vial', 'Local QA density — research peptide', 'Peptides', 52.0000, 48.0000, 10, true),
+  ('QA-DEN-03', 'BPC-157', '5 mg / Vial', 'Local QA density — research peptide', 'Peptides', 58.0000, 54.0000, 10, true),
+  ('QA-DEN-04', 'TB-500', '5 mg / Vial', 'Local QA density — research peptide', 'Peptides', 62.0000, 58.0000, 10, true),
+  ('QA-DEN-05', 'Ipamorelin', '5 mg / Vial', 'Local QA density — research peptide', 'Peptides', 55.0000, 51.0000, 10, true),
+  ('QA-DEN-06', 'CJC-1295', '5 mg / Vial', 'Local QA density — research peptide', 'Peptides', 68.0000, 64.0000, 10, true),
+  ('QA-DEN-07', 'GHK-Cu', '50 mg / Vial', 'Local QA density — research peptide', 'Peptides', 72.0000, 68.0000, 10, true),
+  ('QA-DEN-08', 'AOD-9604', '5 mg / Vial', 'Local QA density — research peptide', 'Peptides', 45.0000, 41.0000, 10, true),
+  ('QA-DEN-09', 'MOTS-c', '10 mg / Vial', 'Local QA density — research peptide', 'Peptides', 85.0000, 80.0000, 10, true),
+  ('QA-DEN-10', 'KPV', '10 mg / Vial', 'Local QA density — research peptide', 'Peptides', 60.8500, 56.0000, 10, true)
 on conflict (code) do update set
   name = excluded.name,
   dosage_vial = excluded.dosage_vial,
@@ -74,7 +84,11 @@ select
   end
 from public.products p
 cross join (values ('shop'), ('group_buy_1')) as area(key)
-where p.code in ('QA-PEP-001', 'QA-OIL-001', 'QA-ORAL-001', 'QA-WATER-001', 'QA-KIT-001')
+where p.code in (
+  'QA-PEP-001', 'QA-OIL-001', 'QA-ORAL-001', 'QA-WATER-001', 'QA-KIT-001',
+  'QA-DEN-01', 'QA-DEN-02', 'QA-DEN-03', 'QA-DEN-04', 'QA-DEN-05',
+  'QA-DEN-06', 'QA-DEN-07', 'QA-DEN-08', 'QA-DEN-09', 'QA-DEN-10'
+)
 on conflict (shop_area_key, vendor_code) do update set
   product_id = excluded.product_id,
   vendor_name = excluded.vendor_name,

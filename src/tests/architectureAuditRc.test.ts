@@ -31,11 +31,12 @@ describe("architecture audit RC (document risky patterns)", () => {
 
   it("shop UI hides bulk column when quantity discounts disabled at app level", () => {
     expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("quantityDiscountsEnabled");
+    expect(read("src/pages/ShopRetail.tsx")).toContain("ShopProductGrid");
     expect(read("src/components/shop/ShopProductsMobileList.tsx")).toContain("quantityDiscountsEnabled");
   });
 
   it("retail desktop uses shared retail CTA constant", () => {
-    expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("SHOP_RETAIL_ADD_CTA");
+    expect(read("src/components/shop/ShopProductCompactRow.tsx")).toContain("SHOP_RETAIL_ADD_CTA");
   });
 
   it("kit reconciliation remains admin-only service path", () => {

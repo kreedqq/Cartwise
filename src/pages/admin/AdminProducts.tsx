@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Download, FileDown, MoreVertical, Plus, Search, Upload } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminSection } from "@/components/admin/AdminSection";
@@ -34,6 +35,7 @@ import { formatBulkTier, formatDateTime, formatUsd } from "@/lib/money";
 import type { Tables } from "@/types/database";
 
 export default function AdminProductsPage() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = React.useState("");
   const productsQuery = useQuery({ queryKey: ["admin-products", search], queryFn: () => listAllProducts({ search }) });
@@ -108,14 +110,19 @@ export default function AdminProductsPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        section="Produkte & Katalog"
-        subsection="Produkte"
-        title="Produkte verwalten"
-        description="Globaler Produktstamm: Codes, Varianten, Status. Bereichskataloge liegen unter Shop Bereiche."
+        section="Produkte"
+        subsection="Stamm"
+        title="Produkte"
+        description="Suchen, bearbeiten, anlegen oder importieren."
         actions={
           <>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/admin/pdf-import">
+                <Upload /> Importieren
+              </Link>
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setCsvOpen(true)}>
-              <Upload /> CSV-Import
+              <Upload /> CSV (Dialog)
             </Button>
             <Button
               variant="outline"
@@ -127,14 +134,10 @@ export default function AdminProductsPage() {
             <Button variant="outline" size="sm" onClick={handleExport} disabled={!productsQuery.data?.length}>
               <Download /> Export
             </Button>
-            <Button
-              size="sm"
-              onClick={() => {
-                setEditing(null);
-                setFormOpen(true);
-              }}
-            >
-              <Plus /> Neues Produkt
+            <Button size="sm" asChild>
+              <Link to="/admin/products/create">
+                <Plus /> Produkt anlegen
+              </Link>
             </Button>
           </>
         }
@@ -205,12 +208,7 @@ export default function AdminProductsPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setEditing(product);
-                          setFormOpen(true);
-                        }}
-                      >
+                      <DropdownMenuItem onClick={() => navigate(`/admin/products/${product.id}/edit`)}>
                         Bearbeiten
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleToggleActive(product)}>

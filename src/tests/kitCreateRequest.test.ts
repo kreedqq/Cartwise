@@ -101,7 +101,7 @@ describe("create_kit_request catalog identity", () => {
     expect(wizard).toContain("kitRequestableVariants");
     expect(wizard).not.toContain("filter((group) => group.variants.length > 0)");
     expect(read("src/components/shop/KitShareDialog.tsx")).toContain("kitRequestableVariants");
-    expect(read("src/components/shop/ShopProductsTable.tsx")).toContain("CreateKitRequestDialog");
+    expect(read("src/components/shop/ShopProductGrid.tsx")).toContain("CreateKitRequestDialog");
     expect(read("src/services/kitRequests.ts")).toContain("list_kit_requestable_product_ids");
     expect(read("src/hooks/useKitRequests.ts")).toContain("QUERY_KEYS.kitRequestableProductIds");
   });

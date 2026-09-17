@@ -1,9 +1,14 @@
 import { Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
-import { ShopAreaShowcase } from "@/components/shop/ShopAreaShowcase";
-import { PAGE_BLEED_PAD, PAGE_BLEED_TOP, UI_TYPE } from "@/lib/design/tokens";
+import { ShopCatalogHero } from "@/components/shop/ShopCatalogHero";
+import { AreaGlyph } from "@/lib/shop/areaIcons";
+import { parseAreaTheme } from "@/lib/shop/areaTheme";
+import { isGroupBuyPricing, type MyShopArea } from "@/lib/shop/shopAreas";
+import { UI_TYPE } from "@/lib/design/tokens";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
 import { cn } from "@/lib/utils";
 
@@ -20,23 +25,50 @@ export default function ShopHubPage() {
   if (areas.length === 1) return <Navigate to={areas[0].path} replace />;
 
   return (
-    <div className="space-y-10">
-      <section className={cn(PAGE_BLEED_TOP, "relative overflow-hidden border-b border-primary/20")}>
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(820px_300px_at_80%_0%,hsl(var(--primary)/0.14),transparent_55%)]"
-        />
-        <div className={cn(PAGE_BLEED_PAD, "relative py-10 lg:py-14")}>
-          <p className={UI_TYPE.eyebrow}>Shop</p>
-          <h1 className="mt-3 max-w-3xl font-display text-[clamp(2rem,4.5vw,3.6rem)] font-semibold leading-[0.94] tracking-tight">
-            Entdecke deine PEPTIX Verkaufsbereiche
-          </h1>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-            Retail für den direkten Einzelkauf. Group Buy, wenn du ein Kit teilst und nur deinen Anteil zahlst.
-          </p>
+    <div className="space-y-5 sm:space-y-6">
+      <ShopCatalogHero
+        compact
+        title="Premium Peptide Katalog"
+        subtitle="Retail oder Group Buy — direkt in den Katalog."
+      />
+      <section className="space-y-3">
+        <div>
+          <p className={UI_TYPE.eyebrow}>Verkaufsbereiche</p>
+          <h2 className="mt-2 font-display text-xl font-semibold tracking-tight sm:text-2xl">Direkt einkaufen</h2>
+        </div>
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          {areas.map((area) => (
+            <AreaEntry key={area.key} area={area} />
+          ))}
         </div>
       </section>
-      <ShopAreaShowcase areas={areas} heading="Wähle einen Bereich" />
     </div>
+  );
+}
+
+function AreaEntry({ area }: { area: MyShopArea }) {
+  const theme = parseAreaTheme(area.theme);
+  const isGb = isGroupBuyPricing(area.pricing_profile);
+  return (
+    <Link
+      to={area.path}
+      className={cn(
+        "group flex items-center gap-4 rounded-xl border border-border/40 bg-gradient-to-br from-card/40 to-background/20 p-4",
+        "transition-colors hover:border-primary/40 hover:from-primary/5",
+      )}
+    >
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <AreaGlyph iconKey={area.icon_key} className="h-6 w-6" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="font-display text-base font-semibold tracking-tight">{theme.hub.title || area.name}</p>
+        <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+          {theme.hub.description ||
+            area.subtitle ||
+            (isGb ? "Kits teilen · nur den eigenen Anteil zahlen" : "Einzelverkauf · Vials · Packungen")}
+        </p>
+      </div>
+      <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+    </Link>
   );
 }

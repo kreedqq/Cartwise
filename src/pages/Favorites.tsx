@@ -4,8 +4,9 @@ import { Star } from "lucide-react";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShopProductsTable } from "@/components/shop/ShopProductsTable";
-import { ShopProductsMobileList } from "@/components/shop/ShopProductsMobileList";
+import { ShopProductGrid } from "@/components/shop/ShopProductGrid";
+import { ShopAreaProvider } from "@/context/ShopAreaContext";
+import { DEFAULT_SHOP_AREA } from "@/lib/shop/shopAreas";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -33,9 +34,9 @@ export default function FavoritesPage() {
       />
 
       {favoritesQuery.isLoading && (
-        <div className="space-y-2">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-14 w-full" />
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-[17rem] w-full rounded-xl sm:h-[18rem]" />
           ))}
         </div>
       )}
@@ -53,24 +54,14 @@ export default function FavoritesPage() {
       )}
 
       {products.length > 0 && (
-        <>
-          <div className="hidden lg:block">
-            <ShopProductsTable
-              products={products}
-              rate={rateQuery.data?.rate ?? null}
-              favoriteProductIds={favoriteProductIds}
-              pricingProfile="retail"
-            />
-          </div>
-          <div className="lg:hidden">
-            <ShopProductsMobileList
-              products={products}
-              rate={rateQuery.data?.rate ?? null}
-              favoriteProductIds={favoriteProductIds}
-              pricingProfile="retail"
-            />
-          </div>
-        </>
+        <ShopAreaProvider shopArea={DEFAULT_SHOP_AREA} pricingProfile="retail">
+          <ShopProductGrid
+            products={products}
+            rate={rateQuery.data?.rate ?? null}
+            favoriteProductIds={favoriteProductIds}
+            pricingProfile="retail"
+          />
+        </ShopAreaProvider>
       )}
     </div>
   );

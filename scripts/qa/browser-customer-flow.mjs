@@ -41,11 +41,11 @@ async function main() {
     }
     log.push(`shop:${page.url()}`);
     await page.waitForTimeout(2800);
-    await page.locator("table tbody tr, [class*='ShopProductsMobile']").first().waitFor({ timeout: 60_000 }).catch(async () => {
+    await page.getByRole("list", { name: "Produktkatalog" }).locator("article").first().waitFor({ timeout: 60_000 }).catch(async () => {
       const snippet = (await page.locator("body").innerText()).slice(0, 500);
       failAndExit("CUSTOMER E2E", `No product rows. Page: ${snippet}`);
     });
-    const addBtn = page.getByRole("button", { name: /Zum Warenkorb|In den Warenkorb/ }).first();
+    const addBtn = page.getByRole("button", { name: /Zum Warenkorb|In den Warenkorb|Hinzufügen/ }).first();
     await addBtn.waitFor({ state: "visible", timeout: 60_000 });
     const eurBefore = await waitForEurSample(page);
     if (!eurBefore) failAndExit("CUSTOMER E2E", "EUR not visible on shop row");

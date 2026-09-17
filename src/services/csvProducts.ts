@@ -1,5 +1,7 @@
 import Papa from "papaparse";
 
+import { type ImportAnalyzeOptions, GLOBAL_IMPORT_ANALYZE } from "@/lib/importAnalyze";
+import { parseProductTableIntelligent, type IntelligentParseResult } from "@/lib/importIntelligentParse";
 import {
   IMPORT_FIELDS,
   IMPORT_HEADER_LABELS,
@@ -22,7 +24,17 @@ export const CSV_HEADERS: string[] = IMPORT_FIELDS.map((field) => IMPORT_HEADER_
  * Every recognised column ends up in the returned rows - and therefore in the
  * import payload. Nothing is parsed and then dropped.
  */
-export function parseProductCsv(text: string): ProductTableParseResult {
+/** Admin global import — intelligent column inference. */
+export function parseProductCsv(
+  text: string,
+  options: ImportAnalyzeOptions = GLOBAL_IMPORT_ANALYZE,
+): IntelligentParseResult {
+  const result = Papa.parse<string[]>(text, { skipEmptyLines: true });
+  return parseProductTableIntelligent(result.data as string[][], options);
+}
+
+/** Vendor area catalog — stable header-alias mapping only. */
+export function parseProductCsvLegacy(text: string): ProductTableParseResult {
   const result = Papa.parse<string[]>(text, { skipEmptyLines: true });
   return parseProductTable(result.data as string[][]);
 }

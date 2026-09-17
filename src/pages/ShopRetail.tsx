@@ -1,18 +1,22 @@
 import * as React from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, PackageSearch, Search } from "lucide-react";
+import { ArrowLeft, PackageSearch } from "lucide-react";
 
-import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ShopProductsTable } from "@/components/shop/ShopProductsTable";
-import { ShopProductsMobileList } from "@/components/shop/ShopProductsMobileList";
+import { ShopCatalogFiltersSheet } from "@/components/shop/ShopCatalogFiltersSheet";
+import { ShopCatalogHeader } from "@/components/shop/ShopCatalogHeader";
+import { ShopCatalogToolbar } from "@/components/shop/ShopCatalogToolbar";
+import { ShopCatalogHero } from "@/components/shop/ShopCatalogHero";
+import { ShopProductGrid } from "@/components/shop/ShopProductGrid";
+import { parseShopCatalogSort, type ShopCatalogSort } from "@/lib/shop/catalogSort";
 import { AreaStorefrontChrome } from "@/components/shop/AreaStorefrontChrome";
 import { ShopCategoryHub } from "@/components/shop/ShopCategoryHub";
-import { PageHeader } from "@/components/common/PageHeader";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { AREA_PAGE_CONTENT_SLOT, AREA_PAGE_RHYTHM } from "@/lib/shop/areaLayout";
 import { ShopAreaProvider } from "@/context/ShopAreaContext";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
@@ -70,6 +74,8 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
   const [params, setParams] = useSearchParams();
   const urlCatalog = React.useMemo(() => readShopCatalogUrlState(params), [params]);
   const [searchDraft, setSearchDraft] = React.useState(urlCatalog.search);
+  const [filtersOpen, setFiltersOpen] = React.useState(false);
+  const favoritesOnly = params.get("favorites") === "1";
 
   const products = React.useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
   const assignments = React.useMemo(
@@ -107,18 +113,22 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
     return () => window.clearTimeout(handle);
   }, [searchDraft, params, setParams]);
 
-  const filtered = React.useMemo(() => {
-    if (!selected) return [];
-    const term = urlCatalog.search.trim();
-    return productsInAreaCategory(products, assignments, selected.category_key).filter((product) =>
-      productMatchesShopSearch(product, term),
-    );
-  }, [assignments, products, selected, urlCatalog.search]);
-
   const favoriteProductIds = React.useMemo(
     () => new Set((favoritesQuery.data ?? []).map((f) => f.productId)),
     [favoritesQuery.data],
   );
+
+  const filtered = React.useMemo(() => {
+    if (!selected) return [];
+    const term = urlCatalog.search.trim();
+    let list = productsInAreaCategory(products, assignments, selected.category_key).filter((product) =>
+      productMatchesShopSearch(product, term),
+    );
+    if (favoritesOnly) {
+      list = list.filter((product) => favoriteProductIds.has(product.id));
+    }
+    return list;
+  }, [assignments, products, selected, urlCatalog.search, favoritesOnly, favoriteProductIds]);
 
   function selectCategory(key: string) {
     setSearchDraft("");
@@ -133,19 +143,19 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
         style={areaThemeCssVars(theme)}
       >
         <AreaStorefrontChrome theme={theme} areaName={area.name}>
+        <ShopCatalogHero
+          eyebrow="Retail · PEPTIX"
+          title={area.name}
+          subtitle={
+            area.subtitle?.trim() ||
+            "Einzelverkauf — Peptide, Oils und Orals als Vials bzw. Packungen."
+          }
+          searchValue={searchDraft}
+          onSearchChange={setSearchDraft}
+          searchPlaceholder={theme.searchPlaceholder || "Produkte suchen …"}
+        />
         <div className={AREA_PAGE_RHYTHM}>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary/80">Retail</p>
-        <h1 className="mt-2 font-display text-[clamp(2rem,4vw,3.2rem)] font-semibold leading-[0.95] tracking-tight">
-          {area.name}
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          {area.subtitle?.trim() ||
-            "Einzelverkauf. Peptide, Water und Oils als Vials, Orals als Packungen."}
-        </p>
         <div className={AREA_PAGE_CONTENT_SLOT}>
-        <p className="mb-4 max-w-2xl text-sm text-muted-foreground">
-          Peptide, Water und Oils als Vials, Orals als Packungen. Keine Kits, keine Mengenstaffeln.
-        </p>
         {(productsQuery.isLoading || storefrontQuery.isLoading) && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -185,9 +195,10 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
     <div className={areaDensityClass(theme)} data-shop-area={area.key} style={areaThemeCssVars(theme)}>
       <AreaStorefrontChrome theme={theme} areaName={area.name}>
       <div className={AREA_PAGE_RHYTHM}>
-      <PageHeader
+      <ShopCatalogHeader
+        eyebrow="Retail · Shop"
         title={selected.label}
-        description={`${filtered.length} Artikel · Einzelmenge wählen und in den Warenkorb legen.`}
+        productCount={filtered.length}
         actions={
           <Button
             variant="ghost"
@@ -196,44 +207,60 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
             className="gap-1.5"
           >
             <ArrowLeft className="h-4 w-4" />
-            Alle Kategorien
+            Kategorien
           </Button>
         }
       />
 
-      <div className={`${AREA_PAGE_CONTENT_SLOT} space-y-6`}>
-      <div className="flex flex-wrap gap-2">
-        {visible.map((category) => (
+      <div className={`${AREA_PAGE_CONTENT_SLOT} space-y-4`}>
+      <ShopCatalogToolbar
+        searchValue={searchDraft}
+        onSearchChange={setSearchDraft}
+        searchPlaceholder={theme.searchPlaceholder || "Produktname suchen …"}
+        filterActive={favoritesOnly}
+        onOpenFilters={() => setFiltersOpen(true)}
+        sortValue={parseShopCatalogSort(urlCatalog.sort)}
+        onSortChange={(sort: ShopCatalogSort) =>
+          setParams(buildShopCatalogSearchParams(params, { sort }), { replace: true })
+        }
+        categoryPills={visible.map((category) => (
           <button
             key={category.category_key}
             type="button"
             onClick={() => selectCategory(category.category_key)}
             className={cn(
-              "rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] transition-colors",
+              "rounded-full px-3 py-1 text-xs font-semibold transition-colors",
               category.category_key === selected.category_key
                 ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                : "bg-muted/80 text-muted-foreground hover:bg-muted",
             )}
           >
             {storefrontHeadline(category.label)}
           </button>
         ))}
-      </div>
-
-      <div className="relative w-full max-w-3xl">
-        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={searchDraft}
-          onChange={(e) => setSearchDraft(e.target.value)}
-          placeholder={theme.searchPlaceholder || "Produktname suchen …"}
-          className="h-11 pl-8"
-        />
-      </div>
+      />
+      <ShopCatalogFiltersSheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <div className="flex items-center justify-between gap-4">
+          <Label htmlFor="retail-favorites-only" className="text-sm">
+            Nur Favoriten
+          </Label>
+          <Switch
+            id="retail-favorites-only"
+            checked={favoritesOnly}
+            onCheckedChange={(checked) => {
+              const next = new URLSearchParams(params);
+              if (checked) next.set("favorites", "1");
+              else next.delete("favorites");
+              setParams(next, { replace: true });
+            }}
+          />
+        </div>
+      </ShopCatalogFiltersSheet>
 
       {productsQuery.isLoading && (
-        <div className="space-y-2">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-14 w-full" />
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-[17rem] w-full rounded-xl sm:h-[18rem]" />
           ))}
         </div>
       )}
@@ -251,29 +278,16 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
       )}
 
       {filtered.length > 0 && (
-        <>
-          <div className="hidden lg:block">
-            <ShopProductsTable
-              products={filtered}
-              rate={rateQuery.data?.rate ?? null}
-              rateLoading={rateQuery.isFetching && rateQuery.data?.rate == null}
-              favoriteProductIds={favoriteProductIds}
-              categoryId={tableCategoryId}
-              categoryLabel={selected.label}
-              pricingProfile={area.pricing_profile}
-            />
-          </div>
-          <div className="lg:hidden">
-            <ShopProductsMobileList
-              products={filtered}
-              rate={rateQuery.data?.rate ?? null}
-              rateLoading={rateQuery.isFetching && rateQuery.data?.rate == null}
-              favoriteProductIds={favoriteProductIds}
-              categoryId={tableCategoryId}
-              pricingProfile={area.pricing_profile}
-            />
-          </div>
-        </>
+        <ShopProductGrid
+          products={filtered}
+          rate={rateQuery.data?.rate ?? null}
+          rateLoading={rateQuery.isFetching && rateQuery.data?.rate == null}
+          favoriteProductIds={favoriteProductIds}
+          categoryId={tableCategoryId}
+          categoryLabel={selected.label}
+          pricingProfile={area.pricing_profile}
+          sort={urlCatalog.sort}
+        />
       )}
       </div>
       </div>

@@ -4,6 +4,7 @@ export type ShopCatalogUrlState = {
   categoryKey: string | null;
   search: string;
   variant: string;
+  sort: string;
 };
 
 /** URL-synced kit marketplace filters. */
@@ -23,6 +24,7 @@ export function readShopCatalogUrlState(params: URLSearchParams): ShopCatalogUrl
     categoryKey: categoryKey?.trim() ? categoryKey.trim() : null,
     search: params.get("search")?.trim() ?? "",
     variant: params.get("variant")?.trim() ?? "",
+    sort: params.get("sort")?.trim() ?? "",
   };
 }
 
@@ -52,11 +54,22 @@ export function buildShopCatalogSearchParams(
     else next.delete("variant");
   }
 
+  if (patch.sort !== undefined) {
+    const s = patch.sort.trim();
+    if (s && s !== "recommended") next.set("sort", s);
+    else next.delete("sort");
+  }
+
   return next;
 }
 
 export function shopCatalogUrlStatesEqual(a: ShopCatalogUrlState, b: ShopCatalogUrlState): boolean {
-  return a.categoryKey === b.categoryKey && a.search === b.search && a.variant === b.variant;
+  return (
+    a.categoryKey === b.categoryKey &&
+    a.search === b.search &&
+    a.variant === b.variant &&
+    a.sort === b.sort
+  );
 }
 
 export function readKitFilterUrlState(params: URLSearchParams): KitFilterUrlState {
