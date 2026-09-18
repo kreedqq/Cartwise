@@ -35,6 +35,7 @@ import {
 } from "@/lib/shop/areaCategories";
 import { DEFAULT_SHOP_AREA, type MyShopArea } from "@/lib/shop/shopAreas";
 import { portalConfigFromAreaTheme, shopAreaPortalProps } from "@/lib/shop/areaPortal";
+import { parseCategoryPortalOverrides, parseVialMedia } from "@/lib/shop/portalAssets";
 import { areaDensityClass, areaThemeCssVars, parseAreaTheme } from "@/lib/shop/areaTheme";
 import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { isShopCategoryId } from "@/lib/shopCategories";
@@ -62,6 +63,8 @@ export default function ShopRetailPage({ area }: { area?: MyShopArea }) {
       pricingProfile={currentArea.pricing_profile}
       theme={parseAreaTheme(currentArea.theme)}
       portal={portalConfigFromAreaTheme(currentArea.theme)}
+      categoryPortals={parseCategoryPortalOverrides(currentArea.theme)}
+      vialMedia={parseVialMedia(currentArea.theme)}
     >
       <ShopCatalog area={currentArea} />
     </ShopAreaProvider>
@@ -159,7 +162,7 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
               glow={portalCopy.portal.glow}
               atmosphere={portalCopy.portal.atmosphere}
               backgroundImageUrl={portalCopy.backgroundImageUrl}
-              focalImageUrl={portalCopy.focalImageUrl}
+              portalAssetUrl={portalCopy.portalAssetUrl}
             />
           );
         })()}

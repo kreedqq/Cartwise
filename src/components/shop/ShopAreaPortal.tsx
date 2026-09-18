@@ -14,7 +14,7 @@ export interface ShopAreaPortalProps {
   glow?: number;
   atmosphere?: PortalAtmosphere;
   backgroundImageUrl?: string | null;
-  focalImageUrl?: string | null;
+  portalAssetUrl?: string | null;
   icon?: React.ReactNode;
   badge?: string | null;
   metaLabel?: string;
@@ -31,15 +31,16 @@ export function ShopAreaPortal({
   glow = 55,
   atmosphere = "energy",
   backgroundImageUrl,
-  focalImageUrl,
-  icon,
+  portalAssetUrl,
+  icon: _icon,
   badge,
   metaLabel,
   ctaLabel = "Betreten",
   disabled,
   layout = "hub",
 }: ShopAreaPortalProps) {
-  const minH = layout === "hub" ? "min-h-[17.5rem] sm:min-h-[19rem]" : "min-h-[11rem] sm:min-h-[12rem]";
+  const minH =
+    layout === "hub" ? "min-h-[20rem] sm:min-h-[26rem] lg:min-h-[30rem]" : "min-h-[14rem] sm:min-h-[16rem]";
 
   const inner = (
     <>
@@ -48,49 +49,63 @@ export function ShopAreaPortal({
         glow={glow}
         atmosphere={atmosphere}
         backgroundImageUrl={backgroundImageUrl}
-        focalImageUrl={focalImageUrl}
-        intensity={layout === "hub" ? "hero" : "standard"}
+        portalAssetUrl={portalAssetUrl}
+        intensity={layout === "hub" ? "hub" : "standard"}
       />
-      <div className="relative z-10 flex h-full flex-col justify-end p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2">
-            {icon ? (
-              <span
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-black/30 text-[color:var(--portal-accent)] backdrop-blur-sm"
-                style={{ boxShadow: `0 0 20px color-mix(in srgb, ${accentHex} 25%, transparent)` }}
-              >
-                {icon}
-              </span>
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t to-transparent",
+          layout === "hub"
+            ? "h-[30%] from-background/75 via-background/35"
+            : "h-[34%] from-background via-background/55",
+        )}
+      />
+      <div
+        className={cn(
+          "relative z-20 mt-auto flex flex-col justify-end",
+          layout === "hub" ? "p-3 pb-4 sm:p-4 sm:pb-5" : "p-4 pb-5 sm:p-5 sm:pb-6",
+        )}
+      >
+        <div className="flex items-end justify-between gap-3">
+          <div className="min-w-0 space-y-1">
+            {metaLabel ? (
+              <p className={cn(UI_TYPE.status, "text-[color:var(--portal-accent)]")}>{metaLabel}</p>
             ) : null}
-            {metaLabel ? <span className={cn(UI_TYPE.status, "text-[color:var(--portal-accent)]")}>{metaLabel}</span> : null}
+            <h3
+              className={cn(
+                "font-display font-semibold leading-[1.02] tracking-tight text-foreground drop-shadow-md",
+                layout === "hub" ? "text-xl sm:text-2xl" : "text-lg sm:text-xl",
+              )}
+            >
+              {title}
+            </h3>
           </div>
           {badge ? (
-            <span className="rounded-md border border-white/15 bg-black/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-foreground/90">
+            <span className="shrink-0 rounded-md border border-white/15 bg-black/45 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">
               {badge}
             </span>
           ) : null}
         </div>
-        <h3
-          className={cn(
-            "mt-4 font-display font-semibold leading-[1.05] tracking-tight text-foreground",
-            layout === "hub" ? "text-2xl sm:text-3xl" : "text-xl sm:text-2xl",
-          )}
-        >
-          {title}
-        </h3>
-        <p className="mt-2 max-w-md line-clamp-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
-        <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[color:var(--portal-accent)]">
-          {disabled ? "Bald verfügbar" : `${ctaLabel} →`}
-          {!disabled ? <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none" /> : null}
+        <p className="mt-1.5 line-clamp-2 max-w-lg text-xs leading-relaxed text-muted-foreground sm:text-sm">
+          {description}
+        </p>
+        <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-accent)] sm:text-sm">
+          {disabled ? "Bald verfügbar" : ctaLabel}
+          {!disabled ? (
+            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none" />
+          ) : null}
         </span>
       </div>
     </>
   );
 
   const className = cn(
-    "group relative flex overflow-hidden rounded-2xl border border-white/10 bg-black/20",
-    "transition-[transform,box-shadow,border-color] duration-200 motion-reduce:transition-none",
-    "hover:border-[color:color-mix(in_srgb,var(--portal-accent)_45%,transparent)] hover:shadow-[0_20px_60px_-24px_color-mix(in_srgb,var(--portal-accent)_55%,transparent)] hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
+    "group relative flex overflow-hidden",
+    layout === "hub"
+      ? "rounded-lg sm:rounded-xl border-0 bg-transparent shadow-none hover:shadow-[0_40px_100px_-60px_color-mix(in_srgb,var(--portal-accent)_45%,transparent)]"
+      : "rounded-xl sm:rounded-2xl border border-white/[0.04] bg-transparent shadow-[0_32px_90px_-55px_color-mix(in_srgb,var(--portal-accent)_50%,transparent)] hover:shadow-[0_48px_130px_-52px_color-mix(in_srgb,var(--portal-accent)_65%,transparent)]",
+    "ring-0 transition-[transform,box-shadow] duration-300 motion-reduce:transition-none",
+    "hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
     minH,
     disabled && "pointer-events-none opacity-60",
   );

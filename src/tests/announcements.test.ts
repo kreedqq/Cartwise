@@ -70,12 +70,7 @@ describe("announcements", () => {
     ]);
     const content = ADMIN_NAV_GROUPS.find((group) => group.id === "content");
     expect(content).toMatchObject({ label: "Inhalte", to: "/admin/announcements" });
-    expect(content?.items.map((item) => item.label)).toEqual([
-      "Ankündigungen",
-      "Bewertungen",
-      "Research",
-      "Design",
-    ]);
+    expect(content?.items.map((item) => item.label)).toEqual(["Ankündigungen", "Bewertungen", "Research"]);
     expect(read("src/App.tsx")).toContain('path="announcements"');
     expect(read("src/pages/admin/AdminAnnouncements.tsx")).toContain('title="Ankündigungen verwalten"');
     expect(read("src/pages/admin/AdminAnnouncements.tsx")).toContain("useAdminAnnouncements");

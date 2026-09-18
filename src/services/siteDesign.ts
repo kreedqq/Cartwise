@@ -42,6 +42,33 @@ export async function uploadAreaDesignImage(
   });
 }
 
+export async function uploadDesignStudioVial(file: File): Promise<string> {
+  const lower = file.name.toLowerCase();
+  const ext = lower.endsWith(".png") ? "png" : lower.endsWith(".webp") ? "webp" : "jpg";
+  const path = `design-studio/vials/${crypto.randomUUID()}.${ext}`;
+  return uploadPrivateOrPublicImage({
+    bucket: SITE_DESIGN_BUCKET,
+    path,
+    file,
+    maxBytes: 8 * 1024 * 1024,
+    minWidth: 120,
+    minHeight: 120,
+  });
+}
+
+export async function uploadDesignStudioCustomPortal(file: File): Promise<string> {
+  const ext = file.name.toLowerCase().endsWith(".png") ? "png" : "webp";
+  const path = `design-studio/portals/${crypto.randomUUID()}.${ext}`;
+  return uploadPrivateOrPublicImage({
+    bucket: SITE_DESIGN_BUCKET,
+    path,
+    file,
+    maxBytes: 8 * 1024 * 1024,
+    minWidth: 256,
+    minHeight: 256,
+  });
+}
+
 export async function uploadSiteDesignImage(device: "desktop" | "tablet" | "mobile", file: File): Promise<string> {
   const ext = file.name.split(".").pop()?.toLowerCase() === "png" ? "png" : file.name.toLowerCase().endsWith(".webp") ? "webp" : "jpg";
   const path = `${device}/${crypto.randomUUID()}.${ext}`;

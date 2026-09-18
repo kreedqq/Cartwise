@@ -40,6 +40,7 @@ import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { ShopAreaProvider } from "@/context/ShopAreaContext";
 import { portalConfigFromAreaTheme } from "@/lib/shop/areaPortal";
+import { parseCategoryPortalOverrides, parseVialMedia } from "@/lib/shop/portalAssets";
 import { parseAreaTheme } from "@/lib/shop/areaTheme";
 import {
   isGroupBuyPricing,
@@ -105,6 +106,8 @@ export default function KitRequestsPage() {
       pricingProfile="group_buy"
       theme={parseAreaTheme(current.theme)}
       portal={portalConfigFromAreaTheme(current.theme)}
+      categoryPortals={parseCategoryPortalOverrides(current.theme)}
+      vialMedia={parseVialMedia(current.theme)}
     >
       <KitRequestsContent shopArea={current.key} areaName={current.name} />
     </ShopAreaProvider>

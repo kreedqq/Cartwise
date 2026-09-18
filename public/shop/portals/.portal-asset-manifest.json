@@ -1,0 +1,15 @@
+{
+  "source": "authoritative-direct",
+  "importedAt": "2026-09-18T18:08:36.216Z",
+  "ids": [
+    "portal_blue",
+    "portal_purple",
+    "portal_green",
+    "portal_red",
+    "portal_orange",
+    "portal_gold",
+    "portal_pink",
+    "portal_cyan"
+  ],
+  "note": "Individual portal PNGs supplied directly (not split from sheet)."
+}

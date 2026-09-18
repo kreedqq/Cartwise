@@ -93,7 +93,7 @@ export default function AdminDashboardPage() {
         <QuickAction to="/admin/users" icon={Users} label="Benutzer" />
         <QuickAction to="/admin/products" icon={Package} label="Produkte" />
         <QuickAction to="/admin/announcements" icon={Megaphone} label="Ankündigungen" />
-        <QuickAction to="/admin/design" icon={Palette} label="Design" />
+        <QuickAction to="/admin/design-studio" icon={Palette} label="Design Studio" />
         <QuickAction to="/admin/shipping-costs" icon={Truck} label="Versand" />
       </nav>
 

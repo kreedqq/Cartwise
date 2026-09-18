@@ -20,7 +20,9 @@
     "research:labels": "node scripts/fetch-regulatory-labels.mjs",
     "research:compile": "node scripts/compile-research-profiles.mjs",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "validate:portals": "node scripts/validate-portal-assets.mjs",
+    "import:portals": "node scripts/import-authoritative-portal-assets.mjs"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.23",

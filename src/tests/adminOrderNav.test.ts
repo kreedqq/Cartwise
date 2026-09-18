@@ -41,6 +41,7 @@ describe("hub admin navigation", () => {
       "Produkte",
       "Shop",
       "Kunden",
+      "Design Studio",
       "Inhalte",
       "System",
     ]);
@@ -69,7 +70,9 @@ describe("hub admin navigation", () => {
         "/admin/system",
         "/admin/research",
         "/admin/announcements",
-        "/admin/design",
+        "/admin/design-studio",
+        "/admin/design-studio/portals",
+        "/admin/design-studio/vials",
         "/admin/feedback",
         "/admin/payment-methods",
         "/admin/pdf-import",

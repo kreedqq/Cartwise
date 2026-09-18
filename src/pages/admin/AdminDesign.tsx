@@ -135,10 +135,10 @@ export default function AdminDesignPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        section="Design"
+        section="Design Studio"
         subsection="Globales Design"
         title="Globales Design steuern"
-        description="Website-Hintergründe zentral steuern. Bereichsdesign bleibt unter Shop Bereiche. Wartungsbilder bleiben unverändert."
+        description="Website-Hintergründe zentral steuern. Portale, Vials und Bereichswelten: Verkaufsbereiche → Bereichsdesign → Portal. Wartungsbilder bleiben unverändert."
         actions={
           <Button type="button" loading={saveMutation.isPending} onClick={() => void handleSave()}>
             Speichern

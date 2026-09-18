@@ -15,8 +15,12 @@ export interface AreaPortalConfig {
   glow: number;
   atmosphere: PortalAtmosphere;
   backgroundImage: string;
-  /** Optional focal portal image (orb), not full-bleed wallpaper */
+  /** Optional focal portal image (orb), not full-bleed wallpaper — legacy */
   image: string;
+  /** Built-in portal asset id (portal_blue, portal_gold, …) */
+  assetId: string;
+  /** Admin-uploaded portal asset (site-design path or URL) */
+  customAsset: string;
 }
 
 export const EMPTY_AREA_PORTAL: AreaPortalConfig = {
@@ -26,6 +30,8 @@ export const EMPTY_AREA_PORTAL: AreaPortalConfig = {
   atmosphere: "energy",
   backgroundImage: "",
   image: "",
+  assetId: "",
+  customAsset: "",
 };
 
 export function parseAreaPortal(raw: unknown): AreaPortalConfig {
@@ -44,6 +50,8 @@ export function parseAreaPortal(raw: unknown): AreaPortalConfig {
     atmosphere,
     backgroundImage: typeof row.backgroundImage === "string" ? row.backgroundImage : "",
     image: typeof row.image === "string" ? row.image : "",
+    assetId: typeof row.assetId === "string" ? row.assetId : "",
+    customAsset: typeof row.customAsset === "string" ? row.customAsset : "",
   };
 }
 
@@ -101,8 +109,9 @@ export function portalAtmosphereLayers(atmosphere: PortalAtmosphere): string {
 
 export function productStageBackgroundStyle(accentHex: string, glow: number): CSSProperties {
   const accent = normalizeHexColor(accentHex) || "#c9a227";
-  const a = 0.12 + (glow / 100) * 0.22;
+  const a = 0.14 + (glow / 100) * 0.26;
   return {
-    backgroundImage: `radial-gradient(ellipse 90% 75% at 50% 42%, color-mix(in srgb, ${accent} ${Math.round(a * 100)}%, transparent), transparent 72%), radial-gradient(circle at 50% 100%, hsl(var(--background) / 0.85), transparent 55%), linear-gradient(180deg, hsl(var(--card) / 0.08) 0%, hsl(var(--background) / 0.55) 100%)`,
+    backgroundColor: "#060608",
+    backgroundImage: `radial-gradient(ellipse 85% 70% at 50% 38%, color-mix(in srgb, ${accent} ${Math.round(a * 100)}%, transparent), transparent 68%), radial-gradient(circle at 18% 12%, color-mix(in srgb, ${accent} 12%, transparent), transparent 42%), linear-gradient(165deg, #0c0a08 0%, #050506 45%, #020203 100%), repeating-linear-gradient(125deg, rgba(201,162,39,0.04) 0px, rgba(201,162,39,0.04) 1px, transparent 1px, transparent 9px)`,
   };
 }

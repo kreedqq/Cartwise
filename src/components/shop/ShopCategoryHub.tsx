@@ -4,6 +4,11 @@ import type { LucideIcon } from "lucide-react";
 import { ShopCategoryPortal } from "@/components/shop/ShopCategoryPortal";
 import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { storefrontHeadline, type AreaCategory } from "@/lib/shop/areaCategories";
+import {
+  type CategoryPortalOverride,
+  portalAssetById,
+  resolveCategoryPortalAsset,
+} from "@/lib/shop/portalAssets";
 import { resolvePortalAccent } from "@/lib/shop/portalTheme";
 
 const KNOWN_ICONS: Record<string, LucideIcon> = {
@@ -12,6 +17,16 @@ const KNOWN_ICONS: Record<string, LucideIcon> = {
   orals: Pill,
   "reconstitution-water": Waves,
 };
+
+function categoryAccentHex(
+  categoryKey: string,
+  areaAccent: string,
+  categoryPortals: Record<string, CategoryPortalOverride>,
+): string {
+  const override = categoryPortals[categoryKey];
+  const fromAsset = override?.assetId ? portalAssetById(override.assetId)?.accentHex : null;
+  return fromAsset || areaAccent;
+}
 
 /** Category discovery as cinematic portals (data-driven from area categories). */
 export function ShopCategoryHub({
@@ -23,8 +38,8 @@ export function ShopCategoryHub({
   counts: Record<string, number> | null;
   onSelect: (key: string) => void;
 }) {
-  const { theme, portal, portalAccentHex } = useShopAreaContext();
-  const accentHex = portalAccentHex || resolvePortalAccent(portal, theme.tokens.accent, theme.tokens.primary);
+  const { theme, portal, portalAccentHex, categoryPortals } = useShopAreaContext();
+  const areaAccent = portalAccentHex || resolvePortalAccent(portal, theme.tokens.accent, theme.tokens.primary);
 
   if (categories.length === 0) return null;
 
@@ -35,6 +50,8 @@ export function ShopCategoryHub({
         {categories.map((category) => {
           const Icon = KNOWN_ICONS[category.category_key] ?? Package;
           const count = counts?.[category.category_key];
+          const portalAssetUrl = resolveCategoryPortalAsset(category.category_key, portal, categoryPortals);
+          const accentHex = categoryAccentHex(category.category_key, areaAccent, categoryPortals);
           return (
             <ShopCategoryPortal
               key={category.category_key}
@@ -44,6 +61,8 @@ export function ShopCategoryHub({
               accentHex={accentHex}
               glow={Math.max(35, portal.glow - 10)}
               atmosphere={portal.atmosphere}
+              portalAssetUrl={portalAssetUrl}
+              categoryKey={category.category_key}
               icon={<Icon className="h-4 w-4" aria-hidden />}
             />
           );

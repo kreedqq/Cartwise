@@ -12,8 +12,10 @@ export function ShopAreaPortalHero({
   glow = 50,
   atmosphere = "energy",
   backgroundImageUrl,
-  focalImageUrl,
+  portalAssetUrl,
   className,
+  /** When page already has a headline (e.g. Group Buy kit hero), show portal band only */
+  portalBandOnly = false,
 }: {
   areaName: string;
   title?: string;
@@ -22,14 +24,16 @@ export function ShopAreaPortalHero({
   glow?: number;
   atmosphere?: PortalAtmosphere;
   backgroundImageUrl?: string | null;
-  focalImageUrl?: string | null;
+  portalAssetUrl?: string | null;
   className?: string;
+  portalBandOnly?: boolean;
 }) {
   return (
     <section
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-white/10",
-        "min-h-[11rem] sm:min-h-[12.5rem]",
+        "group relative overflow-hidden rounded-lg border border-white/[0.04] sm:rounded-xl",
+        portalBandOnly ? "min-h-[10.5rem] sm:min-h-[13rem]" : "min-h-[12rem] sm:min-h-[16rem]",
+        portalBandOnly && "border-0",
         className,
       )}
       style={{ ["--portal-accent" as string]: accentHex }}
@@ -39,16 +43,22 @@ export function ShopAreaPortalHero({
         glow={glow}
         atmosphere={atmosphere}
         backgroundImageUrl={backgroundImageUrl}
-        focalImageUrl={focalImageUrl}
-        intensity="standard"
+        portalAssetUrl={portalAssetUrl}
+        intensity={portalBandOnly ? "hub" : "hero"}
       />
-      <div className="relative z-10 flex flex-col justify-end p-5 sm:p-6">
-        <p className={UI_TYPE.eyebrow}>{areaName}</p>
-        <h1 className="mt-2 font-display text-2xl font-semibold leading-[1.05] tracking-tight sm:text-3xl">
-          {title || areaName}
-        </h1>
-        {subtitle ? <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">{subtitle}</p> : null}
-      </div>
+      {!portalBandOnly ? (
+        <div className="relative z-10 flex min-h-[12rem] flex-col justify-end p-4 sm:min-h-[16rem] sm:p-6">
+          <p className={UI_TYPE.eyebrow}>{areaName}</p>
+          <h1 className="mt-2 font-display text-2xl font-semibold leading-[1.05] tracking-tight sm:text-3xl">
+            {title || areaName}
+          </h1>
+          {subtitle ? <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">{subtitle}</p> : null}
+        </div>
+      ) : (
+        <div className="relative z-10 flex min-h-[10.5rem] items-end p-3 sm:min-h-[13rem] sm:p-4">
+          <p className={cn(UI_TYPE.eyebrow, "text-[color:var(--portal-accent)]")}>{areaName}</p>
+        </div>
+      )}
     </section>
   );
 }

@@ -58,6 +58,10 @@ const AdminShippingPage = lazy(() => import("@/pages/admin/AdminShipping"));
 const AdminResearchPage = lazy(() => import("@/pages/admin/AdminResearch"));
 const AdminAnnouncementsPage = lazy(() => import("@/pages/admin/AdminAnnouncements"));
 const AdminDesignPage = lazy(() => import("@/pages/admin/AdminDesign"));
+const AdminDesignStudioLayout = lazy(() => import("@/pages/admin/AdminDesignStudioLayout"));
+const AdminDesignStudioOverview = lazy(() => import("@/pages/admin/AdminDesignStudioOverview"));
+const AdminDesignStudioPortals = lazy(() => import("@/pages/admin/AdminDesignStudioPortals"));
+const AdminDesignStudioVials = lazy(() => import("@/pages/admin/AdminDesignStudioVials"));
 const AdminPaymentMethodsPage = lazy(() => import("@/pages/admin/AdminPaymentMethods"));
 const AdminFeedbackPage = lazy(() => import("@/pages/admin/AdminFeedback"));
 const AdminSystemPage = lazy(() => import("@/pages/admin/AdminSystem"));
@@ -138,7 +142,13 @@ export default function App() {
                   <Route path="system" element={<AdminSystemPage />} />
                   <Route path="research" element={<AdminResearchPage />} />
                   <Route path="announcements" element={<AdminAnnouncementsPage />} />
-                  <Route path="design" element={<AdminDesignPage />} />
+                  <Route path="design" element={<Navigate to="/admin/design-studio/global" replace />} />
+                  <Route path="design-studio" element={<AdminDesignStudioLayout />}>
+                    <Route index element={<AdminDesignStudioOverview />} />
+                    <Route path="global" element={<AdminDesignPage />} />
+                    <Route path="portals" element={<AdminDesignStudioPortals />} />
+                    <Route path="vials" element={<AdminDesignStudioVials />} />
+                  </Route>
                   <Route path="feedback" element={<AdminFeedbackPage />} />
                 </Route>
               </Route>

@@ -9,6 +9,7 @@ import { ShopAreaProvider } from "@/context/ShopAreaContext";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
 import { portalConfigFromAreaTheme } from "@/lib/shop/areaPortal";
 import { parseAreaTheme } from "@/lib/shop/areaTheme";
+import { parseCategoryPortalOverrides, parseVialMedia } from "@/lib/shop/portalAssets";
 import GroupBuyPage from "@/pages/GroupBuy";
 import ShopRetailPage from "@/pages/ShopRetail";
 
@@ -40,8 +41,17 @@ export default function ShopAreaPage() {
 
   const theme = parseAreaTheme(area.theme);
   const portal = portalConfigFromAreaTheme(area.theme);
+  const categoryPortals = parseCategoryPortalOverrides(area.theme);
+  const vialMedia = parseVialMedia(area.theme);
   return (
-    <ShopAreaProvider shopArea={area.key} pricingProfile={area.pricing_profile} theme={theme} portal={portal}>
+    <ShopAreaProvider
+      shopArea={area.key}
+      pricingProfile={area.pricing_profile}
+      theme={theme}
+      portal={portal}
+      categoryPortals={categoryPortals}
+      vialMedia={vialMedia}
+    >
       {area.pricing_profile === "group_buy" ? <GroupBuyPage area={area} /> : <ShopRetailPage area={area} />}
     </ShopAreaProvider>
   );

@@ -3,6 +3,7 @@ import {
   ClipboardList,
   LayoutDashboard,
   Package,
+  Palette,
   Settings2,
   ShoppingBag,
   ShoppingCart,
@@ -168,6 +169,48 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     ],
   },
   {
+    id: "design",
+    label: "Design Studio",
+    to: "/admin/design-studio",
+    icon: Palette,
+    match: (pathname) =>
+      pathname.startsWith("/admin/design-studio") || pathname.startsWith("/admin/design"),
+    items: [
+      {
+        to: "/admin/design-studio",
+        label: "Übersicht",
+        description: "Design Studio Dashboard.",
+      },
+      {
+        to: "/admin/design-studio/global",
+        label: "Globales Design",
+        description: "Website-Hintergründe.",
+      },
+      {
+        to: "/admin/shop-areas",
+        label: "Shop Bereiche",
+        matchPrefix: true,
+        description: "Portal, Hero und Bereichsthemen.",
+      },
+      {
+        to: "/admin/design-studio/portals",
+        label: "Portale",
+        description: "Portal-Bibliothek und Zuweisungen.",
+      },
+      {
+        to: "/admin/design-studio/vials",
+        label: "Vials",
+        description: "Vial-Bibliothek und globales Standard-Vial.",
+      },
+      {
+        to: "/admin/products",
+        label: "Produktbilder",
+        matchPrefix: true,
+        description: "Produktstamm und Bilder.",
+      },
+    ],
+  },
+  {
     id: "content",
     label: "Inhalte",
     to: "/admin/announcements",
@@ -175,8 +218,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     match: (pathname) =>
       pathname.startsWith("/admin/announcements") ||
       pathname.startsWith("/admin/feedback") ||
-      pathname.startsWith("/admin/research") ||
-      pathname.startsWith("/admin/design"),
+      pathname.startsWith("/admin/research"),
     items: [
       {
         to: "/admin/announcements",
@@ -192,11 +234,6 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         to: "/admin/research",
         label: "Research",
         description: "Research Review.",
-      },
-      {
-        to: "/admin/design",
-        label: "Design",
-        description: "Globales Design.",
       },
     ],
   },

@@ -24,14 +24,14 @@ export default function ShopHubPage() {
     <div className="space-y-6 sm:space-y-8">
       <header className="space-y-2">
         <p className={UI_TYPE.eyebrow}>PEPTIX</p>
-        <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">Premium Research Marketplace</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">Enter a product world</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Wähle einen Verkaufsbereich — jeder Bereich ist ein eigenes Portal in die Produktwelt.
+          Jeder Verkaufsbereich ist ein eigenes Portal — wähle dein Ziel und betrete die Welt.
         </p>
       </header>
       <section className="space-y-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Verkaufsbereiche</p>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Portal-Galerie</p>
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 xl:grid-cols-2 xl:gap-7">
           {areas.map((area) => {
             const copy = shopAreaPortalProps(area);
             return (
@@ -45,7 +45,7 @@ export default function ShopHubPage() {
                 glow={copy.portal.glow}
                 atmosphere={copy.portal.atmosphere}
                 backgroundImageUrl={copy.backgroundImageUrl}
-                focalImageUrl={copy.focalImageUrl}
+                portalAssetUrl={copy.portalAssetUrl}
                 icon={<AreaGlyph iconKey={area.icon_key} className="h-5 w-5" />}
                 badge={area.badge_text}
                 metaLabel={copy.metaLabel}

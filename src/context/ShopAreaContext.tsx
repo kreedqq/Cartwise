@@ -9,6 +9,7 @@ import {
   EMPTY_AREA_THEME,
   type AreaThemeConfig,
 } from "@/lib/shop/areaTheme";
+import { portalAssetById, type CategoryPortalOverride, type VialMediaConfig } from "@/lib/shop/portalAssets";
 import {
   EMPTY_AREA_PORTAL,
   portalThemeCssVars,
@@ -22,7 +23,12 @@ interface ShopAreaContextValue {
   theme: AreaThemeConfig;
   portal: AreaPortalConfig;
   portalAccentHex: string;
+  categoryPortals: Record<string, CategoryPortalOverride>;
+  vialMedia: VialMediaConfig;
 }
+
+const emptyCategoryPortals: Record<string, CategoryPortalOverride> = {};
+const emptyVialMedia: VialMediaConfig = { areaImage: "", categoryImages: {} };
 
 const ShopAreaContext = React.createContext<ShopAreaContextValue>({
   shopArea: DEFAULT_SHOP_AREA,
@@ -30,6 +36,8 @@ const ShopAreaContext = React.createContext<ShopAreaContextValue>({
   theme: EMPTY_AREA_THEME,
   portal: EMPTY_AREA_PORTAL,
   portalAccentHex: "#c9a227",
+  categoryPortals: emptyCategoryPortals,
+  vialMedia: emptyVialMedia,
 });
 
 export function ShopAreaProvider({
@@ -37,18 +45,30 @@ export function ShopAreaProvider({
   pricingProfile,
   theme = EMPTY_AREA_THEME,
   portal = EMPTY_AREA_PORTAL,
+  categoryPortals = emptyCategoryPortals,
+  vialMedia = emptyVialMedia,
   children,
 }: {
   shopArea: ShopAreaKey;
   pricingProfile: ShopPricingProfile;
   theme?: AreaThemeConfig;
   portal?: AreaPortalConfig;
+  categoryPortals?: Record<string, CategoryPortalOverride>;
+  vialMedia?: VialMediaConfig;
   children: React.ReactNode;
 }) {
-  const portalAccentHex = resolvePortalAccent(portal, theme.tokens.accent, theme.tokens.primary, shopArea);
+  const assetAccent = portalAssetById(portal.assetId)?.accentHex;
+  const portalForAccent =
+    assetAccent && !portal.accent ? { ...portal, accent: assetAccent } : portal;
+  const portalAccentHex = resolvePortalAccent(
+    portalForAccent,
+    theme.tokens.accent,
+    theme.tokens.primary,
+    shopArea,
+  );
   const value = React.useMemo(
-    () => ({ shopArea, pricingProfile, theme, portal, portalAccentHex }),
-    [shopArea, pricingProfile, theme, portal, portalAccentHex],
+    () => ({ shopArea, pricingProfile, theme, portal, portalAccentHex, categoryPortals, vialMedia }),
+    [shopArea, pricingProfile, theme, portal, portalAccentHex, categoryPortals, vialMedia],
   );
   return (
     <ShopAreaContext.Provider value={value}>

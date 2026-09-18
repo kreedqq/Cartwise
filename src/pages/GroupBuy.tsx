@@ -58,6 +58,7 @@ import {
 import { ShopAreaPortalHero } from "@/components/shop/ShopAreaPortalHero";
 import { ShopCatalogBreadcrumbs } from "@/components/shop/ShopCatalogBreadcrumbs";
 import { portalConfigFromAreaTheme, shopAreaPortalProps } from "@/lib/shop/areaPortal";
+import { parseCategoryPortalOverrides, parseVialMedia } from "@/lib/shop/portalAssets";
 import { areaDensityClass, parseAreaTheme } from "@/lib/shop/areaTheme";
 import {
   KIT_REQUEST_CARD_GRID,
@@ -129,6 +130,8 @@ export default function GroupBuyPage({ area }: { area?: MyShopArea }) {
       pricingProfile="group_buy"
       theme={parseAreaTheme(current.theme)}
       portal={portalConfigFromAreaTheme(current.theme)}
+      categoryPortals={parseCategoryPortalOverrides(current.theme)}
+      vialMedia={parseVialMedia(current.theme)}
     >
       {content}
     </ShopAreaProvider>
@@ -247,11 +250,31 @@ function GroupBuyContent({
 
   const { activeCart } = useShopCart(shopArea);
   const cartHref = activeCart?.id ? `/carts/${activeCart.id}` : null;
+  const areasForPortal = useMyShopAreas();
+  const areaRowForPortal = areasForPortal.data?.find((row) => row.key === shopArea);
+  const portalCopyMobile =
+    areaRowForPortal && section === "catalog" && !selectedCategory
+      ? shopAreaPortalProps(areaRowForPortal)
+      : null;
 
   return (
     <div className={areaDensityClass(theme)} data-shop-area={shopArea}>
       <AreaStorefrontChrome theme={theme} areaName={areaName}>
       <div className={AREA_PAGE_RHYTHM}>
+      {portalCopyMobile ? (
+        <div className="mb-2 md:hidden">
+          <ShopAreaPortalHero
+            areaName={areaName}
+            accentHex={portalCopyMobile.accentHex}
+            glow={portalCopyMobile.portal.glow}
+            atmosphere={portalCopyMobile.portal.atmosphere}
+            backgroundImageUrl={portalCopyMobile.backgroundImageUrl}
+            portalAssetUrl={portalCopyMobile.portalAssetUrl}
+            portalBandOnly
+            className="min-h-[11rem]"
+          />
+        </div>
+      ) : null}
       <KitMarketplaceHero
         areaName={areaName}
         description={areaDescription}
@@ -401,17 +424,14 @@ function GroupBuyCatalog({
         <ShopCatalogBreadcrumbs items={[{ label: "Shop", href: "/shop" }, { label: areaName }]} />
         {portalCopy ? (
           <ShopAreaPortalHero
-            areaName="Group Buy · PEPTIX"
-            title={portalCopy.title}
-            subtitle={
-              portalCopy.description ||
-              "Gemeinsam kaufen. Ein Kit teilen. Nur deinen Anteil bezahlen."
-            }
+            areaName={areaName}
             accentHex={portalCopy.accentHex}
             glow={portalCopy.portal.glow}
             atmosphere={portalCopy.portal.atmosphere}
             backgroundImageUrl={portalCopy.backgroundImageUrl}
-            focalImageUrl={portalCopy.focalImageUrl}
+            portalAssetUrl={portalCopy.portalAssetUrl}
+            portalBandOnly
+            className="hidden md:block"
           />
         ) : (
           <AreaSectionHeader title="Katalog" description={AREA_CATALOG_DESCRIPTION} />

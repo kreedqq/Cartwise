@@ -28,8 +28,19 @@ import {
   parseAreaTheme,
   type AreaThemeConfig,
 } from "@/lib/shop/areaTheme";
+import { PortalAssetPicker } from "@/components/admin/PortalAssetPicker";
 import { ShopAreaPortal } from "@/components/shop/ShopAreaPortal";
 import { portalConfigFromAreaTheme } from "@/lib/shop/areaPortal";
+import {
+  type BuiltinPortalAssetId,
+  isBuiltinPortalAssetId,
+  parseCategoryPortalOverrides,
+  parseVialMedia,
+  portalAssetById,
+  resolvePortalAssetPublicUrl,
+  type CategoryPortalOverride,
+  type VialMediaConfig,
+} from "@/lib/shop/portalAssets";
 import {
   type AreaPortalConfig,
   type PortalAtmosphere,
@@ -37,7 +48,9 @@ import {
   resolvePortalAccent,
   resolvePortalImageUrl,
 } from "@/lib/shop/portalTheme";
-import { updateAdminShopArea } from "@/services/shopAreas";
+import { QUERY_KEYS } from "@/lib/constants";
+import { updateAdminShopArea, listAdminShopAreaCategories } from "@/services/shopAreas";
+import { useQuery } from "@tanstack/react-query";
 import { deleteSiteDesignImage, siteDesignImageUrl, uploadAreaDesignImage } from "@/services/siteDesign";
 import type { Tables } from "@/types/database";
 
@@ -147,8 +160,17 @@ function AreaDesignForm({
 }) {
   const savedTheme = React.useMemo(() => parseAreaTheme(area.theme), [area.theme]);
   const savedPortal = React.useMemo(() => portalConfigFromAreaTheme(area.theme), [area.theme]);
+  const savedCategoryPortals = React.useMemo(() => parseCategoryPortalOverrides(area.theme), [area.theme]);
+  const savedVialMedia = React.useMemo(() => parseVialMedia(area.theme), [area.theme]);
   const [draft, setDraft] = React.useState<AreaThemeConfig>(savedTheme);
   const [portalDraft, setPortalDraft] = React.useState<AreaPortalConfig>(savedPortal);
+  const [categoryPortalsDraft, setCategoryPortalsDraft] =
+    React.useState<Record<string, CategoryPortalOverride>>(savedCategoryPortals);
+  const [vialMediaDraft, setVialMediaDraft] = React.useState<VialMediaConfig>(savedVialMedia);
+  const categoriesQuery = useQuery({
+    queryKey: QUERY_KEYS.adminShopAreaConfig(area.key).concat("design-categories"),
+    queryFn: () => listAdminShopAreaCategories(area.key),
+  });
   const [iconKey, setIconKey] = React.useState(area.icon_key || "store");
   const [subtitle, setSubtitle] = React.useState(area.subtitle ?? "");
   const [badge, setBadge] = React.useState(area.badge_text ?? "");
@@ -169,6 +191,8 @@ function AreaDesignForm({
   const dirty =
     JSON.stringify(draft) !== JSON.stringify(savedTheme) ||
     JSON.stringify(portalDraft) !== JSON.stringify(savedPortal) ||
+    JSON.stringify(categoryPortalsDraft) !== JSON.stringify(savedCategoryPortals) ||
+    JSON.stringify(vialMediaDraft) !== JSON.stringify(savedVialMedia) ||
     iconKey !== (area.icon_key || "store") ||
     subtitle !== (area.subtitle ?? "") ||
     badge !== (area.badge_text ?? "");
@@ -189,7 +213,13 @@ function AreaDesignForm({
       const themeBase =
         area.theme && typeof area.theme === "object" ? { ...(area.theme as Record<string, unknown>) } : {};
       await updateAdminShopArea(area.key, {
-        theme: { ...themeBase, ...(draft as unknown as Record<string, unknown>), portal: portalDraft },
+        theme: {
+          ...themeBase,
+          ...(draft as unknown as Record<string, unknown>),
+          portal: portalDraft,
+          categoryPortals: categoryPortalsDraft,
+          vialMedia: vialMediaDraft,
+        },
         icon_key: iconKey,
         subtitle: subtitle.trim() || null,
         badge_text: badge.trim() || null,
@@ -206,6 +236,8 @@ function AreaDesignForm({
   function discard() {
     setDraft(savedTheme);
     setPortalDraft(savedPortal);
+    setCategoryPortalsDraft(savedCategoryPortals);
+    setVialMediaDraft(savedVialMedia);
     setIconKey(area.icon_key || "store");
     setSubtitle(area.subtitle ?? "");
     setBadge(area.badge_text ?? "");
@@ -275,6 +307,21 @@ function AreaDesignForm({
                 ) : null}
                 {sectionId === "portal" ? (
                   <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <PortalAssetPicker
+                        value={
+                          isBuiltinPortalAssetId(portalDraft.assetId) ? portalDraft.assetId : ""
+                        }
+                        onChange={(assetId: BuiltinPortalAssetId | "") => {
+                          const accent = assetId ? portalAssetById(assetId)?.accentHex : "";
+                          setPortalDraft((c) => ({
+                            ...c,
+                            assetId,
+                            accent: accent || c.accent,
+                          }));
+                        }}
+                      />
+                    </div>
                     <Field label="Portal aktiv" className="sm:col-span-2">
                       <Switch
                         checked={portalDraft.enabled}
@@ -318,13 +365,84 @@ function AreaDesignForm({
                         </SelectContent>
                       </Select>
                     </Field>
-                    <Field label="Portal-Bild (Orb)" hint="Optional, kein Vollbild">
+                    <Field label="Custom Portal" hint="Optional — ersetzt Built-in Asset">
+                      <Input
+                        value={portalDraft.customAsset}
+                        onChange={(e) => setPortalDraft((c) => ({ ...c, customAsset: e.target.value }))}
+                        placeholder="site-design Pfad oder URL"
+                      />
+                    </Field>
+                    <Field label="Legacy Orb" hint="Nur Fallback wenn kein Asset gewählt">
                       <Input
                         value={portalDraft.image}
                         onChange={(e) => setPortalDraft((c) => ({ ...c, image: e.target.value }))}
                         placeholder="site-design Pfad oder URL"
                       />
                     </Field>
+                    <div className="sm:col-span-2 space-y-3 rounded-lg border border-border/60 p-3">
+                      <p className="text-sm font-medium">Kategorie-Portale</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Überschreibt das Bereichs-Portal pro Kategorie (dynamisch aus dem Katalog).
+                      </p>
+                      {(categoriesQuery.data ?? []).length === 0 ? (
+                        <p className="text-xs text-muted-foreground">Keine Kategorien in diesem Bereich.</p>
+                      ) : (
+                        (categoriesQuery.data ?? []).map((cat) => {
+                          const key = cat.category_key;
+                          const current = categoryPortalsDraft[key]?.assetId ?? "";
+                          return (
+                            <div
+                              key={key}
+                              className="space-y-1 border-t border-border/40 pt-2 first:border-0 first:pt-0"
+                              data-testid={`category-portal-row-${key}`}
+                            >
+                              <p className="text-xs font-medium">{cat.label || key}</p>
+                              <Select
+                                value={current || "__inherit__"}
+                                onValueChange={(value) => {
+                                  setCategoryPortalsDraft((prev) => {
+                                    const next = { ...prev };
+                                    if (value === "__inherit__") {
+                                      delete next[key];
+                                      return next;
+                                    }
+                                    next[key] = { assetId: value, customAsset: prev[key]?.customAsset ?? "" };
+                                    return next;
+                                  });
+                                }}
+                              >
+                                <SelectTrigger className="h-9" data-testid={`category-portal-select-${key}`}>
+                                  <SelectValue placeholder="Bereichs-Portal" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__inherit__">Bereichs-Portal übernehmen</SelectItem>
+                                  <SelectItem value="portal_blue">Blau</SelectItem>
+                                  <SelectItem value="portal_purple">Violett</SelectItem>
+                                  <SelectItem value="portal_green">Grün</SelectItem>
+                                  <SelectItem value="portal_red">Rot</SelectItem>
+                                  <SelectItem value="portal_orange">Orange</SelectItem>
+                                  <SelectItem value="portal_gold">Gold</SelectItem>
+                                  <SelectItem value="portal_pink">Pink</SelectItem>
+                                  <SelectItem value="portal_cyan">Cyan</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                    <div className="sm:col-span-2 space-y-2 rounded-lg border border-border/60 p-3">
+                      <p className="text-sm font-medium">Vial-Bilder (Fallback-Kette)</p>
+                      <Field label="Bereichs-Vial" hint="site-design Pfad — vor Canonical">
+                        <Input
+                          value={vialMediaDraft.areaImage}
+                          onChange={(e) =>
+                            setVialMediaDraft((v) => ({ ...v, areaImage: e.target.value }))
+                          }
+                          placeholder="z. B. shop-areas/…/vial.png"
+                        />
+                      </Field>
+                    </div>
                     <Field label="Portal-Hintergrund" hint="Optional">
                       <Input
                         value={portalDraft.backgroundImage}
@@ -1041,7 +1159,12 @@ function AreaDesignForm({
             <Button type="button" variant="ghost" onClick={discard} disabled={!dirty}>
               Änderungen verwerfen
             </Button>
-            <Button type="button" onClick={() => void save()} disabled={saving || !dirty}>
+            <Button
+              type="button"
+              data-testid="area-design-save"
+              onClick={() => void save()}
+              disabled={saving || !dirty}
+            >
               Speichern
             </Button>
           </div>
@@ -1116,7 +1239,11 @@ function AreaDesignForm({
                       glow={portalDraft.glow}
                       atmosphere={portalDraft.atmosphere}
                       backgroundImageUrl={resolvePortalImageUrl(portalDraft.backgroundImage)}
-                      focalImageUrl={resolvePortalImageUrl(portalDraft.image)}
+                      portalAssetUrl={resolvePortalAssetPublicUrl({
+                        assetId: portalDraft.assetId,
+                        customPath: portalDraft.customAsset,
+                        legacyOrbPath: portalDraft.image,
+                      })}
                       badge={badge || undefined}
                       ctaLabel="Betreten"
                       disabled

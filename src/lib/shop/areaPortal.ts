@@ -1,6 +1,7 @@
 import type { MyShopArea } from "@/lib/shop/shopAreas";
 import { isGroupBuyPricing } from "@/lib/shop/shopAreas";
 import { parseAreaTheme } from "@/lib/shop/areaTheme";
+import { portalAssetById, resolvePortalAssetPublicUrl } from "@/lib/shop/portalAssets";
 import {
   parseAreaPortal,
   resolvePortalAccent,
@@ -17,7 +18,18 @@ export function portalConfigFromAreaTheme(raw: unknown): AreaPortalConfig {
 export function shopAreaPortalProps(area: MyShopArea) {
   const theme = parseAreaTheme(area.theme);
   const portal = portalConfigFromAreaTheme(area.theme);
-  const accentHex = resolvePortalAccent(portal, theme.tokens.accent, theme.tokens.primary, area.key);
+  const assetAccent = portalAssetById(portal.assetId)?.accentHex;
+  const accentHex = resolvePortalAccent(
+    assetAccent && !portal.accent ? { ...portal, accent: assetAccent } : portal,
+    theme.tokens.accent,
+    theme.tokens.primary,
+    area.key,
+  );
+  const portalAssetUrl = resolvePortalAssetPublicUrl({
+    assetId: portal.assetId,
+    customPath: portal.customAsset,
+    legacyOrbPath: portal.image,
+  });
   const isGb = isGroupBuyPricing(area.pricing_profile);
   const title = theme.hub.title || area.name;
   const description =
@@ -37,7 +49,7 @@ export function shopAreaPortalProps(area: MyShopArea) {
     title,
     description,
     backgroundImageUrl: resolvePortalImageUrl(portal.backgroundImage) ?? hubImage,
-    focalImageUrl: resolvePortalImageUrl(portal.image),
+    portalAssetUrl,
     metaLabel: isGb ? "Group Buy" : "Einzelverkauf",
     ctaLabel: "Betreten",
     disabled: area.status === "coming_soon",

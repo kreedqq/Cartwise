@@ -215,12 +215,14 @@
     }
   }
 
-  .peptix-portal-ring {
+  .peptix-portal-asset,
+  .peptix-portal-glow {
     animation: peptix-portal-breathe 5s ease-in-out infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .peptix-portal-ring {
+    .peptix-portal-asset,
+    .peptix-portal-glow {
       animation: none;
     }
   }
