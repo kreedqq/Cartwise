@@ -28,6 +28,15 @@ import {
   parseAreaTheme,
   type AreaThemeConfig,
 } from "@/lib/shop/areaTheme";
+import { ShopAreaPortal } from "@/components/shop/ShopAreaPortal";
+import { portalConfigFromAreaTheme } from "@/lib/shop/areaPortal";
+import {
+  type AreaPortalConfig,
+  type PortalAtmosphere,
+  portalThemeCssVars,
+  resolvePortalAccent,
+  resolvePortalImageUrl,
+} from "@/lib/shop/portalTheme";
 import { updateAdminShopArea } from "@/services/shopAreas";
 import { deleteSiteDesignImage, siteDesignImageUrl, uploadAreaDesignImage } from "@/services/siteDesign";
 import type { Tables } from "@/types/database";
@@ -42,12 +51,19 @@ const VIEWPORTS = [
 
 const PREVIEW_SCENES = [
   { id: "shop", title: "Shop" },
+  { id: "portal", title: "Portal" },
   { id: "product", title: "Produkt" },
   { id: "kit", title: "Kit Gesuch" },
   { id: "join", title: "Join Dialog" },
 ] as const;
 
 const DESIGNER_GROUPS = [
+  {
+    id: "portal",
+    title: "Portal",
+    description: "Portal-Aussehen auf der Shop-Übersicht und beim Betreten des Bereichs.",
+    sections: ["portal"],
+  },
   {
     id: "grunddesign",
     title: "Grunddesign",
@@ -93,6 +109,7 @@ const DESIGNER_GROUPS = [
 ] as const;
 
 const SECTION_TITLES: Record<string, string> = {
+  portal: "Portal-Stil",
   identity: "Name",
   colors: "Farben",
   background: "Hintergrund",
@@ -129,7 +146,9 @@ function AreaDesignForm({
   onChanged: () => Promise<void>;
 }) {
   const savedTheme = React.useMemo(() => parseAreaTheme(area.theme), [area.theme]);
+  const savedPortal = React.useMemo(() => portalConfigFromAreaTheme(area.theme), [area.theme]);
   const [draft, setDraft] = React.useState<AreaThemeConfig>(savedTheme);
+  const [portalDraft, setPortalDraft] = React.useState<AreaPortalConfig>(savedPortal);
   const [iconKey, setIconKey] = React.useState(area.icon_key || "store");
   const [subtitle, setSubtitle] = React.useState(area.subtitle ?? "");
   const [badge, setBadge] = React.useState(area.badge_text ?? "");
@@ -140,8 +159,16 @@ function AreaDesignForm({
   const [seed, setSeed] = React.useState("#d4af37");
   const [saving, setSaving] = React.useState(false);
 
+  const previewPortalAccent = resolvePortalAccent(
+    portalDraft,
+    draft.tokens.accent,
+    draft.tokens.primary,
+    area.key,
+  );
+
   const dirty =
     JSON.stringify(draft) !== JSON.stringify(savedTheme) ||
+    JSON.stringify(portalDraft) !== JSON.stringify(savedPortal) ||
     iconKey !== (area.icon_key || "store") ||
     subtitle !== (area.subtitle ?? "") ||
     badge !== (area.badge_text ?? "");
@@ -159,8 +186,10 @@ function AreaDesignForm({
   async function save() {
     setSaving(true);
     try {
+      const themeBase =
+        area.theme && typeof area.theme === "object" ? { ...(area.theme as Record<string, unknown>) } : {};
       await updateAdminShopArea(area.key, {
-        theme: draft as unknown as Record<string, unknown>,
+        theme: { ...themeBase, ...(draft as unknown as Record<string, unknown>), portal: portalDraft },
         icon_key: iconKey,
         subtitle: subtitle.trim() || null,
         badge_text: badge.trim() || null,
@@ -176,6 +205,7 @@ function AreaDesignForm({
 
   function discard() {
     setDraft(savedTheme);
+    setPortalDraft(savedPortal);
     setIconKey(area.icon_key || "store");
     setSubtitle(area.subtitle ?? "");
     setBadge(area.badge_text ?? "");
@@ -242,6 +272,67 @@ function AreaDesignForm({
               <div key={sectionId} className="mt-3 space-y-3">
                 {group.sections.length > 1 ? (
                   <p className="text-sm font-medium">{SECTION_TITLES[sectionId]}</p>
+                ) : null}
+                {sectionId === "portal" ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Field label="Portal aktiv" className="sm:col-span-2">
+                      <Switch
+                        checked={portalDraft.enabled}
+                        onCheckedChange={(value) => setPortalDraft((c) => ({ ...c, enabled: value }))}
+                      />
+                    </Field>
+                    <ColorField
+                      label="Portal-Akzent"
+                      hint="Glow, Rand und Kategorie-Portale"
+                      usage="Welt-Identität neben PEPTIX Gold"
+                      value={portalDraft.accent || "#c9a227"}
+                      onChange={(value) => setPortalDraft((c) => ({ ...c, accent: value }))}
+                    />
+                    <Field label="Glow-Intensität">
+                      <Input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={portalDraft.glow}
+                        onChange={(e) =>
+                          setPortalDraft((c) => ({ ...c, glow: Number(e.target.value) || 0 }))
+                        }
+                      />
+                      <p className="text-[11px] text-muted-foreground">{portalDraft.glow}%</p>
+                    </Field>
+                    <Field label="Atmosphäre">
+                      <Select
+                        value={portalDraft.atmosphere}
+                        onValueChange={(value: PortalAtmosphere) =>
+                          setPortalDraft((c) => ({ ...c, atmosphere: value }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="energy">Energy</SelectItem>
+                          <SelectItem value="molecule">Molecule</SelectItem>
+                          <SelectItem value="void">Void</SelectItem>
+                          <SelectItem value="calm">Calm</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Field label="Portal-Bild (Orb)" hint="Optional, kein Vollbild">
+                      <Input
+                        value={portalDraft.image}
+                        onChange={(e) => setPortalDraft((c) => ({ ...c, image: e.target.value }))}
+                        placeholder="site-design Pfad oder URL"
+                      />
+                    </Field>
+                    <Field label="Portal-Hintergrund" hint="Optional">
+                      <Input
+                        value={portalDraft.backgroundImage}
+                        onChange={(e) => setPortalDraft((c) => ({ ...c, backgroundImage: e.target.value }))}
+                        placeholder="site-design Pfad oder URL"
+                      />
+                    </Field>
+                  </div>
                 ) : null}
                 {sectionId === "identity" ? (
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -1012,6 +1103,31 @@ function AreaDesignForm({
                 ) : null}
               </div>
               <div className="space-y-3 p-4">
+                {previewScene === "portal" && portalDraft.enabled ? (
+                  <div
+                    className="overflow-hidden rounded-xl"
+                    style={portalThemeCssVars(previewPortalAccent, portalDraft.glow) as React.CSSProperties}
+                  >
+                    <ShopAreaPortal
+                      title={draft.hero.title || area.name}
+                      description={draft.hero.subtitle || subtitle || "Portal-Vorschau — dieselbe Darstellung wie auf /shop."}
+                      href="#"
+                      accentHex={previewPortalAccent}
+                      glow={portalDraft.glow}
+                      atmosphere={portalDraft.atmosphere}
+                      backgroundImageUrl={resolvePortalImageUrl(portalDraft.backgroundImage)}
+                      focalImageUrl={resolvePortalImageUrl(portalDraft.image)}
+                      badge={badge || undefined}
+                      ctaLabel="Betreten"
+                      disabled
+                      layout="hub"
+                    />
+                  </div>
+                ) : previewScene === "portal" && !portalDraft.enabled ? (
+                  <p className="text-xs text-muted-foreground">Portal ist deaktiviert — aktivieren, um die Vorschau zu sehen.</p>
+                ) : null}
+                {previewScene !== "portal" ? (
+                <>
                 <div className="flex flex-wrap gap-2">
                   <Button type="button" size="sm">Primary Button</Button>
                   <Button type="button" size="sm" variant="outline">Secondary Button</Button>
@@ -1101,6 +1217,8 @@ function AreaDesignForm({
                   <p className="text-xs text-muted-foreground">
                     {draft.emptyTitle || "Dieser Bereich wird gerade vorbereitet."}
                   </p>
+                ) : null}
+                </>
                 ) : null}
               </div>
             </div>

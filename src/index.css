@@ -203,6 +203,28 @@
 }
 
 @layer utilities {
+  @keyframes peptix-portal-breathe {
+    0%,
+    100% {
+      opacity: 0.82;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.04);
+    }
+  }
+
+  .peptix-portal-ring {
+    animation: peptix-portal-breathe 5s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .peptix-portal-ring {
+      animation: none;
+    }
+  }
+
   .scrollbar-thin {
     scrollbar-width: thin;
   }

@@ -7,6 +7,7 @@ import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ShopAreaProvider } from "@/context/ShopAreaContext";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
+import { portalConfigFromAreaTheme } from "@/lib/shop/areaPortal";
 import { parseAreaTheme } from "@/lib/shop/areaTheme";
 import GroupBuyPage from "@/pages/GroupBuy";
 import ShopRetailPage from "@/pages/ShopRetail";
@@ -38,8 +39,9 @@ export default function ShopAreaPage() {
   }
 
   const theme = parseAreaTheme(area.theme);
+  const portal = portalConfigFromAreaTheme(area.theme);
   return (
-    <ShopAreaProvider shopArea={area.key} pricingProfile={area.pricing_profile} theme={theme}>
+    <ShopAreaProvider shopArea={area.key} pricingProfile={area.pricing_profile} theme={theme} portal={portal}>
       {area.pricing_profile === "group_buy" ? <GroupBuyPage area={area} /> : <ShopRetailPage area={area} />}
     </ShopAreaProvider>
   );

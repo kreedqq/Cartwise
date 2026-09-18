@@ -1,8 +1,10 @@
-import { FlaskConical } from "lucide-react";
+import * as React from "react";
 
-import { productAccentStyle, productImageUrl } from "@/lib/shop/productImage";
+import { productImageUrl } from "@/lib/shop/productImage";
 import { productBadgeLabel } from "@/lib/shop/productBadge";
+import { PEPTIX_CANONICAL_VIAL_PATH, productStageBackgroundStyle } from "@/lib/shop/portalTheme";
 import { SHOP_GRID } from "@/lib/design/tokens";
+import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { cn } from "@/lib/utils";
 import type { Tables } from "@/types/database";
 
@@ -17,42 +19,56 @@ export function ShopProductImageFrame({
   favoriteControl?: React.ReactNode;
   className?: string;
 }) {
-  const src = productImageUrl(product.image_path);
-  const accent = productAccentStyle(product.code || product.name);
+  const customSrc = productImageUrl(product.image_path);
+  const { portalAccentHex, portal } = useShopAreaContext();
   const badge = productBadgeLabel(product.badge_key);
+  const stageStyle = productStageBackgroundStyle(portalAccentHex, portal.glow);
+  const [customError, setCustomError] = React.useState(false);
+  const [canonicalError, setCanonicalError] = React.useState(false);
+
+  const showCustom = Boolean(customSrc) && !customError;
+  const showCanonical = !showCustom && !canonicalError;
+  const heroMissing = !showCustom && !showCanonical;
 
   return (
-    <div className={cn(SHOP_GRID.imageWrap, className)} style={accent.css}>
+    <div className={cn(SHOP_GRID.imageWrap, className)} style={stageStyle} data-testid="shop-product-image-stage">
       {badge ? (
         <span className={cn(SHOP_GRID.badge, "absolute left-2.5 top-2.5 z-20")}>{badge}</span>
       ) : null}
       {favoriteControl ? (
         <div className="absolute right-1.5 top-1.5 z-20 sm:right-2 sm:top-2">{favoriteControl}</div>
       ) : null}
-      <div className={SHOP_GRID.imageInner}>
-        {src ? (
+      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" aria-hidden />
+      <div className={cn(SHOP_GRID.imageInner, "relative z-[1] flex items-end justify-center px-0 pb-1 pt-2 sm:px-1")}>
+        {showCustom ? (
           <img
-            src={src}
+            src={customSrc!}
             alt={product.name}
-            className="h-full w-full object-contain object-center drop-shadow-[0_10px_24px_rgba(0,0,0,0.4)] transition-transform duration-200 motion-reduce:transition-none group-hover/card:scale-[1.02]"
+            className="max-h-[98%] w-full max-w-full object-contain object-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.65)] transition-transform duration-200 motion-reduce:transition-none group-hover/card:scale-[1.03]"
             loading="lazy"
             decoding="async"
+            onError={() => setCustomError(true)}
+          />
+        ) : showCanonical ? (
+          <img
+            src={PEPTIX_CANONICAL_VIAL_PATH}
+            alt={product.name}
+            data-testid="shop-product-canonical-vial"
+            className="max-h-[98%] w-auto max-w-[92%] object-contain object-bottom drop-shadow-[0_22px_44px_rgba(0,0,0,0.7)] transition-transform duration-200 motion-reduce:transition-none group-hover/card:scale-[1.04]"
+            loading="lazy"
+            decoding="async"
+            onError={() => setCanonicalError(true)}
           />
         ) : (
           <div
-            className="flex h-full w-full flex-col items-center justify-center gap-1 text-center"
-            aria-hidden
+            className="flex h-full w-full flex-col items-center justify-end pb-2 text-center"
+            data-testid="shop-product-vial-missing"
           >
-            <div
-              className="flex h-[72%] max-h-28 w-[38%] min-w-[3.25rem] max-w-[4.5rem] flex-col items-center justify-end rounded-t-full border border-white/10 bg-gradient-to-b from-white/12 to-white/5 pb-1.5 sm:max-h-32 sm:max-w-[5rem]"
-              style={{ boxShadow: `0 10px 32px hsl(${accent.hue} 60% 40% / 0.32)` }}
-            >
-              <div className="mb-auto mt-1.5 h-2 w-2 rounded-full bg-muted-foreground/40" />
-              <span className="px-0.5 text-[8px] font-bold uppercase tracking-wider text-foreground/80 sm:text-[9px]">
-                {product.code.slice(0, 6)}
-              </span>
-            </div>
-            <FlaskConical className="h-4 w-4 text-muted-foreground/50 sm:h-5 sm:w-5" />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary/80">PEPTIX</p>
+            <p className="mt-1 max-w-[12rem] text-[10px] leading-snug text-muted-foreground">
+              Canonical Vial fehlt lokal — bitte{" "}
+              <span className="font-mono text-[9px]">public/shop/peptix-vial-canonical.jpg</span> ablegen.
+            </p>
           </div>
         )}
       </div>
@@ -60,6 +76,9 @@ export function ShopProductImageFrame({
         <span className="pointer-events-none absolute bottom-2 left-2.5 z-10 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/80">
           {categoryLabel}
         </span>
+      ) : null}
+      {heroMissing ? (
+        <span className="sr-only">Produktbild nicht verfügbar — Canonical Vial Asset fehlt.</span>
       ) : null}
     </div>
   );

@@ -78,10 +78,10 @@ describe("ShopHub routing", () => {
     expect(hub).toContain("Navigate");
   });
 
-  it("ShopHubPage shows area cards when multiple areas are accessible", () => {
+  it("ShopHubPage shows area portals when multiple areas are accessible", () => {
     const hub = read("src/pages/ShopHub.tsx");
-    expect(hub).toContain("ShopCatalogHero");
-    expect(hub).toContain("AreaEntry");
+    expect(hub).toContain("ShopAreaPortal");
+    expect(hub).toContain("shopAreaPortalProps");
     expect(hub).toContain("areas.length === 1");
   });
 });

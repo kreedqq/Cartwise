@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { ShopCatalogFiltersSheet } from "@/components/shop/ShopCatalogFiltersSheet";
 import { ShopCatalogHeader } from "@/components/shop/ShopCatalogHeader";
 import { ShopCatalogToolbar } from "@/components/shop/ShopCatalogToolbar";
-import { ShopCatalogHero } from "@/components/shop/ShopCatalogHero";
+import { ShopAreaPortalHero } from "@/components/shop/ShopAreaPortalHero";
+import { ShopCatalogBreadcrumbs } from "@/components/shop/ShopCatalogBreadcrumbs";
 import { ShopProductGrid } from "@/components/shop/ShopProductGrid";
 import { parseShopCatalogSort, type ShopCatalogSort } from "@/lib/shop/catalogSort";
 import { AreaStorefrontChrome } from "@/components/shop/AreaStorefrontChrome";
@@ -33,6 +34,7 @@ import {
   visibleStorefrontCategories,
 } from "@/lib/shop/areaCategories";
 import { DEFAULT_SHOP_AREA, type MyShopArea } from "@/lib/shop/shopAreas";
+import { portalConfigFromAreaTheme, shopAreaPortalProps } from "@/lib/shop/areaPortal";
 import { areaDensityClass, areaThemeCssVars, parseAreaTheme } from "@/lib/shop/areaTheme";
 import { useShopAreaContext } from "@/context/ShopAreaContext";
 import { isShopCategoryId } from "@/lib/shopCategories";
@@ -59,6 +61,7 @@ export default function ShopRetailPage({ area }: { area?: MyShopArea }) {
       shopArea={currentArea.key}
       pricingProfile={currentArea.pricing_profile}
       theme={parseAreaTheme(currentArea.theme)}
+      portal={portalConfigFromAreaTheme(currentArea.theme)}
     >
       <ShopCatalog area={currentArea} />
     </ShopAreaProvider>
@@ -143,18 +146,23 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
         style={areaThemeCssVars(theme)}
       >
         <AreaStorefrontChrome theme={theme} areaName={area.name}>
-        <ShopCatalogHero
-          eyebrow="Retail · PEPTIX"
-          title={area.name}
-          subtitle={
-            area.subtitle?.trim() ||
-            "Einzelverkauf — Peptide, Oils und Orals als Vials bzw. Packungen."
-          }
-          searchValue={searchDraft}
-          onSearchChange={setSearchDraft}
-          searchPlaceholder={theme.searchPlaceholder || "Produkte suchen …"}
-        />
         <div className={AREA_PAGE_RHYTHM}>
+        <ShopCatalogBreadcrumbs items={[{ label: "Shop", href: "/shop" }, { label: area.name }]} className="mb-3" />
+        {(() => {
+          const portalCopy = shopAreaPortalProps(area);
+          return (
+            <ShopAreaPortalHero
+              areaName="PEPTIX · Verkaufsbereich"
+              title={portalCopy.title}
+              subtitle={portalCopy.description}
+              accentHex={portalCopy.accentHex}
+              glow={portalCopy.portal.glow}
+              atmosphere={portalCopy.portal.atmosphere}
+              backgroundImageUrl={portalCopy.backgroundImageUrl}
+              focalImageUrl={portalCopy.focalImageUrl}
+            />
+          );
+        })()}
         <div className={AREA_PAGE_CONTENT_SLOT}>
         {(productsQuery.isLoading || storefrontQuery.isLoading) && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -195,9 +203,17 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
     <div className={areaDensityClass(theme)} data-shop-area={area.key} style={areaThemeCssVars(theme)}>
       <AreaStorefrontChrome theme={theme} areaName={area.name}>
       <div className={AREA_PAGE_RHYTHM}>
+      <ShopCatalogBreadcrumbs
+        items={[
+          { label: "Shop", href: "/shop" },
+          { label: area.name, href: area.path },
+          { label: storefrontHeadline(selected.label) },
+        ]}
+        className="mb-2"
+      />
       <ShopCatalogHeader
-        eyebrow="Retail · Shop"
-        title={selected.label}
+        eyebrow="Produktwelt"
+        title={storefrontHeadline(selected.label)}
         productCount={filtered.length}
         actions={
           <Button

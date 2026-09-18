@@ -46,9 +46,9 @@ export const SHOP_GRID = {
   layout:
     "grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-4",
   card:
-    "group/card relative flex h-full flex-col overflow-hidden rounded-xl bg-gradient-to-b from-card/40 to-background/20 shadow-[0_10px_32px_-22px_rgba(0,0,0,0.85)] transition-[transform,box-shadow] duration-150 motion-reduce:transition-none hover:shadow-[0_16px_40px_-18px_rgba(0,0,0,0.9)] hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
-  /** Fixed hero height — stronger density at 1280 without shrinking type. */
-  imageWrap: "relative h-[8.75rem] w-full overflow-hidden sm:h-[10.25rem] xl:h-[9.75rem]",
+    "group/card relative flex h-full flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-card/25 shadow-[0_8px_28px_-22px_rgba(0,0,0,0.88)] transition-[transform,box-shadow] duration-200 motion-reduce:transition-none hover:border-primary/20 hover:shadow-[0_14px_36px_-18px_rgba(0,0,0,0.92)] hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
+  /** Product stage — vial hero (taller than pre-portal grid). */
+  imageWrap: "relative h-[10.5rem] w-full overflow-hidden sm:h-[12rem] xl:h-[11.25rem]",
   imageInner: "absolute inset-0 flex items-center justify-center p-1 sm:p-2",
   body: "flex flex-1 flex-col gap-1.5 p-2.5 pb-2.5 sm:gap-2 sm:p-3 sm:pb-3",
   qtyStepper:

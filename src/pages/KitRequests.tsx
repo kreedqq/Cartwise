@@ -39,6 +39,7 @@ import { useMyShopAreas } from "@/hooks/useMyShopAreas";
 import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { ShopAreaProvider } from "@/context/ShopAreaContext";
+import { portalConfigFromAreaTheme } from "@/lib/shop/areaPortal";
 import { parseAreaTheme } from "@/lib/shop/areaTheme";
 import {
   isGroupBuyPricing,
@@ -99,7 +100,12 @@ export default function KitRequestsPage() {
   if (!current) return <Navigate to="/403" replace />;
 
   return (
-    <ShopAreaProvider shopArea={current.key} pricingProfile="group_buy" theme={parseAreaTheme(current.theme)}>
+    <ShopAreaProvider
+      shopArea={current.key}
+      pricingProfile="group_buy"
+      theme={parseAreaTheme(current.theme)}
+      portal={portalConfigFromAreaTheme(current.theme)}
+    >
       <KitRequestsContent shopArea={current.key} areaName={current.name} />
     </ShopAreaProvider>
   );

@@ -55,6 +55,9 @@ import {
   type MyShopArea,
   type ShopAreaKey,
 } from "@/lib/shop/shopAreas";
+import { ShopAreaPortalHero } from "@/components/shop/ShopAreaPortalHero";
+import { ShopCatalogBreadcrumbs } from "@/components/shop/ShopCatalogBreadcrumbs";
+import { portalConfigFromAreaTheme, shopAreaPortalProps } from "@/lib/shop/areaPortal";
 import { areaDensityClass, parseAreaTheme } from "@/lib/shop/areaTheme";
 import {
   KIT_REQUEST_CARD_GRID,
@@ -125,6 +128,7 @@ export default function GroupBuyPage({ area }: { area?: MyShopArea }) {
       shopArea={current.key}
       pricingProfile="group_buy"
       theme={parseAreaTheme(current.theme)}
+      portal={portalConfigFromAreaTheme(current.theme)}
     >
       {content}
     </ShopAreaProvider>
@@ -361,6 +365,7 @@ interface GroupBuyCatalogProps {
 }
 
 function GroupBuyCatalog({
+  shopArea,
   areaName,
   products,
   visible,
@@ -386,13 +391,31 @@ function GroupBuyCatalog({
   onCatalogSortChange,
 }: GroupBuyCatalogProps) {
   const { theme } = useShopAreaContext();
+  const areasQuery = useMyShopAreas();
+  const areaRow = areasQuery.data?.find((row) => row.key === shopArea);
+  const portalCopy = areaRow ? shopAreaPortalProps(areaRow) : null;
+
   if (!selectedCategory) {
     return (
       <div className="space-y-6 sm:space-y-8">
-        <AreaSectionHeader
-          title="Katalog"
-          description={AREA_CATALOG_DESCRIPTION}
-        />
+        <ShopCatalogBreadcrumbs items={[{ label: "Shop", href: "/shop" }, { label: areaName }]} />
+        {portalCopy ? (
+          <ShopAreaPortalHero
+            areaName="Group Buy · PEPTIX"
+            title={portalCopy.title}
+            subtitle={
+              portalCopy.description ||
+              "Gemeinsam kaufen. Ein Kit teilen. Nur deinen Anteil bezahlen."
+            }
+            accentHex={portalCopy.accentHex}
+            glow={portalCopy.portal.glow}
+            atmosphere={portalCopy.portal.atmosphere}
+            backgroundImageUrl={portalCopy.backgroundImageUrl}
+            focalImageUrl={portalCopy.focalImageUrl}
+          />
+        ) : (
+          <AreaSectionHeader title="Katalog" description={AREA_CATALOG_DESCRIPTION} />
+        )}
 
         {/* Global hub search field — visible even without category selection */}
         <div className="relative w-full max-w-xl">
