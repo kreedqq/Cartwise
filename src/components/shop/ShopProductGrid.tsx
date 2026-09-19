@@ -7,6 +7,7 @@ import { SHOP_GRID } from "@/lib/design/tokens";
 import { parseShopCatalogSort, sortShopProductGroups } from "@/lib/shop/catalogSort";
 import { groupAndSortShopProducts } from "@/lib/shop/display";
 import { isRetailPricing, type ShopPricingProfile } from "@/lib/shop/shopAreas";
+import type { AreaCategoryAssignment } from "@/lib/shop/areaCategories";
 import type { ShopCategoryId } from "@/lib/shopCategories";
 import { shopCategoryIdFor } from "@/lib/shopCategories";
 import type { Tables } from "@/types/database";
@@ -17,6 +18,7 @@ interface ShopProductGridProps {
   favoriteProductIds: Set<string>;
   categoryId?: ShopCategoryId;
   categoryLabel?: string;
+  categoryAssignments?: readonly AreaCategoryAssignment[];
   pricingProfile?: ShopPricingProfile;
   rateLoading?: boolean;
   sort?: string;
@@ -29,6 +31,7 @@ export function ShopProductGrid({
   favoriteProductIds,
   categoryId,
   categoryLabel,
+  categoryAssignments,
   pricingProfile = "group_buy",
   rateLoading = false,
   sort = "",
@@ -57,6 +60,7 @@ export function ShopProductGrid({
             favoriteProductIds={favoriteProductIds}
             categoryLabel={categoryLabel}
             categoryId={resolvedCategoryId}
+            categoryAssignments={categoryAssignments}
             saleMode={saleMode}
             showKitShare={showKitShare}
             onKitShare={(productId) => setKitProductId(productId)}

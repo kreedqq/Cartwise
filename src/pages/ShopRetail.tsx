@@ -288,6 +288,7 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
           favoriteProductIds={favoriteProductIds}
           categoryId={tableCategoryId}
           categoryLabel={selected.label}
+          categoryAssignments={assignments}
           pricingProfile={area.pricing_profile}
           sort={urlCatalog.sort}
         />

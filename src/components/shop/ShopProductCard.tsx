@@ -16,8 +16,11 @@ import {
   shopProductTitle,
   showsStandaloneVariantLabel,
 } from "@/lib/shop/variantCoverage";
+import type { AreaCategoryAssignment } from "@/lib/shop/areaCategories";
+import { effectiveCategoryKeyForProduct } from "@/lib/shop/areaCategories";
+import { shopCategoryLabelForKey } from "@/lib/shop/productMedia";
 import type { ShopCategoryId } from "@/lib/shopCategories";
-import { shopCategoryIdFor } from "@/lib/shopCategories";
+import { isShopCategoryId, shopCategoryIdFor } from "@/lib/shopCategories";
 import { cn } from "@/lib/utils";
 
 interface ShopProductCardProps {
@@ -27,6 +30,7 @@ interface ShopProductCardProps {
   favoriteProductIds: Set<string>;
   categoryLabel?: string;
   categoryId?: ShopCategoryId;
+  categoryAssignments?: readonly AreaCategoryAssignment[];
   saleMode: "catalog" | "retail_unit";
   showKitShare: boolean;
   onKitShare: (productId: string) => void;
@@ -39,6 +43,7 @@ export function ShopProductCard({
   favoriteProductIds,
   categoryLabel,
   categoryId,
+  categoryAssignments,
   saleMode,
   showKitShare,
   onKitShare,
@@ -50,7 +55,14 @@ export function ShopProductCard({
   const title = isRetail
     ? retailShopProductTitle(group.displayName, product, row.hasMultipleVariants)
     : shopProductTitle(group.displayName, product, row.hasMultipleVariants);
-  const catId = categoryId ?? shopCategoryIdFor(product);
+  const effectiveKey =
+    (categoryAssignments?.length
+      ? effectiveCategoryKeyForProduct(product, categoryAssignments)
+      : null) ??
+    (categoryId ?? shopCategoryIdFor(product));
+  const catId = isShopCategoryId(effectiveKey) ? effectiveKey : categoryId ?? shopCategoryIdFor(product);
+  const resolvedCategoryLabel =
+    categoryLabel ?? shopCategoryLabelForKey(isShopCategoryId(effectiveKey) ? effectiveKey : catId);
   const variantLabel = isRetail ? formatRetailVariantLabel(product) : variantLabelForProduct(product);
   const description = product.description?.trim();
 
@@ -80,6 +92,8 @@ export function ShopProductCard({
     >
       <ShopProductImageFrame
         product={product}
+        categoryKey={effectiveKey}
+        categoryLabel={resolvedCategoryLabel}
         favoriteControl={
           <Button
             type="button"

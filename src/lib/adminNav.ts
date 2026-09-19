@@ -203,6 +203,11 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         description: "Vial-Bibliothek und globales Standard-Vial.",
       },
       {
+        to: "/admin/design-studio/categories",
+        label: "Kategorie Bilder",
+        description: "Standard-Produktbilder pro Kategorie.",
+      },
+      {
         to: "/admin/products",
         label: "Produktbilder",
         matchPrefix: true,

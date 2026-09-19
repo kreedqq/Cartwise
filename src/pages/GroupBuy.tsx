@@ -388,6 +388,7 @@ function GroupBuyCatalog({
   products,
   visible,
   counts,
+  assignments,
   storefrontLoading,
   storefrontError,
   onStorefrontRetry,
@@ -440,6 +441,7 @@ function GroupBuyCatalog({
                 rate={rate}
                 rateLoading={rateLoading}
                 favoriteProductIds={favoriteProductIds}
+                categoryAssignments={assignments}
                 pricingProfile="group_buy"
                 sort={catalogSort}
                 onKitCreated={onKitCreated}
@@ -548,6 +550,7 @@ function GroupBuyCatalog({
           favoriteProductIds={favoriteProductIds}
           categoryId={tableCategoryId}
           categoryLabel={selectedCategory.label}
+          categoryAssignments={assignments}
           pricingProfile="group_buy"
           sort={catalogSort}
           onKitCreated={onKitCreated}

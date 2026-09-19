@@ -143,6 +143,15 @@ export function parseImportedCategoryKey(
   return [...matches][0] ?? null;
 }
 
+/** Effective storefront category for a catalog product in an area (vendor catalog SSoT). */
+export function effectiveCategoryKeyForProduct(
+  product: { id: string; code?: string | null },
+  assignments: readonly AreaCategoryAssignment[],
+): string | null {
+  const byKey = assignmentMap(assignments);
+  return byKey.get(product.id) ?? (product.code ? byKey.get(product.code) : undefined) ?? null;
+}
+
 export function assignmentMap(
   assignments: readonly AreaCategoryAssignment[],
 ): Map<string, string> {

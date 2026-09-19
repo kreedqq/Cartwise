@@ -20,7 +20,7 @@ export default function AdminDesignStudioOverview() {
     queryFn: () => listAllProducts({ search: "" }),
   });
 
-  const studio = parseDesignStudioConfig(siteDesign.data?.config);
+  const studio = siteDesign.data?.designStudio ?? parseDesignStudioConfig(undefined);
   const areas = areasQuery.data ?? [];
   const products = productsQuery.data ?? [];
   const productCount = products.length;

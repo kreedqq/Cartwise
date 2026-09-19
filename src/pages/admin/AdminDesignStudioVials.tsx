@@ -78,8 +78,8 @@ export default function AdminDesignStudioVialsPage() {
   });
 
   const savedStudio = React.useMemo(
-    () => parseDesignStudioConfig(siteQuery.data?.config),
-    [siteQuery.data?.config],
+    () => siteQuery.data?.designStudio ?? EMPTY_DESIGN_STUDIO,
+    [siteQuery.data?.designStudio],
   );
   const [localStudio, setLocalStudio] = React.useState<typeof EMPTY_DESIGN_STUDIO | null>(null);
   const studio = localStudio ?? savedStudio;
@@ -87,8 +87,8 @@ export default function AdminDesignStudioVialsPage() {
   const [pendingName, setPendingName] = React.useState("Neues Vial");
 
   async function persist(nextStudio: typeof studio) {
-    const baseConfig = siteQuery.data?.config ?? parseSiteDesignConfig(undefined);
-    const merged = mergeDesignStudioIntoConfig(baseConfig, nextStudio) as unknown as SiteDesignConfig;
+    const baseRecord = siteQuery.data?.configRecord ?? {};
+    const merged = mergeDesignStudioIntoConfig(baseRecord, nextStudio) as unknown as SiteDesignConfig;
     await saveMutation.mutateAsync({
       enabled: siteQuery.data?.enabled ?? false,
       config: merged,
@@ -136,7 +136,7 @@ export default function AdminDesignStudioVialsPage() {
   async function removeEntry(entry: VialLibraryEntry) {
     const nextLib = studio.vialLibrary.filter((e) => e.id !== entry.id);
     const nextGlobal = studio.globalVialPath === entry.path ? null : studio.globalVialPath;
-    await persist({ vialLibrary: nextLib, globalVialPath: nextGlobal });
+    await persist({ ...studio, vialLibrary: nextLib, globalVialPath: nextGlobal });
     await deleteSiteDesignImage(entry.path).catch(() => undefined);
     toast.success("Vial entfernt.");
   }
@@ -237,7 +237,7 @@ export default function AdminDesignStudioVialsPage() {
         )}
       </AdminSection>
 
-      <AdminSection title="Zuweisungen (Priorität: Variante → Produkt → Kategorie → Bereich → Global → Canonical)" padded>
+      <AdminSection title="Zuweisungen (Priorität: Produkt → Kategorie-Bilder (Design Studio) → Global-Vial → Bereich → Canonical)" padded>
         {assignmentRows.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             Noch keine Zuweisungen — nutze Globales Vial, Bereichsdesign oder{" "}
@@ -301,11 +301,11 @@ export default function AdminDesignStudioVialsPage() {
           </div>
         ) : null}
         <p className="mt-3 text-xs text-muted-foreground">
-          Kategorie-Vials und Portal-Design weiterhin unter{" "}
-          <Link to="/admin/shop-areas" className="text-primary underline-offset-2 hover:underline">
-            Shop Bereiche → Bereichsdesign
+          Kategorie-Produktbilder unter{" "}
+          <Link to="/admin/design-studio/categories" className="text-primary underline-offset-2 hover:underline">
+            Kategorie Bilder
           </Link>
-          . Produkt-/Varianten-Bilder unter Produktbilder.
+          . Portal-Design unter Shop Bereiche. Produkt-/Varianten-Bilder unter Produktbilder.
         </p>
       </AdminSection>
     </div>

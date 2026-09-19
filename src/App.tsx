@@ -62,6 +62,7 @@ const AdminDesignStudioLayout = lazy(() => import("@/pages/admin/AdminDesignStud
 const AdminDesignStudioOverview = lazy(() => import("@/pages/admin/AdminDesignStudioOverview"));
 const AdminDesignStudioPortals = lazy(() => import("@/pages/admin/AdminDesignStudioPortals"));
 const AdminDesignStudioVials = lazy(() => import("@/pages/admin/AdminDesignStudioVials"));
+const AdminDesignStudioCategories = lazy(() => import("@/pages/admin/AdminDesignStudioCategories"));
 const AdminPaymentMethodsPage = lazy(() => import("@/pages/admin/AdminPaymentMethods"));
 const AdminFeedbackPage = lazy(() => import("@/pages/admin/AdminFeedback"));
 const AdminSystemPage = lazy(() => import("@/pages/admin/AdminSystem"));
@@ -148,6 +149,7 @@ export default function App() {
                     <Route path="global" element={<AdminDesignPage />} />
                     <Route path="portals" element={<AdminDesignStudioPortals />} />
                     <Route path="vials" element={<AdminDesignStudioVials />} />
+                    <Route path="categories" element={<AdminDesignStudioCategories />} />
                   </Route>
                   <Route path="feedback" element={<AdminFeedbackPage />} />
                 </Route>

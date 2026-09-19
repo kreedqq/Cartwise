@@ -10,11 +10,14 @@ export interface DesignStudioConfig {
   vialLibrary: VialLibraryEntry[];
   /** site-design storage path — fallback before canonical vial */
   globalVialPath: string | null;
+  /** Global category product images (shop cards) — keyed by area category_key */
+  categoryMedia: Record<string, string>;
 }
 
 export const EMPTY_DESIGN_STUDIO: DesignStudioConfig = {
   vialLibrary: [],
   globalVialPath: null,
+  categoryMedia: {},
 };
 
 export function parseDesignStudioConfig(raw: unknown): DesignStudioConfig {
@@ -40,10 +43,17 @@ export function parseDesignStudioConfig(raw: unknown): DesignStudioConfig {
       }
     }
   }
+  const categoryMedia: Record<string, string> = {};
+  if (s.categoryMedia && typeof s.categoryMedia === "object") {
+    for (const [k, val] of Object.entries(s.categoryMedia as Record<string, unknown>)) {
+      if (typeof val === "string" && val.trim()) categoryMedia[k] = val.trim();
+    }
+  }
   return {
     vialLibrary,
     globalVialPath:
       typeof s.globalVialPath === "string" && s.globalVialPath.trim() ? s.globalVialPath.trim() : null,
+    categoryMedia,
   };
 }
 
@@ -61,6 +71,7 @@ export const DESIGN_STUDIO_TABS = [
   { id: "shop-areas", label: "Shop Bereiche", to: "/admin/shop-areas" },
   { id: "portals", label: "Portale", to: "/admin/design-studio/portals" },
   { id: "vials", label: "Vials", to: "/admin/design-studio/vials" },
+  { id: "categories", label: "Kategorie Bilder", to: "/admin/design-studio/categories" },
   { id: "products", label: "Produktbilder", to: "/admin/products" },
   { id: "presets", label: "Presets", to: "/admin/shop-areas" },
 ] as const;

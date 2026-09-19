@@ -73,6 +73,7 @@ describe("hub admin navigation", () => {
         "/admin/design-studio",
         "/admin/design-studio/portals",
         "/admin/design-studio/vials",
+        "/admin/design-studio/categories",
         "/admin/feedback",
         "/admin/payment-methods",
         "/admin/pdf-import",
