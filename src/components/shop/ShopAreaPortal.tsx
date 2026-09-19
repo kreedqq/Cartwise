@@ -31,7 +31,7 @@ export function ShopAreaPortal({
   accentHex,
   glow = 55,
   atmosphere = "energy",
-  backgroundImageUrl,
+  backgroundImageUrl: _backgroundImageUrl,
   portalAssetUrl,
   icon: _icon,
   badge,
@@ -59,10 +59,9 @@ export function ShopAreaPortal({
         accentHex={accentHex}
         glow={glow}
         atmosphere={atmosphere}
-        backgroundImageUrl={backgroundImageUrl}
         portalAssetUrl={portalAssetUrl}
         intensity={layout === "hub" ? "hub" : "standard"}
-        presentation={backgroundImageUrl ? "scene" : "entrance"}
+        presentation="entrance"
         priorityImage={priorityImage}
       />
     </div>

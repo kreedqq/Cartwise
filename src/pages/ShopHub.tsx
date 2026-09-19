@@ -3,7 +3,6 @@ import { Navigate } from "react-router-dom";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
 import { ShopAreaPortal } from "@/components/shop/ShopAreaPortal";
-import { ShopPortalWorldBackground } from "@/components/shop/ShopPortalWorldBackground";
 import { AreaGlyph } from "@/lib/shop/areaIcons";
 import { shopAreaPortalProps } from "@/lib/shop/areaPortal";
 import { UI_TYPE } from "@/lib/design/tokens";
@@ -22,9 +21,8 @@ export default function ShopHubPage() {
   if (areas.length === 1) return <Navigate to={areas[0].path} replace />;
 
   return (
-    <div className="relative -mx-4 min-h-[calc(100vh-12rem)] overflow-hidden px-4 pb-12 pt-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-      <ShopPortalWorldBackground intensity="hub" accentHex="#22d3ee" />
-      <div className="relative z-[1] space-y-8 sm:space-y-10">
+    <div className="relative -mx-4 min-h-[calc(100vh-12rem)] px-4 pb-12 pt-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+      <div className="relative space-y-8 sm:space-y-10">
         <header className="mx-auto max-w-2xl space-y-2 text-center sm:text-left">
           <p className={UI_TYPE.eyebrow}>PEPTIX</p>
           <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">

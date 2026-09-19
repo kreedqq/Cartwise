@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
-import { ShopPortalWorldBackground } from "@/components/shop/ShopPortalWorldBackground";
 import { areaBackgroundStyle, type AreaThemeConfig } from "@/lib/shop/areaTheme";
 import { cn } from "@/lib/utils";
 import { siteDesignImageUrl } from "@/services/siteDesign";
@@ -50,13 +49,8 @@ export function AreaStorefrontChrome({
     live.enabled && live.background.mode === "image" && live.background.overlay
       ? `rgba(0,0,0,${Math.min(90, Math.max(0, live.background.overlayStrength)) / 100})`
       : null;
-  const worldAccent = live.tokens.accent || live.tokens.primary || "#22d3ee";
-
   return (
     <div className="relative min-w-0" style={live.background.mode === "image" ? undefined : bg}>
-      {portalWorldMode ? (
-        <ShopPortalWorldBackground accentHex={worldAccent} intensity="area" />
-      ) : null}
       {live.enabled && live.background.mode === "image" && (live.background.desktopImage || live.background.mobileImage) ? (
         <div
           aria-hidden
