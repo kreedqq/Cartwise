@@ -1,6 +1,5 @@
-import { ArrowRight } from "lucide-react";
-
 import { ShopPortalAtmosphere } from "@/components/shop/ShopPortalAtmosphere";
+import { UI_TYPE } from "@/lib/design/tokens";
 import type { PortalAtmosphere } from "@/lib/shop/portalTheme";
 import { cn } from "@/lib/utils";
 
@@ -26,43 +25,50 @@ export function ShopCategoryPortal({
   /** Optional — portal artwork is primary; icon not shown in chrome */
   icon?: React.ReactNode;
 }) {
+  const ariaLabel =
+    typeof productCount === "number"
+      ? `${title} — ${productCount} ${productCount === 1 ? "Produkt" : "Produkte"}`
+      : `${title} betreten`;
+
   return (
     <button
       type="button"
       data-testid="shop-category-portal"
       data-category-key={categoryKey}
       onClick={onSelect}
+      aria-label={ariaLabel}
       className={cn(
-        "group relative flex min-h-[13rem] w-full overflow-hidden rounded-lg text-left sm:min-h-[14.5rem]",
-        "border border-white/[0.05] bg-transparent",
-        "transition-[transform,box-shadow,border-color] duration-300 motion-reduce:transition-none",
-        "hover:-translate-y-0.5 hover:border-[color:color-mix(in_srgb,var(--portal-accent)_35%,transparent)]",
-        "hover:shadow-[0_20px_56px_-24px_color-mix(in_srgb,var(--portal-accent)_45%,transparent)]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "group flex w-full flex-col items-center gap-2 rounded-none border-0 bg-transparent p-0 text-center sm:gap-2.5",
+        "transition-[transform,filter] duration-200 motion-reduce:transition-none",
+        "hover:-translate-y-0.5 motion-reduce:hover:translate-y-0",
+        "focus-visible:outline-none focus-visible:ring-0",
+        "focus-visible:[filter:drop-shadow(0_0_16px_color-mix(in_srgb,var(--portal-accent)_50%,transparent))]",
       )}
       style={{ ["--portal-accent" as string]: accentHex }}
     >
-      <ShopPortalAtmosphere
-        accentHex={accentHex}
-        glow={glow}
-        atmosphere={atmosphere}
-        portalAssetUrl={portalAssetUrl}
-        intensity="gateway"
-      />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-[48%] bg-gradient-to-t from-background via-background/70 to-transparent" />
-      <div className="relative z-10 mt-auto flex w-full flex-col p-4 pt-16">
-        <p className="font-display text-lg font-semibold leading-tight tracking-tight text-foreground drop-shadow-sm">
+      <div className="relative w-full max-w-[min(92vw,20rem)] sm:max-w-[min(88%,21rem)]">
+        <ShopPortalAtmosphere
+          accentHex={accentHex}
+          glow={glow}
+          atmosphere={atmosphere}
+          portalAssetUrl={portalAssetUrl}
+          intensity="gateway"
+          presentation="entrance"
+        />
+      </div>
+      <div className="max-w-xs space-y-1 px-1">
+        <p className={cn(UI_TYPE.status, "text-[color:var(--portal-accent)]")}>Kategorie</p>
+        <p className="font-display text-base font-semibold uppercase leading-tight tracking-tight text-foreground sm:text-lg">
           {title}
         </p>
         {typeof productCount === "number" ? (
-          <p className="mt-1 text-xs tabular-nums text-muted-foreground">
+          <p className="text-xs tabular-nums text-muted-foreground">
             {productCount} {productCount === 1 ? "Produkt" : "Produkte"}
           </p>
         ) : null}
-        <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--portal-accent)]">
-          Entdecken
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
-        </span>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--portal-accent)] sm:text-xs">
+          Entdecken →
+        </p>
       </div>
     </button>
   );

@@ -7,7 +7,13 @@ import { dirname, resolve } from "node:path";
 import { assertSafeLocalQaTarget } from "./productionGuard.mjs";
 
 export const ROOT = resolve(process.cwd());
-export const BASE = process.env.PEPTIX_DEV_URL ?? "http://localhost:5173";
+
+/** Read at call time so QA orchestrators can set PEPTIX_DEV_URL after import. */
+export function getQaBase() {
+  return (process.env.PEPTIX_DEV_URL ?? "http://localhost:5173").replace(/\/$/, "");
+}
+
+export const BASE = getQaBase();
 export const ACCOUNTS_PATH =
   process.env.PEPTIX_QA_ACCOUNTS_PATH ?? resolve(ROOT, "supabase/qa/.generated/qa-accounts.local.json");
 export const GENERATED_DIR = resolve(ROOT, "supabase/qa/.generated");
@@ -52,9 +58,10 @@ export function requireQaAccounts() {
 }
 
 export async function login(page, email, password) {
-  assertLocalhostUrl(BASE);
+  const base = getQaBase();
+  assertLocalhostUrl(base);
   await page.context().clearCookies();
-  await page.goto(`${BASE}/login`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.goto(`${base}/login`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await page.evaluate(() => {
     try {
       localStorage.clear();
@@ -71,11 +78,11 @@ export async function login(page, email, password) {
 
   const emailInput = page.locator("#email");
   const maintenanceAdmin = page.locator("button.sr-only", { hasText: "Admin" });
-  for (let attempt = 0; attempt < 5; attempt += 1) {
+  for (let attempt = 0; attempt < 40; attempt += 1) {
     if (await emailInput.isVisible().catch(() => false)) break;
     if (await maintenanceAdmin.count()) {
       await maintenanceAdmin.click({ force: true });
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(400);
       continue;
     }
     await page.waitForTimeout(500);

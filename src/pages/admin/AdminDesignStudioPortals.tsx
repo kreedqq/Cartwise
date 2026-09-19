@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PortalAssetPicker } from "@/components/admin/PortalAssetPicker";
 import { AdminSection } from "@/components/admin/AdminSection";
 import { ShopAreaPortal } from "@/components/shop/ShopAreaPortal";
+import { ShopPortalWorldBackground } from "@/components/shop/ShopPortalWorldBackground";
 import { portalConfigFromAreaTheme } from "@/lib/shop/areaPortal";
 import {
   isBuiltinPortalAssetId,
@@ -41,7 +42,8 @@ export default function AdminDesignStudioPortalsPage() {
     <div className="space-y-6">
       <AdminSection title="Built-in Portale" padded>
         <PortalAssetPicker value={previewAsset} onChange={setPreviewAsset} />
-        <div className="mt-4 max-w-xl overflow-hidden rounded-xl border border-border/60">
+        <div className="relative mt-4 max-w-xl py-4">
+          <ShopPortalWorldBackground accentHex={accent} intensity="hub" className="rounded-lg" />
           <ShopAreaPortal
             layout="hub"
             title="Live-Vorschau"

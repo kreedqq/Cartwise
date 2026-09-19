@@ -203,26 +203,39 @@
 }
 
 @layer utilities {
-  @keyframes peptix-portal-breathe {
+  @keyframes peptix-portal-glow-pulse {
     0%,
     100% {
-      opacity: 0.82;
+      opacity: 0.72;
       transform: translate(-50%, -50%) scale(1);
     }
     50% {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1.04);
+      transform: translate(-50%, -50%) scale(1.06);
     }
   }
 
-  .peptix-portal-asset,
-  .peptix-portal-glow {
-    animation: peptix-portal-breathe 5s ease-in-out infinite;
+  @keyframes peptix-portal-asset-idle {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.94;
+    }
+  }
+
+  .peptix-portal-glow-pulse {
+    animation: peptix-portal-glow-pulse 6s ease-in-out infinite;
+  }
+
+  .peptix-portal-asset-idle {
+    animation: peptix-portal-asset-idle 7s ease-in-out infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .peptix-portal-asset,
-    .peptix-portal-glow {
+    .peptix-portal-glow-pulse,
+    .peptix-portal-asset-idle {
       animation: none;
     }
   }

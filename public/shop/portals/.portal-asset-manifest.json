@@ -1,6 +1,7 @@
 {
-  "source": "authoritative-direct",
-  "importedAt": "2026-09-18T18:08:36.216Z",
+  "source": "reference-sheet",
+  "splitAt": "2026-09-19T16:15:51.834Z",
+  "input": "reference-sheet.jpg",
   "ids": [
     "portal_blue",
     "portal_purple",
@@ -11,5 +12,5 @@
     "portal_pink",
     "portal_cyan"
   ],
-  "note": "Individual portal PNGs supplied directly (not split from sheet)."
+  "gutterDetection": true
 }

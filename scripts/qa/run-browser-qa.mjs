@@ -2,11 +2,15 @@
 
 /** Runs local browser QA suite — never targets production. */
 
-import { spawn, spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 
+import { MATRIX_VIEWPORTS } from "./browser-matrix.mjs";
+
 import { assertSafeLocalQaTarget } from "./productionGuard.mjs";
+import { startQaDevServer, stopQaViteChild, waitForHttpOk } from "./qa-dev-server.mjs";
+import { assertViteResponsive } from "./qa-vite-watchdog.mjs";
 
 const ROOT = resolve(process.cwd());
 const ACCOUNTS_PATH = resolve(ROOT, "supabase/qa/.generated/qa-accounts.local.json");
@@ -38,107 +42,131 @@ function loadQaAccounts() {
   return accounts;
 }
 
-async function waitForHttpOk(url, timeoutMs = 120_000) {
-  const started = Date.now();
-  while (Date.now() - started < timeoutMs) {
-    try {
-      const res = await fetch(url, { method: "GET" });
-      if (res.ok) return;
-    } catch {
-      // retry
-    }
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  throw new Error(`Dev server not ready at ${url}`);
-}
+const GENERATED_DIR = resolve(ROOT, "supabase/qa/.generated");
 
-function spawnQaVite(accounts, port) {
-  const env = {
-    ...process.env,
-    VITE_SUPABASE_URL: accounts.apiUrl,
-    VITE_SUPABASE_ANON_KEY: accounts.anonKey,
-  };
-  delete env.SUPABASE_URL;
-  delete env.SUPABASE_SERVICE_ROLE_KEY;
-
-  const viteBin = resolve(ROOT, "node_modules/vite/bin/vite.js");
-  const child = spawn(process.execPath, [viteBin, "--port", String(port), "--strictPort"], {
+function spawnMatrixStep(script, childEnv) {
+  return spawnSync(process.execPath, [resolve(ROOT, "scripts/qa", script)], {
     cwd: ROOT,
-    env,
-    stdio: ["ignore", "pipe", "pipe"],
-  });
-
-  let log = "";
-  child.stdout?.on("data", (chunk) => {
-    log += chunk.toString();
-    process.stdout.write(chunk);
-  });
-  child.stderr?.on("data", (chunk) => {
-    log += chunk.toString();
-    process.stderr.write(chunk);
-  });
-
-  return { child, log: () => log };
-}
-
-async function waitForViteReady(child, getLog, port, timeoutMs = 60_000) {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      reject(new Error(`Vite did not become ready on port ${port}\n${getLog().slice(-3000)}`));
-    }, timeoutMs);
-
-    const finish = (result, err) => {
-      clearTimeout(timer);
-      if (err) reject(err);
-      else resolve(result);
-    };
-
-    child.once("exit", (code) => {
-      if (code != null && code !== 0) {
-        finish(null, new Error(`Vite exited (${code}) on port ${port}:\n${getLog().slice(-3000)}`));
-      }
-    });
-
-    const onData = (chunk) => {
-      const text = chunk.toString();
-      if (/already in use/i.test(text)) {
-        child.stdout?.off("data", onData);
-        child.stderr?.off("data", onData);
-        finish(null, new Error("PORT_IN_USE"));
-        return;
-      }
-      const m = text.match(/Local:\s+(https?:\/\/[^\s]+)/);
-      if (m) {
-        child.stdout?.off("data", onData);
-        child.stderr?.off("data", onData);
-        finish(m[1].replace(/\/$/, ""), null);
-      }
-    };
-    child.stdout?.on("data", onData);
-    child.stderr?.on("data", onData);
+    stdio: "inherit",
+    env: childEnv,
   });
 }
 
-async function startLocalQaDevServer(accounts, preferredPort) {
-  let lastError = null;
-  for (let port = preferredPort; port < preferredPort + 8; port += 1) {
-    const { child, log } = spawnQaVite(accounts, port);
-    try {
-      const localUrl = await waitForViteReady(child, log, port);
-      const base = localUrl.replace(/\/$/, "");
-      await waitForHttpOk(base, 30_000);
-      return { base, child };
-    } catch (err) {
-      child.kill("SIGTERM");
-      lastError = err;
-      if (/already in use|PORT_IN_USE|Vite exited/i.test(String(err.message))) continue;
+async function restartQaVite(accountsPath, preferredPort) {
+  await new Promise((r) => setTimeout(r, 1500));
+  const restarted = await startQaDevServer(accountsPath, preferredPort);
+  await assertViteResponsive(restarted.base);
+  return restarted;
+}
+
+function readMatrixChunkResults(tag) {
+  const path = resolve(GENERATED_DIR, `browser-matrix-results-${tag}.json`);
+  if (!existsSync(path)) return null;
+  return JSON.parse(readFileSync(path, "utf8"));
+}
+
+function writeMergedMatrixResults(chunks) {
+  mkdirSync(GENERATED_DIR, { recursive: true });
+  const results = chunks.flatMap((c) => c.results ?? []);
+  const failed = results.filter((r) => !r.pass);
+  const infra = chunks.find((c) => c.outcome === "INFRASTRUCTURE_BLOCKED");
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    base: chunks[0]?.base ?? null,
+    outcome: infra ? "INFRASTRUCTURE_BLOCKED" : failed.length ? "TEST_FAILURE" : "PASS",
+    chunks: chunks.map((c) => ({ tag: c.tag, outcome: c.outcome })),
+    results,
+    error: infra?.error ?? null,
+    matrixState: infra?.matrixState ?? null,
+    viteHealth: infra?.viteHealth ?? null,
+  };
+  const outPath = resolve(GENERATED_DIR, "browser-matrix-results.json");
+  writeFileSync(outPath, JSON.stringify(payload, null, 2));
+  console.log(`Results: ${outPath}`);
+  return payload;
+}
+
+/** Fresh Vite per viewport so long sweeps cannot stall a single dev server. */
+async function runBrowserMatrixChunked({
+  childEnv,
+  accountsPath,
+  preferredPort,
+  getViteChild,
+  setViteChild,
+  setBase,
+}) {
+  const chunkPayloads = [];
+
+  for (let i = 0; i < MATRIX_VIEWPORTS.length; i += 1) {
+    const vp = MATRIX_VIEWPORTS[i].name;
+    console.log(`\n--- Matrix chunk viewport=${vp} (${i + 1}/${MATRIX_VIEWPORTS.length}) ---\n`);
+
+    let viteChild = getViteChild();
+    if (process.env.PEPTIX_BROWSER_USE_EXISTING_DEV !== "1") {
+      await stopQaViteChild(viteChild);
+      setViteChild(null);
+      const restarted = await restartQaVite(accountsPath, preferredPort);
+      setBase(restarted.base);
+      setViteChild(restarted.child);
+      childEnv.PEPTIX_DEV_URL = restarted.base;
     }
+
+    await waitForHttpOk(childEnv.PEPTIX_DEV_URL, 120_000);
+    await assertViteResponsive(childEnv.PEPTIX_DEV_URL);
+    console.log("MATRIX START (Vite HTTP verified)");
+
+    const chunkEnv = {
+      ...childEnv,
+      PEPTIX_MATRIX_VIEWPORT: vp,
+      PEPTIX_MATRIX_RESULTS_TAG: vp,
+      PEPTIX_MATRIX_INCLUDE_RETAIL: i === 0 ? "1" : "0",
+    };
+
+    let attempt = 0;
+    let chunk = null;
+    while (attempt < 2) {
+      const child = spawnMatrixStep("browser-matrix.mjs", chunkEnv);
+      chunk = readMatrixChunkResults(vp);
+      if (child.status === 0 && chunk?.outcome === "PASS") break;
+
+      const infra = child.status === 2 || chunk?.outcome === "INFRASTRUCTURE_BLOCKED";
+      if (infra && attempt === 0 && process.env.PEPTIX_BROWSER_USE_EXISTING_DEV !== "1") {
+        attempt += 1;
+        console.error(`\nMatrix chunk viewport=${vp} INFRASTRUCTURE_BLOCKED — restarting Vite once…\n`);
+        await stopQaViteChild(getViteChild());
+        setViteChild(null);
+        const restarted = await restartQaVite(accountsPath, preferredPort);
+        setBase(restarted.base);
+        setViteChild(restarted.child);
+        childEnv.PEPTIX_DEV_URL = restarted.base;
+        chunkEnv.PEPTIX_DEV_URL = restarted.base;
+        continue;
+      }
+
+      chunkPayloads.push({ tag: vp, ...(chunk ?? { outcome: "ERROR", results: [] }) });
+      const merged = writeMergedMatrixResults(chunkPayloads);
+      if (infra || child.status === 2) {
+        console.error("\nBrowser step failed: INFRASTRUCTURE_BLOCKED (see matrix logs / browser-matrix-results.json)\n");
+        process.exit(2);
+      }
+      console.error(`Matrix chunk viewport=${vp} failed`);
+      process.exit(child.status ?? 1);
+    }
+
+    chunkPayloads.push({ tag: vp, ...chunk });
   }
-  throw lastError ?? new Error("Could not start QA Vite dev server");
+
+  const merged = writeMergedMatrixResults(chunkPayloads);
+  const failed = (merged.results ?? []).filter((r) => !r.pass);
+  if (failed.length) {
+    console.error(failed.slice(0, 15));
+    process.exit(1);
+  }
+  console.log("BROWSER MATRIX PASS");
 }
 
 async function main() {
-  const accounts = loadQaAccounts();
+  loadQaAccounts();
 
   let viteChild = null;
   let base;
@@ -148,58 +176,83 @@ async function main() {
     if (!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(base)) {
       throw new Error(`PEPTIX_DEV_URL must be localhost (got ${base})`);
     }
-    console.log(`Using existing dev server at ${base} (expect local Supabase ${accounts.apiUrl})`);
+    console.log(`Using existing dev server at ${base}`);
     await waitForHttpOk(base);
   } else {
     const port = Number(process.env.PEPTIX_BROWSER_DEV_PORT ?? DEFAULT_QA_DEV_PORT);
-    console.log(`Starting QA Vite on 127.0.0.1:${port} → ${accounts.apiUrl}`);
-    const started = await startLocalQaDevServer(accounts, port);
+    console.log(`Starting QA Vite (preferred port ${port})…`);
+    const started = await startQaDevServer(ACCOUNTS_PATH, port);
     base = started.base;
     viteChild = started.child;
+    console.log(`QA Vite ready at ${base}`);
   }
 
-  const cleanup = () => {
-    if (viteChild && !viteChild.killed) {
-      viteChild.kill("SIGTERM");
-    }
+  const cleanup = async () => {
+    await stopQaViteChild(viteChild);
   };
-  process.on("exit", cleanup);
   process.on("SIGINT", () => {
-    cleanup();
-    process.exit(130);
+    void cleanup().finally(() => process.exit(130));
   });
 
   const childEnv = {
     ...process.env,
     PEPTIX_DEV_URL: base,
-    VITE_SUPABASE_URL: accounts.apiUrl,
-    VITE_SUPABASE_ANON_KEY: accounts.anonKey,
     PEPTIX_QA_ACCOUNTS_PATH: ACCOUNTS_PATH,
+    PEPTIX_MANAGE_QA_VITE: "0",
   };
+
+  const preferredPort = Number(process.env.PEPTIX_BROWSER_DEV_PORT ?? DEFAULT_QA_DEV_PORT);
 
   const STEPS = resolveSteps();
   for (const script of STEPS) {
     console.log(`\n=== ${script} ===\n`);
+    if (script === "browser-matrix.mjs" && process.env.PEPTIX_BROWSER_USE_EXISTING_DEV !== "1") {
+      console.log("Restarting QA Vite before browser-matrix (long prior steps can stall dev server)…");
+      await stopQaViteChild(viteChild);
+      viteChild = null;
+      await new Promise((r) => setTimeout(r, 1500));
+      const restarted = await startQaDevServer(ACCOUNTS_PATH, preferredPort);
+      base = restarted.base;
+      viteChild = restarted.child;
+      childEnv.PEPTIX_DEV_URL = base;
+      console.log(`QA Vite restarted at ${base}`);
+    }
     if (script === "browser-matrix.mjs" || script === "browser-accessibility.mjs") {
       await waitForHttpOk(base, 120_000);
+      await assertViteResponsive(base);
       await new Promise((r) => setTimeout(r, 1500));
     }
-    const child = spawnSync(process.execPath, [resolve(ROOT, "scripts/qa", script)], {
-      cwd: ROOT,
-      stdio: "inherit",
-      env: childEnv,
-    });
+    if (script === "browser-matrix.mjs") {
+      await runBrowserMatrixChunked({
+        childEnv,
+        accountsPath: ACCOUNTS_PATH,
+        preferredPort,
+        getViteChild: () => viteChild,
+        setViteChild: (c) => {
+          viteChild = c;
+        },
+        setBase: (b) => {
+          base = b;
+        },
+      });
+      continue;
+    }
+
+    const child = spawnMatrixStep(script, childEnv);
     if (child.status !== 0) {
-      cleanup();
+      await cleanup();
+      if (child.status === 2) {
+        console.error("\nBrowser step failed: INFRASTRUCTURE_BLOCKED\n");
+      }
       process.exit(child.status ?? 1);
     }
   }
 
-  cleanup();
+  await cleanup();
   console.log("\nALL BROWSER QA STEPS PASS\n");
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error(err);
   process.exit(1);
 });

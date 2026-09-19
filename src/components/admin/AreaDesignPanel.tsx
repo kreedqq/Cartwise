@@ -1228,7 +1228,7 @@ function AreaDesignForm({
               <div className="space-y-3 p-4">
                 {previewScene === "portal" && portalDraft.enabled ? (
                   <div
-                    className="overflow-hidden rounded-xl"
+                    className="relative py-2"
                     style={portalThemeCssVars(previewPortalAccent, portalDraft.glow) as React.CSSProperties}
                   >
                     <ShopAreaPortal

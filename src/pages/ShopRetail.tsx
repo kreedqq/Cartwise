@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { ShopCatalogFiltersSheet } from "@/components/shop/ShopCatalogFiltersSheet";
 import { ShopCatalogHeader } from "@/components/shop/ShopCatalogHeader";
 import { ShopCatalogToolbar } from "@/components/shop/ShopCatalogToolbar";
-import { ShopAreaPortalHero } from "@/components/shop/ShopAreaPortalHero";
 import { ShopCatalogBreadcrumbs } from "@/components/shop/ShopCatalogBreadcrumbs";
 import { ShopProductGrid } from "@/components/shop/ShopProductGrid";
 import { parseShopCatalogSort, type ShopCatalogSort } from "@/lib/shop/catalogSort";
@@ -34,7 +33,7 @@ import {
   visibleStorefrontCategories,
 } from "@/lib/shop/areaCategories";
 import { DEFAULT_SHOP_AREA, type MyShopArea } from "@/lib/shop/shopAreas";
-import { portalConfigFromAreaTheme, shopAreaPortalProps } from "@/lib/shop/areaPortal";
+import { portalConfigFromAreaTheme } from "@/lib/shop/areaPortal";
 import { parseCategoryPortalOverrides, parseVialMedia } from "@/lib/shop/portalAssets";
 import { areaDensityClass, areaThemeCssVars, parseAreaTheme } from "@/lib/shop/areaTheme";
 import { useShopAreaContext } from "@/context/ShopAreaContext";
@@ -151,26 +150,11 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
         <AreaStorefrontChrome theme={theme} areaName={area.name}>
         <div className={AREA_PAGE_RHYTHM}>
         <ShopCatalogBreadcrumbs items={[{ label: "Shop", href: "/shop" }, { label: area.name }]} className="mb-3" />
-        {(() => {
-          const portalCopy = shopAreaPortalProps(area);
-          return (
-            <ShopAreaPortalHero
-              areaName="PEPTIX · Verkaufsbereich"
-              title={portalCopy.title}
-              subtitle={portalCopy.description}
-              accentHex={portalCopy.accentHex}
-              glow={portalCopy.portal.glow}
-              atmosphere={portalCopy.portal.atmosphere}
-              backgroundImageUrl={portalCopy.backgroundImageUrl}
-              portalAssetUrl={portalCopy.portalAssetUrl}
-            />
-          );
-        })()}
         <div className={AREA_PAGE_CONTENT_SLOT}>
         {(productsQuery.isLoading || storefrontQuery.isLoading) && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-[200px] w-full rounded-2xl" />
+              <Skeleton key={i} className="mx-auto h-[220px] w-full max-w-[20rem] rounded-none bg-muted/30" />
             ))}
           </div>
         )}

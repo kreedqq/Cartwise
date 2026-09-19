@@ -55,9 +55,8 @@ import {
   type MyShopArea,
   type ShopAreaKey,
 } from "@/lib/shop/shopAreas";
-import { ShopAreaPortalHero } from "@/components/shop/ShopAreaPortalHero";
 import { ShopCatalogBreadcrumbs } from "@/components/shop/ShopCatalogBreadcrumbs";
-import { portalConfigFromAreaTheme, shopAreaPortalProps } from "@/lib/shop/areaPortal";
+import { portalConfigFromAreaTheme } from "@/lib/shop/areaPortal";
 import { parseCategoryPortalOverrides, parseVialMedia } from "@/lib/shop/portalAssets";
 import { areaDensityClass, parseAreaTheme } from "@/lib/shop/areaTheme";
 import {
@@ -68,7 +67,6 @@ import {
   type KitRequestSort,
 } from "@/lib/kitRequests";
 import {
-  AREA_CATALOG_DESCRIPTION,
   AREA_KIT_REQUESTS_DESCRIPTION,
   AREA_PAGE_CONTENT_SLOT,
   AREA_PAGE_RHYTHM,
@@ -250,35 +248,32 @@ function GroupBuyContent({
 
   const { activeCart } = useShopCart(shopArea);
   const cartHref = activeCart?.id ? `/carts/${activeCart.id}` : null;
-  const areasForPortal = useMyShopAreas();
-  const areaRowForPortal = areasForPortal.data?.find((row) => row.key === shopArea);
-  const portalCopyMobile =
-    areaRowForPortal && section === "catalog" && !selectedCategory
-      ? shopAreaPortalProps(areaRowForPortal)
-      : null;
-
   return (
     <div className={areaDensityClass(theme)} data-shop-area={shopArea}>
       <AreaStorefrontChrome theme={theme} areaName={areaName}>
       <div className={AREA_PAGE_RHYTHM}>
-      {portalCopyMobile ? (
-        <div className="mb-2 md:hidden">
-          <ShopAreaPortalHero
-            areaName={areaName}
-            accentHex={portalCopyMobile.accentHex}
-            glow={portalCopyMobile.portal.glow}
-            atmosphere={portalCopyMobile.portal.atmosphere}
-            backgroundImageUrl={portalCopyMobile.backgroundImageUrl}
-            portalAssetUrl={portalCopyMobile.portalAssetUrl}
-            portalBandOnly
-            className="min-h-[11rem]"
-          />
-        </div>
-      ) : null}
-      <KitMarketplaceHero
-        areaName={areaName}
-        description={areaDescription}
-        actions={
+      {section === "kits" ? (
+        <KitMarketplaceHero
+          areaName={areaName}
+          description={areaDescription}
+          actions={
+            <KitAreaActionNav
+              section={section}
+              onSection={(next) => {
+                navigate(next === "kits" ? kitsPath : catalogPath);
+              }}
+              cartHref={cartHref}
+              canUseKitRequests={canUseKitRequests}
+              onCreate={() => {
+                if (!canUseKitRequests) return;
+                navigate(kitsPath);
+                setCreateOpen(true);
+              }}
+            />
+          }
+        />
+      ) : (
+        <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
           <KitAreaActionNav
             section={section}
             onSection={(next) => {
@@ -292,8 +287,8 @@ function GroupBuyContent({
               setCreateOpen(true);
             }}
           />
-        }
-      />
+        </div>
+      )}
 
       <div className={AREA_PAGE_CONTENT_SLOT}>
       {section === "catalog" && (
@@ -388,7 +383,7 @@ interface GroupBuyCatalogProps {
 }
 
 function GroupBuyCatalog({
-  shopArea,
+  shopArea: _shopArea,
   areaName,
   products,
   visible,
@@ -414,28 +409,10 @@ function GroupBuyCatalog({
   onCatalogSortChange,
 }: GroupBuyCatalogProps) {
   const { theme } = useShopAreaContext();
-  const areasQuery = useMyShopAreas();
-  const areaRow = areasQuery.data?.find((row) => row.key === shopArea);
-  const portalCopy = areaRow ? shopAreaPortalProps(areaRow) : null;
-
   if (!selectedCategory) {
     return (
       <div className="space-y-6 sm:space-y-8">
         <ShopCatalogBreadcrumbs items={[{ label: "Shop", href: "/shop" }, { label: areaName }]} />
-        {portalCopy ? (
-          <ShopAreaPortalHero
-            areaName={areaName}
-            accentHex={portalCopy.accentHex}
-            glow={portalCopy.portal.glow}
-            atmosphere={portalCopy.portal.atmosphere}
-            backgroundImageUrl={portalCopy.backgroundImageUrl}
-            portalAssetUrl={portalCopy.portalAssetUrl}
-            portalBandOnly
-            className="hidden md:block"
-          />
-        ) : (
-          <AreaSectionHeader title="Katalog" description={AREA_CATALOG_DESCRIPTION} />
-        )}
 
         {/* Global hub search field — visible even without category selection */}
         <div className="relative w-full max-w-xl">
@@ -477,7 +454,7 @@ function GroupBuyCatalog({
             {(isLoading || storefrontLoading) && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-[200px] w-full rounded-2xl" />
+                  <Skeleton key={i} className="mx-auto h-[220px] w-full max-w-[20rem] rounded-none bg-muted/30" />
                 ))}
               </div>
             )}

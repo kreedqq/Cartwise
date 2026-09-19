@@ -101,25 +101,30 @@ export default function AdminDesignStudioVialsPage() {
       toast.error("Bitte zuerst eine Datei wählen.");
       return;
     }
+    let uploadedPath: string | null = null;
     try {
-      const path = await uploadDesignStudioVial(pendingFile);
+      uploadedPath = await uploadDesignStudioVial(pendingFile);
       const entry: VialLibraryEntry = {
         id: crypto.randomUUID(),
         name: pendingName.trim() || pendingFile.name,
-        path,
+        path: uploadedPath,
         uploadedAt: new Date().toISOString(),
       };
       const next = {
         ...studio,
         vialLibrary: [entry, ...studio.vialLibrary],
-        globalVialPath: studio.globalVialPath ?? path,
+        globalVialPath: studio.globalVialPath ?? uploadedPath,
       };
       await persist(next);
       setPendingFile(null);
       setPendingName("Neues Vial");
       toast.success("Vial hochgeladen.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Upload fehlgeschlagen.");
+      if (uploadedPath) {
+        await deleteSiteDesignImage(uploadedPath).catch(() => undefined);
+      }
+      const message = error instanceof Error ? error.message : "Speichern fehlgeschlagen.";
+      toast.error(message.includes("row-level security") ? `${message} (Storage oder site_design_settings)` : message);
     }
   }
 

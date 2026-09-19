@@ -44,9 +44,11 @@ export function ShopCategoryHub({
   if (categories.length === 0) return null;
 
   return (
-    <div className="space-y-3">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Kategorien</p>
-      <div className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 xl:grid-cols-3">
+    <div className="relative space-y-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        Kategorie-Portale
+      </p>
+      <div className="grid grid-cols-1 gap-8 min-[480px]:grid-cols-2 min-[480px]:gap-10 xl:gap-12">
         {categories.map((category) => {
           const Icon = KNOWN_ICONS[category.category_key] ?? Package;
           const count = counts?.[category.category_key];
