@@ -12,12 +12,9 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toaster";
 import { QUERY_KEYS } from "@/lib/constants";
-import { applyRoleMarkup, formatUsd } from "@/lib/money";
+import { applySellFactorPct, formatUsd } from "@/lib/money";
 import { shopAreaCatalogUnit } from "@/lib/shop/shopAreaPricing";
-import {
-  applyAreaRoleSellUnit,
-  roleMarkupPercentToSellFactorPct,
-} from "@/lib/shop/shopAreaRolePricing";
+import { applyAreaRoleSellUnit } from "@/lib/shop/shopAreaRolePricing";
 import {
   DEFAULT_BASE_PRICE_FACTOR_PCT,
   formatShopAreaLabel,
@@ -33,9 +30,9 @@ import {
 } from "@/services/shopAreas";
 const GLOBAL_SAMPLE_USD = 100;
 
-function parsePositiveNumber(raw: string): number | null {
+function parseSellFactorPctInput(raw: string): number | null {
   const value = Number(raw.replace(",", ".").trim());
-  if (!Number.isFinite(value) || value < 0) return null;
+  if (!Number.isFinite(value) || value <= 0) return null;
   return value;
 }
 
@@ -68,7 +65,7 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
     enabled: !!area,
   });
 
-  const [globalMarkupDraft, setGlobalMarkupDraft] = React.useState<Record<string, string> | null>(null);
+  const [globalFactorDraft, setGlobalFactorDraft] = React.useState<Record<string, string> | null>(null);
   const [roleFactorDraft, setRoleFactorDraft] = React.useState<Record<string, string> | null>(null);
   const [saving, setSaving] = React.useState(false);
 
@@ -80,7 +77,7 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
     return next;
   }, [roles]);
 
-  const globalMarkupInputs = globalMarkupDraft ?? savedGlobalInputs;
+  const globalFactorInputs = globalFactorDraft ?? savedGlobalInputs;
 
   const savedRoleFactorInputs = React.useMemo(() => {
     const next: Record<string, string> = {};
@@ -108,9 +105,9 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
       return;
     }
     for (const role of roles) {
-      const parsed = parsePositiveNumber(globalMarkupInputs[role.id] ?? "");
+      const parsed = parseSellFactorPctInput(globalFactorInputs[role.id] ?? "");
       if (parsed == null) {
-        toast.error(`Ungültiger globaler Aufschlag für „${role.name}“.`);
+        toast.error(`Ungültiger globaler Verkaufspreisfaktor für „${role.name}“ (muss > 0 % sein).`);
         return;
       }
     }
@@ -124,7 +121,7 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
       }
       const parsed = Number(raw.replace(",", "."));
       if (!Number.isFinite(parsed) || parsed <= 0) {
-        toast.error(`Ungültiger Bereichspreis für Rolle „${role.name}“ (muss > 0 % sein).`);
+        toast.error(`Ungültiger Bereichs-Verkaufspreisfaktor für Rolle „${role.name}“ (muss > 0 % sein).`);
         return;
       }
       entries.push({ roleId: role.id, sellFactorPct: parsed });
@@ -133,19 +130,19 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
     setSaving(true);
     try {
       for (const role of roles) {
-        const draftMarkup = parsePositiveNumber(globalMarkupInputs[role.id] ?? "");
-        if (draftMarkup != null && draftMarkup !== Number(role.markup_percent)) {
+        const draftFactor = parseSellFactorPctInput(globalFactorInputs[role.id] ?? "");
+        if (draftFactor != null && draftFactor !== Number(role.markup_percent)) {
           await upsertCustomerRole({
             id: role.id,
             name: role.name,
-            markupPercent: draftMarkup,
+            markupPercent: draftFactor,
             isActive: role.is_active,
             canUseKitRequests: role.can_use_kit_requests === true,
           });
         }
       }
       await saveAdminShopAreaRoleSellFactors(areaKey, entries);
-      setGlobalMarkupDraft(null);
+      setGlobalFactorDraft(null);
       setRoleFactorDraft(null);
       toast.success("Preisregeln gespeichert.");
       await Promise.all([
@@ -181,8 +178,8 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
         <CardHeader>
           <CardTitle className="text-base">Globale Rollenpreise</CardTitle>
           <CardDescription>
-            Diese Regeln gelten standardmäßig in allen Verkaufsbereichen, wenn dort keine individuelle Bereichsregel
-            existiert. Leerer Bereichspreis (—) bedeutet: diese globale Regel greift.
+            Verkaufspreisfaktor: 100&nbsp;% = Grundpreis, 125&nbsp;% = +25&nbsp;%, 200&nbsp;% = doppelter Grundpreis.
+            Gilt in allen Bereichen, wenn dort kein eigener Rollenfaktor gesetzt ist (— = globaler Fallback).
           </CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">
@@ -190,14 +187,15 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
             <TableHeader>
               <TableRow>
                 <TableHead>Rolle</TableHead>
-                <TableHead className="min-w-[7rem]">Globaler Aufschlag</TableHead>
+                <TableHead className="min-w-[9rem]">Globaler Verkaufspreisfaktor</TableHead>
                 <TableHead className="min-w-[7rem]">Verkaufspreis bei {formatUsd(GLOBAL_SAMPLE_USD)}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {roles.map((role) => {
-                const markup = parsePositiveNumber(globalMarkupInputs[role.id] ?? "") ?? Number(role.markup_percent);
-                const preview = applyRoleMarkup(GLOBAL_SAMPLE_USD, markup);
+                const factor =
+                  parseSellFactorPctInput(globalFactorInputs[role.id] ?? "") ?? Number(role.markup_percent);
+                const preview = applySellFactorPct(GLOBAL_SAMPLE_USD, factor);
                 return (
                   <TableRow key={role.id}>
                     <TableCell className="font-medium">{role.name}</TableCell>
@@ -205,17 +203,17 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
                       <div className="flex items-center gap-1">
                         <Input
                           type="number"
-                          min={0}
+                          min={0.01}
                           step={0.01}
                           className="h-8 w-24"
-                          value={globalMarkupInputs[role.id] ?? ""}
+                          value={globalFactorInputs[role.id] ?? ""}
                           onChange={(event) =>
-                            setGlobalMarkupDraft((current) => ({
+                            setGlobalFactorDraft((current) => ({
                               ...(current ?? savedGlobalInputs),
                               [role.id]: event.target.value,
                             }))
                           }
-                          aria-label={`Globaler Aufschlag für ${role.name}`}
+                          aria-label={`Globaler Verkaufspreisfaktor für ${role.name}`}
                         />
                         <span className="text-xs text-muted-foreground">%</span>
                       </div>
@@ -296,7 +294,7 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
               <TableHeader>
                 <TableRow>
                   <TableHead>Rolle</TableHead>
-                  <TableHead className="min-w-[8rem]">Bereichspreis</TableHead>
+                  <TableHead className="min-w-[9rem]">Bereichs-Verkaufspreisfaktor</TableHead>
                   <TableHead className="min-w-[8rem]">Vorschau</TableHead>
                   <TableHead className="min-w-[8rem]">Quelle</TableHead>
                 </TableRow>
@@ -304,9 +302,9 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
               <TableBody>
                 {roles.map((role) => {
                   const explicit = parseExplicitSellFactor(roleFactorInputs[role.id]);
-                  const globalMarkup =
-                    parsePositiveNumber(globalMarkupInputs[role.id] ?? "") ?? Number(role.markup_percent);
-                  const previewUsd = applyAreaRoleSellUnit(catalogAfterArea, explicit, globalMarkup);
+                  const globalFactor =
+                    parseSellFactorPctInput(globalFactorInputs[role.id] ?? "") ?? Number(role.markup_percent);
+                  const previewUsd = applyAreaRoleSellUnit(catalogAfterArea, explicit, globalFactor);
                   return (
                     <TableRow key={role.id}>
                       <TableCell className="font-medium">{role.name}</TableCell>
@@ -325,7 +323,7 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
                                 [role.id]: event.target.value,
                               }))
                             }
-                            aria-label={`Bereichspreis Faktor für ${role.name}`}
+                            aria-label={`Bereichs-Verkaufspreisfaktor für ${role.name}`}
                           />
                           <span className="text-xs text-muted-foreground">%</span>
                         </div>
@@ -335,9 +333,7 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
                         {explicit != null ? (
                           <span>Bereich {explicit} %</span>
                         ) : (
-                          <span>
-                            Global {globalMarkup} % ({roleMarkupPercentToSellFactorPct(globalMarkup).toFixed(0)} %)
-                          </span>
+                          <span>Global {globalFactor} %</span>
                         )}
                       </TableCell>
                     </TableRow>
@@ -352,13 +348,10 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
             <ul className="space-y-1 text-muted-foreground">
               {roles.map((role) => {
                 const explicit = parseExplicitSellFactor(roleFactorInputs[role.id]);
-                const globalMarkup =
-                  parsePositiveNumber(globalMarkupInputs[role.id] ?? "") ?? Number(role.markup_percent);
-                const previewUsd = applyAreaRoleSellUnit(catalogAfterArea, explicit, globalMarkup);
-                const label =
-                  explicit != null
-                    ? `Bereich ${explicit} %`
-                    : `Global ${globalMarkup} % → ${roleMarkupPercentToSellFactorPct(globalMarkup).toFixed(0)} %`;
+                const globalFactor =
+                  parseSellFactorPctInput(globalFactorInputs[role.id] ?? "") ?? Number(role.markup_percent);
+                const previewUsd = applyAreaRoleSellUnit(catalogAfterArea, explicit, globalFactor);
+                const label = explicit != null ? `Bereich ${explicit} %` : `Global ${globalFactor} %`;
                 return (
                   <li key={role.id}>
                     <span className="text-foreground">{role.name}</span>: {label} →{" "}

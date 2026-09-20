@@ -138,6 +138,12 @@ export function applyRoleMarkup(amount: number, markupPercent: number): number {
   return roundHalfUp(amount * (1 + markupPercent / 100), 4);
 }
 
+/** Role sell price factor: 100 = pass-through, 125 = 125 % of catalog unit. Matches SQL sell_factor application. */
+export function applySellFactorPct(amount: number, sellFactorPct: number): number {
+  if (!isFiniteNumber(amount) || !isFiniteNumber(sellFactorPct)) return amount;
+  return roundHalfUp(amount * (sellFactorPct / 100), 4);
+}
+
 /**
  * Catalog bulk-then-markup selling unit price. Server-side create_order
  * uses the SQL twin sell_unit_price; tests use this to lock the contract.

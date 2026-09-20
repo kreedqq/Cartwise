@@ -206,6 +206,15 @@ describe("shop area role sell factors SQL (migration 0114)", () => {
     expect(sql).not.toMatch(/apply_role_markup\(\s*public\.apply_role_markup/);
   });
 
+  const unifySql = read("supabase/migrations/0119_unify_role_sell_factor_semantics.sql");
+
+  it("0119 converts global role storage to sell factors and central conversion", () => {
+    expect(unifySql).toContain("markup_percent = markup_percent + 100");
+    expect(unifySql).toContain("sell_factor_pct_to_role_markup_percent");
+    expect(unifySql).not.toMatch(/update public\.shop_area_role_sell_factors/i);
+    expect(unifySql).toContain("Ungültiger Verkaufspreisfaktor");
+  });
+
   it("does not backfill orders or reset existing areas", () => {
     expect(sql).not.toMatch(/update public\.orders/i);
     expect(sql).not.toMatch(/update public\.order_items/i);
