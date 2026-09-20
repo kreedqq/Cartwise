@@ -272,6 +272,8 @@ comment on table public.shop_area_role_sell_factors is
   'Sell multiplier (×100 on area catalog unit) per shop area and customer role. Required for pricing; no global fallback.';
 
 -- Cart repricing: area×role markup for cart owner (not customer_roles.markup_percent).
+drop function if exists public.shop_area_sell_unit_price(public.products, numeric, numeric, text);
+
 create or replace function public.shop_area_sell_unit_price(
   _product  public.products,
   _qty      numeric,
