@@ -1946,6 +1946,10 @@ export interface Database {
         Returns: Record<string, unknown>;
       };
       admin_remove_open_cart_item: { Args: { _cart_item_id: string }; Returns: undefined };
+      admin_delete_carts: {
+        Args: { _cart_ids: string[] };
+        Returns: { deletedCount: number; cartIds: string[] };
+      };
       admin_add_open_cart_catalog_line: {
         Args: {
           _cart_id: string;

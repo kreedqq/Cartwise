@@ -4,6 +4,7 @@ import { QUERY_KEYS } from "@/lib/constants";
 import {
   adminAddOpenCartCatalogLine,
   adminCheckoutOpenCart,
+  adminDeleteCarts,
   adminRemoveOpenCartItem,
   adminReplaceOpenCartCatalogLine,
   adminSyncOrdersAndCarts,
@@ -91,5 +92,17 @@ export function useAdminCartMutations(cartId: string) {
 export function useAdminGlobalSync() {
   return useMutation({
     mutationFn: () => adminSyncOrdersAndCarts(),
+  });
+}
+
+export function useAdminDeleteOpenCarts() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (cartIds: string[]) => adminDeleteCarts(cartIds),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-open-carts"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin-open-cart"] });
+    },
   });
 }

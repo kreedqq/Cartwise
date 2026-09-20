@@ -20,6 +20,11 @@ describe("migration 0107 admin carts and global sync", () => {
     expect(sql).toContain("admin.cart_checkout");
   });
 
+  it("0117 adds bulk admin cart delete RPC", () => {
+    const sql = read("supabase/migrations/0117_admin_delete_carts.sql");
+    expect(sql).toContain("admin_delete_carts");
+  });
+
   it("orchestrates global sync without mass delete", () => {
     expect(sql).toContain("admin_sync_orders_and_carts");
     expect(sql).toContain("admin_refresh_open_cart_prices");

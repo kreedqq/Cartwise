@@ -148,3 +148,18 @@ export async function adminSyncOrdersAndCarts(): Promise<AdminGlobalSyncResult> 
   if (error) throw error;
   return data as unknown as AdminGlobalSyncResult;
 }
+
+export interface AdminDeleteCartsResult {
+  deletedCount: number;
+  cartIds: string[];
+}
+
+export async function adminDeleteCarts(cartIds: string[]): Promise<AdminDeleteCartsResult> {
+  const { data, error } = await supabase.rpc("admin_delete_carts", { _cart_ids: cartIds });
+  if (error) throw error;
+  const payload = data as { deletedCount?: number; cartIds?: string[] };
+  return {
+    deletedCount: payload.deletedCount ?? cartIds.length,
+    cartIds: payload.cartIds ?? cartIds,
+  };
+}
