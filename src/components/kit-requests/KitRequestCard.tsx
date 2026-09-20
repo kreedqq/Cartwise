@@ -7,11 +7,10 @@ import {
 } from "@/lib/kit/kitRequestActions";
 import { kitRequestCustomerStatusLabel } from "@/lib/kitRequests";
 import { KIT_ALMOST_FULL_REMAINING_THRESHOLD } from "@/lib/kit/kitShareState";
-import { getProductUnitLabel } from "@/lib/quantityFormat";
+import { formatKitParticipantShare, getProductUnitLabel, resolveProductCategoryId } from "@/lib/quantityFormat";
 import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { EditKitShareButton } from "@/components/shop/EditKitShareButton";
 import type { KitRequestCard } from "@/services/kitRequests";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -72,8 +71,8 @@ function cardContainerCn(
 interface KitRequestCardViewProps {
   request: KitRequestCard;
   onJoin?: (request: KitRequestCard) => void;
-  onLeave?: (request: KitRequestCard) => void;
-  onCancel?: (request: KitRequestCard) => void;
+  onAdminManage?: (request: KitRequestCard) => void;
+  isAdmin?: boolean;
   onRetryCart?: (request: KitRequestCard) => void;
   onDetails?: (request: KitRequestCard) => void;
   joining?: boolean;
@@ -84,8 +83,8 @@ interface KitRequestCardViewProps {
 export function KitRequestCardView({
   request,
   onJoin,
-  onLeave,
-  onCancel,
+  onAdminManage,
+  isAdmin = false,
   onRetryCart,
   onDetails,
   joining,
@@ -93,10 +92,16 @@ export function KitRequestCardView({
   const rateQuery = useExchangeRate();
   const primary = kitRequestPrimaryAction(request);
   const canJoin = primary === "join";
-  const canChangeQuantity = primary === "change_quantity";
-  const canLeave =
-    request.status === "open" && request.isParticipant && !request.isCreator;
-  const canCancel = request.status === "open" && request.isCreator;
+  const categoryId = resolveProductCategoryId({
+    category: request.category,
+    name: request.productName,
+    code: request.productCode,
+    dosageVial: request.variantLabel,
+  });
+  const myShareLabel =
+    request.myQuantity > 0
+      ? formatKitParticipantShare(request.myQuantity, request.kitSizeVials, categoryId)
+      : null;
   const showRetry = primary === "retry_cart" && onRetryCart;
   const disabledPrimary = [
     "full",
@@ -207,19 +212,30 @@ export function KitRequestCardView({
       {/* ── Footer ── Price, note, creator, actions ──────────────────────── */}
       <div className="mt-auto flex flex-col gap-3 pt-5">
         {/* My price share — prominent, anchors the value proposition */}
-        {request.myUnitPriceUsd != null ? (
+        {request.isParticipant && myShareLabel ? (
           <div>
             <p className="mb-0.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Dein Anteil
             </p>
-            <DualCurrencyPrice
-              usd={request.myUnitPriceUsd}
-              rate={rateQuery.data?.rate ?? null}
-              unit={unitLabel}
-              size="catalog"
-              className="[&_[data-currency=eur]]:text-xl"
-            />
+            <p className="font-display text-2xl font-semibold tabular-nums tracking-tight">{myShareLabel}</p>
+            {request.status === "full" ? (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Dein Anteil wurde in deinen Warenkorb übernommen.
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Sobald das Kit vollständig ist, wird dein Anteil automatisch in deinen Warenkorb übernommen.
+              </p>
+            )}
           </div>
+        ) : null}
+        {request.myUnitPriceUsd != null && request.isParticipant ? (
+          <DualCurrencyPrice
+            usd={request.myUnitPriceUsd * request.myQuantity}
+            rate={rateQuery.data?.rate ?? null}
+            unit={unitLabel}
+            size="summary"
+          />
         ) : null}
 
         {request.note ? (
@@ -254,48 +270,23 @@ export function KitRequestCardView({
             {kitRequestActionLabel("join")}
           </Button>
         ) : null}
-        {canChangeQuantity && onJoin ? (
-          <Button
-            className="min-h-11 w-full"
-            variant="secondary"
-            onClick={() => onJoin(request)}
-            disabled={joining}
-          >
-            {kitRequestActionLabel("change_quantity")} ({request.myQuantity})
-          </Button>
-        ) : null}
         {request.isCreator && request.status === "open" ? (
           <Button className="min-h-11 w-full" variant="secondary" disabled>
             {kitRequestActionLabel("view_mine")}
           </Button>
         ) : null}
-        {request.isParticipant && request.status === "full" ? (
-          <EditKitShareButton
-            kitShareId={request.id}
-            presentation="participantCard"
-          />
-        ) : null}
-        {disabledPrimary && !canJoin && !canChangeQuantity ? (
+        {disabledPrimary && !canJoin ? (
           <Button className="min-h-11 w-full" variant="secondary" disabled>
             {kitRequestActionLabel(primary)}
           </Button>
         ) : null}
-        {canLeave && onLeave ? (
+        {isAdmin && onAdminManage ? (
           <Button
             className="min-h-11 w-full"
             variant="outline"
-            onClick={() => onLeave(request)}
+            onClick={() => onAdminManage(request)}
           >
-            Kit verlassen
-          </Button>
-        ) : null}
-        {canCancel && onCancel ? (
-          <Button
-            className="min-h-11 w-full"
-            variant="destructive"
-            onClick={() => onCancel(request)}
-          >
-            Kit stornieren
+            Teilnehmer verwalten
           </Button>
         ) : null}
         {showRetry ? (

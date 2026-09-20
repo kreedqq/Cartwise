@@ -17,9 +17,9 @@ describe("cartDisplay", () => {
       note: "Kit Anteil · 20 mg · 7 Vials · Gemeinsames 10-Vial-Kit",
     });
 
-    expect(subtitle).toContain("Kit Anteil");
-    expect(subtitle).toContain("7/10 Kit");
-    expect(subtitle).toContain("Gemeinsames 10er Kit");
+    expect(subtitle).toContain("7/10 Kit Anteil");
+    expect(subtitle).toContain("Geteiltes Kit");
+    expect(subtitle).toContain("10er Kit");
     expect(isKitShareCartItem({
       product_name_snapshot: "Retatrutide",
       product_code_snapshot: "20RT",
@@ -83,9 +83,9 @@ describe("cartDisplay", () => {
         product_code_snapshot: "SK10",
         quantity: 5,
         kit_share_id: "kit-1",
-        note: "Gemeinsames 10-Vial-Kit",
+        note: "Gemeinsames 10-Einheiten-Kit",
       }),
-    ).toBe("5/10 Kit");
+    ).toBe("5/10 Kit Anteil");
   });
 
   it("normalizes product display names", () => {

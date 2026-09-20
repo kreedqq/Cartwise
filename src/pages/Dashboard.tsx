@@ -8,7 +8,7 @@ import { KitProgress } from "@/components/kit-requests/KitProgress";
 import { OrderIdentity } from "@/components/orders/OrderIdentity";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { OrderTemplatesCard } from "@/components/shop/OrderTemplatesCard";
-import { ShopAreaShowcase } from "@/components/shop/ShopAreaShowcase";
+import { ShopAreaPortalGallery } from "@/components/shop/ShopAreaPortalGallery";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/context/AuthProvider";
@@ -253,7 +253,13 @@ export default function DashboardPage() {
       </section>
 
       {(areasQuery.data?.length ?? 0) > 0 ? (
-        <ShopAreaShowcase areas={areasQuery.data ?? []} heading="Shop Bereiche" />
+        <div className="relative -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+          <ShopAreaPortalGallery
+            areas={areasQuery.data ?? []}
+            heading="Shop Bereiche"
+            description="Jeder Verkaufsbereich ist ein eigenes Portal — dieselbe Welt wie im Shop-Hub."
+          />
+        </div>
       ) : null}
 
       <OrderTemplatesCard currentRate={rateQuery.data?.rate ?? null} />

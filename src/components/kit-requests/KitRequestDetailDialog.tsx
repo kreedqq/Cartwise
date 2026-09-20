@@ -17,6 +17,7 @@ import { useKitRequest } from "@/hooks/useKitRequests";
 import { kitRequestActionLabel } from "@/lib/kit/kitRequestActions";
 import { KIT_ALMOST_FULL_REMAINING_THRESHOLD } from "@/lib/kit/kitShareState";
 import { kitRequestCustomerStatusLabel } from "@/lib/kitRequests";
+import { formatKitParticipantShare, resolveProductCategoryId } from "@/lib/quantityFormat";
 import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
 import { cn } from "@/lib/utils";
 
@@ -107,7 +108,17 @@ export function KitRequestDetailDialog({
               {request.isParticipant && request.myQuantity > 0 ? (
                 <div className="rounded-xl border border-border p-4">
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Dein Anteil</p>
-                  <p className="mt-1 text-base font-semibold">{request.myQuantity} Kit</p>
+                  <p className="mt-1 text-base font-semibold">
+                    {formatKitParticipantShare(
+                      request.myQuantity,
+                      request.kitSizeVials,
+                      resolveProductCategoryId({
+                        name: request.productName,
+                        code: request.productCode,
+                        dosageVial: request.variantLabel,
+                      }),
+                    )}
+                  </p>
                   {request.myUnitPriceUsd != null ? (
                     <DualCurrencyPrice
                       usd={request.myUnitPriceUsd * request.myQuantity}

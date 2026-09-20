@@ -153,7 +153,7 @@ function MetaEditForm({
   );
 }
 
-function DistributionEditor({
+export function KitRequestDistributionEditor({
   detail,
   saving,
   onSave,
@@ -573,7 +573,7 @@ export default function AdminKitRequestDetailPage() {
         </AdminSection>
       ) : null}
 
-      <DistributionEditor
+      <KitRequestDistributionEditor
         key={`${detail.id}-${detail.updatedAt}-dist`}
         detail={detail}
         saving={distributionMutation.isPending}

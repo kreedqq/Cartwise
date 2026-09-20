@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SaveStatusIndicator } from "@/components/common/SaveStatusIndicator";
 import { ResolutionStatusBadge } from "@/components/cart/ResolutionStatusBadge";
-import { EditKitShareButton } from "@/components/shop/EditKitShareButton";
 import { useCartItemRow } from "@/hooks/useCartItemRow";
 import { DualCurrencyPrice } from "@/components/common/DualCurrencyPrice";
 import { convertUsdToEur, formatDateTime, formatEur, formatRate, formatUsd } from "@/lib/money";
@@ -111,6 +110,7 @@ function CartItemRowDesktop({
 }) {
   const row = useCartItemRow(item, cartId, currentRate);
   const kitAllocationLine = isKitShareCartItem(item);
+  const kitLineProtected = kitAllocationLine || kitLocked;
   const displayRate = item.exchange_rate_snapshot ?? currentRate;
   const lineRateLoading = rateLoading && item.exchange_rate_snapshot == null && displayRate == null;
   const isProblem = item.resolution_status === "not_found" || item.resolution_status === "inactive";
@@ -129,7 +129,7 @@ function CartItemRowDesktop({
             onChange={(e) => row.onCodeChange(e.target.value)}
             onBlur={row.onCodeBlur}
             invalid={item.resolution_status === "not_found"}
-            disabled={readOnly}
+            disabled={readOnly || kitLineProtected}
             className="h-8 font-mono text-xs uppercase"
           />
         </div>
@@ -156,7 +156,6 @@ function CartItemRowDesktop({
             {kitLocked ? (
               <span className="mt-1 block text-[11px] text-muted-foreground">Kit gesperrt</span>
             ) : null}
-            {item.kit_share_id && !kitLocked ? <EditKitShareButton kitShareId={item.kit_share_id} /> : null}
           </>
         )}
       </TableCell>
@@ -166,7 +165,7 @@ function CartItemRowDesktop({
           onChange={(e) => row.onQuantityChange(e.target.value)}
           onBlur={row.onQuantityBlur}
           invalid={!!row.quantityError}
-          disabled={readOnly || kitAllocationLine}
+          disabled={readOnly || kitLineProtected}
           inputMode="decimal"
           className="h-8 text-right tabular-nums"
           aria-readonly={kitAllocationLine || undefined}
@@ -174,8 +173,10 @@ function CartItemRowDesktop({
         {row.quantityError && <p className="mt-1 text-[11px] text-destructive">{row.quantityError}</p>}
         <SaveStatusIndicator status={row.quantityStatus} className="mt-1 justify-end" />
         <p className="mt-1 text-[11px] text-muted-foreground">{cartItemQuantityLabel({ ...item, shop_area: item.shop_area ?? shopArea })}</p>
-        {kitAllocationLine ? (
-          <p className="mt-0.5 text-[11px] text-muted-foreground">Menge folgt deinem Kit-Anteil.</p>
+        {kitLineProtected ? (
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            Kit Anteil — wird automatisch aus dem Kit Gesuch gesetzt.
+          </p>
         ) : null}
       </TableCell>
       <TableCell className="text-right">
@@ -215,7 +216,7 @@ function CartItemRowDesktop({
           onChange={(e) => row.onNoteChange(e.target.value)}
           onBlur={row.onNoteBlur}
           placeholder="Notiz"
-          disabled={readOnly}
+          disabled={readOnly || kitLineProtected}
           className="h-8 text-xs"
         />
         <SaveStatusIndicator status={row.noteStatus} className="mt-1" />
@@ -223,17 +224,21 @@ function CartItemRowDesktop({
       <TableCell className="text-right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8" disabled={readOnly}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" disabled={readOnly || kitLineProtected}>
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem disabled={row.duplicating} onClick={() => row.duplicate(nextPosition)}>
-              <Copy /> Duplizieren
-            </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive" disabled={row.removing} onClick={row.remove}>
-              <Trash2 /> Löschen
-            </DropdownMenuItem>
+            {!kitLineProtected ? (
+              <>
+                <DropdownMenuItem disabled={row.duplicating} onClick={() => row.duplicate(nextPosition)}>
+                  <Copy /> Duplizieren
+                </DropdownMenuItem>
+                <DropdownMenuItem variant="destructive" disabled={row.removing} onClick={row.remove}>
+                  <Trash2 /> Löschen
+                </DropdownMenuItem>
+              </>
+            ) : null}
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>

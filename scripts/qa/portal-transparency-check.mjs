@@ -14,6 +14,7 @@ requireQaAccounts();
 const OUT = resolve(GENERATED_DIR, "portal-transparency-check.json");
 const ROUTES = [
   { id: "shop-hub", path: "/shop", portalTestId: "shop-area-portal" },
+  { id: "dashboard-portals", path: "/dashboard", portalTestId: "shop-area-portal" },
   { id: "gb1-hub", path: "/shop/group-buy-1", portalTestId: "shop-category-portal" },
 ];
 

@@ -15,7 +15,7 @@ import { OrderChargeSummary } from "@/components/orders/OrderChargeSummary";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
-import { EditKitShareButton } from "@/components/shop/EditKitShareButton";
+import { isKitShareCartItem } from "@/lib/shop/cartDisplay";
 import { useCarts } from "@/hooks/useCarts";
 import { useCartItems } from "@/hooks/useCartItems";
 import { useCartComputed } from "@/hooks/useCartComputed";
@@ -255,11 +255,11 @@ export default function CheckoutPage() {
                         {cartItemVariantSubtitle(item) && (
                           <p className="mt-0.5 text-xs text-muted-foreground">{cartItemVariantSubtitle(item)}</p>
                         )}
-                        {item.kit_share_id && (
-                          <div>
-                            <EditKitShareButton kitShareId={item.kit_share_id} />
-                          </div>
-                        )}
+                        {isKitShareCartItem(item) ? (
+                          <span className="mt-1 inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-primary">
+                            Geteiltes Kit
+                          </span>
+                        ) : null}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
                         {cartItemQuantityLabel({ ...item, shop_area: item.shop_area ?? cart.shop_area })}

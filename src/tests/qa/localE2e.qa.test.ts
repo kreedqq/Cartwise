@@ -66,10 +66,10 @@ describe("1 Group Buy kit permissions", () => {
     expect(joined.error, rpcMessage(joined.error)).toBeNull();
 
     const left = await joiner.rpc("leave_kit_request", { _kit_share_id: kitId });
-    expect(left.error, rpcMessage(left.error)).toBeNull();
+    expect(left.error, rpcMessage(left.error)).not.toBeNull();
 
     const cancelled = await client.rpc("cancel_kit_request", { _kit_share_id: kitId });
-    expect(cancelled.error, rpcMessage(cancelled.error)).toBeNull();
+    expect(cancelled.error, rpcMessage(cancelled.error)).not.toBeNull();
   });
 });
 

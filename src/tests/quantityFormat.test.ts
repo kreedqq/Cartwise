@@ -7,6 +7,7 @@ import {
   formatCatalogQuantity,
   formatCompleteKitCount,
   formatKitSizeLabel,
+  formatKitParticipantShare,
   formatKitSplitQuantity,
   formatOrderItemQuantity,
   formatPartialKitQuantity,
@@ -53,6 +54,11 @@ describe("quantityFormat", () => {
     expect(formatUnitWord("vial", 2)).toBe("Vials");
     expect(formatUnitWord("packung", 1)).toBe("Packung");
     expect(formatUnitWord("packung", 2)).toBe("Packungen");
+  });
+
+  it("formats participant share as Kit Anteil", () => {
+    expect(formatKitParticipantShare(5, 10, "peptides")).toBe("5/10 Kit Anteil");
+    expect(formatKitParticipantShare(10, 10, "peptides")).toBe("1 Kit");
   });
 
   it("formats peptide kit shares from kit_size_vials math", () => {

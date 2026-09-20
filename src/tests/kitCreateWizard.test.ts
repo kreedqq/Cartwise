@@ -103,14 +103,13 @@ describe("kit join and leave customer copy", () => {
     expect(join).not.toContain("create_kit_share");
   });
 
-  it("explains leave without technical status values", () => {
+  it("does not offer customer leave/cancel after policy change", () => {
     const groupBuy = read("src/pages/GroupBuy.tsx");
     const kitRequests = read("src/pages/KitRequests.tsx");
-    expect(groupBuy).toContain("Möchtest du deinen Anteil wieder freigeben?");
-    expect(kitRequests).toContain("Möchtest du deinen Anteil wieder freigeben?");
-    expect(groupBuy).toContain("Ja, Anteil freigeben");
-    expect(kitRequests).toContain("Ja, Anteil freigeben");
-    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Kit verlassen");
+    expect(groupBuy).not.toContain("Möchtest du deinen Anteil wieder freigeben?");
+    expect(kitRequests).not.toContain("Ja, Anteil freigeben");
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).not.toContain("Kit verlassen");
+    expect(read("supabase/migrations/0113_kit_request_customer_no_leave_cancel.sql")).toContain("cancel_kit_request");
   });
 });
 
@@ -120,7 +119,7 @@ describe("shop kit entry no longer uses invite-kit sync errors", () => {
     expect(dialog).not.toContain("Der Kit Anteil konnte nicht synchronisiert werden.");
     expect(dialog).toContain("Das hat leider nicht funktioniert. Dein Kit wurde nicht verändert.");
     expect(read("src/components/shop/EditKitShareButton.tsx")).toContain("KitShareDialog");
-    expect(read("src/components/cart/CartItemsTable.tsx")).toContain("EditKitShareButton");
+    expect(read("src/components/cart/CartItemsTable.tsx")).not.toContain("EditKitShareButton");
   });
 });
 

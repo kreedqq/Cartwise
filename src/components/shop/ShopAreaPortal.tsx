@@ -54,7 +54,7 @@ export function ShopAreaPortal({
   );
 
   const portalBlock = (
-    <div className="relative w-full max-w-[min(94vw,34rem)] xl:max-w-[min(94vw,36rem)]">
+    <div className="relative w-full max-w-[34rem] overflow-x-clip xl:max-w-[36rem]">
       <ShopPortalAtmosphere
         accentHex={accentHex}
         glow={glow}

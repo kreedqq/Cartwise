@@ -347,8 +347,8 @@ describe("order CSV / PDF snapshot source", () => {
         kit_participant_quantity_snapshot: 5,
       }),
     ]);
-    expect(peptideKit.items[0]?.quantityLabel).toBe("5/10 Kit");
-    expect(buildOrderPrintHtml(peptideKit)).toContain("5/10 Kit");
+    expect(peptideKit.items[0]?.quantityLabel).toBe("5/10 Kit Anteil");
+    expect(buildOrderPrintHtml(peptideKit)).toContain("5/10 Kit Anteil");
 
     const oil = toOrderExportDoc(
       makeOrder(),

@@ -119,14 +119,20 @@ async function checkoutFromCart(page, expectedQty, kitId) {
   const cartId = page.url().match(/\/carts\/([^/?#]+)/)?.[1] ?? null;
   const kitRow = kitCartRowLocator(page, kitId);
   await kitRow.waitFor({ state: "visible", timeout: 30_000 });
+  await kitRow.getByText(new RegExp(`${expectedQty}/10 Kit Anteil`)).first().waitFor({ state: "visible", timeout: 10_000 });
+  await kitRow.locator("span", { hasText: "Geteiltes Kit" }).first().waitFor({ state: "visible", timeout: 5_000 });
+  await kitRow
+    .getByText(/Kit Anteil — (wird automatisch aus dem Kit Gesuch gesetzt|automatisch aus dem Kit Gesuch)/)
+    .waitFor({ state: "visible", timeout: 5_000 });
   const qtyInput = kitRow.locator('input[inputmode="decimal"]');
-  await qtyInput.waitFor({ state: "visible", timeout: 10_000 });
-  if (await qtyInput.isDisabled().catch(() => false)) {
-    await kitRow.getByText("Menge folgt deinem Kit-Anteil.").waitFor({ state: "visible", timeout: 5_000 });
-  }
-  const qtyVal = await qtyInput.inputValue();
-  if (Number(qtyVal.replace(",", ".")) !== expectedQty) {
-    failAndExit("KIT CART", `Expected quantity ${expectedQty} for kit ${kitId}, cart input=${qtyVal}`);
+  if (await qtyInput.isVisible().catch(() => false)) {
+    if (!(await qtyInput.isDisabled().catch(() => false))) {
+      failAndExit("KIT CART", "Kit share line quantity input must be disabled");
+    }
+    const qtyVal = await qtyInput.inputValue();
+    if (Number(qtyVal.replace(",", ".")) !== expectedQty) {
+      failAndExit("KIT CART", `Expected vial qty ${expectedQty} for kit ${kitId}, cart input=${qtyVal}`);
+    }
   }
   await page.getByRole("button", { name: "Bestellung prüfen" }).click();
   await fillCheckoutAndSubmit(page);

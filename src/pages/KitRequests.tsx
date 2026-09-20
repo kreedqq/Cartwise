@@ -5,10 +5,10 @@ import { Layers } from "lucide-react";
 import { CreateKitRequestDialog } from "@/components/kit-requests/CreateKitRequestDialog";
 import { JoinKitRequestDialog } from "@/components/kit-requests/JoinKitRequestDialog";
 import { KitOnboardingBanner } from "@/components/kit-requests/KitOnboardingBanner";
+import { KitRequestAdminManageDialog } from "@/components/kit-requests/KitRequestAdminManageDialog";
 import { KitRequestCardView } from "@/components/kit-requests/KitRequestCard";
 import { KitRequestFilterBar } from "@/components/kit-requests/KitRequestFilterBar";
 import { CreateKitRequestButton, KitRequestHint } from "@/components/kit-requests/KitRequestIntro";
-import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { FullScreenSpinner } from "@/components/common/FullScreenSpinner";
@@ -26,15 +26,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toaster";
 import {
-  useCancelKitRequest,
   useCanUseKitRequests,
-  useLeaveKitRequest,
   useMyKitRequestParticipations,
   useMyKitRequests,
   useOpenKitRequests,
   useSyncKitRequestCarts,
   type OpenKitRequestFilters,
 } from "@/hooks/useKitRequests";
+import { useAuth } from "@/context/AuthProvider";
 import { useMyShopAreas } from "@/hooks/useMyShopAreas";
 import { useShopAreaStorefront } from "@/hooks/useShopAreaStorefront";
 import { useShopProducts } from "@/hooks/useShopProducts";
@@ -140,8 +139,6 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
 
   const [createOpen, setCreateOpen] = React.useState(false);
   const [joinTarget, setJoinTarget] = React.useState<KitRequestCard | null>(null);
-  const [leaveTarget, setLeaveTarget] = React.useState<KitRequestCard | null>(null);
-  const [cancelTarget, setCancelTarget] = React.useState<KitRequestCard | null>(null);
   const [myStatus, setMyStatus] = React.useState<string>("all");
 
   const groups = React.useMemo(() => {
@@ -166,8 +163,8 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
   const openQuery = useOpenKitRequests(filters);
   const mineQuery = useMyKitRequests(shopArea);
   const joinedQuery = useMyKitRequestParticipations(shopArea);
-  const leaveMutation = useLeaveKitRequest();
-  const cancelMutation = useCancelKitRequest();
+  const { isAdmin } = useAuth();
+  const [adminManageTarget, setAdminManageTarget] = React.useState<KitRequestCard | null>(null);
   const syncMutation = useSyncKitRequestCarts();
 
   const selectedGroup = groups.find(
@@ -307,9 +304,9 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
                     key={item.id}
                     request={item}
                     onJoin={setJoinTarget}
-                    onLeave={setLeaveTarget}
-                    onCancel={setCancelTarget}
                     onRetryCart={(req) => void handleRetryCart(req)}
+                    isAdmin={isAdmin}
+                    onAdminManage={isAdmin ? setAdminManageTarget : undefined}
                   />
                 ))}
               </div>
@@ -361,8 +358,9 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
               <KitRequestCardView
                 key={item.id}
                 request={item}
-                onCancel={setCancelTarget}
                 onRetryCart={(req) => void handleRetryCart(req)}
+                isAdmin={isAdmin}
+                onAdminManage={isAdmin ? setAdminManageTarget : undefined}
               />
             ))}
           </div>
@@ -385,8 +383,9 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
               <KitRequestCardView
                 key={item.id}
                 request={item}
-                onLeave={setLeaveTarget}
                 onRetryCart={(req) => void handleRetryCart(req)}
+                isAdmin={isAdmin}
+                onAdminManage={isAdmin ? setAdminManageTarget : undefined}
               />
             ))}
           </div>
@@ -395,45 +394,10 @@ function KitRequestsContent({ shopArea, areaName }: { shopArea: ShopAreaKey; are
 
       <CreateKitRequestDialog shopArea={shopArea} open={createOpen} onOpenChange={setCreateOpen} />
       <JoinKitRequestDialog request={joinTarget} open={joinTarget != null} onOpenChange={(next) => !next && setJoinTarget(null)} />
-
-      <ConfirmDialog
-        open={leaveTarget != null}
-        onOpenChange={(next) => !next && setLeaveTarget(null)}
-        title="Möchtest du deinen Anteil wieder freigeben?"
-        description="Dein Anteil wird anschließend wieder für andere Kunden verfügbar."
-        confirmLabel="Ja, Anteil freigeben"
-        variant="destructive"
-        loading={leaveMutation.isPending}
-        onConfirm={async () => {
-          if (!leaveTarget) return;
-          try {
-            await leaveMutation.mutateAsync(leaveTarget.id);
-            toast.success("Du hast das Kit verlassen.");
-            setLeaveTarget(null);
-          } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Stornierung fehlgeschlagen.");
-          }
-        }}
-      />
-
-      <ConfirmDialog
-        open={cancelTarget != null}
-        onOpenChange={(next) => !next && setCancelTarget(null)}
-        title="Kit stornieren"
-        description="Das offene Kit wird geschlossen. Anteile anderer Teilnehmer werden freigegeben. Es werden keine Warenkörbe erzeugt."
-        confirmLabel="Kit stornieren"
-        variant="destructive"
-        loading={cancelMutation.isPending}
-        onConfirm={async () => {
-          if (!cancelTarget) return;
-          try {
-            await cancelMutation.mutateAsync(cancelTarget.id);
-            toast.success("Gesuch storniert.");
-            setCancelTarget(null);
-          } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Stornierung fehlgeschlagen.");
-          }
-        }}
+      <KitRequestAdminManageDialog
+        kitId={adminManageTarget?.id ?? null}
+        open={adminManageTarget != null}
+        onOpenChange={(next) => !next && setAdminManageTarget(null)}
       />
     </div>
   );

@@ -88,7 +88,7 @@ export function ShopPortalAtmosphere({
 
       : intensity === "hub"
 
-        ? "min(94vw,34rem)"
+        ? "min(100%,34rem)"
 
         : intensity === "gateway"
 

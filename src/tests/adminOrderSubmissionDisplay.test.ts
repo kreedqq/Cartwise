@@ -99,7 +99,7 @@ describe("admin order submission display", () => {
           kit_participant_quantity_snapshot: 2,
         }),
       ),
-    ).toBe("2/10 Kit");
+    ).toBe("2/10 Kit Anteil");
   });
 
   it("keeps PDF and CSV on historical order_items only", () => {
@@ -121,10 +121,10 @@ describe("admin order submission display", () => {
     const doc = toOrderExportDoc(makeOrder(), items, undefined, null, { audience: "admin" });
     expect(doc.items).toHaveLength(2);
     expect(doc.total_usd).toBe(37.32);
-    expect(doc.items.map((i) => i.quantityLabel)).toEqual(["2 Kits", "2/10 Kit"]);
+    expect(doc.items.map((i) => i.quantityLabel)).toEqual(["2 Kits", "2/10 Kit Anteil"]);
     const csv = buildOrderCsv(doc);
     expect(csv).toContain("2 Kits");
-    expect(csv).toContain("2/10 Kit");
+    expect(csv).toContain("2/10 Kit Anteil");
     expect(csv).not.toContain("KP10");
     expect(csv).not.toContain("5/10 Kit");
   });

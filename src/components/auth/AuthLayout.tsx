@@ -6,7 +6,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="relative min-h-[100dvh] w-full overflow-x-hidden bg-black">
       <div
-        className="pointer-events-none fixed inset-0 h-[100dvh] w-screen bg-black bg-cover bg-center bg-no-repeat"
+        className="pointer-events-none fixed inset-0 h-[100dvh] w-full bg-black bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${BRAND_ART})` }}
         aria-hidden="true"
       />

@@ -49,7 +49,7 @@ describe("orderKitDisplay snapshots", () => {
           kit_participant_quantity_snapshot: 4,
         }),
       ),
-    ).toBe("4/10 Kit");
+    ).toBe("4/10 Kit Anteil");
     expect(
       formatKitShareLabelForOrderItem(
         item({
@@ -59,7 +59,7 @@ describe("orderKitDisplay snapshots", () => {
           quantity: 4,
         }),
       ),
-    ).toBe("2/10 Kit");
+    ).toBe("2/10 Kit Anteil");
     expect(
       formatKitShareLabelForOrderItem(
         item({
@@ -77,7 +77,7 @@ describe("orderKitDisplay snapshots", () => {
           kit_participant_quantity_snapshot: 5,
         }),
       ),
-    ).toBe("5/10 Kit");
+    ).toBe("5/10 Kit Anteil");
   });
 });
 
@@ -132,6 +132,6 @@ describe("formatHistoricalOrderItemQuantity", () => {
           product_code_snapshot: "SK10",
         }),
       ),
-    ).toBe("4/10 Kit");
+    ).toBe("4/10 Kit Anteil");
   });
 });

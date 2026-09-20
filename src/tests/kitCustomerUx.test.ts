@@ -15,7 +15,8 @@ describe("kit customer UX", () => {
     expect(kitRequestCustomerStatusLabel("cancelled")).toBe("Abgebrochen");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain('kitRequestActionLabel("join")');
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("kitRequestActionLabel");
-    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Kit verlassen");
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).not.toContain("Kit verlassen");
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("formatKitParticipantShare");
     // "Vials vergeben" ARIA label now lives in KitProgress.tsx (the dedicated progress component)
     expect(read("src/components/kit-requests/KitProgress.tsx")).toContain("Vials vergeben");
     expect(read("src/components/kit-requests/JoinKitRequestDialog.tsx")).toContain("Mitmachen");
@@ -25,7 +26,7 @@ describe("kit customer UX", () => {
     expect(read("src/components/kit-requests/CreateKitRequestDialog.tsx")).toContain("Welches Produkt möchtest du teilen?");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("useExchangeRate");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("DualCurrencyPrice");
-    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain('data-currency=eur');
+    expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain('size="summary"');
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Dein Anteil");
     expect(read("src/pages/GroupBuy.tsx")).toContain("KIT_REQUEST_CARD_GRID");
     expect(read("src/pages/KitRequests.tsx")).toContain("KIT_REQUEST_CARD_GRID");
@@ -58,10 +59,9 @@ describe("kit customer UX", () => {
     // "freie Plätze" wording is more descriptive than "Plätze" — updated label
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toContain("Noch ${request.remainingVials}");
     expect(read("src/pages/KitRequests.tsx")).toContain("parseAreaTheme");
-    expect(read("src/pages/GroupBuy.tsx")).toContain("Ja, Anteil freigeben");
-    expect(read("src/pages/KitRequests.tsx")).toContain("Ja, Anteil freigeben");
-    expect(read("src/pages/GroupBuy.tsx")).toContain("Du hast das Kit verlassen.");
-    expect(read("src/pages/KitRequests.tsx")).toContain("Du hast das Kit verlassen.");
+    expect(read("src/pages/GroupBuy.tsx")).not.toContain("Ja, Anteil freigeben");
+    expect(read("src/pages/KitRequests.tsx")).not.toContain("Ja, Anteil freigeben");
+    expect(read("supabase/migrations/0113_kit_request_customer_no_leave_cancel.sql")).toContain("leave_kit_request");
   });
 
   it("keeps kit gesuche filters and cards usable on mobile widths", () => {

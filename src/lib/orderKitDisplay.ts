@@ -1,7 +1,7 @@
 import {
   asQuantity,
   formatCatalogQuantity,
-  formatKitSplitQuantity,
+  formatKitParticipantShare,
   resolveProductCategoryId,
 } from "@/lib/quantityFormat";
 import type { Tables } from "@/types/database";
@@ -46,12 +46,7 @@ export function formatKitShareLabelForOrderItem(
     code: item.product_code_snapshot,
     dosageVial: item.dosage_vial_snapshot,
   });
-  return formatKitSplitQuantity(
-    Math.floor(shareQty / kitSize),
-    shareQty % kitSize,
-    kitSize,
-    categoryId,
-  );
+  return formatKitParticipantShare(shareQty, kitSize, categoryId);
 }
 
 /** Frozen order line quantity: kit fraction only when kit_share_id_snapshot exists. */

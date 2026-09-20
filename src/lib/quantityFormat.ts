@@ -120,6 +120,40 @@ export function formatPartialKitQuantity(filled: number, kitSize: number, catego
 }
 
 /**
+ * Participant share of one shared kit (cart, orders, kit gesuche).
+ * Example: 5 of 10 vials → "5/10 Kit Anteil". Full personal fill → "10/10 Kit" or "1 Kit".
+ */
+export function formatKitParticipantShare(
+  participantQuantity: number,
+  kitSize: number,
+  categoryId: ShopCategoryId,
+  options?: { completeAsSingleKit?: boolean },
+): string {
+  const filled = asQuantity(participantQuantity);
+  const size = asQuantity(kitSize);
+  if (size <= 0) return formatCatalogQuantity(filled, categoryId);
+  if (filled >= size) {
+    if (options?.completeAsSingleKit !== false && usesKitNoun(categoryId)) {
+      return formatCompleteKitCount(1, categoryId);
+    }
+    return `${size}/${size} ${singularUnit(productQuantityKindFor(categoryId))}`;
+  }
+  if (usesKitNoun(categoryId)) {
+    return `${filled}/${size} Kit Anteil`;
+  }
+  return `${filled}/${size} ${singularUnit(productQuantityKindFor(categoryId))} Anteil`;
+}
+
+/** @deprecated Prefer formatKitParticipantShare for shared-kit participant lines. */
+export function formatKitParticipantQuantity(
+  participantQuantity: number,
+  kitSize: number,
+  categoryId: ShopCategoryId,
+): string {
+  return formatKitParticipantShare(participantQuantity, kitSize, categoryId);
+}
+
+/**
  * Complete kits for peptide/water: 1 Kit, 2 Kits.
  * Oils/orals never say Kit — a filled 10er oil kit is 10 Vials.
  */

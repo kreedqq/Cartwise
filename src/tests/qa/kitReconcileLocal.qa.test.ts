@@ -31,7 +31,10 @@ describe("kit reconcile RPC (local)", () => {
     expect(report.reconciliationRequired).toBe(false);
     expect(report.participants.length).toBeGreaterThan(0);
 
-    const cancelled = await creator.rpc("cancel_kit_request", { _kit_share_id: kitId });
+    const customerCancel = await creator.rpc("cancel_kit_request", { _kit_share_id: kitId });
+    expect(customerCancel.error, rpcMessage(customerCancel.error)).not.toBeNull();
+
+    const cancelled = await admin.rpc("admin_cancel_kit_request", { _kit_share_id: kitId });
     expect(cancelled.error, rpcMessage(cancelled.error)).toBeNull();
   });
 
@@ -50,6 +53,10 @@ describe("kit reconcile RPC (local)", () => {
     const denied = await creator.rpc("kit_share_reconcile_report", { _kit_share_id: kitId });
     expect(denied.error).not.toBeNull();
 
-    await creator.rpc("cancel_kit_request", { _kit_share_id: kitId });
+    const customerCancel = await creator.rpc("cancel_kit_request", { _kit_share_id: kitId });
+    expect(customerCancel.error).not.toBeNull();
+
+    const { client: admin } = await signIn("admin");
+    await admin.rpc("admin_cancel_kit_request", { _kit_share_id: kitId });
   });
 });

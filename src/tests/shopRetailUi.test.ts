@@ -56,14 +56,14 @@ describe("retail shop UI", () => {
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toMatch("remainingVials");
     expect(read("src/components/kit-requests/KitRequestCard.tsx")).toMatch("kitSizeVials");
     expect(read("src/pages/KitRequests.tsx")).toMatch("JoinKitRequestDialog");
-    expect(read("src/pages/KitRequests.tsx")).toMatch("useLeaveKitRequest");
+    expect(read("src/pages/KitRequests.tsx")).not.toMatch("useLeaveKitRequest");
   });
 
   it("GroupBuyPage integrates catalog and kit requests", () => {
     const page = read("src/pages/GroupBuy.tsx");
     expect(page).toContain('pricingProfile="group_buy"');
     expect(page).toContain("JoinKitRequestDialog");
-    expect(page).toContain("useLeaveKitRequest");
+    expect(page).not.toContain("useLeaveKitRequest");
     expect(page).toContain("ShopProductGrid");
     expect(page).toContain("ShopCategoryHub");
     expect(read("src/components/shop/ShopProductCard.tsx")).toContain("DualCurrencyPrice");

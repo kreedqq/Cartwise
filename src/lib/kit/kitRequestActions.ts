@@ -18,7 +18,7 @@ export type KitRequestActionKind =
 export function kitRequestPrimaryAction(request: KitRequestCard): KitRequestActionKind {
   if (request.status === "open") {
     if (request.isCreator) return "view_mine";
-    if (request.isParticipant) return "change_quantity";
+    if (request.isParticipant) return "locked";
     if (request.remainingVials > 0) return "join";
   }
   if (request.status === "full") {

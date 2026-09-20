@@ -77,14 +77,14 @@ async function parallelJoin(clients, kitId, qty = 1) {
   );
 }
 
-async function cleanup(creatorClient, kitId) {
-  const { error } = await creatorClient.rpc("cancel_kit_request", { _kit_share_id: kitId });
+async function cleanup(adminClient, kitId) {
+  const { error } = await adminClient.rpc("admin_cancel_kit_request", { _kit_share_id: kitId });
   if (error) {
     /* kit may already be cancelled or ordered */
   }
 }
 
-async function test1(accounts, apiUrl, anonKey, product) {
+async function test1(accounts, apiUrl, anonKey, product, adminClient) {
   const creator = accounts.find((a) => a.key === "groupBuy");
   const joiners = accounts.filter((a) => a.key.startsWith("join")).slice(0, 9);
   const creatorClient = await signIn(apiUrl, anonKey, creator);
@@ -96,14 +96,14 @@ async function test1(accounts, apiUrl, anonKey, product) {
   const ok = results.filter((r) => !r.error).length;
   const state = await projectState(creatorClient, kitId);
   const allocated = Number(state.allocatedQuantity);
-  await cleanup(creatorClient, kitId);
+  await cleanup(adminClient, kitId);
   if (allocated !== 10 || ok !== 9) {
     throw new Error(`TEST1 fail: ok=${ok} allocated=${allocated}`);
   }
   console.log("TEST1 PASS: 10 allocations, FULL");
 }
 
-async function test2(accounts, apiUrl, anonKey, product) {
+async function test2(accounts, apiUrl, anonKey, product, adminClient) {
   const creator = accounts.find((a) => a.key === "groupBuy");
   const joiners = accounts.filter((a) => a.key.startsWith("join")).slice(0, 10);
   const extra = accounts.find((a) => a.key === "kunde");
@@ -117,7 +117,7 @@ async function test2(accounts, apiUrl, anonKey, product) {
   const fail = results.filter((r) => r.error).length;
   const state = await projectState(creatorClient, kitId);
   const allocated = Number(state.allocatedQuantity);
-  await cleanup(creatorClient, kitId);
+  await cleanup(adminClient, kitId);
   // Creator already holds 1 slot; 11 parallel join attempts compete for 9 remaining slots.
   if (allocated !== 10 || ok !== 9 || fail < 2) {
     throw new Error(`TEST2 fail: ok=${ok} fail=${fail} allocated=${allocated}`);
@@ -125,7 +125,7 @@ async function test2(accounts, apiUrl, anonKey, product) {
   console.log("TEST2 PASS: 9 joins ok, >=2 rejected, allocated=10 (creator holds 1)");
 }
 
-async function test3(accounts, apiUrl, anonKey, product) {
+async function test3(accounts, apiUrl, anonKey, product, adminClient) {
   const creator = accounts.find((a) => a.key === "groupBuy");
   const pool = accounts.filter((a) => a.key.startsWith("join")).slice(0, 5);
   const creatorClient = await signIn(apiUrl, anonKey, creator);
@@ -139,7 +139,7 @@ async function test3(accounts, apiUrl, anonKey, product) {
   );
   const state = await projectState(creatorClient, kitId);
   const allocated = Number(state.allocatedQuantity);
-  await cleanup(creatorClient, kitId);
+  await cleanup(adminClient, kitId);
   if (allocated > 10) {
     throw new Error(`TEST3 fail: allocated=${allocated}`);
   }
@@ -169,7 +169,7 @@ async function cartKitLines(client, kitId) {
   return data ?? [];
 }
 
-async function test5(accounts, apiUrl, anonKey, product) {
+async function test5(accounts, apiUrl, anonKey, product, adminClient) {
   const creator = accounts.find((a) => a.key === "groupBuy");
   const u1 = accounts.find((a) => a.key === "join01");
   const u2 = accounts.find((a) => a.key === "join02");
@@ -181,7 +181,6 @@ async function test5(accounts, apiUrl, anonKey, product) {
   await Promise.all([
     c1.rpc("join_kit_request", { _kit_share_id: kitId, _quantity: 4 }),
     c2.rpc("join_kit_request", { _kit_share_id: kitId, _quantity: 3 }),
-    c1.rpc("leave_kit_request", { _kit_share_id: kitId }),
     c1.rpc("join_kit_request", { _kit_share_id: kitId, _quantity: 2 }),
     c2.rpc("join_kit_request", { _kit_share_id: kitId, _quantity: 1 }),
   ]);
@@ -190,19 +189,17 @@ async function test5(accounts, apiUrl, anonKey, product) {
   const allocated = Number(state.allocatedQuantity);
   const remaining = Number(state.remainingQuantity ?? state.remainingVials ?? 0);
   await assertNoDuplicateParticipants(creatorClient, kitId);
-  await cleanup(creatorClient, kitId);
+  await cleanup(adminClient, kitId);
   if (allocated > 10 || remaining < 0) {
     throw new Error(`TEST5 fail: allocated=${allocated} remaining=${remaining}`);
   }
-  console.log(`TEST5 PASS: chaotic join/leave, allocated=${allocated}, consistent`);
+  console.log(`TEST5 PASS: chaotic parallel joins, allocated=${allocated}, consistent`);
 }
 
-async function test6(accounts, apiUrl, anonKey, product) {
+async function test6(accounts, apiUrl, anonKey, product, adminClient) {
   const creator = accounts.find((a) => a.key === "groupBuy");
-  const admin = accounts.find((a) => a.key === "admin");
   const joiners = accounts.filter((a) => a.key.startsWith("join")).slice(0, 8);
   const creatorClient = await signIn(apiUrl, anonKey, creator);
-  const adminClient = await signIn(apiUrl, anonKey, admin);
   const kitId = await createOpenKit(creatorClient, product, 2);
   const clients = await Promise.all(joiners.map((acc) => signIn(apiUrl, anonKey, acc)));
   const joinResults = await parallelJoin(clients, kitId, 1);
@@ -210,7 +207,7 @@ async function test6(accounts, apiUrl, anonKey, product) {
   const state = await projectState(creatorClient, kitId);
   const allocated = Number(state.allocatedQuantity);
   if (allocated !== 10 || joinOk < 8) {
-    await cleanup(creatorClient, kitId);
+    await cleanup(adminClient, kitId);
     throw new Error(`TEST6 setup fail: allocated=${allocated} joinOk=${joinOk}`);
   }
 
@@ -231,13 +228,13 @@ async function test6(accounts, apiUrl, anonKey, product) {
   }
   for (const [k, count] of byCartAfter) {
     if (count > 1) {
-      await cleanup(creatorClient, kitId);
+      await cleanup(adminClient, kitId);
       throw new Error(`TEST6 fail: duplicate cart lines for ${k}`);
     }
   }
   const qtyBefore = before.reduce((s, r) => s + Number(r.quantity), 0);
   const qtyAfter = after.reduce((s, r) => s + Number(r.quantity), 0);
-  await cleanup(creatorClient, kitId);
+  await cleanup(adminClient, kitId);
   if (qtyAfter !== qtyBefore) {
     throw new Error(`TEST6 fail: qty drift before=${qtyBefore} after=${qtyAfter}`);
   }
@@ -247,7 +244,7 @@ async function test6(accounts, apiUrl, anonKey, product) {
   console.log("TEST6 PASS: 10 parallel global syncs, stable cart lines");
 }
 
-async function test4(accounts, apiUrl, anonKey, product) {
+async function test4(accounts, apiUrl, anonKey, product, adminClient) {
   const creator = accounts.find((a) => a.key === "groupBuy");
   const joiner = accounts.find((a) => a.key === "join01");
   const creatorClient = await signIn(apiUrl, anonKey, creator);
@@ -264,7 +261,7 @@ async function test4(accounts, apiUrl, anonKey, product) {
     .select("user_id")
     .eq("kit_share_id", kitId)
     .eq("user_id", joiner.userId);
-  await cleanup(creatorClient, kitId);
+  await cleanup(adminClient, kitId);
   if ((parts ?? []).length > 1) {
     throw new Error("TEST4 fail: duplicate participant rows");
   }
@@ -275,15 +272,17 @@ async function main() {
   const file = loadAccounts();
   const { apiUrl, anonKey, accounts } = file;
   const creator = accounts.find((a) => a.key === "groupBuy");
+  const admin = accounts.find((a) => a.key === "admin");
   const creatorClient = await signIn(apiUrl, anonKey, creator);
+  const adminClient = await signIn(apiUrl, anonKey, admin);
   const product = await productForKit(creatorClient);
 
-  await test1(accounts, apiUrl, anonKey, product);
-  await test2(accounts, apiUrl, anonKey, product);
-  await test3(accounts, apiUrl, anonKey, product);
-  await test4(accounts, apiUrl, anonKey, product);
-  await test5(accounts, apiUrl, anonKey, product);
-  await test6(accounts, apiUrl, anonKey, product);
+  await test1(accounts, apiUrl, anonKey, product, adminClient);
+  await test2(accounts, apiUrl, anonKey, product, adminClient);
+  await test3(accounts, apiUrl, anonKey, product, adminClient);
+  await test4(accounts, apiUrl, anonKey, product, adminClient);
+  await test5(accounts, apiUrl, anonKey, product, adminClient);
+  await test6(accounts, apiUrl, anonKey, product, adminClient);
 
   console.log("ALL CONCURRENCY TESTS PASS");
 }

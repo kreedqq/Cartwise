@@ -164,8 +164,8 @@ describe("oral variant in cart and kit share display", () => {
       dosage_vial_snapshot: "5mg x 100tablets",
     });
     expect(subtitle).toContain("5 mg × 100 Tabletten");
-    expect(subtitle).toContain("6/10 Packung");
-    expect(subtitle).toContain("Kit Anteil");
+    expect(subtitle).toContain("6/10 Packung Anteil");
+    expect(subtitle).toContain("Geteiltes Kit");
   });
 
   it("does not treat a zero catalog price as a mapping failure for B12", () => {
