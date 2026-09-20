@@ -1,6 +1,7 @@
 import { productImageUrl } from "@/lib/shop/productImage";
 import { PEPTIX_CANONICAL_VIAL_PATH } from "@/lib/shop/portalTheme";
-import { shopCategoryById, isShopCategoryId, type ShopCategoryId } from "@/lib/shopCategories";
+import { categoryDisplayLabelForKey } from "@/lib/designStudioCategories";
+import { shopCategoryById, isShopCategoryId } from "@/lib/shopCategories";
 import { siteDesignImageUrl } from "@/services/siteDesign";
 
 export type ProductMediaKind =
@@ -107,6 +108,5 @@ export function resolveProductMedia(input: ResolveProductMediaInput): ResolvedPr
 }
 
 export function shopCategoryLabelForKey(key: string | null | undefined): string | undefined {
-  if (!key || !isShopCategoryId(key)) return undefined;
-  return shopCategoryById(key as ShopCategoryId).label;
+  return categoryDisplayLabelForKey(key);
 }

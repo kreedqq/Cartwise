@@ -74,6 +74,22 @@ describe("resolveProductMedia", () => {
     }
   });
 
+  it("uses accessories category media with explicit label", () => {
+    const r = resolveProductMedia({
+      productName: "Spritzen",
+      productImagePath: null,
+      effectiveCategoryKey: "accessories",
+      categoryLabel: "Zubehör",
+      categoryMedia: {
+        ...categoryMedia,
+        accessories: "design-studio/categories/accessories/z.jpg",
+      },
+    });
+    expect(r.kind).toBe("category");
+    expect(r.alt).toBe("Zubehör Kategorie");
+    expect(r.src).toContain("accessories");
+  });
+
   it("product image wins over category image", () => {
     const r = resolveProductMedia({
       productName: "Custom Oil",

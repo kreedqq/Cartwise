@@ -87,6 +87,7 @@ export const QUERY_KEYS = {
   adminOrderGroups: ["admin-order-groups"] as const,
   adminOrderGroupOrders: ["admin-order-group-orders"] as const,
   siteDesign: ["site-design"] as const,
+  designStudioCategories: ["design-studio-categories"] as const,
   approvedFeedback: (page: number) => ["approved-feedback", page] as const,
   myFeedback: ["my-feedback"] as const,
   adminFeedback: (filters: unknown) => ["admin-feedback", filters] as const,

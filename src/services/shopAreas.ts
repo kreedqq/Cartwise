@@ -417,6 +417,16 @@ export async function listAdminShopAreaCategories(shopAreaKey: ShopAreaKey) {
   return data ?? [];
 }
 
+/** Distinct category keys across all shop areas (Design Studio category media). */
+export async function listAllShopAreaCategoryKeysForDesignStudio() {
+  const { data, error } = await supabase
+    .from("shop_area_categories")
+    .select("category_key, label, sort_order")
+    .order("sort_order");
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function listShopAreaStorefront(shopArea: ShopAreaKey): Promise<ShopAreaStorefront> {
   const { data, error } = await supabase.rpc("list_shop_area_storefront", { _shop_area: shopArea });
   if (error) throw error;

@@ -61,8 +61,7 @@ export function ShopProductCard({
       : null) ??
     (categoryId ?? shopCategoryIdFor(product));
   const catId = isShopCategoryId(effectiveKey) ? effectiveKey : categoryId ?? shopCategoryIdFor(product);
-  const resolvedCategoryLabel =
-    categoryLabel ?? shopCategoryLabelForKey(isShopCategoryId(effectiveKey) ? effectiveKey : catId);
+  const resolvedCategoryLabel = categoryLabel ?? shopCategoryLabelForKey(effectiveKey);
   const variantLabel = isRetail ? formatRetailVariantLabel(product) : variantLabelForProduct(product);
   const description = product.description?.trim();
 
