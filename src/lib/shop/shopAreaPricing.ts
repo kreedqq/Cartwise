@@ -86,7 +86,7 @@ export function resolveAreaCatalogPriceUsd(
   return areaOverrideUsd ?? globalPriceUsd;
 }
 
-/** Missing product×area×role markup inherits customer_roles.markup_percent (e.g. 25%). */
+/** Missing product×area×role override inherits the area role markup from the caller (not a global column). */
 export function resolveAreaRoleMarkupPercent(
   roleMarkupPercent: number,
   areaProductRoleMarkup: number | null | undefined,

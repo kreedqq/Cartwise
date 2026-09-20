@@ -20,14 +20,14 @@ describe("central admin pricing rules IA", () => {
     expect(nav).toContain("Aufschlags-Auswertung");
   });
 
-  it("central panel owns global sell factors and area role sell factors", () => {
+  it("central panel owns area role sell factors only (no global role pricing)", () => {
     const panel = read("src/components/admin/AdminPricingRulesPanel.tsx");
-    expect(panel).toContain("upsertCustomerRole");
+    expect(panel).not.toContain("upsertCustomerRole");
+    expect(panel).not.toContain("Globale Rollenpreise");
     expect(panel).toContain("saveAdminShopAreaRoleSellFactors");
     expect(panel).toContain("applyAreaRoleSellUnit");
-    expect(panel).toContain("applySellFactorPct");
-    expect(panel).toContain("Globaler Verkaufspreisfaktor");
-    expect(panel).toContain('placeholder="—"');
+    expect(panel).toContain("Verkaufsbereich-Preisregeln");
+    expect(panel).not.toContain('placeholder="—"');
   });
 
   it("shows area base price read-only on Preisregeln and does not persist it there", () => {

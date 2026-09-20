@@ -26,7 +26,9 @@ describe("dynamic sales areas", () => {
   it("recalculates open carts from catalog + owner markup, never cart unit", () => {
     expect(sql).toContain("admin_refresh_open_cart_prices");
     expect(sql).toContain("refresh_cart_selling_prices_for_user");
-    expect(sql).toContain("markup_percent_for(_user_id)");
+    expect(read("supabase/migrations/0120_area_role_pricing_only.sql")).toMatch(
+      /markup_percent_for_area\(_user_id, _area, _product\.id\)/,
+    );
     expect(sql).toContain("resolve_area_catalog_product");
     expect(sql).toContain("shop_area_sell_unit_price");
     expect(sql).toContain("status in ('draft', 'ready')");

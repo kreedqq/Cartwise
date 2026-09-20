@@ -13,7 +13,7 @@ export default function AdminPricingRulesPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Preisregeln"
-        description="Zentrale Verwaltung globaler Rollenaufschläge und bereichsspezifischer Verkaufspreise. Shop, Warenkorb und Bestellungen nutzen dieselbe Server-Pricing-Pipeline."
+        description="Zentrale Verwaltung der Verkaufspreise pro Verkaufsbereich und Rolle."
       />
       <AdminPricingRulesPanel key={initialAreaKey ?? "default-area"} initialAreaKey={initialAreaKey} />
     </div>

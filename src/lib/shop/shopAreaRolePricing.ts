@@ -1,19 +1,11 @@
 import { applySellFactorPct, roundHalfUp } from "@/lib/money";
 
 /**
- * Area role sell factor as shown in admin UI (100 = pass-through, 125 = 1.25× catalog).
- * Mirrors SQL: explicit row in shop_area_role_sell_factors, else global customer_roles.markup_percent (sell factor).
+ * Area role sell factor on the area catalog unit (100 = pass-through, 125 = 1.25×).
+ * Mirrors SQL shop_area_role_sell_factors via markup_percent_for_area + apply_role_markup.
  */
-export function applyAreaRoleSellUnit(
-  catalogUnitUsd: number,
-  explicitSellFactorPct: number | null | undefined,
-  globalSellFactorPct: number,
-): number {
-  const factor =
-    explicitSellFactorPct != null && Number.isFinite(explicitSellFactorPct)
-      ? explicitSellFactorPct
-      : globalSellFactorPct;
-  return applySellFactorPct(catalogUnitUsd, factor);
+export function applyAreaRoleSellUnit(catalogUnitUsd: number, sellFactorPct: number): number {
+  return applySellFactorPct(catalogUnitUsd, sellFactorPct);
 }
 
 /** Convert stored sell factor to additive markup for apply_role_markup (SQL twin). */

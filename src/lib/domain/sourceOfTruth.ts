@@ -16,7 +16,7 @@ export const DOMAIN_SOURCE_OF_TRUTH = {
     source: "user_customer_roles + customer_roles",
   },
   markup: {
-    source: "markup_percent_for_area + apply_role_markup (once)",
+    source: "shop_area_role_sell_factors → markup_percent_for_area + apply_role_markup (once)",
   },
   cart: {
     source: "carts + cart_items",

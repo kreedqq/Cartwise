@@ -12,7 +12,7 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toaster";
 import { QUERY_KEYS } from "@/lib/constants";
-import { applySellFactorPct, formatUsd } from "@/lib/money";
+import { formatUsd } from "@/lib/money";
 import { shopAreaCatalogUnit } from "@/lib/shop/shopAreaPricing";
 import { applyAreaRoleSellUnit } from "@/lib/shop/shopAreaRolePricing";
 import {
@@ -22,24 +22,18 @@ import {
   type ShopAreaKey,
   type ShopPricingProfile,
 } from "@/lib/shop/shopAreas";
-import { listCustomerRoles, upsertCustomerRole } from "@/services/customerRoles";
+import { listCustomerRoles } from "@/services/customerRoles";
 import {
   listAdminShopAreaRoleSellFactors,
   listAdminShopAreas,
   saveAdminShopAreaRoleSellFactors,
 } from "@/services/shopAreas";
+
 const GLOBAL_SAMPLE_USD = 100;
+const DEFAULT_ROLE_SELL_FACTOR_PCT = 100;
 
 function parseSellFactorPctInput(raw: string): number | null {
   const value = Number(raw.replace(",", ".").trim());
-  if (!Number.isFinite(value) || value <= 0) return null;
-  return value;
-}
-
-function parseExplicitSellFactor(raw: string | undefined): number | null {
-  const trimmed = raw?.trim();
-  if (!trimmed) return null;
-  const value = Number(trimmed.replace(",", "."));
   if (!Number.isFinite(value) || value <= 0) return null;
   return value;
 }
@@ -65,25 +59,16 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
     enabled: !!area,
   });
 
-  const [globalFactorDraft, setGlobalFactorDraft] = React.useState<Record<string, string> | null>(null);
   const [roleFactorDraft, setRoleFactorDraft] = React.useState<Record<string, string> | null>(null);
   const [saving, setSaving] = React.useState(false);
 
   const areaFactor = area?.base_price_factor_pct ?? DEFAULT_BASE_PRICE_FACTOR_PCT;
 
-  const savedGlobalInputs = React.useMemo(() => {
-    const next: Record<string, string> = {};
-    for (const role of roles) next[role.id] = String(role.markup_percent);
-    return next;
-  }, [roles]);
-
-  const globalFactorInputs = globalFactorDraft ?? savedGlobalInputs;
-
   const savedRoleFactorInputs = React.useMemo(() => {
     const next: Record<string, string> = {};
     for (const role of roles) {
       const row = sellFactorsQuery.data?.find((entry) => entry.role_id === role.id);
-      next[role.id] = row != null ? String(row.sell_factor_pct) : "";
+      next[role.id] = row != null ? String(row.sell_factor_pct) : String(DEFAULT_ROLE_SELL_FACTOR_PCT);
     }
     return next;
   }, [roles, sellFactorsQuery.data]);
@@ -104,24 +89,12 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
       toast.error("Verkaufsbereich konnte nicht geladen werden.");
       return;
     }
-    for (const role of roles) {
-      const parsed = parseSellFactorPctInput(globalFactorInputs[role.id] ?? "");
-      if (parsed == null) {
-        toast.error(`Ungültiger globaler Verkaufspreisfaktor für „${role.name}“ (muss > 0 % sein).`);
-        return;
-      }
-    }
 
-    const entries: { roleId: string; sellFactorPct: number | null }[] = [];
+    const entries: { roleId: string; sellFactorPct: number }[] = [];
     for (const role of roles) {
-      const raw = roleFactorInputs[role.id]?.trim();
-      if (!raw) {
-        entries.push({ roleId: role.id, sellFactorPct: null });
-        continue;
-      }
-      const parsed = Number(raw.replace(",", "."));
-      if (!Number.isFinite(parsed) || parsed <= 0) {
-        toast.error(`Ungültiger Bereichs-Verkaufspreisfaktor für Rolle „${role.name}“ (muss > 0 % sein).`);
+      const parsed = parseSellFactorPctInput(roleFactorInputs[role.id] ?? "");
+      if (parsed == null) {
+        toast.error(`Ungültiger Verkaufspreisfaktor für Rolle „${role.name}“ (muss > 0 % sein).`);
         return;
       }
       entries.push({ roleId: role.id, sellFactorPct: parsed });
@@ -129,25 +102,12 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
 
     setSaving(true);
     try {
-      for (const role of roles) {
-        const draftFactor = parseSellFactorPctInput(globalFactorInputs[role.id] ?? "");
-        if (draftFactor != null && draftFactor !== Number(role.markup_percent)) {
-          await upsertCustomerRole({
-            id: role.id,
-            name: role.name,
-            markupPercent: draftFactor,
-            isActive: role.is_active,
-            canUseKitRequests: role.can_use_kit_requests === true,
-          });
-        }
-      }
       await saveAdminShopAreaRoleSellFactors(areaKey, entries);
-      setGlobalFactorDraft(null);
       setRoleFactorDraft(null);
       toast.success("Preisregeln gespeichert.");
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["customer-roles"] }),
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.adminShopAreas }),
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.shopProducts(areaKey) }),
         sellFactorsQuery.refetch(),
       ]);
     } catch (error) {
@@ -173,66 +133,14 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
   }
 
   return (
-    <div className="space-y-8">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Globale Rollenpreise</CardTitle>
-          <CardDescription>
-            Verkaufspreisfaktor: 100&nbsp;% = Grundpreis, 125&nbsp;% = +25&nbsp;%, 200&nbsp;% = doppelter Grundpreis.
-            Gilt in allen Bereichen, wenn dort kein eigener Rollenfaktor gesetzt ist (— = globaler Fallback).
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Rolle</TableHead>
-                <TableHead className="min-w-[9rem]">Globaler Verkaufspreisfaktor</TableHead>
-                <TableHead className="min-w-[7rem]">Verkaufspreis bei {formatUsd(GLOBAL_SAMPLE_USD)}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {roles.map((role) => {
-                const factor =
-                  parseSellFactorPctInput(globalFactorInputs[role.id] ?? "") ?? Number(role.markup_percent);
-                const preview = applySellFactorPct(GLOBAL_SAMPLE_USD, factor);
-                return (
-                  <TableRow key={role.id}>
-                    <TableCell className="font-medium">{role.name}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Input
-                          type="number"
-                          min={0.01}
-                          step={0.01}
-                          className="h-8 w-24"
-                          value={globalFactorInputs[role.id] ?? ""}
-                          onChange={(event) =>
-                            setGlobalFactorDraft((current) => ({
-                              ...(current ?? savedGlobalInputs),
-                              [role.id]: event.target.value,
-                            }))
-                          }
-                          aria-label={`Globaler Verkaufspreisfaktor für ${role.name}`}
-                        />
-                        <span className="text-xs text-muted-foreground">%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="tabular-nums text-sm">{formatUsd(preview)}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
+    <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Verkaufsbereich-Preisregeln</CardTitle>
           <CardDescription>
-            Bereichsgrundpreis und optionale Verkaufsfaktoren pro Rolle auf dem Bereichskatalog. Explizit 100&nbsp;% ist
-            nicht dasselbe wie leer (globaler Fallback).
+            Verkaufspreisfaktor pro Rolle in diesem Bereich: 100&nbsp;% = Bereichskatalogpreis, 125&nbsp;% = ×1,25,
+            200&nbsp;% = doppelter Bereichskatalogpreis. Shop, Warenkorb und Bestellungen nutzen dieselbe
+            Server-Pipeline.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -277,7 +185,7 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
             <Link to={`/admin/shop-areas/${areaKey}`}>Verkaufsbereich öffnen</Link>
           </Button>
           <p className="text-xs text-muted-foreground">
-            Beispiel Händler {formatUsd(GLOBAL_SAMPLE_USD)} → Bereichskatalog {formatUsd(catalogAfterArea)} (
+            Vorschau-Basis: Händler {formatUsd(GLOBAL_SAMPLE_USD)} → Bereichskatalog {formatUsd(catalogAfterArea)} (
             {formatShopAreaLabel(areaKey)}).
           </p>
 
@@ -294,17 +202,15 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
               <TableHeader>
                 <TableRow>
                   <TableHead>Rolle</TableHead>
-                  <TableHead className="min-w-[9rem]">Bereichs-Verkaufspreisfaktor</TableHead>
+                  <TableHead className="min-w-[9rem]">Verkaufspreisfaktor</TableHead>
                   <TableHead className="min-w-[8rem]">Vorschau</TableHead>
-                  <TableHead className="min-w-[8rem]">Quelle</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {roles.map((role) => {
-                  const explicit = parseExplicitSellFactor(roleFactorInputs[role.id]);
-                  const globalFactor =
-                    parseSellFactorPctInput(globalFactorInputs[role.id] ?? "") ?? Number(role.markup_percent);
-                  const previewUsd = applyAreaRoleSellUnit(catalogAfterArea, explicit, globalFactor);
+                  const factor =
+                    parseSellFactorPctInput(roleFactorInputs[role.id] ?? "") ?? DEFAULT_ROLE_SELL_FACTOR_PCT;
+                  const previewUsd = applyAreaRoleSellUnit(catalogAfterArea, factor);
                   return (
                     <TableRow key={role.id}>
                       <TableCell className="font-medium">{role.name}</TableCell>
@@ -314,7 +220,6 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
                             type="number"
                             min={0.01}
                             step={0.01}
-                            placeholder="—"
                             className="h-8 w-24"
                             value={roleFactorInputs[role.id] ?? ""}
                             onChange={(event) =>
@@ -323,19 +228,12 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
                                 [role.id]: event.target.value,
                               }))
                             }
-                            aria-label={`Bereichs-Verkaufspreisfaktor für ${role.name}`}
+                            aria-label={`Verkaufspreisfaktor für ${role.name}`}
                           />
                           <span className="text-xs text-muted-foreground">%</span>
                         </div>
                       </TableCell>
                       <TableCell className="tabular-nums text-sm">{formatUsd(previewUsd)}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground">
-                        {explicit != null ? (
-                          <span>Bereich {explicit} %</span>
-                        ) : (
-                          <span>Global {globalFactor} %</span>
-                        )}
-                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -344,17 +242,15 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
           </div>
 
           <div className="space-y-2 rounded-lg border border-border p-3 text-sm">
-            <p className="font-medium">Vorschau (Bereichskatalog {formatUsd(catalogAfterArea)})</p>
+            <p className="font-medium">Live-Vorschau (Bereichskatalog {formatUsd(catalogAfterArea)})</p>
             <ul className="space-y-1 text-muted-foreground">
               {roles.map((role) => {
-                const explicit = parseExplicitSellFactor(roleFactorInputs[role.id]);
-                const globalFactor =
-                  parseSellFactorPctInput(globalFactorInputs[role.id] ?? "") ?? Number(role.markup_percent);
-                const previewUsd = applyAreaRoleSellUnit(catalogAfterArea, explicit, globalFactor);
-                const label = explicit != null ? `Bereich ${explicit} %` : `Global ${globalFactor} %`;
+                const factor =
+                  parseSellFactorPctInput(roleFactorInputs[role.id] ?? "") ?? DEFAULT_ROLE_SELL_FACTOR_PCT;
+                const previewUsd = applyAreaRoleSellUnit(catalogAfterArea, factor);
                 return (
                   <li key={role.id}>
-                    <span className="text-foreground">{role.name}</span>: {label} →{" "}
+                    <span className="text-foreground">{role.name}</span>: {factor} % →{" "}
                     <span className="tabular-nums text-foreground">{formatUsd(previewUsd)}</span>
                   </li>
                 );

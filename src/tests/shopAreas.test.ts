@@ -222,6 +222,33 @@ describe("shop area role sell factors SQL (migration 0114)", () => {
   });
 });
 
+describe("area-only role pricing SQL (migration 0120)", () => {
+  const sql = read("supabase/migrations/0120_area_role_pricing_only.sql");
+
+  it("backfills missing area×role sell factors at 100 %", () => {
+    expect(sql).toMatch(/insert into public\.shop_area_role_sell_factors/);
+    expect(sql).toMatch(/cross join public\.customer_roles/);
+  });
+
+  it("removes global markup_percent_for fallback from markup_percent_for_area", () => {
+    expect(sql).toMatch(/create or replace function public\.markup_percent_for_area/);
+    expect(sql).not.toMatch(/markup_percent_for\(_user_id\)/);
+    expect(sql).toMatch(/shop_area_role_sell_factor_pct/);
+  });
+
+  it("seeds or copies sell factors when creating shop areas and new roles", () => {
+    expect(sql).toContain("seed_shop_area_role_sell_factors");
+    expect(sql).toMatch(/perform public\.seed_shop_area_role_sell_factors\(_row\.key/);
+    expect(sql).toMatch(/insert into public\.shop_area_role_sell_factors.*_row\.id, 100/s);
+  });
+
+  it("cart refresh uses markup_percent_for_area for cart owner", () => {
+    expect(sql).toMatch(/refresh_cart_selling_prices_for_user/);
+    expect(sql).toMatch(/markup_percent_for_area\(_user_id, _area, _product\.id\)/);
+    expect(sql).not.toMatch(/markup_percent_for\(_user_id\)/);
+  });
+});
+
 describe("global role markup SQL (migration 0053)", () => {
   const sql = read("supabase/migrations/0053_global_role_markup.sql");
 

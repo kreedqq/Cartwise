@@ -48,7 +48,7 @@ export function AdminRoleCatalog() {
       return;
     }
     const existing = editingId ? roles.find((role) => role.id === editingId) : null;
-    const markupPercent = existing != null ? Number(existing.markup_percent) : 0;
+    const markupPercent = existing != null ? Number(existing.markup_percent) : 100;
     setSaving(true);
     try {
       await upsertCustomerRole({

@@ -167,14 +167,14 @@ export async function listAdminShopAreaRoleSellFactors(shopAreaKey: ShopAreaKey)
   return data ?? [];
 }
 
-/** null sellFactorPct removes an explicit area rule (global role markup applies). */
+/** Persists explicit sell factors for every role row supplied (no global fallback). */
 export async function saveAdminShopAreaRoleSellFactors(
   shopAreaKey: ShopAreaKey,
-  entries: readonly { roleId: string; sellFactorPct: number | null }[],
+  entries: readonly { roleId: string; sellFactorPct: number }[],
 ): Promise<void> {
   const explicit = entries.filter(
     (entry): entry is { roleId: string; sellFactorPct: number } =>
-      entry.sellFactorPct != null && Number.isFinite(entry.sellFactorPct) && entry.sellFactorPct > 0,
+      Number.isFinite(entry.sellFactorPct) && entry.sellFactorPct > 0,
   );
   const { error: delError } = await supabase
     .from("shop_area_role_sell_factors")
