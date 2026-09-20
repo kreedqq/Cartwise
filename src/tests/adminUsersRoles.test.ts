@@ -24,7 +24,7 @@ describe("admin users and roles merge", () => {
     expect(nav).toContain('label: "Kunden"');
     expect(nav).toContain('label: "Benutzer"');
     expect(nav).toContain('to: "/admin/users#rollen"');
-    expect(nav).toContain('to: "/admin/surcharges"');
+    expect(nav).toContain('to: "/admin/pricing-rules"');
     expect(nav).toContain('to: "/admin/audit-log"');
     expect(nav).not.toContain('label: "Rollen & Preisaufschlag"');
     expect(nav).not.toContain('label: "Kunden & Rollen"');
@@ -50,11 +50,11 @@ describe("admin users and roles merge", () => {
     expect(page).not.toContain("displayName");
   });
 
-  it("keeps the role catalog markup editor without a new 25% engine", () => {
+  it("keeps role catalog free of inline markup editing (Preisregeln is central)", () => {
     const catalog = readSource("src/pages/admin/AdminRoleCatalog.tsx");
     expect(catalog).toContain("upsertCustomerRole");
-    expect(catalog).toContain("Aufschlag %");
-    expect(catalog).not.toMatch(/price \* 1\.25|0\.25/);
+    expect(catalog).not.toContain("Aufschlag %");
+    expect(catalog).toContain("/admin/pricing-rules");
     expect(readSource("src/pages/admin/AdminUsers.tsx")).not.toMatch(/price \* 1\.25/);
   });
 });

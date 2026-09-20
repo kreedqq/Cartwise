@@ -1,5 +1,5 @@
 ﻿import * as React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
@@ -29,10 +29,6 @@ import {
   effectiveAreaPriceUsd,
   shopAreaCatalogUnit,
 } from "@/lib/shop/shopAreaPricing";
-import {
-  applyAreaRoleSellUnit,
-  roleMarkupPercentToSellFactorPct,
-} from "@/lib/shop/shopAreaRolePricing";
 import {
   DEFAULT_BASE_PRICE_FACTOR_PCT,
   formatShopAreaLabel,
@@ -66,14 +62,12 @@ import {
   listAdminShopAreaProductPrices,
   listAdminShopAreaProducts,
   listAdminShopAreaRoleAccess,
-  listAdminShopAreaRoleSellFactors,
   listAdminShopAreas,
   renameAdminShopAreaCategory,
   reorderAdminShopAreaCategories,
   setAdminShopAreaCategoryActive,
   setAdminShopAreaManualPrice,
   setAdminShopAreaProductCategory,
-  saveAdminShopAreaRoleSellFactors,
   setAdminShopAreaRoles,
   signedAdminShopAreaDocumentUrl,
   updateAdminShopArea,
@@ -371,24 +365,7 @@ function AreaSettingsCard({
 }) {
   const [factor, setFactor] = React.useState(area.base_price_factor_pct ?? DEFAULT_BASE_PRICE_FACTOR_PCT);
   const [roleIds, setRoleIds] = React.useState(assignedRoleIds);
-  const [roleFactorDraft, setRoleFactorDraft] = React.useState<Record<string, string> | null>(null);
   const [saving, setSaving] = React.useState(false);
-
-  const sellFactorsQuery = useQuery({
-    queryKey: QUERY_KEYS.adminShopAreaConfig(areaKey).concat("role-sell-factors"),
-    queryFn: () => listAdminShopAreaRoleSellFactors(areaKey),
-  });
-
-  const savedRoleFactorInputs = React.useMemo(() => {
-    const next: Record<string, string> = {};
-    for (const role of roles) {
-      const row = sellFactorsQuery.data?.find((entry) => entry.role_id === role.id);
-      next[role.id] = row != null ? String(row.sell_factor_pct) : "";
-    }
-    return next;
-  }, [roles, sellFactorsQuery.data]);
-
-  const roleFactorInputs = roleFactorDraft ?? savedRoleFactorInputs;
 
   const safeFactor = Number.isFinite(factor) && factor > 0 ? factor : DEFAULT_BASE_PRICE_FACTOR_PCT;
   const sampleVendorUsd = 100;
@@ -400,43 +377,18 @@ function AreaSettingsCard({
     safeFactor,
   );
 
-  function parseExplicitSellFactor(roleId: string): number | null {
-    const raw = roleFactorInputs[roleId]?.trim();
-    if (!raw) return null;
-    const value = Number(raw.replace(",", "."));
-    if (!Number.isFinite(value) || value <= 0) return null;
-    return value;
-  }
-
   async function save() {
     const value = Number(factor);
     if (!Number.isFinite(value) || value <= 0) {
       toast.error("Bereichsgrundpreis muss eine positive Zahl sein.");
       return;
     }
-    const entries: { roleId: string; sellFactorPct: number | null }[] = [];
-    for (const role of roles) {
-      const raw = roleFactorInputs[role.id]?.trim();
-      if (!raw) {
-        entries.push({ roleId: role.id, sellFactorPct: null });
-        continue;
-      }
-      const parsed = Number(raw.replace(",", "."));
-      if (!Number.isFinite(parsed) || parsed <= 0) {
-        toast.error(`Ungültiger Bereichspreis für Rolle „${role.name}“ (muss > 0 % sein).`);
-        return;
-      }
-      entries.push({ roleId: role.id, sellFactorPct: parsed });
-    }
     setSaving(true);
     try {
       await updateAdminShopArea(areaKey, { base_price_factor_pct: value, pricing_profile: profile });
       await setAdminShopAreaRoles(areaKey, roleIds);
-      await saveAdminShopAreaRoleSellFactors(areaKey, entries);
-      setRoleFactorDraft(null);
       toast.success(`${formatShopAreaLabel(areaKey)} gespeichert.`);
       await onChanged();
-      await sellFactorsQuery.refetch();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Einstellungen konnten nicht gespeichert werden.");
     } finally {
@@ -447,10 +399,9 @@ function AreaSettingsCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Preisregeln — {formatShopAreaLabel(areaKey)}</CardTitle>
+        <CardTitle className="text-base">Bereichspreise — {formatShopAreaLabel(areaKey)}</CardTitle>
         <CardDescription>
-          Bereichsgrundpreis und optionaler Verkaufsfaktor pro Rolle auf dem Bereichskatalogpreis. Leer = globale
-          Rollenaufschläge (Admin → Benutzer &amp; Rollen).
+          Bereichsgrundpreis und Sichtbarkeit. Rollenpreise werden zentral unter Kunden → Preisregeln verwaltet.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -475,100 +426,14 @@ function AreaSettingsCard({
           </p>
         </div>
 
-        <div className="space-y-3">
-          <div>
-            <p className="text-sm font-medium">Rollenpreise</p>
-            <p className="text-xs text-muted-foreground">
-              Faktor auf Bereichskatalog ({formatUsd(catalogAfterArea)} bei {formatUsd(sampleVendorUsd)} Händlerpreis).
-            </p>
-          </div>
-
-          {sellFactorsQuery.isLoading ? <Skeleton className="h-32 w-full" /> : null}
-          {sellFactorsQuery.isError ? (
-            <ErrorState
-              message="Rollenpreise konnten nicht geladen werden."
-              onRetry={() => void sellFactorsQuery.refetch()}
-            />
-          ) : null}
-
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Rolle</TableHead>
-                  <TableHead className="min-w-[8rem]">Bereichspreis</TableHead>
-                  <TableHead className="min-w-[8rem]">Vorschau</TableHead>
-                  <TableHead className="hidden md:table-cell">Regel</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {roles.map((role) => {
-                  const explicit = parseExplicitSellFactor(role.id);
-                  const previewUsd = applyAreaRoleSellUnit(
-                    catalogAfterArea,
-                    explicit,
-                    role.markup_percent,
-                  );
-                  const globalFactor = roleMarkupPercentToSellFactorPct(role.markup_percent);
-                  return (
-                    <TableRow key={role.id}>
-                      <TableCell className="font-medium">{role.name}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Input
-                            type="number"
-                            min={0.01}
-                            step={0.01}
-                            placeholder="—"
-                            className="h-8 w-24"
-                            value={roleFactorInputs[role.id] ?? ""}
-                            onChange={(event) =>
-                              setRoleFactorDraft((current) => ({
-                                ...(current ?? savedRoleFactorInputs),
-                                [role.id]: event.target.value,
-                              }))
-                            }
-                            aria-label={`Bereichspreis Faktor für ${role.name}`}
-                          />
-                          <span className="text-xs text-muted-foreground">%</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm tabular-nums">{formatUsd(previewUsd)}</TableCell>
-                      <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
-                        {explicit != null ? (
-                          <span>Expliziter Bereichspreis</span>
-                        ) : (
-                          <span>
-                            Globale Rollenregel ({role.markup_percent} % → {globalFactor.toFixed(0)} %)
-                          </span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-
-        <div className="space-y-2 rounded-lg border border-border p-3 text-sm">
-          <p className="font-medium">Vorschau (Bereichskatalog {formatUsd(catalogAfterArea)})</p>
-          <ul className="space-y-1 text-muted-foreground">
-            {roles.map((role) => {
-              const explicit = parseExplicitSellFactor(role.id);
-              const previewUsd = applyAreaRoleSellUnit(catalogAfterArea, explicit, role.markup_percent);
-              const label =
-                explicit != null
-                  ? `${explicit} %`
-                  : `${roleMarkupPercentToSellFactorPct(role.markup_percent).toFixed(0)} % (global)`;
-              return (
-                <li key={role.id}>
-                  <span className="text-foreground">{role.name}</span>: {label} →{" "}
-                  <span className="tabular-nums text-foreground">{formatUsd(previewUsd)}</span>
-                </li>
-              );
-            })}
-          </ul>
+        <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm">
+          <p className="text-muted-foreground">
+            Rollenpreise (globaler Aufschlag und bereichsspezifische Faktoren) werden zentral unter{" "}
+            <span className="font-medium text-foreground">Kunden → Preisregeln</span> verwaltet.
+          </p>
+          <Button type="button" variant="outline" size="sm" className="mt-3" asChild>
+            <Link to={`/admin/pricing-rules?area=${areaKey}`}>Preisregeln öffnen</Link>
+          </Button>
         </div>
 
         <div className="space-y-2">

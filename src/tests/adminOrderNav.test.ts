@@ -90,6 +90,7 @@ describe("hub admin navigation", () => {
       "Kit Gesuche",
       "Bestellzusammenfassung",
       "Versand",
+      "Aufschlags-Auswertung",
     ]);
     expect(orders?.items.map((item) => item.to)).toContain("/admin/kit-requests");
 
@@ -105,11 +106,7 @@ describe("hub admin navigation", () => {
     ]);
 
     const customers = ADMIN_NAV_GROUPS.find((group) => group.id === "customers");
-    expect(customers?.items.map((item) => item.label)).toEqual([
-      "Benutzer",
-      "Rollen",
-      "Rollenaufschläge",
-    ]);
+    expect(customers?.items.map((item) => item.label)).toEqual(["Benutzer", "Rollen", "Preisregeln"]);
 
     const system = ADMIN_NAV_GROUPS.find((group) => group.id === "system");
     expect(system?.items.map((item) => item.label)).toEqual([

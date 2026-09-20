@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,6 @@ export function AdminRoleCatalog() {
   const areas = areasQuery.data ?? [];
 
   const [name, setName] = React.useState("");
-  const [markup, setMarkup] = React.useState("25");
   const [active, setActive] = React.useState(true);
   const [canUseKitRequests, setCanUseKitRequests] = React.useState(false);
   const [editingId, setEditingId] = React.useState<string | null>(null);
@@ -36,7 +36,6 @@ export function AdminRoleCatalog() {
 
   function resetForm() {
     setName("");
-    setMarkup("25");
     setActive(true);
     setCanUseKitRequests(false);
     setEditingId(null);
@@ -44,11 +43,12 @@ export function AdminRoleCatalog() {
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    const markupPercent = Number(markup.replace(",", "."));
-    if (!name.trim() || !Number.isFinite(markupPercent)) {
-      toast.error("Bitte Name und einen gültigen Aufschlag in % angeben.");
+    if (!name.trim()) {
+      toast.error("Bitte einen Rollennamen angeben.");
       return;
     }
+    const existing = editingId ? roles.find((role) => role.id === editingId) : null;
+    const markupPercent = existing != null ? Number(existing.markup_percent) : 0;
     setSaving(true);
     try {
       await upsertCustomerRole({
@@ -89,7 +89,11 @@ export function AdminRoleCatalog() {
         <CardHeader>
           <CardTitle className="text-base">{editingId ? "Rolle bearbeiten" : "Neue Rolle"}</CardTitle>
           <CardDescription>
-            Aufschlag gilt automatisch für Shop, Warenkorb und neue Bestellungen – ohne Codeänderung.
+            Rollenattribute und Kit-Berechtigung. Preisregeln (Aufschläge) legst du unter{" "}
+            <Link to="/admin/pricing-rules" className="font-medium text-primary underline-offset-2 hover:underline">
+              Preisregeln
+            </Link>{" "}
+            fest.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -97,10 +101,6 @@ export function AdminRoleCatalog() {
             <div className="space-y-1">
               <Label htmlFor="role-name">Rollenname</Label>
               <Input id="role-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="z. B. VIP" />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="role-markup">Aufschlag %</Label>
-              <Input id="role-markup" value={markup} onChange={(e) => setMarkup(e.target.value)} className="w-28" />
             </div>
             <div className="flex items-center gap-2 pb-2">
               <Checkbox id="role-active" checked={active} onCheckedChange={(v) => setActive(v === true)} />
@@ -135,7 +135,6 @@ export function AdminRoleCatalog() {
           <TableHeader>
             <TableRow>
               <TableHead>Rolle</TableHead>
-              <TableHead>Aufschlag</TableHead>
               <TableHead>Kit Gesuche</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Aktionen</TableHead>
@@ -152,7 +151,6 @@ export function AdminRoleCatalog() {
                     </Badge>
                   )}
                 </TableCell>
-                <TableCell className="tabular-nums">{Number(role.markup_percent)} %</TableCell>
                 <TableCell>{role.can_use_kit_requests ? "Erlaubt" : "Nicht erlaubt"}</TableCell>
                 <TableCell>{role.is_active ? "Aktiv" : "Inaktiv"}</TableCell>
                 <TableCell className="text-right">
@@ -163,7 +161,6 @@ export function AdminRoleCatalog() {
                     onClick={() => {
                       setEditingId(role.id);
                       setName(role.name);
-                      setMarkup(String(role.markup_percent));
                       setActive(role.is_active);
                       setCanUseKitRequests(role.can_use_kit_requests === true);
                     }}

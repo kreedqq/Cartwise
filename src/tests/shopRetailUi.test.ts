@@ -116,9 +116,9 @@ describe("admin Verkaufsbereiche", () => {
     expect(page).toContain("Kategorien");
     expect(page).toContain("Excel-Preise erzwingen");
     expect(page).toContain("Override entfernen");
-    expect(page).toContain("Preisregeln");
-    expect(page).toContain("Rollenpreise");
-    expect(page).toContain("saveAdminShopAreaRoleSellFactors");
+    expect(page).toContain("Bereichspreise");
+    expect(page).toContain("/admin/pricing-rules");
+    expect(page).not.toContain("saveAdminShopAreaRoleSellFactors");
     expect(page).toContain("base_price_factor_pct");
     expect(page).toContain("updateAdminShopArea");
     expect(page).not.toContain("uploadAdminShopAreaDocument");

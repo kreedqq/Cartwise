@@ -75,6 +75,11 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         label: "Versand",
         description: "Versandkosten und Verteilung.",
       },
+      {
+        to: "/admin/surcharges",
+        label: "Aufschlags-Auswertung",
+        description: "Rollenaufschläge aus Bestell-Snapshots (Reporting).",
+      },
     ],
   },
   {
@@ -148,6 +153,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     match: (pathname) =>
       pathname.startsWith("/admin/users") ||
       pathname.startsWith("/admin/roles") ||
+      pathname.startsWith("/admin/pricing-rules") ||
       pathname.startsWith("/admin/surcharges"),
     items: [
       {
@@ -159,12 +165,13 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       {
         to: "/admin/users#rollen",
         label: "Rollen",
-        description: "Kundenrollen.",
+        description: "Kundenrollen anlegen und Bereichszugriff.",
       },
       {
-        to: "/admin/surcharges",
-        label: "Rollenaufschläge",
-        description: "Aufschläge aus Bestell-Snapshots.",
+        to: "/admin/pricing-rules",
+        label: "Preisregeln",
+        matchPrefix: true,
+        description: "Globale Rollenpreise und Bereichs-Rollenfaktoren.",
       },
     ],
   },
