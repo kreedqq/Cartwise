@@ -82,6 +82,35 @@ export function isOnline(): boolean {
   return typeof navigator === "undefined" ? true : navigator.onLine;
 }
 
+/** Safe user-facing message from Supabase/PostgREST errors (plain objects, not Error subclasses). */
+export function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string" && message.trim()) {
+      return message;
+    }
+  }
+  return fallback;
+}
+
+/** Log RPC failures for debugging (console only; never show raw details in UI). */
+export function logSupabaseRpcError(context: string, error: unknown): void {
+  if (error && typeof error === "object") {
+    const err = error as { code?: string; message?: string; details?: string; hint?: string };
+    console.error(context, {
+      code: err.code,
+      message: err.message,
+      details: err.details,
+      hint: err.hint,
+    });
+    return;
+  }
+  console.error(context, error);
+}
+
 export class ConcurrencyError extends Error {
   constructor(message = "Diese Position wurde zwischenzeitlich von jemand anderem geändert.") {
     super(message);

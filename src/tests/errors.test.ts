@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { ConcurrencyError, isSupabaseSessionError, toAppError } from "@/lib/errors";
+import {
+  ConcurrencyError,
+  getErrorMessage,
+  isSupabaseSessionError,
+  toAppError,
+} from "@/lib/errors";
 
 describe("toAppError", () => {
   it("maps a Postgres unique-violation code to a helpful German message", () => {
@@ -38,6 +43,23 @@ describe("isSupabaseSessionError", () => {
   it("does not treat a missing username or generic profile error as a session failure", () => {
     expect(isSupabaseSessionError({ message: "username is required" })).toBe(false);
     expect(isSupabaseSessionError({ message: "could not load profile session cache" })).toBe(false);
+  });
+});
+
+describe("getErrorMessage", () => {
+  it("reads message from PostgREST-style plain objects", () => {
+    expect(
+      getErrorMessage(
+        { code: "P0001", message: "Bestellte Warenkörbe können nicht gelöscht werden." },
+        "fallback",
+      ),
+    ).toBe("Bestellte Warenkörbe können nicht gelöscht werden.");
+  });
+
+  it("uses fallback for unknown shapes", () => {
+    expect(getErrorMessage(null, "Die Warenkörbe konnten nicht gelöscht werden.")).toBe(
+      "Die Warenkörbe konnten nicht gelöscht werden.",
+    );
   });
 });
 

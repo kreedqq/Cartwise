@@ -25,6 +25,12 @@ describe("migration 0107 admin carts and global sync", () => {
     expect(sql).toContain("admin_delete_carts");
   });
 
+  it("0118 fixes delete for checked-out carts with leftover open lines", () => {
+    const sql = read("supabase/migrations/0118_fix_admin_delete_carts_ordered.sql");
+    expect(sql).not.toContain("status = 'ordered'");
+    expect(sql).toContain("kit.skip_cart_removal_tracking");
+  });
+
   it("orchestrates global sync without mass delete", () => {
     expect(sql).toContain("admin_sync_orders_and_carts");
     expect(sql).toContain("admin_refresh_open_cart_prices");

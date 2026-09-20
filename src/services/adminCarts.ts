@@ -1,3 +1,4 @@
+import { logSupabaseRpcError } from "@/lib/errors";
 import { supabase } from "@/lib/supabaseClient";
 import type { Tables } from "@/types/database";
 
@@ -156,7 +157,10 @@ export interface AdminDeleteCartsResult {
 
 export async function adminDeleteCarts(cartIds: string[]): Promise<AdminDeleteCartsResult> {
   const { data, error } = await supabase.rpc("admin_delete_carts", { _cart_ids: cartIds });
-  if (error) throw error;
+  if (error) {
+    logSupabaseRpcError("[admin_delete_carts]", error);
+    throw error;
+  }
   const payload = data as { deletedCount?: number; cartIds?: string[] };
   return {
     deletedCount: payload.deletedCount ?? cartIds.length,

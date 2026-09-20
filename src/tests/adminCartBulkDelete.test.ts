@@ -15,8 +15,8 @@ function read(path: string): string {
   return readFileSync(resolve(process.cwd(), path), "utf8");
 }
 
-describe("migration 0117 admin_delete_carts", () => {
-  const sql = read("supabase/migrations/0117_admin_delete_carts.sql");
+describe("migration 0118 admin_delete_carts fix", () => {
+  const sql = read("supabase/migrations/0118_fix_admin_delete_carts_ordered.sql");
 
   it("requires admin and deletes atomically", () => {
     expect(sql).toContain("admin_delete_carts");
@@ -24,6 +24,7 @@ describe("migration 0117 admin_delete_carts", () => {
     expect(sql).toContain("security definer");
     expect(sql).toContain("set search_path = public");
     expect(sql).toContain("kit.skip_customer_lock");
+    expect(sql).toContain("kit.skip_cart_removal_tracking");
     expect(sql).toContain("admin.carts.bulk_delete");
     expect(sql).toContain("log_audit");
     expect(sql).not.toMatch(/delete from public\.orders/i);
@@ -31,7 +32,8 @@ describe("migration 0117 admin_delete_carts", () => {
     expect(sql).not.toMatch(/delete from public\.kit_shares/i);
   });
 
-  it("soft-deletes carts and removes only open cart items", () => {
+  it("allows leftover open lines on checked-out carts (no ordered status block)", () => {
+    expect(sql).not.toContain("status = 'ordered'");
     expect(sql).toContain("submitted_order_id is null");
     expect(sql).toContain("deleted_at = now()");
     expect(sql).toContain("is_active_cart = false");

@@ -33,6 +33,7 @@ import {
   selectAllVisibleIds,
   toggleIdSet,
 } from "@/lib/admin/adminCartBulkDelete";
+import { getErrorMessage } from "@/lib/errors";
 import { formatDateTime, formatUsd } from "@/lib/money";
 import { formatShopAreaLabel } from "@/lib/shop/shopAreas";
 import { listAdminShopAreas } from "@/services/shopAreas";
@@ -60,10 +61,6 @@ export default function AdminCartsPage() {
   const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
   const someVisibleSelected = visibleIds.some((id) => selectedIds.has(id));
 
-  React.useEffect(() => {
-    setSelectedIds(new Set());
-  }, [shopArea, search]);
-
   function toggleRow(cartId: string, checked: boolean) {
     setSelectedIds((prev) => toggleIdSet(prev, cartId, checked));
   }
@@ -82,7 +79,7 @@ export default function AdminCartsPage() {
       setConfirmOpen(false);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Die Warenkörbe konnten nicht gelöscht werden.",
+        getErrorMessage(error, "Die Warenkörbe konnten nicht gelöscht werden."),
       );
     }
   }
@@ -99,14 +96,23 @@ export default function AdminCartsPage() {
         <Input
           placeholder="Kunde oder Warenkorb …"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setSelectedIds(new Set());
+          }}
           className="max-w-xs"
         />
         <div className="space-y-1">
           <Label id="admin-carts-area-label" htmlFor="admin-carts-area" className="sr-only">
             Shop-Bereich
           </Label>
-          <Select value={shopArea} onValueChange={setShopArea}>
+          <Select
+            value={shopArea}
+            onValueChange={(value) => {
+              setShopArea(value);
+              setSelectedIds(new Set());
+            }}
+          >
             <SelectTrigger id="admin-carts-area" className="w-[220px]" aria-labelledby="admin-carts-area-label">
               <SelectValue placeholder="Shop-Bereich" />
             </SelectTrigger>
