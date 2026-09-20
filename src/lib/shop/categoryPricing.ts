@@ -4,6 +4,9 @@ import type { ShopPricingProfile } from "@/lib/shop/shopAreas";
 /** Stable area category key for Zubehör (PenBuddy area). */
 export const ACCESSORIES_AREA_CATEGORY_KEY = "accessories";
 
+/** Legacy/production PenBuddy area category key (same pricing unit as accessories). */
+export const ZUBEHOR_AREA_CATEGORY_KEY = "zubehoer";
+
 export interface CategoryPricingProductRef {
   category?: string | null;
   name?: string | null;
@@ -16,7 +19,8 @@ export function normalizeAreaCategoryKey(value: string): string {
 
 export function isAccessoriesAreaCategory(categoryKey: string | null | undefined): boolean {
   if (!categoryKey?.trim()) return false;
-  return normalizeAreaCategoryKey(categoryKey) === ACCESSORIES_AREA_CATEGORY_KEY;
+  const key = normalizeAreaCategoryKey(categoryKey);
+  return key === ACCESSORIES_AREA_CATEGORY_KEY || key === ZUBEHOR_AREA_CATEGORY_KEY;
 }
 
 function productCategoryNormalized(product: CategoryPricingProductRef | undefined): string {
@@ -32,7 +36,7 @@ export function productUsesKitUnitPricingFromProduct(
   product: CategoryPricingProductRef | undefined,
 ): boolean {
   const cat = productCategoryNormalized(product);
-  if (cat.includes("accessor")) return false;
+  if (cat.includes("accessor") || cat.includes("zubehoer")) return false;
   if (cat.includes("oral")) return false;
   if (cat.includes("oil") || cat.includes("inject")) return false;
   const categoryId = shopCategoryIdFor(product ?? {});

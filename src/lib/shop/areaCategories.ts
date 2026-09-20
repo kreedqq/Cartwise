@@ -50,6 +50,7 @@ const FILE_ALIASES: Record<string, readonly string[]> = {
     "bac water",
   ],
   accessories: ["accessories", "accessory", "zubehoer", "zubehör"],
+  zubehoer: ["zubehoer", "zubehör", "accessories", "accessory"],
 };
 
 function normalizeCategoryToken(value: string): string {

@@ -23,6 +23,7 @@ const ORAL = { price_usd: 50, category: "Orals", name: "Tabs", code: "OR1" };
 describe("accessories unit pricing", () => {
   it("classifies accessories as non-kit by area category and product category", () => {
     expect(usesKitUnitPricingForAreaCategory("accessories", ACCESSORY)).toBe(false);
+    expect(usesKitUnitPricingForAreaCategory("zubehoer", ACCESSORY)).toBe(false);
     expect(productUsesKitUnitPricingFromProduct(ACCESSORY)).toBe(false);
     expect(productUsesKitUnitPricing(ACCESSORY)).toBe(false);
   });
@@ -71,6 +72,7 @@ describe("accessories unit pricing", () => {
 
   it("admin basis label shows Stückpreis for accessories", () => {
     expect(adminAreaCatalogPriceBasisLabel("retail", "accessories", ACCESSORY)).toBe("Stückpreis");
+    expect(adminAreaCatalogPriceBasisLabel("retail", "zubehoer", ACCESSORY)).toBe("Stückpreis");
     expect(adminAreaCatalogPriceBasisLabel("retail", "peptides", PEPTIDE)).toBe("Kit-/10er-Grundpreis");
   });
 
