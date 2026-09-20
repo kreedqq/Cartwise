@@ -190,6 +190,29 @@ describe("shop area product config SQL", () => {
   });
 });
 
+describe("shop area role sell factors SQL (migration 0114)", () => {
+  const sql = read("supabase/migrations/0114_shop_area_role_sell_factors.sql");
+
+  it("stores explicit sell_factor_pct per area and role", () => {
+    expect(sql).toMatch(/create table if not exists public\.shop_area_role_sell_factors/);
+    expect(sql).toMatch(/primary key \(shop_area_key, role_id\)/);
+    expect(sql).toMatch(/sell_factor_pct > 0/);
+  });
+
+  it("extends markup_percent_for_area without double apply_role_markup", () => {
+    expect(sql).toMatch(/shop_area_role_sell_factor_pct/);
+    expect(sql).toMatch(/create or replace function public\.markup_percent_for_area/);
+    expect(sql).toMatch(/markup_percent_for\(_user_id\)/);
+    expect(sql).not.toMatch(/apply_role_markup\(\s*public\.apply_role_markup/);
+  });
+
+  it("does not backfill orders or reset existing areas", () => {
+    expect(sql).not.toMatch(/update public\.orders/i);
+    expect(sql).not.toMatch(/update public\.order_items/i);
+    expect(sql).not.toMatch(/truncate/i);
+  });
+});
+
 describe("global role markup SQL (migration 0053)", () => {
   const sql = read("supabase/migrations/0053_global_role_markup.sql");
 

@@ -601,6 +601,22 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["shop_area_role_access"]["Row"]>;
         Relationships: never[];
       };
+      shop_area_role_sell_factors: {
+        Row: {
+          shop_area_key: string;
+          role_id: string;
+          sell_factor_pct: number;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["shop_area_role_sell_factors"]["Row"]> & {
+          shop_area_key: string;
+          role_id: string;
+          sell_factor_pct: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["shop_area_role_sell_factors"]["Row"]>;
+        Relationships: never[];
+      };
       shop_area_products: {
         Row: {
           shop_area_key: string;

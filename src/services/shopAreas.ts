@@ -158,6 +158,41 @@ export async function setAdminShopAreaRoles(shopAreaKey: ShopAreaKey, roleIds: s
   if (error) throw error;
 }
 
+export async function listAdminShopAreaRoleSellFactors(shopAreaKey: ShopAreaKey) {
+  const { data, error } = await supabase
+    .from("shop_area_role_sell_factors")
+    .select("*")
+    .eq("shop_area_key", shopAreaKey);
+  if (error) throw error;
+  return data ?? [];
+}
+
+/** null sellFactorPct removes an explicit area rule (global role markup applies). */
+export async function saveAdminShopAreaRoleSellFactors(
+  shopAreaKey: ShopAreaKey,
+  entries: readonly { roleId: string; sellFactorPct: number | null }[],
+): Promise<void> {
+  const explicit = entries.filter(
+    (entry): entry is { roleId: string; sellFactorPct: number } =>
+      entry.sellFactorPct != null && Number.isFinite(entry.sellFactorPct) && entry.sellFactorPct > 0,
+  );
+  const { error: delError } = await supabase
+    .from("shop_area_role_sell_factors")
+    .delete()
+    .eq("shop_area_key", shopAreaKey);
+  if (delError) throw delError;
+  if (explicit.length === 0) return;
+  const { error } = await supabase.from("shop_area_role_sell_factors").insert(
+    explicit.map((entry) => ({
+      shop_area_key: shopAreaKey,
+      role_id: entry.roleId,
+      sell_factor_pct: entry.sellFactorPct,
+      updated_at: new Date().toISOString(),
+    })),
+  );
+  if (error) throw error;
+}
+
 export async function setAdminRoleShopAreas(roleId: string, areaKeys: ShopAreaKey[]): Promise<void> {
   const { error: delError } = await supabase.from("shop_area_role_access").delete().eq("role_id", roleId);
   if (delError) throw delError;
