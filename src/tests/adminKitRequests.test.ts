@@ -109,6 +109,19 @@ describe("0087 admin kit distribution", () => {
     expect(read("src/hooks/useAdminKitRequests.ts")).toContain("useAdminSetKitRequestDistribution");
   });
 
+  it("0123 allows admin distribution on full kits and syncs remaining carts when reopening", () => {
+    const sql = read("supabase/migrations/0123_admin_edit_full_kit_requests.sql");
+    expect(sql).toContain("canEditDistribution");
+    expect(sql).toContain("_kit.status in ('open', 'full')");
+    expect(sql).toContain("kit_request.admin_participant_removed");
+    expect(sql).toContain("kit_share_sync_participant_cart(_kit.id, _remaining.user_id)");
+    expect(sql).not.toMatch(/delete from public\.cart_items ci[\s\S]*where ci\.kit_share_id = _kit\.id[\s\S]*and ci\.submitted_order_id is null[\s\S]*and c\.deleted_at is null;\s*end if;/);
+    const detail = read("src/pages/admin/AdminKitRequestDetail.tsx");
+    expect(detail).toContain("Teilnehmer entfernen");
+    expect(detail).toContain("Teilnehmer entfernen?");
+    expect(detail).toContain("onRemoveParticipant");
+  });
+
   it("documents redistribution scenarios as capacity sums", () => {
     // A5 B3 C2 -> A3 B3 C2 D2
     expect(3 + 3 + 2 + 2).toBe(10);

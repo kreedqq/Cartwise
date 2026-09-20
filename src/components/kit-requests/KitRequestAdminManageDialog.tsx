@@ -86,10 +86,30 @@ export function KitRequestAdminManageDialog({
                       allocations: rows.map((r) => ({ userId: r.userId, quantity: r.quantity })),
                     });
                     toast.success("Verteilung gespeichert.");
+                    await detailQuery.refetch();
                   } catch (error) {
                     toast.error(
                       error instanceof Error ? error.message : "Verteilung konnte nicht gespeichert werden.",
                     );
+                  }
+                }}
+                onRemoveParticipant={async (_target, remaining) => {
+                  if (remaining.length === 0) {
+                    toast.error("Mindestens ein Teilnehmer muss verbleiben.");
+                    throw new Error("empty distribution");
+                  }
+                  try {
+                    await distributionMutation.mutateAsync({
+                      id: detail.id,
+                      allocations: remaining.map((r) => ({ userId: r.userId, quantity: r.quantity })),
+                    });
+                    toast.success("Teilnehmer entfernt.");
+                    await detailQuery.refetch();
+                  } catch (error) {
+                    toast.error(
+                      error instanceof Error ? error.message : "Teilnehmer konnte nicht entfernt werden.",
+                    );
+                    throw error;
                   }
                 }}
               />

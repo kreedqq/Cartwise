@@ -157,15 +157,18 @@ export function KitRequestDistributionEditor({
   detail,
   saving,
   onSave,
+  onRemoveParticipant,
 }: {
   detail: AdminKitRequestDetail;
   saving: boolean;
   onSave: (rows: DraftRow[]) => Promise<void>;
+  onRemoveParticipant: (row: DraftRow, remainingRows: DraftRow[]) => Promise<void>;
 }) {
   const [rows, setRows] = React.useState<DraftRow[]>(() => rowsFromDetail(detail));
   const [search, setSearch] = React.useState("");
   const [addQty, setAddQty] = React.useState("1");
   const [showAdd, setShowAdd] = React.useState(false);
+  const [removeTarget, setRemoveTarget] = React.useState<DraftRow | null>(null);
   const searchQuery = useAdminSearchKitRequestUsers(search, showAdd);
 
   const draftTotal = rows.reduce((sum, row) => sum + (Number.isInteger(row.quantity) ? row.quantity : 0), 0);
@@ -200,10 +203,6 @@ export function KitRequestDistributionEditor({
           : row,
       ),
     );
-  }
-
-  function removeRow(userId: string) {
-    setRows((prev) => prev.filter((row) => row.userId !== userId));
   }
 
   function addUser(hit: { userId: string; username: string }) {
@@ -267,13 +266,58 @@ export function KitRequestDistributionEditor({
               disabled={!detail.canEditDistribution}
             />
             {detail.canEditDistribution ? (
-              <Button type="button" size="sm" variant="ghost" onClick={() => removeRow(row.userId)}>
-                Entfernen
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => setRemoveTarget(row)}
+                disabled={saving}
+              >
+                Teilnehmer entfernen
               </Button>
             ) : null}
           </li>
         ))}
       </ul>
+
+      <ConfirmDialog
+        open={removeTarget != null}
+        onOpenChange={(open) => {
+          if (!open) setRemoveTarget(null);
+        }}
+        title="Teilnehmer entfernen?"
+        description={
+          removeTarget ? (
+            <span className="block space-y-2 text-sm text-muted-foreground">
+              <span className="block">
+                Der Anteil von {creatorHandle(removeTarget.username)} beträgt{" "}
+                <strong className="text-foreground">
+                  {removeTarget.quantity}/{detail.kitSizeVials} Kit
+                </strong>
+                .
+              </span>
+              <span className="block">
+                Der Anteil wird aus dem offenen Warenkorb des Kunden entfernt und die{" "}
+                {removeTarget.quantity} Plätze werden im Kit Gesuch wieder freigegeben.
+              </span>
+              <span className="block">
+                Das Kit Gesuch wird anschließend wieder für andere Teilnehmer geöffnet.
+              </span>
+            </span>
+          ) : null
+        }
+        confirmLabel="Teilnehmer entfernen"
+        cancelLabel="Abbrechen"
+        variant="destructive"
+        loading={saving}
+        onConfirm={async () => {
+          if (!removeTarget) return;
+          const remaining = rows.filter((row) => row.userId !== removeTarget.userId);
+          await onRemoveParticipant(removeTarget, remaining);
+          setRemoveTarget(null);
+          setRows(remaining);
+        }}
+      />
 
       {detail.canEditDistribution ? (
         <div className="mt-4 space-y-3">
@@ -349,8 +393,13 @@ export function KitRequestDistributionEditor({
         </div>
       ) : (
         <p className="mt-3 text-sm text-muted-foreground">
-          Verteilung kann in diesem Status nicht geändert werden
-          {detail.anyParticipantOrdered ? " (bereits bestellt)." : "."}
+          {detail.status === "ordered" || detail.anyParticipantOrdered
+            ? "Das Kit wurde bereits bestellt und kann nicht mehr geändert werden."
+            : detail.status === "cancelled"
+              ? "Stornierte Kit Gesuche können nicht mehr bearbeitet werden."
+              : detail.status === "expired"
+                ? "Abgelaufene Kit Gesuche können nicht mehr bearbeitet werden."
+                : "Verteilung kann in diesem Status nicht geändert werden."}
         </p>
       )}
     </AdminSection>
@@ -426,6 +475,24 @@ export default function AdminKitRequestDetailPage() {
       await detailQuery.refetch();
     } catch (error) {
       toast.error(adminKitRpcErrorMessage(error, "Verteilung konnte nicht gespeichert werden."));
+    }
+  }
+
+  async function removeParticipant(_target: DraftRow, remaining: DraftRow[]) {
+    if (remaining.length === 0) {
+      toast.error("Mindestens ein Teilnehmer muss im Kit verbleiben oder das Gesuch storniert werden.");
+      throw new Error("empty distribution");
+    }
+    try {
+      await distributionMutation.mutateAsync({
+        id: detail.id,
+        allocations: remaining.map((row) => ({ userId: row.userId, quantity: row.quantity })),
+      });
+      toast.success("Teilnehmer entfernt.");
+      await detailQuery.refetch();
+    } catch (error) {
+      toast.error(adminKitRpcErrorMessage(error, "Teilnehmer konnte nicht entfernt werden."));
+      throw error;
     }
   }
 
@@ -578,6 +645,7 @@ export default function AdminKitRequestDetailPage() {
         detail={detail}
         saving={distributionMutation.isPending}
         onSave={saveDistribution}
+        onRemoveParticipant={removeParticipant}
       />
 
       <AdminSection title="Stammdaten" padded>
