@@ -17,6 +17,7 @@ interface ShopProductGridProps {
   rate: number | null;
   favoriteProductIds: Set<string>;
   categoryId?: ShopCategoryId;
+  areaCategoryKey?: string;
   categoryLabel?: string;
   categoryAssignments?: readonly AreaCategoryAssignment[];
   pricingProfile?: ShopPricingProfile;
@@ -30,6 +31,7 @@ export function ShopProductGrid({
   rate,
   favoriteProductIds,
   categoryId,
+  areaCategoryKey,
   categoryLabel,
   categoryAssignments,
   pricingProfile = "group_buy",
@@ -60,6 +62,7 @@ export function ShopProductGrid({
             favoriteProductIds={favoriteProductIds}
             categoryLabel={categoryLabel}
             categoryId={resolvedCategoryId}
+            areaCategoryKey={areaCategoryKey}
             categoryAssignments={categoryAssignments}
             saleMode={saleMode}
             showKitShare={showKitShare}

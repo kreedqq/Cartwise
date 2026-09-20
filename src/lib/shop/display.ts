@@ -9,6 +9,7 @@ import {
 import { resolveLexiconSlugForShopFamily } from "@/lib/peptide/lexiconV2/pdfResearch/slugMap";
 import { substanceLabelForSlug } from "@/lib/peptide/shopCoverage/formClass";
 import type { ShopCatalogProduct } from "@/lib/peptide/shopCoverage/types";
+import { isAccessoriesAreaCategory } from "@/lib/shop/categoryPricing";
 import { productInShopCategory, shopCategoryIdFor, type ShopCategoryId } from "@/lib/shopCategories";
 import { variantStrengthLabel } from "@/lib/shop/variantCoverage";
 import type { Tables } from "@/types/database";
@@ -20,7 +21,11 @@ export const RETAIL_VIAL_QUANTITY_OPTIONS = [1, 5, 10] as const;
 export function shopQuantityOptions(
   categoryId: ShopCategoryId | null | undefined,
   saleMode: "catalog" | "retail_unit",
+  areaCategoryKey?: string | null,
 ): readonly number[] {
+  if (isAccessoriesAreaCategory(areaCategoryKey)) {
+    return SHOP_QUANTITY_OPTIONS;
+  }
   if (saleMode === "retail_unit" && categoryId !== "orals") {
     return RETAIL_VIAL_QUANTITY_OPTIONS;
   }

@@ -11,6 +11,7 @@ export function useShopProductGroupRow(
   favoriteProductIds: Set<string>,
   saleMode: "catalog" | "retail_unit" = "catalog",
   categoryId?: ShopCategoryId,
+  areaCategoryKey?: string | null,
 ) {
   const defaultProductId = group.variants[0]?.id ?? "";
   const [selectedProductId, setSelectedProductId] = React.useState(defaultProductId);
@@ -23,7 +24,7 @@ export function useShopProductGroupRow(
 
   const isFavorite = favoriteProductIds.has(product.id);
   const qtyCategory = categoryId ?? shopCategoryIdFor(product);
-  const quantityOptions = shopQuantityOptions(qtyCategory, saleMode);
+  const quantityOptions = shopQuantityOptions(qtyCategory, saleMode, areaCategoryKey);
   const row = useShopProductRow(product, rate, isFavorite, quantityOptions);
 
   return {

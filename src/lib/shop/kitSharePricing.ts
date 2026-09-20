@@ -1,5 +1,5 @@
 import { applyRoleMarkup, roundCurrency } from "@/lib/money";
-import { shopCategoryIdFor } from "@/lib/shopCategories";
+import { productUsesKitUnitPricingFromProduct } from "@/lib/shop/categoryPricing";
 
 /** Vials (or water units) covered by one catalog `price_usd` row for peptides / water. */
 export const CATALOG_UNITS_PER_KIT_PRICE = 10;
@@ -15,8 +15,7 @@ export interface KitSharePricedProduct {
 
 /** Peptides and reconstitution water store `price_usd` per 10-vial catalog kit. */
 export function productUsesKitUnitPricing(product: KitSharePricedProduct): boolean {
-  const categoryId = shopCategoryIdFor(product);
-  return categoryId === "peptides" || categoryId === "reconstitution-water";
+  return productUsesKitUnitPricingFromProduct(product);
 }
 
 /** Units encoded in one catalog price row (10 vials for kit-priced products, 1 piece otherwise). */

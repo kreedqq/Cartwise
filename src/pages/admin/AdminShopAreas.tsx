@@ -17,8 +17,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toaster";
 import { MAX_PDF_SIZE_BYTES, QUERY_KEYS } from "@/lib/constants";
 import { formatDateTime, formatUsd } from "@/lib/money";
-import { usesKitNoun } from "@/lib/quantityFormat";
-import { shopCategoryIdFor } from "@/lib/shopCategories";
+import {
+  adminAreaCatalogPriceBasisLabel,
+  usesKitUnitPricingForAreaCategory,
+} from "@/lib/shop/categoryPricing";
 import {
   areaCategorySource,
   effectiveAreaCategoryKey,
@@ -893,11 +895,16 @@ function VendorProductsPanel({
       const price = priceByCode.get(row.vendor_code) ?? (row.product_id ? priceByCode.get(row.product_id) : undefined);
       const imported = price?.imported_price_usd ?? price?.price_usd ?? null;
       const manual = price?.manual_price_usd ?? null;
-      const kitBasis = usesKitNoun(
-        shopCategoryIdFor(product ?? { category: row.imported_category_key, name: row.vendor_name, code: row.vendor_code }),
-      );
       const importedCategory = row.imported_category_key;
       const manualCategory = row.manual_category_key;
+      const effectiveCategory = effectiveAreaCategoryKey(importedCategory, manualCategory);
+      const productRef = product ?? {
+        category: row.imported_category_key,
+        name: row.vendor_name,
+        code: row.vendor_code,
+      };
+      const kitBasis = usesKitUnitPricingForAreaCategory(effectiveCategory, productRef);
+      const priceBasisLabel = adminAreaCatalogPriceBasisLabel(profile, effectiveCategory, productRef);
       return {
         vendorCode: row.vendor_code,
         productId: row.product_id,
@@ -909,9 +916,10 @@ function VendorProductsPanel({
         effective: effectiveAreaPriceUsd(imported, manual),
         source: areaPriceSource(manual),
         kitBasis,
+        priceBasisLabel,
         importedCategory,
         manualCategory,
-        effectiveCategory: effectiveAreaCategoryKey(importedCategory, manualCategory),
+        effectiveCategory,
         categorySource: areaCategorySource(importedCategory, manualCategory),
         masterLinked: Boolean(row.product_id),
       };
@@ -1148,6 +1156,7 @@ function VendorPriceRow({
     effective: number | null;
     source: "manual" | "vendor_file";
     kitBasis: boolean;
+    priceBasisLabel: string;
     importedCategory: string | null;
     manualCategory: string | null;
     effectiveCategory: string | null;
@@ -1237,7 +1246,7 @@ function VendorPriceRow({
         </div>
       </TableCell>
       <TableCell className="text-xs text-muted-foreground">
-        {profile === "retail" && row.kitBasis ? "Kit-/10er-Grundpreis" : "Einzelpreis"}
+        {row.priceBasisLabel}
       </TableCell>
       <TableCell className="text-right">{row.imported == null ? "—" : formatUsd(row.imported)}</TableCell>
       <TableCell>

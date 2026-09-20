@@ -287,6 +287,7 @@ function ShopCatalog({ area }: { area: MyShopArea }) {
           rateLoading={rateQuery.isFetching && rateQuery.data?.rate == null}
           favoriteProductIds={favoriteProductIds}
           categoryId={tableCategoryId}
+          areaCategoryKey={selected.category_key}
           categoryLabel={selected.label}
           categoryAssignments={assignments}
           pricingProfile={area.pricing_profile}

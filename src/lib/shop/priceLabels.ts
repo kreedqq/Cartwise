@@ -1,3 +1,4 @@
+import { isAccessoriesAreaCategory } from "@/lib/shop/categoryPricing";
 import type { ShopCategoryId } from "@/lib/shopCategories";
 import type { ShopPricingProfile } from "@/lib/shop/shopAreas";
 
@@ -46,12 +47,23 @@ const RETAIL_PACK_LABELS: ShopPriceColumnLabels = {
   usesKitPricing: false,
 };
 
+const RETAIL_PIECE_LABELS: ShopPriceColumnLabels = {
+  unitPrice: "Preis / Stück",
+  bulkPrice: "",
+  bulkActive: "",
+  bulkRemaining: () => "",
+  noBulk: "",
+  usesKitPricing: false,
+};
+
 /** Category-aware shop column labels. Default profile is group_buy (existing kit/tier copy). */
 export function shopPriceColumnLabels(
   categoryId: ShopCategoryId,
   profile: ShopPricingProfile = "group_buy",
+  areaCategoryKey?: string | null,
 ): ShopPriceColumnLabels {
   if (profile === "retail") {
+    if (isAccessoriesAreaCategory(areaCategoryKey)) return RETAIL_PIECE_LABELS;
     return categoryId === "orals" ? RETAIL_PACK_LABELS : RETAIL_VIAL_LABELS;
   }
   if (categoryId === "peptides" || categoryId === "reconstitution-water") {

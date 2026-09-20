@@ -30,6 +30,7 @@ interface ShopProductCardProps {
   favoriteProductIds: Set<string>;
   categoryLabel?: string;
   categoryId?: ShopCategoryId;
+  areaCategoryKey?: string;
   categoryAssignments?: readonly AreaCategoryAssignment[];
   saleMode: "catalog" | "retail_unit";
   showKitShare: boolean;
@@ -43,13 +44,21 @@ export function ShopProductCard({
   favoriteProductIds,
   categoryLabel,
   categoryId,
+  areaCategoryKey,
   categoryAssignments,
   saleMode,
   showKitShare,
   onKitShare,
 }: ShopProductCardProps) {
   const isRetail = saleMode === "retail_unit";
-  const row = useShopProductGroupRow(group, rate, favoriteProductIds, saleMode, categoryId);
+  const row = useShopProductGroupRow(
+    group,
+    rate,
+    favoriteProductIds,
+    saleMode,
+    categoryId,
+    areaCategoryKey,
+  );
   const product = row.product;
   const isFavorite = favoriteProductIds.has(product.id);
   const title = isRetail
