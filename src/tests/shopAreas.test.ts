@@ -249,6 +249,18 @@ describe("area-only role pricing SQL (migration 0120)", () => {
   });
 });
 
+describe("cart refresh area role pricing SQL (migration 0122)", () => {
+  const sql = read("supabase/migrations/0122_refresh_cart_area_role_pricing.sql");
+
+  it("reprices each cart line with cart_item_shop_area and area role markup", () => {
+    expect(sql).toMatch(/create or replace function public\.refresh_cart_selling_prices_for_user/);
+    expect(sql).toMatch(/cart_item_shop_area\(_item\.shop_area, _cart_area\)/);
+    expect(sql).toMatch(/markup_percent_for_area\(_user_id, _area, _product\.id\)/);
+    expect(sql).toMatch(/shop_area_sell_unit_price\([^)]*_user_id\)/);
+    expect(sql).not.toMatch(/markup_percent_for\(_user_id\)/);
+  });
+});
+
 describe("global role markup SQL (migration 0053)", () => {
   const sql = read("supabase/migrations/0053_global_role_markup.sql");
 

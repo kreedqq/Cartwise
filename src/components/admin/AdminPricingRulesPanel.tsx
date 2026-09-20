@@ -204,6 +204,7 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
                   <TableHead>Rolle</TableHead>
                   <TableHead className="min-w-[9rem]">Verkaufspreisfaktor</TableHead>
                   <TableHead className="min-w-[8rem]">Vorschau</TableHead>
+                  <TableHead className="min-w-[8rem]">Quelle</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -234,6 +235,9 @@ export function AdminPricingRulesPanel({ initialAreaKey }: { initialAreaKey?: Sh
                         </div>
                       </TableCell>
                       <TableCell className="tabular-nums text-sm">{formatUsd(previewUsd)}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        Bereich {formatShopAreaLabel(areaKey)} · {factor} %
+                      </TableCell>
                     </TableRow>
                   );
                 })}
