@@ -31,6 +31,8 @@ export interface AdminKitRequestListItem {
   orderSyncLabel: string | null;
   orderSyncSyncedCount: number;
   orderSyncParticipantCount: number;
+  canCancel: boolean;
+  canDelete: boolean;
 }
 
 export interface AdminKitRequestParticipant {
@@ -129,6 +131,8 @@ function mapListItem(raw: Record<string, unknown>): AdminKitRequestListItem {
     orderSyncLabel: raw.orderSyncLabel == null ? null : String(raw.orderSyncLabel),
     orderSyncSyncedCount: Number(raw.orderSyncSyncedCount ?? 0),
     orderSyncParticipantCount: Number(raw.orderSyncParticipantCount ?? 0),
+    canCancel: Boolean(raw.canCancel),
+    canDelete: Boolean(raw.canDelete),
   };
 }
 
@@ -293,6 +297,26 @@ export async function adminDeleteKitRequest(id: string): Promise<{ deleted: bool
   if (error) throw error;
   const raw = asRecord(data);
   return { deleted: Boolean(raw.deleted), id: String(raw.id ?? id) };
+}
+
+export async function adminCancelKitRequests(ids: string[]): Promise<{ cancelledCount: number; ids: string[] }> {
+  const { data, error } = await supabase.rpc("admin_cancel_kit_requests", {
+    _kit_share_ids: ids,
+  });
+  if (error) throw error;
+  const raw = asRecord(data);
+  const idList = Array.isArray(raw.ids) ? (raw.ids as unknown[]).map(String) : [];
+  return { cancelledCount: Number(raw.cancelledCount ?? idList.length), ids: idList };
+}
+
+export async function adminDeleteKitRequests(ids: string[]): Promise<{ deletedCount: number; ids: string[] }> {
+  const { data, error } = await supabase.rpc("admin_delete_kit_requests", {
+    _kit_share_ids: ids,
+  });
+  if (error) throw error;
+  const raw = asRecord(data);
+  const idList = Array.isArray(raw.ids) ? (raw.ids as unknown[]).map(String) : [];
+  return { deletedCount: Number(raw.deletedCount ?? idList.length), ids: idList };
 }
 
 export async function adminGetKitReconcileReport(kitShareId: string): Promise<KitReconcileReport> {

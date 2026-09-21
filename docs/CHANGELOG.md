@@ -2,6 +2,26 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-21 (Admin bulk kit request cancel/delete)
+
+### Added
+
+- Migration `0124`: `admin_cancel_kit_requests` / `admin_delete_kit_requests` (atomic, same guards as single admin RPCs); list items expose `canCancel` / `canDelete`.
+- `/admin/kit-requests`: row checkboxes, select-all on current page, bulk toolbar with confirm dialogs.
+
+## 2026-09-20 (Kit sharing semantics + dashboard portals)
+
+### Added
+
+- Migration `0113`: block customer `leave_kit_request` / `cancel_kit_request`; admin uses `admin_cancel_kit_request` / distribution RPCs.
+- Shared-kit display SSoT: `formatKitParticipantShare` (`5/10 Kit Anteil`, oral `Packung Anteil`) in cart, checkout, orders, PDF/CSV paths.
+- `ShopAreaPortalGallery` on dashboard; admin kit management dialog in Group Buy Kit Gesuche.
+- Portal hub sizing fix (`min(100%, 34rem)` + clip) for 1024px horizontal overflow.
+
+### Notes
+
+- Production commit `74a4118`; migration `0113` applied on `cartwise-prod`. Historical orders unchanged (CW-2026-000063 verified).
+
 ## 2026-09-15 (Admin create order for customer)
 
 ### Added

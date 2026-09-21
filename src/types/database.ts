@@ -1738,6 +1738,10 @@ export interface Database {
         Returns: Record<string, unknown>;
       };
       admin_cancel_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
+      admin_cancel_kit_requests: {
+        Args: { _kit_share_ids: string[] };
+        Returns: Record<string, unknown>;
+      };
       admin_set_kit_request_distribution: {
         Args: { _kit_share_id: string; _allocations: unknown };
         Returns: Record<string, unknown>;
@@ -1747,6 +1751,10 @@ export interface Database {
         Returns: Record<string, unknown>;
       };
       admin_delete_kit_request: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
+      admin_delete_kit_requests: {
+        Args: { _kit_share_ids: string[] };
+        Returns: Record<string, unknown>;
+      };
       admin_sync_kit_full_orders: { Args: { _kit_share_id: string }; Returns: Record<string, unknown> };
       admin_apply_order_correction: {
         Args: {

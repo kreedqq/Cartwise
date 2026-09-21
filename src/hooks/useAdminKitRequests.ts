@@ -3,7 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/constants";
 import {
   adminCancelKitRequest,
+  adminCancelKitRequests,
   adminDeleteKitRequest,
+  adminDeleteKitRequests,
   adminGetKitReconcileReport,
   adminGetKitRequest,
   adminListKitRequests,
@@ -120,6 +122,28 @@ export function useAdminDeleteKitRequest() {
     onSuccess: (result) => {
       queryClient.removeQueries({ queryKey: QUERY_KEYS.adminKitRequest(result.id) });
       invalidate({ id: result.id });
+    },
+  });
+}
+
+export function useAdminCancelKitRequests() {
+  const invalidate = useInvalidateAdminKitRequests();
+  return useMutation({
+    mutationFn: adminCancelKitRequests,
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useAdminDeleteKitRequests() {
+  const invalidate = useInvalidateAdminKitRequests();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: adminDeleteKitRequests,
+    onSuccess: (result) => {
+      for (const id of result.ids) {
+        queryClient.removeQueries({ queryKey: QUERY_KEYS.adminKitRequest(id) });
+      }
+      invalidate();
     },
   });
 }

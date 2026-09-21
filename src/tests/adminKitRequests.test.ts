@@ -122,6 +122,32 @@ describe("0087 admin kit distribution", () => {
     expect(detail).toContain("onRemoveParticipant");
   });
 
+  it("0124 adds atomic bulk cancel/delete RPCs and list canCancel/canDelete flags", () => {
+    const sql = read("supabase/migrations/0124_admin_bulk_kit_requests.sql");
+    expect(sql).toContain("create or replace function public.admin_cancel_kit_requests");
+    expect(sql).toContain("create or replace function public.admin_delete_kit_requests");
+    expect(sql).toContain("assert_admin_kit_request");
+    expect(sql).toContain("kit_request.admin_bulk_cancelled");
+    expect(sql).toContain("kit_request.admin_bulk_deleted");
+    expect(sql).toContain("kit_request.admin_cancel");
+    expect(sql).toContain("kit_request.admin_delete");
+    expect(sql).toContain("'canCancel'");
+    expect(sql).toContain("'canDelete'");
+    expect(sql).toContain("ci.submitted_order_id is null");
+    expect(sql).toContain("peptix.allow_kit_request_join");
+    expect(sql).not.toMatch(/grant execute[\s\S]*to anon/);
+    expect(sql).not.toContain("update public.orders");
+    expect(sql).not.toContain("update public.order_items");
+    const listPage = read("src/pages/admin/AdminKitRequests.tsx");
+    expect(listPage).toContain("Gesuche stornieren");
+    expect(listPage).toContain("Gesuche löschen");
+    expect(listPage).toContain("Alle auf dieser Seite auswählen");
+    expect(read("src/services/adminKitRequests.ts")).toContain("admin_cancel_kit_requests");
+    expect(read("src/services/adminKitRequests.ts")).toContain("admin_delete_kit_requests");
+    expect(read("src/hooks/useAdminKitRequests.ts")).toContain("useAdminCancelKitRequests");
+    expect(read("src/hooks/useAdminKitRequests.ts")).toContain("useAdminDeleteKitRequests");
+  });
+
   it("documents redistribution scenarios as capacity sums", () => {
     // A5 B3 C2 -> A3 B3 C2 D2
     expect(3 + 3 + 2 + 2).toBe(10);
