@@ -30,6 +30,14 @@ import {
   adminKitSelectionCanBulkCancel,
   adminKitSelectionCanBulkDelete,
 } from "@/lib/adminKitRequestBulk";
+import {
+  areAllKitRequestsOnPageSelected,
+  areSomeKitRequestsOnPageSelected,
+  kitRequestSelectionCount,
+  kitRequestSelectionIds,
+  toggleAllKitRequestsOnPage,
+  toggleKitRequestInSelection,
+} from "@/lib/adminKitRequestSelection";
 import { kitFullOrderSyncListLabel } from "@/lib/kitFullOrderSync";
 import { kitRequestStatusLabel } from "@/lib/kitRequests";
 import { formatVendorDosageDisplay } from "@/lib/shop/variantCoverage";
@@ -48,6 +56,8 @@ const STATUS_FILTERS: Array<{ id: AdminKitRequestStatusFilter; label: string }> 
   { id: "cancelled", label: "Storniert" },
   { id: "ordered", label: "Bestellt" },
 ];
+
+const SEARCH_DEBOUNCE_MS = 300;
 
 function formatDate(value: string | null): string {
   if (!value) return "—";
@@ -68,95 +78,18 @@ function adminStatusLabel(status: string, remainingVials: number): string {
 
 export default function AdminKitRequestsPage() {
   const [status, setStatus] = React.useState<AdminKitRequestStatusFilter>("all");
-  const [search, setSearch] = React.useState("");
+  const [searchDraft, setSearchDraft] = React.useState("");
+  const [searchApplied, setSearchApplied] = React.useState("");
   const [page, setPage] = React.useState(1);
-  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(() => new Set());
-  const [bulkCancelOpen, setBulkCancelOpen] = React.useState(false);
-  const [bulkDeleteOpen, setBulkDeleteOpen] = React.useState(false);
 
-  const listQuery = useAdminKitRequests({ status, shopArea: null, search, page });
-  const cancelBulk = useAdminCancelKitRequests();
-  const deleteBulk = useAdminDeleteKitRequests();
-  const totalPages = Math.max(1, Math.ceil((listQuery.data?.total ?? 0) / 30));
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setSearchApplied(searchDraft.trim());
+    }, SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(timer);
+  }, [searchDraft]);
 
-  const visibleItems = React.useMemo(
-    () => listQuery.data?.items ?? [],
-    [listQuery.data?.items],
-  );
-  const selectedItems = React.useMemo(
-    () => visibleItems.filter((item) => selectedIds.has(item.id)),
-    [visibleItems, selectedIds],
-  );
-  const selectedCount = selectedItems.length;
-  const allVisibleSelected =
-    visibleItems.length > 0 && visibleItems.every((item) => selectedIds.has(item.id));
-  const someVisibleSelected = visibleItems.some((item) => selectedIds.has(item.id));
-  const canBulkCancel = adminKitSelectionCanBulkCancel(selectedItems);
-  const canBulkDelete = adminKitSelectionCanBulkDelete(selectedItems);
-  const bulkHint = adminKitBulkActionHint(selectedItems);
-
-  function clearSelection() {
-    setSelectedIds(new Set());
-  }
-
-  function toggleRow(id: string, checked: boolean) {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (checked) next.add(id);
-      else next.delete(id);
-      return next;
-    });
-  }
-
-  function toggleAllVisible(checked: boolean) {
-    if (!checked) {
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        for (const item of visibleItems) next.delete(item.id);
-        return next;
-      });
-      return;
-    }
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      for (const item of visibleItems) next.add(item.id);
-      return next;
-    });
-  }
-
-  async function confirmBulkCancel() {
-    const ids = selectedItems.map((item) => item.id);
-    try {
-      const result = await cancelBulk.mutateAsync(ids);
-      setSelectedIds(new Set());
-      setBulkCancelOpen(false);
-      toast.success(`${result.cancelledCount} Kit-Gesuche wurden storniert.`);
-    } catch (error) {
-      toast.error(
-        adminKitRpcErrorMessage(
-          error,
-          "Die Bulk-Aktion wurde abgebrochen. Kein ausgewähltes Kit-Gesuch wurde verändert.",
-        ),
-      );
-    }
-  }
-
-  async function confirmBulkDelete() {
-    const ids = selectedItems.map((item) => item.id);
-    try {
-      const result = await deleteBulk.mutateAsync(ids);
-      setSelectedIds(new Set());
-      setBulkDeleteOpen(false);
-      toast.success(`${result.deletedCount} Kit-Gesuche wurden gelöscht.`);
-    } catch (error) {
-      toast.error(
-        adminKitRpcErrorMessage(
-          error,
-          "Die Bulk-Aktion wurde abgebrochen. Kein ausgewähltes Kit-Gesuch wurde verändert.",
-        ),
-      );
-    }
-  }
+  const listResetKey = `${status}|${searchApplied}|${page}`;
 
   return (
     <div className="space-y-4">
@@ -177,7 +110,6 @@ export default function AdminKitRequestsPage() {
                 size="sm"
                 variant={status === item.id ? "default" : "outline"}
                 onClick={() => {
-                  clearSelection();
                   setStatus(item.id);
                   setPage(1);
                 }}
@@ -187,10 +119,9 @@ export default function AdminKitRequestsPage() {
             ))}
           </div>
           <Input
-            value={search}
+            value={searchDraft}
             onChange={(event) => {
-              clearSelection();
-              setSearch(event.target.value);
+              setSearchDraft(event.target.value);
               setPage(1);
             }}
             placeholder="Suche Produkt, Code, Händler oder Ersteller …"
@@ -199,6 +130,96 @@ export default function AdminKitRequestsPage() {
         </div>
       </AdminSection>
 
+      <AdminKitRequestsListSection
+        key={listResetKey}
+        status={status}
+        search={searchApplied}
+        page={page}
+        onPageChange={setPage}
+      />
+    </div>
+  );
+}
+
+function AdminKitRequestsListSection({
+  status,
+  search,
+  page,
+  onPageChange,
+}: {
+  status: AdminKitRequestStatusFilter;
+  search: string;
+  page: number;
+  onPageChange: (page: number) => void;
+}) {
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(() => new Set());
+  const [bulkCancelOpen, setBulkCancelOpen] = React.useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = React.useState(false);
+
+  const listQuery = useAdminKitRequests({ status, shopArea: null, search, page });
+  const cancelBulk = useAdminCancelKitRequests();
+  const deleteBulk = useAdminDeleteKitRequests();
+  const totalPages = Math.max(1, Math.ceil((listQuery.data?.total ?? 0) / 30));
+
+  const visibleItems = listQuery.data?.items ?? [];
+  const visibleIds = React.useMemo(() => visibleItems.map((item) => item.id), [visibleItems]);
+
+  const selectedCount = kitRequestSelectionCount(selectedIds);
+  const selectedItems = React.useMemo(
+    () => visibleItems.filter((item) => selectedIds.has(item.id)),
+    [visibleItems, selectedIds],
+  );
+  const bulkTargetIds = React.useMemo(() => kitRequestSelectionIds(selectedIds), [selectedIds]);
+
+  const allVisibleSelected = areAllKitRequestsOnPageSelected(selectedIds, visibleIds);
+  const someVisibleSelected = areSomeKitRequestsOnPageSelected(selectedIds, visibleIds);
+
+  const canBulkCancel = adminKitSelectionCanBulkCancel(selectedItems);
+  const canBulkDelete = adminKitSelectionCanBulkDelete(selectedItems);
+  const bulkHint = adminKitBulkActionHint(selectedItems);
+
+  function toggleRow(id: string, checked: boolean) {
+    setSelectedIds((prev) => toggleKitRequestInSelection(prev, id, checked));
+  }
+
+  function toggleAllVisible(checked: boolean) {
+    setSelectedIds((prev) => toggleAllKitRequestsOnPage(prev, visibleIds, checked));
+  }
+
+  async function confirmBulkCancel() {
+    try {
+      const result = await cancelBulk.mutateAsync(bulkTargetIds);
+      setSelectedIds(new Set());
+      setBulkCancelOpen(false);
+      toast.success(`${result.cancelledCount} Kit-Gesuche wurden storniert.`);
+    } catch (error) {
+      toast.error(
+        adminKitRpcErrorMessage(
+          error,
+          "Die Bulk-Aktion wurde abgebrochen. Kein ausgewähltes Kit-Gesuch wurde verändert.",
+        ),
+      );
+    }
+  }
+
+  async function confirmBulkDelete() {
+    try {
+      const result = await deleteBulk.mutateAsync(bulkTargetIds);
+      setSelectedIds(new Set());
+      setBulkDeleteOpen(false);
+      toast.success(`${result.deletedCount} Kit-Gesuche wurden gelöscht.`);
+    } catch (error) {
+      toast.error(
+        adminKitRpcErrorMessage(
+          error,
+          "Die Bulk-Aktion wurde abgebrochen. Kein ausgewähltes Kit-Gesuch wurde verändert.",
+        ),
+      );
+    }
+  }
+
+  return (
+    <>
       {selectedCount > 0 ? (
         <div className="rounded-lg border border-border bg-secondary/30 px-4 py-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -293,10 +314,7 @@ export default function AdminKitRequestsPage() {
                 variant="outline"
                 className="h-11 min-h-11"
                 disabled={page <= 1}
-                onClick={() => {
-                  clearSelection();
-                  setPage((p) => p - 1);
-                }}
+                onClick={() => onPageChange(page - 1)}
               >
                 Zurück
               </Button>
@@ -308,10 +326,7 @@ export default function AdminKitRequestsPage() {
                 variant="outline"
                 className="h-11 min-h-11"
                 disabled={page >= totalPages}
-                onClick={() => {
-                  clearSelection();
-                  setPage((p) => p + 1);
-                }}
+                onClick={() => onPageChange(page + 1)}
               >
                 Weiter
               </Button>
@@ -343,7 +358,7 @@ export default function AdminKitRequestsPage() {
         loading={deleteBulk.isPending}
         onConfirm={() => void confirmBulkDelete()}
       />
-    </div>
+    </>
   );
 }
 
@@ -358,12 +373,17 @@ function KitRequestRow({
 }) {
   return (
     <TableRow className="hover:bg-secondary/40">
-      <TableCell className="w-10 align-middle">
+      <TableCell
+        className="w-10 align-middle"
+        onPointerDown={(event) => event.stopPropagation()}
+      >
         <Checkbox
           checked={selected}
-          onCheckedChange={(value) => onToggle(value === true)}
+          onCheckedChange={(value) => {
+            if (value === "indeterminate") return;
+            onToggle(value === true);
+          }}
           aria-label={`Kit-Gesuch ${item.productName} auswählen`}
-          onClick={(event) => event.stopPropagation()}
         />
       </TableCell>
       <TableCell className="min-w-[12rem]">

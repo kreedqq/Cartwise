@@ -142,6 +142,8 @@ describe("0087 admin kit distribution", () => {
     expect(listPage).toContain("Gesuche stornieren");
     expect(listPage).toContain("Gesuche löschen");
     expect(listPage).toContain("Alle auf dieser Seite auswählen");
+    expect(read("src/lib/adminKitRequestSelection.ts")).toContain("toggleKitRequestInSelection");
+    expect(read("src/tests/adminKitRequestSelection.test.ts")).toContain("keeping both in the set");
     expect(read("src/services/adminKitRequests.ts")).toContain("admin_cancel_kit_requests");
     expect(read("src/services/adminKitRequests.ts")).toContain("admin_delete_kit_requests");
     expect(read("src/hooks/useAdminKitRequests.ts")).toContain("useAdminCancelKitRequests");
