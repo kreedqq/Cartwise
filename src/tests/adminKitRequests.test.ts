@@ -122,6 +122,12 @@ describe("0087 admin kit distribution", () => {
     expect(detail).toContain("onRemoveParticipant");
   });
 
+  it("0126 admin list canCancel uses status only not is_open_request", () => {
+    const sql = read("supabase/migrations/0126_admin_kit_list_cancel_flags.sql");
+    expect(sql).toContain("'canCancel', _kit.status in ('open', 'full', 'ordered', 'expired')");
+    expect(sql).not.toContain("coalesce(_kit.is_open_request");
+  });
+
   it("0125 allows admin bulk cancel/delete for ordered kits with exclusive order purge", () => {
     const sql = read("supabase/migrations/0125_admin_bulk_ordered_kit_purge.sql");
     expect(sql).toContain("admin_kit_request_collect_order_ids");

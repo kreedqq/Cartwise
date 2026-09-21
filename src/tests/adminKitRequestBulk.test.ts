@@ -97,6 +97,28 @@ describe("adminKitPartitionBulkTargets", () => {
     });
   });
 
+  it("treats server canCancel on open rows as cancelable regardless of is_open_request in data model", () => {
+    const items = [
+      item({ id: "open-false", canCancel: true, status: "open" }),
+      item({ id: "full-false", canCancel: true, status: "full" }),
+      item({ id: "ordered-false", canCancel: true, status: "ordered" }),
+      item({ id: "open-true", canCancel: true, status: "open" }),
+    ];
+    const selected = new Set(items.map((i) => i.id));
+    const { cancelableIds } = adminKitPartitionBulkTargets(selected, items);
+    expect(cancelableIds).toEqual(["open-false", "full-false", "ordered-false", "open-true"]);
+  });
+
+  it("maps cancelled rows to deletable only", () => {
+    const items = [item({ id: "c1", canCancel: false, canDelete: true, status: "cancelled" })];
+    const { cancelableIds, deletableIds } = adminKitPartitionBulkTargets(
+      new Set(["c1"]),
+      items,
+    );
+    expect(cancelableIds).toEqual([]);
+    expect(deletableIds).toEqual(["c1"]);
+  });
+
   it("never includes non-cancelable ids in cancelableIds", () => {
     const items = [
       item({ id: "a", canCancel: true, status: "open" }),
