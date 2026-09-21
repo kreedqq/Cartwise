@@ -2,6 +2,12 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-21 (Admin bulk ordered kit purge)
+
+### Added
+
+- Migration `0125`: bulk cancel for ordered/full kits; bulk delete removes exclusively kit-linked orders (`kit_share_id_snapshot` / participant `order_id` / submitted cart lines). Fail-closed on mixed order lines or order feedback.
+
 ## 2026-09-21 (Admin bulk kit request cancel/delete)
 
 ### Added

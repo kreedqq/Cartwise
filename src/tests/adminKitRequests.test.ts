@@ -122,6 +122,18 @@ describe("0087 admin kit distribution", () => {
     expect(detail).toContain("onRemoveParticipant");
   });
 
+  it("0125 allows admin bulk cancel/delete for ordered kits with exclusive order purge", () => {
+    const sql = read("supabase/migrations/0125_admin_bulk_ordered_kit_purge.sql");
+    expect(sql).toContain("admin_kit_request_collect_order_ids");
+    expect(sql).toContain("kit_share_id_snapshot is distinct from _kit_share_id");
+    expect(sql).toContain("admin_kit_request_delete_linked_orders");
+    expect(sql).toContain("deletedOrderIds");
+    expect(sql).toContain("_kit.status in ('open', 'full', 'ordered', 'expired')");
+    expect(sql).toContain("Kit-Gesuch „%“ muss zuerst storniert werden");
+    expect(sql).not.toMatch(/create or replace function public\.admin_cancel_kit_request\(uuid\)/);
+    expect(sql).not.toMatch(/create or replace function public\.admin_delete_kit_request\(uuid\)/);
+  });
+
   it("0124 adds atomic bulk cancel/delete RPCs and list canCancel/canDelete flags", () => {
     const sql = read("supabase/migrations/0124_admin_bulk_kit_requests.sql");
     expect(sql).toContain("create or replace function public.admin_cancel_kit_requests");

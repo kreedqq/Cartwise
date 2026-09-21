@@ -66,16 +66,23 @@ describe("adminKitRequestBulk selection rules", () => {
     ).toBe(false);
   });
 
-  it("explains blocked mixed selections", () => {
+  it("allows bulk cancel for ordered kits when list flags permit", () => {
+    expect(
+      adminKitSelectionCanBulkCancel([item({ canCancel: true, status: "ordered" })]),
+    ).toBe(true);
+  });
+
+  it("explains blocked mixed selections without rejecting ordered kits outright", () => {
     expect(
       adminKitBulkActionHint([
-        item({ canCancel: false, canDelete: false, status: "ordered" }),
+        item({ canCancel: true, status: "open" }),
+        item({ id: "2", canCancel: false, canDelete: true, status: "cancelled" }),
       ]),
-    ).toContain("Bestellte");
+    ).toContain("Storniere zuerst");
     expect(
       adminKitBulkActionHint([
-        item({ canCancel: false, canDelete: false, status: "full" }),
+        item({ canCancel: false, canDelete: false, status: "cancelled" }),
       ]),
-    ).toContain("keine gemeinsame");
+    ).toContain("serverseitig");
   });
 });
