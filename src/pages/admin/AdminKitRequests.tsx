@@ -27,14 +27,13 @@ import {
 } from "@/hooks/useAdminKitRequests";
 import {
   adminKitBulkActionHint,
-  adminKitSelectionCanBulkCancel,
-  adminKitSelectionCanBulkDelete,
+  adminKitPartitionBulkTargets,
+  adminKitSelectionAfterBulkDelete,
 } from "@/lib/adminKitRequestBulk";
 import {
   areAllKitRequestsOnPageSelected,
   areSomeKitRequestsOnPageSelected,
   kitRequestSelectionCount,
-  kitRequestSelectionIds,
   toggleAllKitRequestsOnPage,
   toggleKitRequestInSelection,
 } from "@/lib/adminKitRequestSelection";
@@ -169,14 +168,22 @@ function AdminKitRequestsListSection({
     () => visibleItems.filter((item) => selectedIds.has(item.id)),
     [visibleItems, selectedIds],
   );
-  const bulkTargetIds = React.useMemo(() => kitRequestSelectionIds(selectedIds), [selectedIds]);
+  const { cancelableIds, deletableIds } = React.useMemo(
+    () => adminKitPartitionBulkTargets(selectedIds, visibleItems),
+    [selectedIds, visibleItems],
+  );
+  const cancelableCount = cancelableIds.length;
+  const deletableCount = deletableIds.length;
 
   const allVisibleSelected = areAllKitRequestsOnPageSelected(selectedIds, visibleIds);
   const someVisibleSelected = areSomeKitRequestsOnPageSelected(selectedIds, visibleIds);
 
-  const canBulkCancel = adminKitSelectionCanBulkCancel(selectedItems);
-  const canBulkDelete = adminKitSelectionCanBulkDelete(selectedItems);
-  const bulkHint = adminKitBulkActionHint(selectedItems);
+  const bulkHint = adminKitBulkActionHint(
+    selectedCount,
+    cancelableCount,
+    deletableCount,
+    selectedItems,
+  );
 
   function toggleRow(id: string, checked: boolean) {
     setSelectedIds((prev) => toggleKitRequestInSelection(prev, id, checked));
@@ -188,8 +195,7 @@ function AdminKitRequestsListSection({
 
   async function confirmBulkCancel() {
     try {
-      const result = await cancelBulk.mutateAsync(bulkTargetIds);
-      setSelectedIds(new Set());
+      const result = await cancelBulk.mutateAsync(cancelableIds);
       setBulkCancelOpen(false);
       toast.success(`${result.cancelledCount} Kit-Gesuche wurden storniert.`);
     } catch (error) {
@@ -204,8 +210,8 @@ function AdminKitRequestsListSection({
 
   async function confirmBulkDelete() {
     try {
-      const result = await deleteBulk.mutateAsync(bulkTargetIds);
-      setSelectedIds(new Set());
+      const result = await deleteBulk.mutateAsync(deletableIds);
+      setSelectedIds((prev) => adminKitSelectionAfterBulkDelete(prev, deletableIds));
       setBulkDeleteOpen(false);
       toast.success(`${result.deletedCount} Kit-Gesuche wurden gelöscht.`);
     } catch (error) {
@@ -223,11 +229,23 @@ function AdminKitRequestsListSection({
       {selectedCount > 0 ? (
         <div className="rounded-lg border border-border bg-secondary/30 px-4 py-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-medium">
-              {selectedCount} {selectedCount === 1 ? "Gesuch" : "Gesuche"} ausgewählt
-            </p>
+            <div className="space-y-1">
+              <p className="text-sm font-medium">
+                {selectedCount} {selectedCount === 1 ? "Gesuch" : "Gesuche"} ausgewählt
+              </p>
+              {cancelableCount > 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  {cancelableCount} {cancelableCount === 1 ? "kann storniert werden" : "können storniert werden"}
+                </p>
+              ) : null}
+              {deletableCount > 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  {deletableCount} {deletableCount === 1 ? "kann gelöscht werden" : "können gelöscht werden"}
+                </p>
+              ) : null}
+            </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              {canBulkCancel ? (
+              {cancelableCount > 0 ? (
                 <Button
                   type="button"
                   variant="destructive"
@@ -235,10 +253,10 @@ function AdminKitRequestsListSection({
                   disabled={cancelBulk.isPending}
                   onClick={() => setBulkCancelOpen(true)}
                 >
-                  Gesuche stornieren
+                  {cancelableCount} {cancelableCount === 1 ? "Gesuch stornieren" : "Gesuche stornieren"}
                 </Button>
               ) : null}
-              {canBulkDelete && !canBulkCancel ? (
+              {deletableCount > 0 ? (
                 <Button
                   type="button"
                   variant="destructive"
@@ -246,7 +264,7 @@ function AdminKitRequestsListSection({
                   disabled={deleteBulk.isPending}
                   onClick={() => setBulkDeleteOpen(true)}
                 >
-                  Gesuche löschen
+                  {deletableCount} {deletableCount === 1 ? "Gesuch löschen" : "Gesuche löschen"}
                 </Button>
               ) : null}
             </div>
@@ -338,8 +356,8 @@ function AdminKitRequestsListSection({
       <ConfirmDialog
         open={bulkCancelOpen}
         onOpenChange={setBulkCancelOpen}
-        title={`${selectedCount} Kit-Gesuche stornieren?`}
-        description="Die ausgewählten Kit-Gesuche werden storniert. Anschließend können sie gelöscht werden, sofern keine Bestellungen oder andere geschützte Daten vorhanden sind."
+        title={`${cancelableCount} Kit-Gesuche stornieren?`}
+        description="Nur die stornierbaren ausgewählten Kit-Gesuche werden storniert. Anschließend können sie gelöscht werden, sofern keine Bestellungen oder andere geschützte Daten vorhanden sind."
         confirmLabel="Stornieren"
         cancelLabel="Abbrechen"
         variant="destructive"
@@ -350,8 +368,8 @@ function AdminKitRequestsListSection({
       <ConfirmDialog
         open={bulkDeleteOpen}
         onOpenChange={setBulkDeleteOpen}
-        title={`${selectedCount} Kit-Gesuche endgültig löschen?`}
-        description="Die ausgewählten Kit-Gesuche werden aus der Kit-Gesuch-Verwaltung entfernt. Historische Bestellungen werden nicht verändert."
+        title={`${deletableCount} Kit-Gesuche endgültig löschen?`}
+        description="Nur die löschbaren ausgewählten Kit-Gesuche werden entfernt. Verknüpfte Kit-Bestellungen werden gemäß den Admin-Regeln mit gelöscht, sofern zulässig."
         confirmLabel="Löschen"
         cancelLabel="Abbrechen"
         variant="destructive"
