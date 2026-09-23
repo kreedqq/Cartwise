@@ -2,6 +2,12 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-23 (Bestell-Zusammenfassung PDF — China footer overlap)
+
+### Fixed
+
+- China price last page: reserve vertical space for GESAMT + Mengenübersicht (separator up to y≈247); product rows capped so footer never overlaps TA5/TR5/XA10-style tail rows. Splits e.g. 20 codes across two price pages when needed.
+
 ## 2026-09-23 (Bestell-Zusammenfassung PDF — China Bestellliste + pagination)
 
 ### Changed

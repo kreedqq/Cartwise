@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildPeptixOrderSummaryPdf,
+  chinaPriceProductRowBaselineY,
+  chinaPriceSummaryLayoutForTest,
   chunkChinaPurchaseLines,
   orderListRowCapacity,
   planPeptixOrderSummaryPages,
@@ -222,18 +224,74 @@ describe("order summary PDF finalization", () => {
     expect(planPeptixOrderSummaryPages(big as typeof summary).filter((p) => p === "BESTELLUNGEN").length).toBe(2);
   });
 
-  it("20 china product codes stay on one CHINA BESTELLUNG page with footer", () => {
-    const lines = Array.from({ length: 20 }, (_, i) => ({
-      code: `P${i}`,
+  it("20 china product codes paginate before footer overlap on the last price page", () => {
+    const codes = [
+      "50AM",
+      "5AM",
+      "BA03",
+      "BA10",
+      "BAM50",
+      "BC5",
+      "CGL10",
+      "CU100",
+      "CU50",
+      "IP5",
+      "KP10",
+      "KS5",
+      "MS40",
+      "RT10",
+      "RT30",
+      "SK10",
+      "SLU5",
+      "TA5",
+      "TR5",
+      "XA10",
+    ];
+    const lines = codes.map((code, i) => ({
+      code,
       quantity: 1,
       quantityLabel: "1 Kit",
-      unitPriceUsd: 10,
-      totalUsd: 10,
+      unitPriceUsd: 10 + i,
+      totalUsd: 10 + i,
       categoryId: "peptides" as const,
     }));
+    const layout = chinaPriceSummaryLayoutForTest();
     const chunks = chunkChinaPurchaseLines(lines);
-    expect(chunks).toHaveLength(1);
-    expect(chunks[0]).toHaveLength(20);
+    expect(chunks.length).toBeGreaterThan(1);
+    expect(chunks.flat().map((l) => l.code)).toEqual(codes);
+
+    const lastChunk = chunks[chunks.length - 1]!;
+    const lastRowY = chinaPriceProductRowBaselineY(lastChunk.length - 1);
+    expect(lastRowY).toBeGreaterThanOrEqual(layout.minProductBaselineY);
+    expect(lastRowY).toBeGreaterThan(layout.separatorY + 6);
+    expect(layout.separatorY).toBeGreaterThan(layout.totalLabelY + 4);
+    expect(layout.totalLabelY).toBeGreaterThan(layout.overviewLowestY + 4);
+    expect(layout.overviewLowestY).toBeGreaterThan(36.85 + 10);
+
+    const summary = {
+      ...mixedFinalSummary(),
+      chinaPurchase: {
+        lines,
+        totalUsd: lines.reduce((s, l) => s + l.totalUsd, 0),
+        distinctProducts: 20,
+        kitCount: 26,
+        packungCount: 2,
+        vialCount: 0,
+      },
+    };
+    const plan = planPeptixOrderSummaryPages(summary as ReturnType<typeof mixedFinalSummary>);
+    expect(plan.filter((p) => p === "CHINA BESTELLUNG").length).toBe(chunks.length);
+    expect(plan).toContain("CHINA BESTELLLISTE");
+
+    const text = new TextDecoder("latin1").decode(buildPeptixOrderSummaryPdf(summary as ReturnType<typeof mixedFinalSummary>, "now"));
+    for (const code of codes) {
+      expect(text).toContain(code);
+    }
+    expect(text).toContain("GESAMT CHINA BESTELLUNG");
+    expect(text).toContain("VERSCHIEDENE PRODUKTE: 20");
+    expect(text).toContain("KITS: 26");
+    expect(text).toContain("PACKUNGEN: 2");
+    expect(text).toContain("VIALS: 0");
   });
 
   it("PDF has no category pages and copy-friendly china columns", () => {

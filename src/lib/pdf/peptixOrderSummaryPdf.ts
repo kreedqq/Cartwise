@@ -37,7 +37,13 @@ const ORDER_LIST_BOTTOM = 72;
 const CHINA_ROW_H = 11.15;
 const CHINA_HEADER_OFFSET = 26;
 const CHINA_LIST_TOP = 455;
+/** Base Y for GESAMT / Mengenübersicht block on the last China price page. */
 const CHINA_FOOTER_TOP = 195;
+const CHINA_SUMMARY_SEPARATOR_Y = CHINA_FOOTER_TOP + 52;
+const CHINA_SUMMARY_LOWEST_TEXT_Y = CHINA_FOOTER_TOP - 12;
+/** Product row baselines must stay at or above this Y (footer draws up to ~247). */
+const CHINA_PRODUCT_MIN_BASELINE_Y = CHINA_SUMMARY_SEPARATOR_Y + 14;
+const CHINA_PRODUCT_PANEL_BOTTOM_LAST = CHINA_PRODUCT_MIN_BASELINE_Y - CHINA_ROW_H;
 /** @deprecated Use dynamic china row capacity; kept for tests referencing pagination constants. */
 export const CHINA_PRODUCT_ROWS_PER_PAGE = 20;
 
@@ -244,13 +250,12 @@ function chunkPersonLines(lines: OrderSummaryPersonLine[]): OrderSummaryPersonLi
   if (lines.length === 0) return [[]];
   const firstCap = orderListRowCapacity(true);
   const contCap = orderListRowCapacity(false);
-  const pages: OrderSummaryPersonLine[][] = [];
-  let index = 0;
   if (lines.length <= firstCap) {
     return [lines];
   }
+  const pages: OrderSummaryPersonLine[][] = [];
+  let index = firstCap;
   pages.push(lines.slice(0, firstCap));
-  index = firstCap;
   while (index < lines.length) {
     pages.push(lines.slice(index, index + contCap));
     index += contCap;
@@ -258,10 +263,19 @@ function chunkPersonLines(lines: OrderSummaryPersonLine[]): OrderSummaryPersonLi
   return pages;
 }
 
+function chinaFirstProductRowY(): number {
+  return CHINA_LIST_TOP - CHINA_HEADER_OFFSET;
+}
+
 function chinaRowCapacity(reserveFooter: boolean): number {
-  const firstRowY = CHINA_LIST_TOP - CHINA_HEADER_OFFSET;
-  const bottom = reserveFooter ? CHINA_FOOTER_TOP + 8 : ORDER_LIST_BOTTOM;
-  return Math.max(1, Math.floor((firstRowY - bottom) / CHINA_ROW_H));
+  const firstRowY = chinaFirstProductRowY();
+  if (!reserveFooter) {
+    return Math.max(1, Math.floor((firstRowY - ORDER_LIST_BOTTOM) / CHINA_ROW_H));
+  }
+  return Math.max(
+    1,
+    Math.floor((firstRowY - CHINA_PRODUCT_MIN_BASELINE_Y) / CHINA_ROW_H) + 1,
+  );
 }
 
 /** Keeps totals on the last page while using full height on earlier China price pages. */
@@ -279,23 +293,40 @@ export function chunkChinaPurchaseLines(lines: ChinaPurchaseLine[]): ChinaPurcha
       pages.push(lines.slice(index));
       break;
     }
-    if (remaining <= fullMax + lastMax) {
-      const tail = remaining - fullMax;
-      if (tail > 0 && tail <= lastMax) {
-        pages.push(lines.slice(index, index + fullMax));
-        index += fullMax;
-        continue;
-      }
-    }
     if (remaining > fullMax) {
       pages.push(lines.slice(index, index + fullMax));
       index += fullMax;
-    } else {
-      pages.push(lines.slice(index));
-      break;
+      continue;
     }
+    const firstPageRows = remaining - lastMax;
+    pages.push(lines.slice(index, index + firstPageRows));
+    index += firstPageRows;
   }
   return pages;
+}
+
+/** Test hook: baseline Y for product row index on China price pages. */
+export function chinaPriceProductRowBaselineY(rowIndex: number): number {
+  return chinaFirstProductRowY() - rowIndex * CHINA_ROW_H;
+}
+
+/** Test hook: layout bounds for overlap checks on the last China price page. */
+export function chinaPriceSummaryLayoutForTest(): {
+  minProductBaselineY: number;
+  separatorY: number;
+  totalLabelY: number;
+  overviewLowestY: number;
+  lastPageMaxRows: number;
+  fullPageMaxRows: number;
+} {
+  return {
+    minProductBaselineY: CHINA_PRODUCT_MIN_BASELINE_Y,
+    separatorY: CHINA_SUMMARY_SEPARATOR_Y,
+    totalLabelY: CHINA_FOOTER_TOP + 36,
+    overviewLowestY: CHINA_SUMMARY_LOWEST_TEXT_Y,
+    lastPageMaxRows: chinaRowCapacity(true),
+    fullPageMaxRows: chinaRowCapacity(false),
+  };
 }
 
 function codeListRowCapacity(): number {
@@ -399,7 +430,7 @@ function chinaPages(summary: ProcessingOrderSummary, exportedAt: string, startPa
             ),
           ]
         : []),
-      ...listPanel(CHINA_LIST_TOP, isLast ? CHINA_FOOTER_TOP + 8 : ORDER_LIST_BOTTOM),
+      ...listPanel(CHINA_LIST_TOP, isLast ? CHINA_PRODUCT_PANEL_BOTTOM_LAST : ORDER_LIST_BOTTOM),
       textAt(CHINA_COL_CODE, CHINA_LIST_TOP - 14, "PRODUKT CODE", 7.5, true, MUTED),
       textAt(CHINA_COL_QTY, CHINA_LIST_TOP - 14, "MENGE", 7.5, true, MUTED),
       textAt(CHINA_COL_PRICE, CHINA_LIST_TOP - 14, "PREIS", 7.5, true, MUTED),
