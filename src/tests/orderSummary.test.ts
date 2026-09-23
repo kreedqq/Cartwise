@@ -379,7 +379,7 @@ describe("processing order summary PDF", () => {
     expect(text).not.toContain("PEPTIDEBESTELLÜBERSICHT");
     expect(text).toContain("PRODUKTE");
     expect(text).not.toContain("GESAMTMENGE");
-    expect((text.match(/\/Count (\d+)/) ?? [])[1]).toBe("2");
+    expect((text.match(/\/Count (\d+)/) ?? [])[1]).toBe("3");
   });
 });
 
@@ -469,7 +469,7 @@ describe("merchant quantity totals", () => {
       catalog,
     );
     const pages = planPeptixOrderSummaryPages(summary);
-    expect(pages).toEqual(["BESTELLUNGEN", "CHINA BESTELLUNG"]);
+    expect(pages).toEqual(["BESTELLUNGEN", "CHINA BESTELLUNG", "CHINA BESTELLLISTE"]);
     expect(summary.chinaPurchase.lines).toEqual([
       expect.objectContaining({ code: "RT10", quantity: 4, totalUsd: 200 }),
     ]);
@@ -477,7 +477,7 @@ describe("merchant quantity totals", () => {
     const bytes = buildProcessingOrderSummaryPdf(summary, "13.09.2026, 12:00");
     const text = new TextDecoder("latin1").decode(bytes);
     const count = text.match(/\/Count (\d+)/);
-    expect(Number(count?.[1])).toBe(2);
+    expect(Number(count?.[1])).toBe(3);
     expect(text.indexOf("BESTELLUNGEN")).toBeGreaterThan(-1);
     expect(text.indexOf("CHINA BESTELLUNG")).toBeGreaterThan(text.indexOf("BESTELLUNGEN"));
     expect(text).toContain("GESAMT CHINA BESTELLUNG");

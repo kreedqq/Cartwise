@@ -24,17 +24,27 @@ const LOGO_Y = 672.44;
 const CARD_X = 63.78;
 const CARD_W = 467.72;
 const META_Y = 578.12;
-const META_H = 39.69;
+const ORDER_META_H = 34;
 
-/** Dynamic list layout (no fixed table grid — avoids footer/row overlap). */
-export const ORDER_ROWS_PER_PAGE = 32;
-export const CHINA_PRODUCT_ROWS_PER_PAGE = 18;
-const ORDER_ROW_H = 13.2;
-const CHINA_ROW_H = 13.2;
-const ORDER_LIST_TOP = 505;
+/** Compact list layout — fits 36+ person rows on page 1 without losing PEPTIX chrome. */
+export const ORDER_ROWS_PER_PAGE = 36;
+const ORDER_ROW_H = 11.15;
+const ORDER_HEADER_OFFSET = 26;
+const ORDER_LIST_TOP_FIRST = 505;
+const ORDER_LIST_TOP_CONT = 560;
 const ORDER_LIST_BOTTOM = 72;
+
+const CHINA_ROW_H = 11.15;
+const CHINA_HEADER_OFFSET = 26;
 const CHINA_LIST_TOP = 455;
 const CHINA_FOOTER_TOP = 195;
+/** @deprecated Use dynamic china row capacity; kept for tests referencing pagination constants. */
+export const CHINA_PRODUCT_ROWS_PER_PAGE = 20;
+
+const CODE_LIST_ROW_H = 11.15;
+const CODE_LIST_TOP = 585;
+const CODE_LIST_BOTTOM = 72;
+const CODE_LIST_HEADER_OFFSET = 26;
 
 const ORDER_COL_USER = CARD_X + 8;
 const ORDER_COL_CODE = CARD_X + 168;
@@ -44,6 +54,9 @@ const CHINA_COL_CODE = CARD_X + 8;
 const CHINA_COL_QTY = CARD_X + 118;
 const CHINA_COL_PRICE = CARD_X + 248;
 const CHINA_COL_TOTAL = CARD_X + 378;
+
+const CODE_LIST_COL_CODE = CARD_X + 8;
+const CODE_LIST_COL_QTY = CARD_X + 120;
 
 const HELVETICA_WIDTHS: number[] = [
   278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278,
@@ -140,28 +153,48 @@ function chrome(pageLabel: string, pageNumber: number, subtitle: string): string
   ];
 }
 
-const STATS_Y = META_Y - 44;
+function compactChrome(pageLabel: string, pageNumber: number): string[] {
+  const number = String(pageNumber).padStart(2, "0");
+  return [
+    rgb(PAGE_FILL, true),
+    rect(0, 0, PAGE_W, PAGE_H),
+    "f",
+    "q",
+    `${n(LOGO_W)} 0 0 ${n(LOGO_H)} ${n(LOGO_X)} ${n(LOGO_Y)} cm`,
+    "/Im1 Do",
+    "Q",
+    rgb(GOLD_STROKE, false),
+    "0.55 w",
+    line(51.02, 677.48, 544.25, 677.48),
+    line(51.02, 36.85, 544.25, 36.85),
+    textAt(51.02, 24, "PEPTIX • BESTELL ZUSAMMENFASSUNG", 7, true, GOLD),
+    textAt(537, 24, number, 7, true, GOLD),
+    textAt(57.02, 643, pageLabel, 20, true, GOLD),
+  ];
+}
 
-function metaBox(datum: string, status: string, zeitraum: string, y = META_Y): string[] {
+const STATS_Y = META_Y - ORDER_META_H - 6;
+
+function metaBox(datum: string, status: string, zeitraum: string, y = META_Y, boxH = ORDER_META_H): string[] {
   const colW = CARD_W / 3;
   return [
     rgb(PANEL, true),
-    rect(CARD_X, y, CARD_W, META_H),
+    rect(CARD_X, y, CARD_W, boxH),
     "f",
     rgb(GOLD_STROKE, false),
     "0.6 w",
-    rect(CARD_X, y, CARD_W, META_H),
+    rect(CARD_X, y, CARD_W, boxH),
     "S",
     rgb(GOLD_STROKE, false),
     "0.35 w",
-    line(CARD_X + colW, y, CARD_X + colW, y + META_H),
-    line(CARD_X + colW * 2, y, CARD_X + colW * 2, y + META_H),
-    textAt(CARD_X + 11.2, y + 22.5, "DATUM", 7.2, true, MUTED),
-    textAt(CARD_X + 11.2, y + 8.5, datum, 8, false, CREAM),
-    textAt(CARD_X + colW + 11.2, y + 22.5, "STATUS", 7.2, true, MUTED),
-    textAt(CARD_X + colW + 11.2, y + 8.5, status, 8, false, CREAM),
-    textAt(CARD_X + colW * 2 + 11.2, y + 22.5, "ZEITRAUM", 7.2, true, MUTED),
-    textAt(CARD_X + colW * 2 + 11.2, y + 8.5, zeitraum, 8, false, CREAM),
+    line(CARD_X + colW, y, CARD_X + colW, y + boxH),
+    line(CARD_X + colW * 2, y, CARD_X + colW * 2, y + boxH),
+    textAt(CARD_X + 11.2, y + 20, "DATUM", 7, true, MUTED),
+    textAt(CARD_X + 11.2, y + 7, datum, 8, false, CREAM),
+    textAt(CARD_X + colW + 11.2, y + 20, "STATUS", 7, true, MUTED),
+    textAt(CARD_X + colW + 11.2, y + 7, status, 8, false, CREAM),
+    textAt(CARD_X + colW * 2 + 11.2, y + 20, "ZEITRAUM", 7, true, MUTED),
+    textAt(CARD_X + colW * 2 + 11.2, y + 7, zeitraum, 8, false, CREAM),
   ];
 }
 
@@ -169,22 +202,22 @@ function statsBox(personen: string, positionen: string, produkte: string, y = ST
   const colW = CARD_W / 3;
   return [
     rgb(PANEL, true),
-    rect(CARD_X, y, CARD_W, META_H),
+    rect(CARD_X, y, CARD_W, ORDER_META_H),
     "f",
     rgb(GOLD_STROKE, false),
     "0.6 w",
-    rect(CARD_X, y, CARD_W, META_H),
+    rect(CARD_X, y, CARD_W, ORDER_META_H),
     "S",
     rgb(GOLD_STROKE, false),
     "0.35 w",
-    line(CARD_X + colW, y, CARD_X + colW, y + META_H),
-    line(CARD_X + colW * 2, y, CARD_X + colW * 2, y + META_H),
-    textAt(CARD_X + 12.2, y + 22.5, "PERSONEN", 7.2, true, MUTED),
-    textAt(CARD_X + 12.2, y + 6.5, personen, 14, false, CREAM),
-    textAt(CARD_X + colW + 12.2, y + 22.5, "POSITIONEN", 7.2, true, MUTED),
-    textAt(CARD_X + colW + 12.2, y + 6.5, positionen, 14, false, CREAM),
-    textAt(CARD_X + colW * 2 + 12.2, y + 22.5, "PRODUKTE", 7.2, true, MUTED),
-    textAt(CARD_X + colW * 2 + 12.2, y + 6.5, produkte, 14, false, CREAM),
+    line(CARD_X + colW, y, CARD_X + colW, y + ORDER_META_H),
+    line(CARD_X + colW * 2, y, CARD_X + colW * 2, y + ORDER_META_H),
+    textAt(CARD_X + 12.2, y + 20, "PERSONEN", 7, true, MUTED),
+    textAt(CARD_X + 12.2, y + 5, personen, 12, false, CREAM),
+    textAt(CARD_X + colW + 12.2, y + 20, "POSITIONEN", 7, true, MUTED),
+    textAt(CARD_X + colW + 12.2, y + 5, positionen, 12, false, CREAM),
+    textAt(CARD_X + colW * 2 + 12.2, y + 20, "PRODUKTE", 7, true, MUTED),
+    textAt(CARD_X + colW * 2 + 12.2, y + 5, produkte, 12, false, CREAM),
   ];
 }
 
@@ -201,10 +234,82 @@ function listPanel(top: number, bottom: number): string[] {
   ];
 }
 
-function chunkRows<T>(rows: T[], size: number): T[][] {
-  if (rows.length === 0) return [[]];
-  const pages: T[][] = [];
-  for (let i = 0; i < rows.length; i += size) pages.push(rows.slice(i, i + size));
+export function orderListRowCapacity(firstPage: boolean): number {
+  const listTop = firstPage ? ORDER_LIST_TOP_FIRST : ORDER_LIST_TOP_CONT;
+  const firstRowY = listTop - ORDER_HEADER_OFFSET;
+  return Math.max(1, Math.floor((firstRowY - ORDER_LIST_BOTTOM) / ORDER_ROW_H));
+}
+
+function chunkPersonLines(lines: OrderSummaryPersonLine[]): OrderSummaryPersonLine[][] {
+  if (lines.length === 0) return [[]];
+  const firstCap = orderListRowCapacity(true);
+  const contCap = orderListRowCapacity(false);
+  const pages: OrderSummaryPersonLine[][] = [];
+  let index = 0;
+  if (lines.length <= firstCap) {
+    return [lines];
+  }
+  pages.push(lines.slice(0, firstCap));
+  index = firstCap;
+  while (index < lines.length) {
+    pages.push(lines.slice(index, index + contCap));
+    index += contCap;
+  }
+  return pages;
+}
+
+function chinaRowCapacity(reserveFooter: boolean): number {
+  const firstRowY = CHINA_LIST_TOP - CHINA_HEADER_OFFSET;
+  const bottom = reserveFooter ? CHINA_FOOTER_TOP + 8 : ORDER_LIST_BOTTOM;
+  return Math.max(1, Math.floor((firstRowY - bottom) / CHINA_ROW_H));
+}
+
+/** Keeps totals on the last page while using full height on earlier China price pages. */
+export function chunkChinaPurchaseLines(lines: ChinaPurchaseLine[]): ChinaPurchaseLine[][] {
+  if (lines.length === 0) return [[]];
+  const fullMax = chinaRowCapacity(false);
+  const lastMax = chinaRowCapacity(true);
+  if (lines.length <= lastMax) return [lines];
+
+  const pages: ChinaPurchaseLine[][] = [];
+  let index = 0;
+  while (index < lines.length) {
+    const remaining = lines.length - index;
+    if (remaining <= lastMax) {
+      pages.push(lines.slice(index));
+      break;
+    }
+    if (remaining <= fullMax + lastMax) {
+      const tail = remaining - fullMax;
+      if (tail > 0 && tail <= lastMax) {
+        pages.push(lines.slice(index, index + fullMax));
+        index += fullMax;
+        continue;
+      }
+    }
+    if (remaining > fullMax) {
+      pages.push(lines.slice(index, index + fullMax));
+      index += fullMax;
+    } else {
+      pages.push(lines.slice(index));
+      break;
+    }
+  }
+  return pages;
+}
+
+function codeListRowCapacity(): number {
+  const firstRowY = CODE_LIST_TOP - CODE_LIST_HEADER_OFFSET;
+  return Math.max(1, Math.floor((firstRowY - CODE_LIST_BOTTOM) / CODE_LIST_ROW_H));
+}
+
+function chunkCodeListLines(lines: ChinaPurchaseLine[]): ChinaPurchaseLine[][] {
+  const size = codeListRowCapacity();
+  if (lines.length === 0) return [[]];
+  const pages: ChinaPurchaseLine[][] = [];
+  for (let i = 0; i < lines.length; i += size) {
+    pages.push(lines.slice(i, i + size));
+  }
   return pages;
 }
 
@@ -220,21 +325,24 @@ function displayUsername(name: string): string {
   return name.trim().replace(/^@+/, "");
 }
 
-/** Two-page export: orders by person, then China purchase aggregated by product code. */
-export function planPeptixOrderSummaryPages(summary: ProcessingOrderSummary): string[] {
-  const orderPages = Math.max(1, Math.ceil(summary.personLines.length / ORDER_ROWS_PER_PAGE));
-  const chinaPages = Math.max(1, Math.ceil(summary.chinaPurchase.lines.length / CHINA_PRODUCT_ROWS_PER_PAGE));
+export type PeptixOrderSummaryPageKind = "BESTELLUNGEN" | "CHINA BESTELLUNG" | "CHINA BESTELLLISTE";
+
+export function planPeptixOrderSummaryPages(summary: ProcessingOrderSummary): PeptixOrderSummaryPageKind[] {
+  const orderPages = chunkPersonLines(summary.personLines).length;
+  const chinaPages = chunkChinaPurchaseLines(summary.chinaPurchase.lines).length;
+  const codeListPages = chunkCodeListLines(summary.chinaPurchase.lines).length;
   return [
-    ...Array.from({ length: orderPages }, () => "BESTELLUNGEN"),
-    ...Array.from({ length: chinaPages }, () => "CHINA BESTELLUNG"),
+    ...Array.from({ length: orderPages }, () => "BESTELLUNGEN" as const),
+    ...Array.from({ length: chinaPages }, () => "CHINA BESTELLUNG" as const),
+    ...Array.from({ length: codeListPages }, () => "CHINA BESTELLLISTE" as const),
   ];
 }
 
 function orderPages(summary: ProcessingOrderSummary, exportedAt: string): string[] {
   const { datum, zeitraum } = splitExportStamp(exportedAt);
-  const chunks = chunkRows(summary.personLines, ORDER_ROWS_PER_PAGE);
+  const chunks = chunkPersonLines(summary.personLines);
   return chunks.map((chunk, pageIndex) => {
-    const listTop = pageIndex === 0 ? ORDER_LIST_TOP : 560;
+    const listTop = pageIndex === 0 ? ORDER_LIST_TOP_FIRST : ORDER_LIST_TOP_CONT;
     const ops = [
       ...chrome("BESTELLUNGEN", pageIndex + 1, "WER HAT WAS BESTELLT UND IN WELCHER MENGE"),
       ...(pageIndex === 0
@@ -253,11 +361,11 @@ function orderPages(summary: ProcessingOrderSummary, exportedAt: string): string
       textAt(ORDER_COL_QTY, listTop - 14, "MENGE", 7.5, true, MUTED),
     ];
     chunk.forEach((line: OrderSummaryPersonLine, index) => {
-      const y = listTop - 28 - index * ORDER_ROW_H;
+      const y = listTop - ORDER_HEADER_OFFSET - index * ORDER_ROW_H;
       ops.push(
-        textAt(ORDER_COL_USER, y, fitText(displayUsername(line.name), 8.5, 150), 8.5, false, CREAM),
-        textAt(ORDER_COL_CODE, y, fitText(line.code, 8.5, 140), 8.5, false, CREAM),
-        textAt(ORDER_COL_QTY, y, fitText(line.quantityLabel, 8.5, 120), 8.5, false, CREAM),
+        textAt(ORDER_COL_USER, y, fitText(displayUsername(line.name), 8.3, 150), 8.3, false, CREAM),
+        textAt(ORDER_COL_CODE, y, fitText(line.code, 8.3, 140), 8.3, false, CREAM),
+        textAt(ORDER_COL_QTY, y, fitText(line.quantityLabel, 8.3, 120), 8.3, false, CREAM),
       );
     });
     return contentStream(ops);
@@ -267,18 +375,30 @@ function orderPages(summary: ProcessingOrderSummary, exportedAt: string): string
 function chinaPages(summary: ProcessingOrderSummary, exportedAt: string, startPage: number): string[] {
   const { datum, zeitraum } = splitExportStamp(exportedAt);
   const purchase = summary.chinaPurchase;
-  const chunks = chunkRows(purchase.lines, CHINA_PRODUCT_ROWS_PER_PAGE);
+  const chunks = chunkChinaPurchaseLines(purchase.lines);
   return chunks.map((chunk, chunkIndex) => {
     const pageNumber = startPage + chunkIndex;
     const isLast = chunkIndex === chunks.length - 1;
+    const title = chunkIndex === 0 ? "CHINA BESTELLUNG" : "CHINA BESTELLUNG";
+    const subtitle =
+      chunkIndex === 0
+        ? "ORIGINALPREISE • KOPIERFREUNDLICHE BESTELLÜBERSICHT"
+        : "FORTSETZUNG";
     const ops = [
-      ...chrome(
-        "CHINA BESTELLUNG",
-        pageNumber,
-        "ORIGINALPREISE • KOPIERFREUNDLICHE BESTELLÜBERSICHT",
-      ),
-      ...metaBox(datum, "In Bearbeitung", zeitraum),
-      textAt(CARD_X + 8, CHINA_LIST_TOP + 8, "Alle Bestellungen aggregiert. Originalpreise in USD, ohne Rollen- oder Verkaufsaufschläge.", 7, false, MUTED),
+      ...chrome(title, pageNumber, subtitle),
+      ...(chunkIndex === 0 ? metaBox(datum, "In Bearbeitung", zeitraum) : []),
+      ...(chunkIndex === 0
+        ? [
+            textAt(
+              CARD_X + 8,
+              CHINA_LIST_TOP + 8,
+              "Alle Bestellungen aggregiert. Originalpreise in USD, ohne Rollen- oder Verkaufsaufschläge.",
+              7,
+              false,
+              MUTED,
+            ),
+          ]
+        : []),
       ...listPanel(CHINA_LIST_TOP, isLast ? CHINA_FOOTER_TOP + 8 : ORDER_LIST_BOTTOM),
       textAt(CHINA_COL_CODE, CHINA_LIST_TOP - 14, "PRODUKT CODE", 7.5, true, MUTED),
       textAt(CHINA_COL_QTY, CHINA_LIST_TOP - 14, "MENGE", 7.5, true, MUTED),
@@ -286,13 +406,13 @@ function chinaPages(summary: ProcessingOrderSummary, exportedAt: string, startPa
       textAt(CHINA_COL_TOTAL, CHINA_LIST_TOP - 14, "GESAMTPREIS", 7.5, true, MUTED),
     ];
     chunk.forEach((line: ChinaPurchaseLine, index) => {
-      const y = CHINA_LIST_TOP - 28 - index * CHINA_ROW_H;
+      const y = CHINA_LIST_TOP - CHINA_HEADER_OFFSET - index * CHINA_ROW_H;
       const prices = formatChinaPurchasePriceCells(line);
       ops.push(
-        textAt(CHINA_COL_CODE, y, fitText(line.code, 8.5, 100), 8.5, false, CREAM),
-        textAt(CHINA_COL_QTY, y, fitText(line.quantityLabel, 8.5, 120), 8.5, false, CREAM),
-        textAt(CHINA_COL_PRICE, y, fitText(prices.price, 8.5, 115), 8.5, false, CREAM),
-        textAt(CHINA_COL_TOTAL, y, fitText(prices.total, 8.5, 90), 8.5, false, CREAM),
+        textAt(CHINA_COL_CODE, y, fitText(line.code, 8.3, 100), 8.3, false, CREAM),
+        textAt(CHINA_COL_QTY, y, fitText(line.quantityLabel, 8.3, 120), 8.3, false, CREAM),
+        textAt(CHINA_COL_PRICE, y, fitText(prices.price, 8.3, 115), 8.3, false, CREAM),
+        textAt(CHINA_COL_TOTAL, y, fitText(prices.total, 8.3, 90), 8.3, false, CREAM),
       );
     });
     if (isLast) {
@@ -314,10 +434,34 @@ function chinaPages(summary: ProcessingOrderSummary, exportedAt: string, startPa
   });
 }
 
+function chinaCodeListPages(summary: ProcessingOrderSummary, startPage: number): string[] {
+  const purchase = summary.chinaPurchase;
+  const chunks = chunkCodeListLines(purchase.lines);
+  return chunks.map((chunk, chunkIndex) => {
+    const pageNumber = startPage + chunkIndex;
+    const label = chunkIndex === 0 ? "CHINA BESTELLLISTE" : "CHINA BESTELLLISTE";
+    const ops = [
+      ...compactChrome(label, pageNumber),
+      ...listPanel(CODE_LIST_TOP, CODE_LIST_BOTTOM),
+      textAt(CODE_LIST_COL_CODE, CODE_LIST_TOP - 14, "PRODUKT CODE", 7.5, true, MUTED),
+      textAt(CODE_LIST_COL_QTY, CODE_LIST_TOP - 14, "MENGE", 7.5, true, MUTED),
+    ];
+    chunk.forEach((line: ChinaPurchaseLine, index) => {
+      const y = CODE_LIST_TOP - CODE_LIST_HEADER_OFFSET - index * CODE_LIST_ROW_H;
+      ops.push(
+        textAt(CODE_LIST_COL_CODE, y, fitText(line.code, 8.5, 110), 8.5, false, CREAM),
+        textAt(CODE_LIST_COL_QTY, y, fitText(line.quantityLabel, 8.5, 200), 8.5, false, CREAM),
+      );
+    });
+    return contentStream(ops);
+  });
+}
+
 export function buildPeptixOrderSummaryPdf(summary: ProcessingOrderSummary, exportedAt: string): Uint8Array {
   const orders = orderPages(summary, exportedAt);
   const china = chinaPages(summary, exportedAt, orders.length + 1);
-  const contents = [...orders, ...china];
+  const codeList = chinaCodeListPages(summary, orders.length + china.length + 1);
+  const contents = [...orders, ...china, ...codeList];
   const jpeg = jpegImageXObject(templateLogoJpeg(), 630, 700);
   const pageObjectStart = 6 + contents.length;
   const pageRefs = contents.map((_, index) => `${pageObjectStart + index} 0 R`).join(" ");

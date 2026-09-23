@@ -2,11 +2,18 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-23 (Bestell-Zusammenfassung PDF — China Bestellliste + pagination)
+
+### Changed
+
+- Admin export adds **CHINA BESTELLLISTE** (Produktcode + Menge only, copy-friendly, same aggregated `chinaPurchase.lines` as the price page). Page order: BESTELLUNGEN → CHINA BESTELLUNG (Preise) → CHINA BESTELLLISTE.
+- Tighter person-list layout (36 rows on page 1); dynamic China price pagination so totals/Mengenübersicht stay on the last price page without orphan product rows.
+
 ## 2026-09-23 (Bestell-Zusammenfassung PDF — 2 pages)
 
 ### Changed
 
-- Admin export `Bestell-Zusammenfassung.pdf`: two pages only — **BESTELLUNGEN** (Nutzername / Produktcode / Menge, dynamic layout) and **CHINA BESTELLUNG** (aggregated by product code, catalog/bulk USD, copy-friendly columns). Removed per-category and Händler table pages. PEPTIX gold template chrome unchanged.
+- Admin export `Bestell-Zusammenfassung.pdf`: **BESTELLUNGEN** (Nutzername / Produktcode / Menge, dynamic layout) and **CHINA BESTELLUNG** (aggregated by product code, catalog/bulk USD, copy-friendly columns). Removed per-category and Händler table pages. PEPTIX gold template chrome unchanged.
 - `personLines`: one row per processing order line (kit shares stay `5/10 Kit` per participant; no merged `User A + User B` rows).
 - Page 1 stats: **PERSONEN / POSITIONEN / PRODUKTE** (distinct codes on person lines) instead of a mixed-unit **GESAMTMENGE**.
 

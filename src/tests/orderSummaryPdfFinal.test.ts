@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { buildPeptixOrderSummaryPdf, planPeptixOrderSummaryPages, ORDER_ROWS_PER_PAGE } from "@/lib/pdf/peptixOrderSummaryPdf";
-import { buildChinaPurchaseSummary, buildProcessingOrderSummary } from "@/lib/orderSummary";
+import {
+  buildPeptixOrderSummaryPdf,
+  chunkChinaPurchaseLines,
+  orderListRowCapacity,
+  planPeptixOrderSummaryPages,
+} from "@/lib/pdf/peptixOrderSummaryPdf";
+import { buildProcessingOrderSummary } from "@/lib/orderSummary";
 import { buildProcessingOrderSummaryPdf } from "@/lib/orderSummaryExport";
 import type { KitShareOrderContext } from "@/lib/kitOrderSummary";
 import type { Tables } from "@/types/database";
@@ -154,10 +159,58 @@ describe("order summary PDF finalization", () => {
     );
   });
 
-  it("normal batch is two PDF pages; large person list adds continuation pages only", () => {
+  it("default export is three pages: orders, china prices, china code list", () => {
     const summary = mixedFinalSummary();
-    expect(planPeptixOrderSummaryPages(summary)).toEqual(["BESTELLUNGEN", "CHINA BESTELLUNG"]);
-    const manyPersonLines = Array.from({ length: ORDER_ROWS_PER_PAGE + 3 }, (_, i) => ({
+    expect(planPeptixOrderSummaryPages(summary)).toEqual([
+      "BESTELLUNGEN",
+      "CHINA BESTELLUNG",
+      "CHINA BESTELLLISTE",
+    ]);
+    const pageCount = planPeptixOrderSummaryPages(summary).length;
+    const bytes = buildPeptixOrderSummaryPdf(summary, "now");
+    const text = new TextDecoder("latin1").decode(bytes);
+    expect(Number(text.match(/\/Count (\d+)/)?.[1])).toBe(pageCount);
+  });
+
+  it("china code list uses aggregated lines only — no prices or usernames", () => {
+    const summary = mixedFinalSummary();
+    const text = new TextDecoder("latin1").decode(buildPeptixOrderSummaryPdf(summary, "now"));
+    const listStart = text.lastIndexOf("CHINA BESTELLLISTE");
+    expect(listStart).toBeGreaterThan(-1);
+    const listSection = text.slice(listStart);
+    expect(listSection).toContain("CU50");
+    expect(listSection).toContain("11 Kits");
+    expect(listSection).not.toContain("USD");
+    expect(listSection).not.toContain("GESAMTPREIS");
+    expect(listSection).not.toContain("EddiB");
+    expect(listSection).not.toContain("Melissa");
+  });
+
+  it("36 person lines fit on one BESTELLUNGEN page", () => {
+    const summary = mixedFinalSummary();
+    const cap = orderListRowCapacity(true);
+    expect(cap).toBeGreaterThanOrEqual(36);
+    const personLines = Array.from({ length: 36 }, (_, i) => ({
+      name: `User${i}`,
+      code: `C${String(i).padStart(2, "0")}`,
+      quantity: 1,
+      quantityLabel: "1 Kit",
+      dose: "10 mg",
+      article: "X",
+    }));
+    const big = {
+      ...summary,
+      personLines,
+      personCount: 36,
+      positionCount: 36,
+    };
+    expect(planPeptixOrderSummaryPages(big as typeof summary).filter((p) => p === "BESTELLUNGEN")).toHaveLength(1);
+  });
+
+  it("large person list adds BESTELLUNGEN continuation pages only", () => {
+    const summary = mixedFinalSummary();
+    const cap = orderListRowCapacity(true);
+    const manyPersonLines = Array.from({ length: cap + 3 }, (_, i) => ({
       name: `User${i}`,
       code: `C${i}`,
       quantity: 1,
@@ -169,12 +222,27 @@ describe("order summary PDF finalization", () => {
     expect(planPeptixOrderSummaryPages(big as typeof summary).filter((p) => p === "BESTELLUNGEN").length).toBe(2);
   });
 
+  it("20 china product codes stay on one CHINA BESTELLUNG page with footer", () => {
+    const lines = Array.from({ length: 20 }, (_, i) => ({
+      code: `P${i}`,
+      quantity: 1,
+      quantityLabel: "1 Kit",
+      unitPriceUsd: 10,
+      totalUsd: 10,
+      categoryId: "peptides" as const,
+    }));
+    const chunks = chunkChinaPurchaseLines(lines);
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0]).toHaveLength(20);
+  });
+
   it("PDF has no category pages and copy-friendly china columns", () => {
     const text = new TextDecoder("latin1").decode(buildPeptixOrderSummaryPdf(mixedFinalSummary(), "now"));
     expect(text).not.toMatch(/PEPTIDE BESTELL/i);
     expect(text).not.toContain("HÄNDLER GESAMTÜBERSICHT");
     expect(text).toContain("NUTZERNAME");
     expect(text).toContain("CHINA BESTELLUNG");
+    expect(text).toContain("CHINA BESTELLLISTE");
     expect(text).toContain("GESAMT CHINA BESTELLUNG");
     expect(text).toContain("BERSICHT");
     expect(text).toContain("VERSCHIEDENE PRODUKTE");
