@@ -9,7 +9,9 @@ import {
 } from "@/lib/orderSummaryExport";
 import {
   aggregateMerchantQuantitiesByCode,
+  buildChinaPurchaseSummary,
   buildProcessingOrderSummary,
+  formatChinaPurchasePriceCells,
   ORDER_SUMMARY_CATEGORY_LABELS,
 } from "@/lib/orderSummary";
 import { planPeptixOrderSummaryPages } from "@/lib/pdf/peptixOrderSummaryPdf";
@@ -361,23 +363,23 @@ describe("processing order summary PDF", () => {
     const bytes = buildProcessingOrderSummaryPdf(summary, "03.09.2026, 10:00");
     const text = new TextDecoder("latin1").decode(bytes);
     expect(text.startsWith("%PDF-")).toBe(true);
-    expect(text).toContain("PEPTIDE");
+    expect(text).toContain("CHINA BESTELLUNG");
+    expect(text).toContain("NUTZERNAME");
     expect(text).toContain("BESTELLUNGEN");
-    expect(text).toContain("CODE");
-    expect(text).toContain("ARTIKEL");
+    expect(text).toContain("PRODUKT CODE");
     expect(text).toContain("MENGE");
     expect(text).toContain("GESAMTPREIS");
-    expect(text).toContain("NAME");
-    expect(text).toContain("DOSIS");
     expect(text).toContain("RETA10");
     expect(text).toContain("PepsiDry");
-    expect(text).toContain("3x");
-    expect(text).toContain("10 mg");
-    expect(text).toContain("150,00");
+    expect(text).toContain("3 Kits");
+    expect(text).toContain("GESAMT CHINA BESTELLUNG");
     expect(summary.customers[0]?.orderNumber).toBe("CN-2026-000034");
     expect(text).not.toContain("display_name");
     expect(text).not.toContain("1.25");
-    expect(text).toContain("GESAMTMENGE");
+    expect(text).not.toContain("PEPTIDEBESTELLÜBERSICHT");
+    expect(text).toContain("PRODUKTE");
+    expect(text).not.toContain("GESAMTMENGE");
+    expect((text.match(/\/Count (\d+)/) ?? [])[1]).toBe("2");
   });
 });
 
@@ -443,44 +445,143 @@ describe("merchant quantity totals", () => {
     expect(summary.merchantTotals.some((row) => row.quantity === 1 && row.code === "RT10")).toBe(false);
   });
 
-  it("puts the dealer overview on its own additional page after the order pages", () => {
+  it("exports exactly two pages for a normal order batch (orders + China purchase)", () => {
     const pdf = readFileSync(resolve(process.cwd(), "src/lib/pdf/peptixOrderSummaryPdf.ts"), "utf8");
-    const customer = readFileSync(resolve(process.cwd(), "src/lib/orderExport.ts"), "utf8");
-    expect(pdf).toContain("HÄNDLER GESAMTÜBERSICHT");
-    expect(pdf).toContain("merchantTotals");
-    expect(pdf).toContain("GESAMTMENGE");
-    expect(pdf).toContain("[...product, ...orders, ...merchant]");
-    expect(customer).not.toContain("HÄNDLER GESAMTÜBERSICHT");
+    expect(pdf).toContain("CHINA BESTELLUNG");
+    expect(pdf).toContain("NUTZERNAME");
+    expect(pdf).toContain("PRODUKT CODE");
+    expect(pdf).not.toContain("PEPTIDEBESTELLÜBERSICHT");
+    expect(pdf).not.toContain("HÄNDLER GESAMTÜBERSICHT");
     expect(readFileSync(resolve(process.cwd(), "src/lib/orderSummaryExport.ts"), "utf8")).toContain(
       "buildPeptixOrderSummaryPdf",
     );
 
+    const catalog = [{ id: "prod-10", code: "RT10", name: "Retatrutide 10 mg", category: "PEPTIDES", price_usd: 50 }];
     const summary = buildProcessingOrderSummary(
       [
         makeOrder({ id: "a", order_number: "CN-1" }),
         makeOrder({ id: "b", order_number: "CN-2", user_id: "user-2", telegram_username_snapshot: "Raff" }),
       ],
       [
-        makeItem({ id: "i1", order_id: "a", product_code_snapshot: "RT10", quantity: 2 }),
-        makeItem({ id: "i2", order_id: "b", product_code_snapshot: "RT10", quantity: 2 }),
+        makeItem({ id: "i1", order_id: "a", product_code_snapshot: "RT10", quantity: 2, normal_price_usd_snapshot: 50, unit_price_usd_snapshot: 62.5 }),
+        makeItem({ id: "i2", order_id: "b", product_code_snapshot: "RT10", quantity: 2, normal_price_usd_snapshot: 50, unit_price_usd_snapshot: 62.5 }),
       ],
+      catalog,
     );
     const pages = planPeptixOrderSummaryPages(summary);
-    const firstMerchant = pages.indexOf("HÄNDLER GESAMTÜBERSICHT");
-    const lastOrders = pages.lastIndexOf("BESTELLUNGEN");
-    expect(pages[0]).toBe("PEPTIDE");
-    expect(firstMerchant).toBeGreaterThan(0);
-    expect(lastOrders).toBeGreaterThanOrEqual(0);
-    expect(firstMerchant).toBe(lastOrders + 1);
-    expect(pages.at(-1)).toBe("HÄNDLER GESAMTÜBERSICHT");
-    expect(pages.filter((title) => title === "HÄNDLER GESAMTÜBERSICHT")).toHaveLength(1);
+    expect(pages).toEqual(["BESTELLUNGEN", "CHINA BESTELLUNG"]);
+    expect(summary.chinaPurchase.lines).toEqual([
+      expect.objectContaining({ code: "RT10", quantity: 4, totalUsd: 200 }),
+    ]);
 
     const bytes = buildProcessingOrderSummaryPdf(summary, "13.09.2026, 12:00");
     const text = new TextDecoder("latin1").decode(bytes);
     const count = text.match(/\/Count (\d+)/);
-    expect(Number(count?.[1])).toBe(pages.length);
-    expect(text.indexOf("PEPTIDE")).toBeGreaterThan(-1);
-    expect(text.indexOf("BESTELLUNGEN")).toBeGreaterThan(text.indexOf("PEPTIDE"));
-    expect(text.lastIndexOf("H")).toBeGreaterThan(-1);
+    expect(Number(count?.[1])).toBe(2);
+    expect(text.indexOf("BESTELLUNGEN")).toBeGreaterThan(-1);
+    expect(text.indexOf("CHINA BESTELLUNG")).toBeGreaterThan(text.indexOf("BESTELLUNGEN"));
+    expect(text).toContain("GESAMT CHINA BESTELLUNG");
+  });
+
+  it("buildChinaPurchaseSummary uses catalog getEffectiveUnitPrice without customer markup", () => {
+    const items = [
+      makeItem({
+        id: "a",
+        product_code_snapshot: "CU50",
+        quantity: 5,
+        normal_price_usd_snapshot: 50,
+        unit_price_usd_snapshot: 62.5,
+        line_total_usd: 312.5,
+      }),
+      makeItem({
+        id: "b",
+        product_code_snapshot: "CU50",
+        quantity: 6,
+        normal_price_usd_snapshot: 50,
+        unit_price_usd_snapshot: 62.5,
+        line_total_usd: 375,
+      }),
+    ];
+    const catalog = [
+      {
+        id: "prod-cu50",
+        code: "CU50",
+        name: "GHK-Cu",
+        category: "PEPTIDES",
+        price_usd: 40.5,
+        bulk_price_usd: null,
+        bulk_price_min_quantity: null,
+      },
+    ];
+    const china = buildChinaPurchaseSummary(items, catalog);
+    expect(china.lines).toHaveLength(1);
+    expect(china.lines[0]?.quantity).toBe(11);
+    expect(china.lines[0]?.quantityLabel).toBe("11 Kits");
+    expect(china.lines[0]?.unitPriceUsd).toBe(40.5);
+    expect(china.lines[0]?.totalUsd).toBe(445.5);
+    expect(china.distinctProducts).toBe(1);
+    expect(china.kitCount).toBe(11);
+    expect(formatChinaPurchasePriceCells(china.lines[0]!).price).toContain("/ Kit");
+  });
+
+  it("applies bulk catalog pricing once for injectable oil totals", () => {
+    const items = [
+      makeItem({
+        id: "oil",
+        product_id: "oil-id",
+        product_code_snapshot: "OXO50",
+        product_name_snapshot: "Test Oil",
+        quantity: 10,
+        normal_price_usd_snapshot: 18,
+        bulk_price_usd_snapshot: 160,
+        bulk_price_min_quantity_snapshot: 10,
+        unit_price_usd_snapshot: 20,
+        line_total_usd: 200,
+      }),
+    ];
+    const catalog = [
+      {
+        id: "oil-id",
+        code: "OXO50",
+        name: "Test Oil",
+        category: "INJECTABLE OILS",
+        price_usd: 18,
+        bulk_price_usd: 160,
+        bulk_price_min_quantity: 10,
+      },
+    ];
+    const china = buildChinaPurchaseSummary(items, catalog);
+    expect(china.lines[0]?.quantityLabel).toBe("10 Vials");
+    expect(china.lines[0]?.totalUsd).toBe(160);
+    expect(china.vialCount).toBe(10);
+    expect(china.kitCount).toBe(0);
+  });
+
+  it("counts orals as packungen in the China quantity overview", () => {
+    const items = [
+      makeItem({
+        id: "o1",
+        product_code_snapshot: "SLU5",
+        product_name_snapshot: "Oral A",
+        quantity: 1,
+        normal_price_usd_snapshot: 54,
+        unit_price_usd_snapshot: 67.5,
+      }),
+      makeItem({
+        id: "o2",
+        product_code_snapshot: "BAM50",
+        product_name_snapshot: "Oral B",
+        quantity: 1,
+        normal_price_usd_snapshot: 40,
+        unit_price_usd_snapshot: 50,
+      }),
+    ];
+    const catalog = [
+      { id: "1", code: "SLU5", name: "Oral A", category: "ORALS", price_usd: 54 },
+      { id: "2", code: "BAM50", name: "Oral B", category: "ORALS", price_usd: 40 },
+    ];
+    const china = buildChinaPurchaseSummary(items, catalog);
+    expect(china.packungCount).toBe(2);
+    expect(china.distinctProducts).toBe(2);
   });
 });

@@ -9,9 +9,20 @@ import {
   splitKitProgress,
   type KitShareOrderContext,
 } from "@/lib/kitOrderSummary";
-import { formatCatalogQuantity, type QuantitySaleMode } from "@/lib/quantityFormat";
+import {
+  formatCatalogQuantity,
+  productQuantityKindFor,
+  type QuantitySaleMode,
+} from "@/lib/quantityFormat";
 import { saleModeForShopArea } from "@/lib/shop/shopAreas";
-import { normalizeProductCode, roundCurrency } from "@/lib/money";
+import {
+  calculateLineTotalUsd,
+  formatUsd,
+  getEffectiveUnitPrice,
+  normalizeProductCode,
+  roundCurrency,
+  type PricedProduct,
+} from "@/lib/money";
 import { SHOP_CATEGORIES, shopCategoryIdFor, type ShopCategoryId } from "@/lib/shopCategories";
 import {
   formatOralVariantLabel,
@@ -86,6 +97,24 @@ export interface MerchantQuantityTotal {
   quantity: number;
 }
 
+export interface ChinaPurchaseLine {
+  code: string;
+  quantity: number;
+  quantityLabel: string;
+  unitPriceUsd: number;
+  totalUsd: number;
+  categoryId: ShopCategoryId;
+}
+
+export interface ChinaPurchaseSummary {
+  lines: ChinaPurchaseLine[];
+  totalUsd: number;
+  distinctProducts: number;
+  kitCount: number;
+  packungCount: number;
+  vialCount: number;
+}
+
 export interface ProcessingOrderSummary {
   orderCount: number;
   productCount: number;
@@ -95,13 +124,168 @@ export interface ProcessingOrderSummary {
   customers: OrderSummaryCustomer[];
   personCount: number;
   positionCount: number;
+  /** @deprecated Misleading when lines mix kits/vials/packungen — HTML print only. PDF uses personDistinctProductCount. */
   personQuantityTotal: number;
+  /** Distinct product codes on person lines (page 1 stats). */
+  personDistinctProductCount: number;
   personLines: OrderSummaryPersonLine[];
   merchantTotals: MerchantQuantityTotal[];
   merchantArticleCount: number;
+  chinaPurchase: ChinaPurchaseSummary;
 }
 
 /** Raw order-item quantities grouped by product code. Never uses merged kit display lines. */
+type CatalogPricedHint = CatalogCategoryHint & {
+  price_usd?: number | null;
+  bulk_price_usd?: number | null;
+  bulk_price_min_quantity?: number | null;
+};
+
+function pricedProductForChinaLine(
+  item: Tables<"order_items">,
+  byId: Map<string, CatalogPricedHint>,
+  byCode: Map<string, CatalogPricedHint>,
+): PricedProduct {
+  const fromId = item.product_id ? byId.get(item.product_id) : undefined;
+  const fromCode = byCode.get(normalizeProductCode(item.product_code_snapshot ?? ""));
+  const catalog = fromId ?? fromCode;
+  if (catalog && typeof catalog.price_usd === "number" && Number.isFinite(catalog.price_usd)) {
+    return {
+      price_usd: catalog.price_usd,
+      bulk_price_usd: catalog.bulk_price_usd ?? null,
+      bulk_price_min_quantity: catalog.bulk_price_min_quantity ?? null,
+    };
+  }
+  return {
+    price_usd: Number(item.normal_price_usd_snapshot ?? item.unit_price_usd_snapshot ?? 0),
+    bulk_price_usd: item.bulk_price_usd_snapshot,
+    bulk_price_min_quantity: item.bulk_price_min_quantity_snapshot,
+  };
+}
+
+function aggregateChinaRowsFromMerchantLines(
+  merchantLines: readonly OrderSummaryLine[],
+): Array<{ code: string; quantity: number; quantityLabel: string; categoryId: ShopCategoryId }> {
+  const byCode = new Map<string, OrderSummaryLine[]>();
+  for (const line of merchantLines) {
+    const list = byCode.get(line.code) ?? [];
+    list.push(line);
+    byCode.set(line.code, list);
+  }
+  return [...byCode.entries()]
+    .map(([code, lines]) => {
+      const categoryId = lines[0]?.categoryId ?? "peptides";
+      const quantity = lines.reduce((sum, row) => sum + row.quantity, 0);
+      const quantityLabel =
+        lines.length === 1 ? (lines[0]?.quantityLabel ?? formatCatalogQuantity(quantity, categoryId)) : formatCatalogQuantity(quantity, categoryId);
+      return { code, quantity, quantityLabel, categoryId };
+    })
+    .sort((a, b) => {
+      if (a.code === "—") return 1;
+      if (b.code === "—") return -1;
+      return a.code.localeCompare(b.code, "de");
+    });
+}
+
+function kitUnitsForChinaOverview(line: ChinaPurchaseLine): number {
+  if (productQuantityKindFor(line.categoryId) !== "kit") return 0;
+  if (line.quantityLabel.includes("/")) {
+    const share = line.quantityLabel.match(/^(\d+)\/(\d+)/);
+    if (share) {
+      return splitKitProgress(Number(share[1]), Number(share[2])).completeKits;
+    }
+    return 0;
+  }
+  return line.quantity;
+}
+
+/** China vendor totals: aggregate by product code, catalog/bulk pricing via getEffectiveUnitPrice (no role markup). */
+export function buildChinaPurchaseSummary(
+  items: readonly Tables<"order_items">[],
+  catalog: CatalogCategoryHint[] = [],
+  merchantLines: readonly OrderSummaryLine[] = [],
+): ChinaPurchaseSummary {
+  const byId = new Map<string, CatalogPricedHint>();
+  const byCode = new Map<string, CatalogPricedHint>();
+  for (const product of catalog as CatalogPricedHint[]) {
+    if (product.id) byId.set(product.id, product);
+    const code = normalizeProductCode(product.code ?? "");
+    if (code) byCode.set(code, product);
+  }
+
+  const sampleByCode = new Map<string, Tables<"order_items">>();
+  for (const item of items) {
+    const code = normalizeProductCode(item.product_code_snapshot ?? "") || "—";
+    if (!sampleByCode.has(code)) sampleByCode.set(code, item);
+  }
+
+  const quantityRows =
+    merchantLines.length > 0
+      ? aggregateChinaRowsFromMerchantLines(merchantLines)
+      : aggregateMerchantQuantitiesByCode(items).map(({ code, quantity }) => {
+          const sample = sampleByCode.get(code);
+          const hint = sample ? catalogHintForItem(sample, byId, byCode) : { category: null, name: null };
+          const categoryId = shopCategoryIdFor({
+            category: hint.category,
+            name: hint.name ?? sample?.product_name_snapshot,
+            code: sample?.product_code_snapshot,
+          });
+          return {
+            code,
+            quantity,
+            quantityLabel: formatCatalogQuantity(quantity, categoryId),
+            categoryId,
+          };
+        });
+
+  const lines: ChinaPurchaseLine[] = [];
+  for (const { code, quantity, quantityLabel, categoryId } of quantityRows) {
+    const sample = sampleByCode.get(code);
+    if (!sample || quantity <= 0) continue;
+    const product = pricedProductForChinaLine(sample, byId, byCode);
+    const effective = getEffectiveUnitPrice(product, quantity);
+    const totalUsd = calculateLineTotalUsd(quantity, effective.unitPriceUsd) ?? 0;
+    lines.push({
+      code,
+      quantity,
+      quantityLabel,
+      unitPriceUsd: effective.unitPriceUsd,
+      totalUsd,
+      categoryId,
+    });
+  }
+
+  let kitCount = 0;
+  let packungCount = 0;
+  let vialCount = 0;
+  for (const line of lines) {
+    const kind = productQuantityKindFor(line.categoryId);
+    if (kind === "kit") kitCount += kitUnitsForChinaOverview(line);
+    else if (kind === "packung") packungCount += line.quantity;
+    else vialCount += line.quantity;
+  }
+
+  return {
+    lines,
+    totalUsd: roundCurrency(lines.reduce((sum, line) => sum + line.totalUsd, 0)),
+    distinctProducts: lines.length,
+    kitCount,
+    packungCount,
+    vialCount,
+  };
+}
+
+/** Copy-friendly China price columns for PDF/text export. */
+export function formatChinaPurchasePriceCells(line: ChinaPurchaseLine): { price: string; total: string } {
+  const total = formatUsd(line.totalUsd);
+  const unit = formatUsd(line.unitPriceUsd);
+  if (line.quantity <= 1) {
+    return { price: unit, total };
+  }
+  const unitWord = productQuantityKindFor(line.categoryId) === "kit" ? "Kit" : productQuantityKindFor(line.categoryId) === "packung" ? "Packung" : "Stück";
+  return { price: `${unit} / ${unitWord}`, total };
+}
+
 export function aggregateMerchantQuantitiesByCode(
   items: readonly Pick<Tables<"order_items">, "product_code_snapshot" | "quantity">[],
 ): MerchantQuantityTotal[] {
@@ -238,21 +422,6 @@ export function formatOrderSummaryDose(
 
 function personSortKey(name: string): string {
   return name === ORDER_TELEGRAM_SNAPSHOT_UNAVAILABLE ? "\uFFFF" : name;
-}
-
-function mergePersonNames(current: string, next: string): string {
-  const names = new Set(
-    current
-      .split(/\s*\+\s*|,\s*/)
-      .map((name) => name.trim())
-      .filter(Boolean),
-  );
-  if (next.trim()) names.add(next.trim());
-  return [...names].sort((a, b) => personSortKey(a).localeCompare(personSortKey(b), "de")).join(" + ");
-}
-
-function isKitFullyComplete(progress: { completeKits: number; remainderVials: number } | undefined): boolean {
-  return Boolean(progress && progress.completeKits > 0 && progress.remainderVials === 0);
 }
 
 /** Merchant buy list from frozen order_items. Default: processing orders only. Pass includedOrderIds for a persistent order group (any status). */
@@ -474,14 +643,11 @@ export function buildProcessingOrderSummary(
       const hint = catalogHintForItem(item, byId, byCode);
       const kitShareId = resolveKitShareIdForItem(item, order, resolvedContext, participants);
       const progress = kitShareId ? kitProgress.get(kitShareId) : undefined;
-      const kitFullyComplete = isKitFullyComplete(progress);
       const dose = formatOrderSummaryDose(item.dosage_vial_snapshot || hint.dosage_vial, item.product_code_snapshot ?? "");
       const article = (item.product_name_snapshot ?? "").trim() || hint.name?.trim() || "Nicht verfügbar";
       const code = (item.product_code_snapshot ?? "").trim() || hint.code?.trim() || "—";
       const mergeKey = kitShareId
-        ? kitFullyComplete
-          ? `kit-complete:${kitShareId}`
-          : `${personKey}|kit:${kitShareId}`
+        ? `${personKey}|kit:${kitShareId}`
         : `${personKey}|${productMergeKey(item)}|${dose}`;
       const existing = personMap.get(mergeKey);
       const quantity = asQuantity(item.quantity);
@@ -492,18 +658,12 @@ export function buildProcessingOrderSummary(
         existing.quantityLabel = formatPersonQuantityLabel(existing.quantity, categoryId, saleMode);
         continue;
       }
-      if (existing && kitFullyComplete) {
-        existing.name = mergePersonNames(existing.name, telegramLabel);
-        continue;
-      }
       if (existing) continue;
       personMap.set(mergeKey, {
         name: telegramLabel,
-        quantity: kitFullyComplete && progress ? progress.completeKits : quantity,
+        quantity,
         quantityLabel: progress
-          ? kitFullyComplete
-            ? formatCompleteKitQuantityLabel(progress.completeKits, categoryId, progress.kitSize)
-            : formatSharedKitShareLabel(quantity, progress.kitSize, categoryId)
+          ? formatSharedKitShareLabel(quantity, progress.kitSize, categoryId)
           : formatPersonQuantityLabel(quantity, categoryId, saleMode),
         dose,
         article,
@@ -515,11 +675,13 @@ export function buildProcessingOrderSummary(
   const personLines = [...personMap.values()].sort((a, b) => {
     const name = personSortKey(a.name).localeCompare(personSortKey(b.name), "de");
     if (name !== 0) return name;
-    const article = a.article.localeCompare(b.article, "de");
-    if (article !== 0) return article;
-    return a.dose.localeCompare(b.dose, "de");
+    return a.code.localeCompare(b.code, "de");
   });
   const merchantTotals = aggregateMerchantQuantitiesByCode(processingItems);
+  const chinaPurchase = buildChinaPurchaseSummary(processingItems, catalog, allLines);
+  const personDistinctProductCount = new Set(
+    personLines.map((line) => line.code.trim()).filter((code) => code && code !== "—"),
+  ).size;
   const personKeys = new Set(
     processing.map((order) =>
       order.telegram_username_snapshot?.trim()
@@ -538,8 +700,10 @@ export function buildProcessingOrderSummary(
     personCount: personKeys.size,
     positionCount: personLines.length,
     personQuantityTotal: personLines.reduce((sum, line) => sum + line.quantity, 0),
+    personDistinctProductCount,
     personLines,
     merchantTotals,
     merchantArticleCount: merchantTotals.reduce((sum, row) => sum + row.quantity, 0),
+    chinaPurchase,
   };
 }

@@ -44,3 +44,7 @@ supabase/qa/.generated/
 
 # Local research/debug dumps
 scripts/output/
+
+# Order summary PDF visual QA (generated locally)
+.cursor/visual-qa/
+public/qa-visual/

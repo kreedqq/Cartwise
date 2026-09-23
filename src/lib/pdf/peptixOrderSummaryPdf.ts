@@ -1,20 +1,22 @@
 import logoInline from "./peptix-template-logo.jpg?inline";
 import { formatUsd } from "@/lib/money";
-import type { OrderSummaryGroup, OrderSummaryLine, OrderSummaryPersonLine, ProcessingOrderSummary } from "@/lib/orderSummary";
+import {
+  formatChinaPurchasePriceCells,
+  type ChinaPurchaseLine,
+  type OrderSummaryPersonLine,
+  type ProcessingOrderSummary,
+} from "@/lib/orderSummary";
 import { assemblePdf, bytesFromDataUrl, jpegImageXObject, pdfLiteral } from "@/lib/pdfDocument";
-import type { ShopCategoryId } from "@/lib/shopCategories";
 
 const PAGE_W = 595.28;
 const PAGE_H = 841.89;
 const GOLD = "0.843 0.659 0.290";
 const GOLD_LIGHT = "0.949 0.827 0.541";
 const GOLD_STROKE = "0.490 0.353 0.141";
-const GRID = "0.227 0.200 0.153";
 const CREAM = "0.969 0.957 0.929";
 const MUTED = "0.686 0.663 0.616";
 const PAGE_FILL = "0.020 0.020 0.020";
 const PANEL = "0.051 0.051 0.051";
-const HEADER_BAR = "0.082 0.071 0.051";
 const LOGO_W = 147.4;
 const LOGO_H = 163.78;
 const LOGO_X = 36.85;
@@ -23,15 +25,25 @@ const CARD_X = 63.78;
 const CARD_W = 467.72;
 const META_Y = 578.12;
 const META_H = 39.69;
-const TABLE_Y = 136.22;
-const TABLE_H = 403.09;
-const HEADER_H = 22.4;
-const ROW_H = 22.4;
-const BODY_ROWS = 17;
-const FOOTER_H = 24.09;
-const PRODUCT_COLS = [0, 79.4, 275, 354.3, 467.72];
-const ORDER_COLS = [0, 119, 204, 301, 467.72];
-const MERCHANT_COLS = [0, 233.86, 467.72];
+
+/** Dynamic list layout (no fixed table grid — avoids footer/row overlap). */
+export const ORDER_ROWS_PER_PAGE = 32;
+export const CHINA_PRODUCT_ROWS_PER_PAGE = 18;
+const ORDER_ROW_H = 13.2;
+const CHINA_ROW_H = 13.2;
+const ORDER_LIST_TOP = 505;
+const ORDER_LIST_BOTTOM = 72;
+const CHINA_LIST_TOP = 455;
+const CHINA_FOOTER_TOP = 195;
+
+const ORDER_COL_USER = CARD_X + 8;
+const ORDER_COL_CODE = CARD_X + 168;
+const ORDER_COL_QTY = CARD_X + 318;
+
+const CHINA_COL_CODE = CARD_X + 8;
+const CHINA_COL_QTY = CARD_X + 118;
+const CHINA_COL_PRICE = CARD_X + 248;
+const CHINA_COL_TOTAL = CARD_X + 378;
 
 const HELVETICA_WIDTHS: number[] = [
   278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278,
@@ -128,98 +140,65 @@ function chrome(pageLabel: string, pageNumber: number, subtitle: string): string
   ];
 }
 
-function metaBox(datum: string, status: string, zeitraum: string): string[] {
+const STATS_Y = META_Y - 44;
+
+function metaBox(datum: string, status: string, zeitraum: string, y = META_Y): string[] {
   const colW = CARD_W / 3;
   return [
     rgb(PANEL, true),
-    rect(CARD_X, META_Y, CARD_W, META_H),
+    rect(CARD_X, y, CARD_W, META_H),
     "f",
     rgb(GOLD_STROKE, false),
     "0.6 w",
-    rect(CARD_X, META_Y, CARD_W, META_H),
+    rect(CARD_X, y, CARD_W, META_H),
     "S",
-    rgb(GRID, false),
+    rgb(GOLD_STROKE, false),
     "0.35 w",
-    line(CARD_X + colW, META_Y, CARD_X + colW, META_Y + META_H),
-    line(CARD_X + colW * 2, META_Y, CARD_X + colW * 2, META_Y + META_H),
-    textAt(CARD_X + 11.2, META_Y + 22.5, "DATUM", 7.2, true, MUTED),
-    textAt(CARD_X + 11.2, META_Y + 8.5, datum, 8, false, CREAM),
-    textAt(CARD_X + colW + 11.2, META_Y + 22.5, "STATUS", 7.2, true, MUTED),
-    textAt(CARD_X + colW + 11.2, META_Y + 8.5, status, 8, false, CREAM),
-    textAt(CARD_X + colW * 2 + 11.2, META_Y + 22.5, "ZEITRAUM", 7.2, true, MUTED),
-    textAt(CARD_X + colW * 2 + 11.2, META_Y + 8.5, zeitraum, 8, false, CREAM),
+    line(CARD_X + colW, y, CARD_X + colW, y + META_H),
+    line(CARD_X + colW * 2, y, CARD_X + colW * 2, y + META_H),
+    textAt(CARD_X + 11.2, y + 22.5, "DATUM", 7.2, true, MUTED),
+    textAt(CARD_X + 11.2, y + 8.5, datum, 8, false, CREAM),
+    textAt(CARD_X + colW + 11.2, y + 22.5, "STATUS", 7.2, true, MUTED),
+    textAt(CARD_X + colW + 11.2, y + 8.5, status, 8, false, CREAM),
+    textAt(CARD_X + colW * 2 + 11.2, y + 22.5, "ZEITRAUM", 7.2, true, MUTED),
+    textAt(CARD_X + colW * 2 + 11.2, y + 8.5, zeitraum, 8, false, CREAM),
   ];
 }
 
-function statsBox(personen: string, positionen: string, gesamtmenge: string): string[] {
+function statsBox(personen: string, positionen: string, produkte: string, y = STATS_Y): string[] {
   const colW = CARD_W / 3;
   return [
     rgb(PANEL, true),
-    rect(CARD_X, META_Y, CARD_W, META_H),
+    rect(CARD_X, y, CARD_W, META_H),
     "f",
     rgb(GOLD_STROKE, false),
     "0.6 w",
-    rect(CARD_X, META_Y, CARD_W, META_H),
+    rect(CARD_X, y, CARD_W, META_H),
     "S",
-    rgb(GRID, false),
+    rgb(GOLD_STROKE, false),
     "0.35 w",
-    line(CARD_X + colW, META_Y, CARD_X + colW, META_Y + META_H),
-    line(CARD_X + colW * 2, META_Y, CARD_X + colW * 2, META_Y + META_H),
-    textAt(CARD_X + 12.2, META_Y + 22.5, "PERSONEN", 7.2, true, MUTED),
-    textAt(CARD_X + 12.2, META_Y + 6.5, personen, 14, false, CREAM),
-    textAt(CARD_X + colW + 12.2, META_Y + 22.5, "POSITIONEN", 7.2, true, MUTED),
-    textAt(CARD_X + colW + 12.2, META_Y + 6.5, positionen, 14, false, CREAM),
-    textAt(CARD_X + colW * 2 + 12.2, META_Y + 22.5, "GESAMTMENGE", 7.2, true, MUTED),
-    textAt(CARD_X + colW * 2 + 12.2, META_Y + 6.5, gesamtmenge, 14, false, CREAM),
+    line(CARD_X + colW, y, CARD_X + colW, y + META_H),
+    line(CARD_X + colW * 2, y, CARD_X + colW * 2, y + META_H),
+    textAt(CARD_X + 12.2, y + 22.5, "PERSONEN", 7.2, true, MUTED),
+    textAt(CARD_X + 12.2, y + 6.5, personen, 14, false, CREAM),
+    textAt(CARD_X + colW + 12.2, y + 22.5, "POSITIONEN", 7.2, true, MUTED),
+    textAt(CARD_X + colW + 12.2, y + 6.5, positionen, 14, false, CREAM),
+    textAt(CARD_X + colW * 2 + 12.2, y + 22.5, "PRODUKTE", 7.2, true, MUTED),
+    textAt(CARD_X + colW * 2 + 12.2, y + 6.5, produkte, 14, false, CREAM),
   ];
 }
 
-function tableFrame(cols: number[]): string[] {
-  const bodyBottom = TABLE_Y + FOOTER_H;
-  const headerBottom = TABLE_Y + TABLE_H - HEADER_H;
-  const ops: string[] = [
+function listPanel(top: number, bottom: number): string[] {
+  const height = top - bottom;
+  return [
     rgb(PANEL, true),
-    rect(CARD_X, bodyBottom, CARD_W, TABLE_H - HEADER_H - FOOTER_H + HEADER_H),
+    rect(CARD_X, bottom, CARD_W, height),
     "f",
-    rgb(HEADER_BAR, true),
-    rect(CARD_X, headerBottom, CARD_W, HEADER_H),
-    "f",
-    rgb(HEADER_BAR, true),
-    rect(CARD_X, TABLE_Y, CARD_W, FOOTER_H),
-    "f",
-    rgb(GRID, false),
+    rgb(GOLD_STROKE, false),
     "0.45 w",
-    rect(CARD_X, TABLE_Y, CARD_W, TABLE_H),
+    rect(CARD_X, bottom, CARD_W, height),
     "S",
   ];
-  for (let i = 1; i <= BODY_ROWS; i++) {
-    const y = headerBottom - i * ROW_H;
-    ops.push(line(CARD_X, y, CARD_X + CARD_W, y));
-  }
-  ops.push(line(CARD_X, headerBottom, CARD_X + CARD_W, headerBottom));
-  ops.push(line(CARD_X, bodyBottom, CARD_X + CARD_W, bodyBottom));
-  for (const col of cols.slice(1, -1)) {
-    ops.push(line(CARD_X + col, TABLE_Y, CARD_X + col, TABLE_Y + TABLE_H));
-  }
-  ops.push(rgb(GOLD, false), "1 w", line(CARD_X, headerBottom, CARD_X + CARD_W, headerBottom));
-  ops.push("0.75 w", rect(CARD_X, TABLE_Y, CARD_W, FOOTER_H), "S");
-  return ops;
-}
-
-function cellText(cols: number[], rowY: number, values: string[], size = 8): string[] {
-  return values.map((value, index) => {
-    const x = CARD_X + cols[index] + 8;
-    const max = cols[index + 1] - cols[index] - 14;
-    return textAt(x, rowY, fitText(value, size, max, index === 0), size, false, CREAM);
-  });
-}
-
-function headerCells(cols: number[], labels: string[]): string[] {
-  const y = TABLE_Y + TABLE_H - HEADER_H + 7.2;
-  return labels.map((label, index) => {
-    const x = CARD_X + cols[index] + 8;
-    return textAt(x, y, label, 8.2, true, CREAM);
-  });
 }
 
 function chunkRows<T>(rows: T[], size: number): T[][] {
@@ -237,125 +216,108 @@ function splitExportStamp(exportedAt: string): { datum: string; zeitraum: string
   };
 }
 
-const PRODUCT_PAGE_CATEGORIES: Array<{ id: ShopCategoryId; title: string }> = [
-  { id: "peptides", title: "PEPTIDE" },
-  { id: "injectable-oils", title: "INJECTABLE OILS" },
-  { id: "orals", title: "ORALS" },
-];
-
-function groupById(groups: OrderSummaryGroup[]): Map<ShopCategoryId, OrderSummaryGroup> {
-  return new Map(groups.map((group) => [group.categoryId, group]));
+function displayUsername(name: string): string {
+  return name.trim().replace(/^@+/, "");
 }
 
-function productPageSpecs(summary: ProcessingOrderSummary): Array<{ id: ShopCategoryId; title: string }> {
-  const specs = [...PRODUCT_PAGE_CATEGORIES];
-  const water = groupById(summary.groups).get("reconstitution-water");
-  if (water && water.lines.length > 0) {
-    specs.push({ id: "reconstitution-water", title: "RECONSTITUTION WATER" });
-  }
-  return specs;
-}
-
-/** Page titles in export order. Merchant totals always start on their own page after BESTELLUNGEN. */
+/** Two-page export: orders by person, then China purchase aggregated by product code. */
 export function planPeptixOrderSummaryPages(summary: ProcessingOrderSummary): string[] {
-  const titles: string[] = [];
-  const byId = groupById(summary.groups);
-  for (const spec of productPageSpecs(summary)) {
-    titles.push(...chunkRows(byId.get(spec.id)?.lines ?? [], BODY_ROWS).map(() => spec.title));
-  }
-  titles.push(...chunkRows(summary.personLines, BODY_ROWS).map(() => "BESTELLUNGEN"));
-  titles.push(...chunkRows(summary.merchantTotals ?? [], BODY_ROWS).map(() => "HÄNDLER GESAMTÜBERSICHT"));
-  return titles;
+  const orderPages = Math.max(1, Math.ceil(summary.personLines.length / ORDER_ROWS_PER_PAGE));
+  const chinaPages = Math.max(1, Math.ceil(summary.chinaPurchase.lines.length / CHINA_PRODUCT_ROWS_PER_PAGE));
+  return [
+    ...Array.from({ length: orderPages }, () => "BESTELLUNGEN"),
+    ...Array.from({ length: chinaPages }, () => "CHINA BESTELLUNG"),
+  ];
 }
 
-function merchantPages(summary: ProcessingOrderSummary, exportedAt: string, startPage: number): string[] {
+function orderPages(summary: ProcessingOrderSummary, exportedAt: string): string[] {
   const { datum, zeitraum } = splitExportStamp(exportedAt);
-  const rows = summary.merchantTotals ?? [];
-  const articleCount = summary.merchantArticleCount ?? rows.reduce((sum, row) => sum + row.quantity, 0);
-  return chunkRows(rows, BODY_ROWS).map((chunk, index) => {
+  const chunks = chunkRows(summary.personLines, ORDER_ROWS_PER_PAGE);
+  return chunks.map((chunk, pageIndex) => {
+    const listTop = pageIndex === 0 ? ORDER_LIST_TOP : 560;
     const ops = [
-      ...chrome("HÄNDLER GESAMTÜBERSICHT", startPage + index, "GESAMTÜBERSICHT ALLER BESTELLUNGEN"),
-      ...metaBox(datum, `${summary.orderCount} Bestellungen`, zeitraum),
-      ...tableFrame(MERCHANT_COLS),
-      ...headerCells(MERCHANT_COLS, ["CODE", "GESAMTMENGE"]),
+      ...chrome("BESTELLUNGEN", pageIndex + 1, "WER HAT WAS BESTELLT UND IN WELCHER MENGE"),
+      ...(pageIndex === 0
+        ? [
+            ...metaBox(datum, "In Bearbeitung", zeitraum),
+            ...statsBox(
+              String(summary.personCount),
+              String(summary.positionCount),
+              String(summary.personDistinctProductCount),
+            ),
+          ]
+        : []),
+      ...listPanel(listTop, ORDER_LIST_BOTTOM),
+      textAt(ORDER_COL_USER, listTop - 14, "NUTZERNAME", 7.5, true, MUTED),
+      textAt(ORDER_COL_CODE, listTop - 14, "PRODUKT CODE", 7.5, true, MUTED),
+      textAt(ORDER_COL_QTY, listTop - 14, "MENGE", 7.5, true, MUTED),
     ];
-    chunk.forEach((row, rowIndex) => {
-      const y = TABLE_Y + TABLE_H - HEADER_H - (rowIndex + 1) * ROW_H + 7;
-      ops.push(...cellText(MERCHANT_COLS, y, [row.code, `${row.quantity}x`]));
+    chunk.forEach((line: OrderSummaryPersonLine, index) => {
+      const y = listTop - 28 - index * ORDER_ROW_H;
+      ops.push(
+        textAt(ORDER_COL_USER, y, fitText(displayUsername(line.name), 8.5, 150), 8.5, false, CREAM),
+        textAt(ORDER_COL_CODE, y, fitText(line.code, 8.5, 140), 8.5, false, CREAM),
+        textAt(ORDER_COL_QTY, y, fitText(line.quantityLabel, 8.5, 120), 8.5, false, CREAM),
+      );
     });
-    ops.push(
-      ...cellText(
-        MERCHANT_COLS,
-        TABLE_Y + 8.2,
-        ["GESAMT ARTIKEL", String(articleCount)],
-        8.2,
-      ),
-    );
     return contentStream(ops);
   });
 }
 
-function productPages(summary: ProcessingOrderSummary, exportedAt: string, startPage = 1): string[] {
+function chinaPages(summary: ProcessingOrderSummary, exportedAt: string, startPage: number): string[] {
   const { datum, zeitraum } = splitExportStamp(exportedAt);
-  const byId = groupById(summary.groups);
-  const specs = productPageSpecs(summary);
-  const streams: string[] = [];
-  let pageNumber = startPage;
-  for (const spec of specs) {
-    const group = byId.get(spec.id);
-    const lines = group?.lines ?? [];
-    const chunks = chunkRows(lines, BODY_ROWS);
-    for (const chunk of chunks) {
-      const ops = [
-        ...chrome(spec.title, pageNumber, "BESTELLÜBERSICHT • IN BEARBEITUNG"),
-        ...metaBox(datum, "In Bearbeitung", zeitraum),
-        ...tableFrame(PRODUCT_COLS),
-        ...headerCells(PRODUCT_COLS, ["CODE", "ARTIKEL", "MENGE", "GESAMTPREIS"]),
-      ];
-      chunk.forEach((line: OrderSummaryLine, index) => {
-        const y = TABLE_Y + TABLE_H - HEADER_H - (index + 1) * ROW_H + 7;
-        ops.push(
-          ...cellText(PRODUCT_COLS, y, [line.code, line.name, line.quantityLabel, formatUsd(line.totalUsd)]),
-        );
-      });
-      const footerY = TABLE_Y + 8.2;
-      ops.push(
-        ...cellText(
-          PRODUCT_COLS,
-          footerY,
-          ["GESAMT", "", String(lines.reduce((sum, line) => sum + line.quantity, 0) || ""), formatUsd(group?.lines.reduce((sum, line) => sum + line.totalUsd, 0) ?? 0)],
-          8.2,
-        ),
-      );
-      streams.push(contentStream(ops));
-      pageNumber += 1;
-    }
-  }
-  return streams;
-}
-
-function orderPages(summary: ProcessingOrderSummary, startPage: number): string[] {
-  const chunks = chunkRows(summary.personLines, BODY_ROWS);
-  return chunks.map((chunk, index) => {
+  const purchase = summary.chinaPurchase;
+  const chunks = chunkRows(purchase.lines, CHINA_PRODUCT_ROWS_PER_PAGE);
+  return chunks.map((chunk, chunkIndex) => {
+    const pageNumber = startPage + chunkIndex;
+    const isLast = chunkIndex === chunks.length - 1;
     const ops = [
-      ...chrome("BESTELLUNGEN", startPage + index, "WER HAT WAS BESTELLT UND IN WELCHER MENGE"),
-      ...statsBox(String(summary.personCount), String(summary.positionCount), String(summary.personQuantityTotal)),
-      ...tableFrame(ORDER_COLS),
-      ...headerCells(ORDER_COLS, ["NAME", "MENGE", "DOSIS", "ARTIKEL"]),
+      ...chrome(
+        "CHINA BESTELLUNG",
+        pageNumber,
+        "ORIGINALPREISE • KOPIERFREUNDLICHE BESTELLÜBERSICHT",
+      ),
+      ...metaBox(datum, "In Bearbeitung", zeitraum),
+      textAt(CARD_X + 8, CHINA_LIST_TOP + 8, "Alle Bestellungen aggregiert. Originalpreise in USD, ohne Rollen- oder Verkaufsaufschläge.", 7, false, MUTED),
+      ...listPanel(CHINA_LIST_TOP, isLast ? CHINA_FOOTER_TOP + 8 : ORDER_LIST_BOTTOM),
+      textAt(CHINA_COL_CODE, CHINA_LIST_TOP - 14, "PRODUKT CODE", 7.5, true, MUTED),
+      textAt(CHINA_COL_QTY, CHINA_LIST_TOP - 14, "MENGE", 7.5, true, MUTED),
+      textAt(CHINA_COL_PRICE, CHINA_LIST_TOP - 14, "PREIS", 7.5, true, MUTED),
+      textAt(CHINA_COL_TOTAL, CHINA_LIST_TOP - 14, "GESAMTPREIS", 7.5, true, MUTED),
     ];
-    chunk.forEach((line: OrderSummaryPersonLine, row) => {
-      const y = TABLE_Y + TABLE_H - HEADER_H - (row + 1) * ROW_H + 7;
-      ops.push(...cellText(ORDER_COLS, y, [line.name, line.quantityLabel, line.dose, line.article]));
+    chunk.forEach((line: ChinaPurchaseLine, index) => {
+      const y = CHINA_LIST_TOP - 28 - index * CHINA_ROW_H;
+      const prices = formatChinaPurchasePriceCells(line);
+      ops.push(
+        textAt(CHINA_COL_CODE, y, fitText(line.code, 8.5, 100), 8.5, false, CREAM),
+        textAt(CHINA_COL_QTY, y, fitText(line.quantityLabel, 8.5, 120), 8.5, false, CREAM),
+        textAt(CHINA_COL_PRICE, y, fitText(prices.price, 8.5, 115), 8.5, false, CREAM),
+        textAt(CHINA_COL_TOTAL, y, fitText(prices.total, 8.5, 90), 8.5, false, CREAM),
+      );
     });
+    if (isLast) {
+      const footerY = CHINA_FOOTER_TOP;
+      ops.push(
+        rgb(GOLD_STROKE, false),
+        "0.55 w",
+        line(CARD_X, footerY + 52, CARD_X + CARD_W, footerY + 52),
+        textAt(CARD_X + 8, footerY + 36, "GESAMT CHINA BESTELLUNG", 9, true, GOLD_LIGHT),
+        textAt(CARD_X + CARD_W - 8 - fontWidth(formatUsd(purchase.totalUsd), 11, true), footerY + 34, formatUsd(purchase.totalUsd), 11, true, CREAM),
+        textAt(CARD_X + 8, footerY + 16, "MENGENÜBERSICHT", 8, true, MUTED),
+        textAt(CARD_X + 8, footerY + 2, `VERSCHIEDENE PRODUKTE: ${purchase.distinctProducts}`, 8, false, CREAM),
+        textAt(CARD_X + 200, footerY + 2, `KITS: ${purchase.kitCount}`, 8, false, CREAM),
+        textAt(CARD_X + 8, footerY - 12, `PACKUNGEN: ${purchase.packungCount}`, 8, false, CREAM),
+        textAt(CARD_X + 200, footerY - 12, `STÜCK / VIALS: ${purchase.vialCount}`, 8, false, CREAM),
+      );
+    }
     return contentStream(ops);
   });
 }
 
 export function buildPeptixOrderSummaryPdf(summary: ProcessingOrderSummary, exportedAt: string): Uint8Array {
-  const product = productPages(summary, exportedAt, 1);
-  const orders = orderPages(summary, product.length + 1);
-  const merchant = merchantPages(summary, exportedAt, product.length + orders.length + 1);
-  const contents = [...product, ...orders, ...merchant];
+  const orders = orderPages(summary, exportedAt);
+  const china = chinaPages(summary, exportedAt, orders.length + 1);
+  const contents = [...orders, ...china];
   const jpeg = jpegImageXObject(templateLogoJpeg(), 630, 700);
   const pageObjectStart = 6 + contents.length;
   const pageRefs = contents.map((_, index) => `${pageObjectStart + index} 0 R`).join(" ");

@@ -2,6 +2,14 @@
 
 Only material changes. Dates are local project days.
 
+## 2026-09-23 (Bestell-Zusammenfassung PDF — 2 pages)
+
+### Changed
+
+- Admin export `Bestell-Zusammenfassung.pdf`: two pages only — **BESTELLUNGEN** (Nutzername / Produktcode / Menge, dynamic layout) and **CHINA BESTELLUNG** (aggregated by product code, catalog/bulk USD, copy-friendly columns). Removed per-category and Händler table pages. PEPTIX gold template chrome unchanged.
+- `personLines`: one row per processing order line (kit shares stay `5/10 Kit` per participant; no merged `User A + User B` rows).
+- Page 1 stats: **PERSONEN / POSITIONEN / PRODUKTE** (distinct codes on person lines) instead of a mixed-unit **GESAMTMENGE**.
+
 ## 2026-09-21 (Admin bulk ordered kit purge)
 
 ### Added
