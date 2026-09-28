@@ -47,15 +47,13 @@ export function FeedbackCard({
   footer?: ReactNode;
 }) {
   return (
-    <Card className="flex h-full flex-col overflow-hidden bg-card/95">
-      <CardContent className="flex h-full flex-col gap-3 p-5">
+    <Card className="overflow-hidden bg-card/95">
+      <CardContent className="flex flex-col gap-3 p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <StarRating value={item.rating} readOnly />
           {item.is_featured ? <Badge>Hervorgehoben</Badge> : null}
         </div>
-        <p className="flex-1 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-          „{item.body}“
-        </p>
+        <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">„{item.body}“</p>
         {item.image_path ? (
           <FeedbackPhoto path={item.image_path} alt="Bestellfoto des Kunden" priority={priority} />
         ) : null}

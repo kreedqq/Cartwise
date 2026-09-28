@@ -98,7 +98,7 @@ export default function AdminFeedbackPage() {
       ) : null}
       {listQuery.data && items.length === 0 ? <EmptyState title="Keine Bewertungen für diesen Filter." /> : null}
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
         {items.map((row: AdminFeedbackRow) => (
           <FeedbackCard
             key={row.id}

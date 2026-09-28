@@ -194,9 +194,9 @@ export default function FeedbackPage() {
       ) : null}
 
       {feedQuery.isLoading && page === 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 3 }).map((_, index) => (
-            <Skeleton key={index} className="h-64 w-full rounded-xl" />
+            <Skeleton key={index} className="h-48 w-full rounded-xl" />
           ))}
         </div>
       ) : null}
@@ -207,7 +207,7 @@ export default function FeedbackPage() {
         <EmptyState title="Noch keine veröffentlichten Bewertungen." />
       ) : null}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {visibleFeed.map((item, index) => (
           <FeedbackCard key={item.id} item={item} priority={page === 0 && index === 0} />
         ))}

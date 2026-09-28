@@ -317,6 +317,10 @@ describe("optional order feedback", () => {
     expect(page).toContain("image_consent");
     expect(card).toContain("feedbackProvenanceLabel");
     expect(card).toContain("isVerifiedOrderFeedback(item.order_id)");
+    expect(card).toContain('Card className="overflow-hidden bg-card/95"');
+    expect(card).not.toMatch(/CardContent className="[^"]*h-full/);
+    expect(card).not.toMatch(/„\{item\.body\}“[\s\S]*flex-1/);
+    expect(page).toContain("items-start");
     expect(read("src/lib/feedback.ts")).toContain("Verifizierte Bestellung");
     expect(read("src/lib/feedback.ts")).toContain("Allgemeine Bewertung");
     expect(admin).toContain("Keine Bestellung verknüpft");
